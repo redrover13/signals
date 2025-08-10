@@ -3,6 +3,9 @@
   "compilerOptions": {
     "rootDir": ".",
     "baseUrl": ".",
+    "paths": {
+      "@dulce-de-saigon/agents-lib": ["libs/agents/src/index.ts"]
+    },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": true,

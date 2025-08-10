@@ -1,4 +1,4 @@
-name: Nx Monorepo CI
+name: CI
 
 on:
   push:
@@ -7,13 +7,63 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build_and_test:
+    name: Build and Test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Use Node.js 18
+      - name: 'Debug OIDC Token'
+        id: oidc
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const token = await core.getIDToken()
+            const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
+            console.log(JSON.stringify(payload, null, 2))
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/871192566066/locations/global/workloadIdentityPools/github/providers/github'
+          service_account: 'github-actions@saigon-signals.iam.gserviceaccount.com'
+
+      - name: Setup Node.js and PNPM
         uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        id: pnpm-install
+        run: pnpm install --frozen-lockfile
+
+      - name: Security Audit
+        run: pnpm audit --audit-level=moderate
+
+      - name: Secret Scan with TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          base: ${{ github.event.before }}
+          head: ${{ github.sha }}
+
+      - name: Lint Code
+        run: pnpm nx lint
+
+      - name: Build Projects
+        run: pnpm nx build
+
+      - name: Run Tests
+        run: pnpm nx test
+
+      - name: Upload Coverage Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/

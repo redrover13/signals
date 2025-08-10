@@ -9,7 +9,6 @@ dist/
 .idea/
 .vscode/
 *.tsbuildinfo
-pnpm-lock.yaml
 .nx/
 fix-repository-case.bat
 update-provider-no-condition.bat

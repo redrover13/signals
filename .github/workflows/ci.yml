@@ -33,10 +33,13 @@ jobs:
 
       - name: Trufflehog Scan
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: trufflesecurity/trufflehog@main
-        with:
-          base: ${{ github.event.before }}
-          head: ${{ github.sha }}
+        run: |
+          # For a push event, compare against the previous commit (HEAD~1)
+          BASE_COMMIT=$(git rev-parse HEAD~1)
+          HEAD_COMMIT=$(git rev-parse HEAD)
+          echo "Running TruffleHog from $BASE_COMMIT to $HEAD_COMMIT"
+          trufflehog git file://. --since-commit $BASE_COMMIT --branch HEAD --json
+        shell: bash
 
       - name: Upload Coverage Artifact
         uses: actions/upload-artifact@v4

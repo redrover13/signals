@@ -15,3 +15,7 @@ update-provider-no-condition.bat
 
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
+
+
+#Ignore vscode AI rules
+.github\copilot-instructions.md

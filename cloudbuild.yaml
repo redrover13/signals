@@ -1,0 +1,47 @@
+steps:
+# Build and push API
+- name: gcr.io/cloud-builders/docker
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/dulce-api', '.']
+  dir: apps/api
+- name: gcr.io/cloud-builders/docker
+  args: ['push', 'gcr.io/$PROJECT_ID/dulce-api']
+
+# Deploy API
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  entrypoint: gcloud
+  args: ['run', 'deploy', 'dulce-api', '--image', 'gcr.io/$PROJECT_ID/dulce-api',
+         '--platform', 'managed', '--region', 'us-central1',
+         '--service-account', 'dulce-api-sa@$PROJECT_ID.iam.gserviceaccount.com', '--allow-unauthenticated']
+
+# Build and push Web
+- name: gcr.io/cloud-builders/docker
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/dulce-web', '.']
+  dir: apps/web
+- name: gcr.io/cloud-builders/docker
+  args: ['push', 'gcr.io/$PROJECT_ID/dulce-web']
+
+# Deploy Web
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  entrypoint: gcloud
+  args: ['run', 'deploy', 'dulce-web', '--image', 'gcr.io/$PROJECT_ID/dulce-web',
+         '--platform', 'managed', '--region', 'us-central1',
+         '--service-account', 'dulce-web-sa@$PROJECT_ID.iam.gserviceaccount.com', '--allow-unauthenticated']
+
+# Build and push Agents
+- name: gcr.io/cloud-builders/docker
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/agents', '.']
+  dir: apps/agents
+- name: gcr.io/cloud-builders/docker
+  args: ['push', 'gcr.io/$PROJECT_ID/agents']
+
+# Deploy Agents
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  entrypoint: gcloud
+  args: ['run', 'deploy', 'agents', '--image', 'gcr.io/$PROJECT_ID/agents',
+         '--platform', 'managed', '--region', 'us-central1',
+         '--service-account', 'dulce-agents-sa@$PROJECT_ID.iam.gserviceaccount.com']
+
+images:
+- gcr.io/$PROJECT_ID/dulce-api
+- gcr.io/$PROJECT_ID/dulce-web
+- gcr.io/$PROJECT_ID/agents

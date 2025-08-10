@@ -233,7 +233,7 @@ jobs:
         run: pnpm nx graph --file=nx-graph.json
 
       - name: Upload Nx Graph
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nx-dependency-graph
           path: nx-graph.json

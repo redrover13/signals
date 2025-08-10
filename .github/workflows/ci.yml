@@ -1,53 +1,32 @@
-name: CI
+name: Nx Monorepo CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-  build_and_test:
-    name: Build and Test
+  build-and-test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     steps:
-      - name: Checkout Repository
+      - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: 'Debug OIDC Token'
-        id: oidc
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const token = await core.getIDToken()
-            const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString())
-            console.log(JSON.stringify(payload, null, 2))
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: 'projects/871192566066/locations/global/workloadIdentityPools/github/providers/github'
-          service_account: 'github-actions@saigon-signals.iam.gserviceaccount.com'
-
-      - name: Setup Node.js and PNPM
+      - name: Setup Node.js and pnpm
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: 'pnpm'
 
-      - name: Install Dependencies
-        id: pnpm-install
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Security Audit
-        run: pnpm audit --audit-level=moderate
+      - name: Nx build
+        run: pnpm build
 
-      - name: Secret Scan with TruffleHog
+      - name: Nx test
+        run: pnpm test
         uses: trufflesecurity/trufflehog@main
         with:
           base: ${{ github.event.before }}

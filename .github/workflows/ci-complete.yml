@@ -109,6 +109,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+
+      - name: Debug pnpm installation
+        run: |
+          echo "PATH: $PATH"
+          which pnpm || true
+          pnpm --version || true
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 

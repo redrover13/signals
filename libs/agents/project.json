@@ -1,5 +1,5 @@
 {
-  "name": "agents",
+  "name": "agents-lib",
   "sourceRoot": "libs/agents/src",
   "projectType": "library",
   "targets": {

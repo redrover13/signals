@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "engines": {
-    "node": ">=18 <21",
+    "node": ">=18 <21 || >=22",
     "pnpm": ">=8 <9"
   },
   "scripts": {
@@ -15,12 +15,13 @@
     "affected": "nx affected --target=build"
   },
   "devDependencies": {
-    "@nrwl/cli": "18.0.6",
-    "@nrwl/workspace": "18.0.6",
     "nx": "18.0.6",
+    "@nx/workspace": "18.0.6",
     "typescript": "5.4.5",
     "ts-node": "10.9.2",
-    "@types/node": "18.19.34"
+    "@types/node": "18.19.34",
+    "@secretlint/secretlint-rule-preset-recommend": "^8.1.0",
+    "secretlint": "^8.1.0"
   },
   "packageManager": "pnpm@8.15.4"
 }

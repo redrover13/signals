@@ -22,16 +22,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Nx build
-        run: pnpm build
-
-      - name: Nx test
-        run: pnpm test
-        uses: trufflesecurity/trufflehog@main
-        with:
-          base: ${{ github.event.before }}
-          head: ${{ github.sha }}
-
       - name: Lint Code
         run: pnpm nx lint
 
@@ -40,6 +30,13 @@ jobs:
 
       - name: Run Tests
         run: pnpm nx test
+
+      - name: Trufflehog Scan
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: trufflesecurity/trufflehog@main
+        with:
+          base: ${{ github.event.before }}
+          head: ${{ github.sha }}
 
       - name: Upload Coverage Artifact
         uses: actions/upload-artifact@v4

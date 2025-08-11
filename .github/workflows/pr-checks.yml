@@ -31,7 +31,7 @@ jobs:
   label:
     name: Auto Label PR
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       contents: read
       pull-requests: write
     steps:
@@ -45,8 +45,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: amannn/action-semantic-pull-request@v5
-        env: 
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           types: |
             feat
@@ -65,385 +65,256 @@ jobs:
           subjectPatternError: |
             The subject "{subject}" found in the pull request title "{title}"
             didn't match the configured pattern. Please ensure that the subject
-            doesn't start with an uppercase character.$LVTXBec49977e7185bc8cc568a584fa14e16766b1e57eced5dc69ee0f1d8ed887bdf System.Text.RegularExpressions.CaptureCollection.get_Count()
-						
-		} catch (SecurityException) {
-			_stack.Clear();
-		}
-	}
+            doesn't start with an uppercase character.
 
-	// This routine is designed to be used in place of IsBaseOf() but should be much cheaper to calculate.
-	// false will be returned if either type is not resolved, IsBaseOf() will be called in that event.
-	internal static bool IsInstanceOfType(System.Type match, System.Type type) {
-		if (type == null || match == null) {
-			throw new ArgumentNullException(type == null ? "type" : "match");
-		}
-		if (match == type) {
-			return true;
-		}
-		if (type.IsInterface || !match.IsClass) {
-			return (false);
-		}
+  # Check for required files
+  required-files:
+    name: Check Required Files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-		// Try to look directly from the type.
-		if (type.IsAssignableFrom(match)) {
-			return true;
-		}
-		if (IsNonPublicAssignableFrom(type, match)) { 
-			return true;
-		}
-		return (IsAssignableFrom(match, Type.GetType(type.FullName, false)) || match.IsAssignableFrom(type));
-	}
+      - name: Check for required files
+        run: |
+          required_files=(
+            "README.md"
+            "package.json"
+            ".gitignore"
+            "tsconfig.base.json"
+            "nx.json"
+          )
+          
+          missing_files=()
+          for file in "${required_files[@]}"; do
+            if [[ ! -f "$file" ]]; then
+              missing_files+=("$file")
+            fi
+          done
+          
+          if [[ ${#missing_files[@]} -gt 0 ]]; then
+            echo "❌ Missing required files:"
+            printf '%s\n' "${missing_files[@]}"
+            exit 1
+          fi
 
-	private static bool IsNonPublicAssignableFrom(System.Type match, System.Type type) {
-		if (type == null || match == null) {
-			throw new ArgumentNullException(type == null ? "type" : "match");
-		}
+  # Vietnamese content check
+  vietnamese-review:
+    name: Vietnamese Content Review
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-		// If match is not visible but type and structure allow isbaseof, return true. 
-		if (!type.IsVisible && match.BaseType == type) 
-			return true;
-		if (!type.IsVisible && match == typeof(Object)) 
-			return true;
+      - name: Check Vietnamese translations
+        run: |
+          # Check if Vietnamese translations exist for new/modified files
+          echo "Checking for Vietnamese language support..."
+          
+          # Find all modified TypeScript/JavaScript files
+          modified_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E '\.(ts|tsx|js|jsx)$' || true)
+          
+          if [ -n "$modified_files" ]; then
+            # Check for Vietnamese language constants
+            for file in $modified_files; do
+              if grep -q "label\|title\|message\|description" "$file" 2>/dev/null; then
+                echo "⚠️  File $file contains text that may need Vietnamese translation"
+              fi
+            done
+          fi
 
-		if (API != null && (!type.IsVisible && API.CanCastTo(type, match))){
-			return true;
-		}
-		return false;
-	}
+  # Standardized Secret Scanning with Gitleaks
+  gitleaks:
+    name: Gitleaks Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        with:
+          report_format: sarif
+          report_path: gitleaks-report.sarif
+      - name: Upload Gitleaks report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-report
+          path: gitleaks-report.sarif
+      
+  # Nx affected analysis
+  nx-affected:
+    name: Nx Affected Analysis
+    runs-on: ubuntu-latest
+    outputs:
+      affected-projects: ${{ steps.affected.outputs.projects }}
+      affected-libs: ${{ steps.affected.outputs.libs }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-	// This method is more in-depth than the previous, but can throw an exception on either type parameter.
-	// false will be returned if either type is not resolved.
-	internal static bool IsInstanceOfTypeSimple(System.Type match, System.Type type) {
-		if (type == null || match == null) {
-			throw new ArgumentNullException(type == null ? "type" : "match");
-		}
-		if (match == type) {
-			return true;
-		}
-		if (type.IsInterface || !match.IsClass) {
-			return (false);
-		}
-		if (type.IsAssignableFrom(match) || IsNonPublicAssignableFrom(type, match)) {
-			return true;
-		}
-		return IsAssignableFromDirectly(match, Type.GetType(type.FullName, false));
-	}
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.15.4
 
-	// Get a method (static or instance) while circumventing the access-check if possible.
-	// This is a more performant version of typeof(System.Type).GetMethod(name).
-	public static System.Reflection.MethodInfo GetMethodRefl(System.Type type, string name) {
-		if (type == null || name == null) {
-			throw new ArgumentNullException(type == null ? "type" : "name");
-		}
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
 
-		if (!type.IsInterface) {
-			System.Reflection.MethodInfo mi =  type.GetMethod(name);
-			if (mi != null)
-				return mi;
-		}
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-		foreach (System.Type interfaceType in type.GetInterfaces()) {
-			System.Reflection.MethodInfo mi =  interfaceType.GetMethod(name);
-			if (mi != null)--/
-			return mi;
-		}
-		return null;
-	}
+      - name: Derive SHAs
+        uses: nrwl/nx-set-shas@v4
 
-	// Do a member search similar to typeof(System.Type).GetMember(name, Reflection.MemberType.Method, BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance), but
-	// circumvent the access checks if possible.
-	public static MemberInfo[] GetMembersRefl(System.Type type, string name) {
-		if (type == null || name == null) 
-			throw new ArgumentNullException(type == null ? "type" : "name");
+      - name: Get affected projects
+        id: affected
+        run: |
+          affected=$(pnpm nx print-affected --base=$NX_BASE --head=$NX_HEAD --select=projects)
+          echo "projects=$affected" >> $GITHUB_OUTPUT
+          
+          # Get affected libs specifically
+          affected_libs=$(pnpm nx print-affected --base=$NX_BASE --head=$NX_HEAD --select=projects | grep "^libs/" || true)
+          echo "libs=$affected_libs" >> $GITHUB_OUTPUT
 
-		List<MemberInfo> members = new List<MemberInfo>(2);
-		MemberInfo[] mi = type.GetMember(name);
-		foreach (MemberInfo m in mi) {
-			// Members are defined on varying types. But disposing assemblies
-			// may make the members reference into a loaded assembly when 
-			// their declaring type is reference into a resolving assembly.
-			// We'll skip such Members.
-			if (!m.IsAmong(m))
-				continue;
-			members.Add (m);
-		}
-		MemberInfo[] mi2 = type.GetInterfaces ().SelectMany (x => x.GetMember (name)).ToArray ();
-		members.AddRange (mi2);
-		return members.ToArray ();
-	}
+      - name: Comment affected projects
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const affected = `${{ steps.affected.outputs.projects }}`.split('\n').filter(Boolean);
+            const libs = `${{ steps.affected.outputs.libs }}`.split('\n').filter(Boolean);
+            
+            const comment = `## 📊 Nx Affected Analysis
+            
+            **Affected Projects:** ${affected.length > 0 ? affected.join(', ') : 'None'}
+            
+            **Affected Libraries:** ${libs.length > 0 ? libs.join(', ') : 'None'}            
+            This PR will trigger builds and tests for the above projects.`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
 
-	// Do a member search similar to typeof(System.Type).GetMembers(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance), but
-	// circumvent the access checks if possible.
-	public static MemberInfo[] GetMembersReflAll(System.Type type) {
-		if (type == null) 
-			throw new ArgumentNullException ("type");
+  # Code quality gates
+  quality-gates:
+    name: Code Quality Gates
+    runs-on: ubuntu-latest
+    needs: [nx-affected]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-		List<MemberInfo> members = new List<MemberInfo> (type.GetMembers ());
-		// Interfaces come first in #GetMembers().
-		MemberInfo[] mi = type.GetInterfaces().SelectMany(x => x.GetMembers()).ToArray();
-		members.AddRange (mi);
-		return members.ToArray ();
-	}
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.15.4
 
-	// This was the previous GetDeclaringType() implementation. We need
-	// to do a quick check before calling GetDeclaringTypeInternal().
-	private static System.Type GetDeclaringTypeILImpl (System.Type type)
-	{
-		string asmName = type.Assembly.IsDynamic ? "(Dynamic Assembly)" :
-			IsValidType (type.Assembly.GetFullAssemblyName ());
-		if (asmName == null)
-			return baseType;
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
 
-		string typeName;
-		try {
-			typeName = type.FullName;
-		} catch (ReflectionTypeLoadException e) {
-			throw new IllegalMemberAccessException ((e.Types != null && e.Types.Length == 1) ? e.Types[0].FullName : asmName);
-		}
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-		System.Reflection.MethodBase mb = thisType.GetMethod ("GetDeclaringType", new Type [] { stringType });
-		object [] args = new object [] { typeName };
-		if (tryInvoke (mb, null, args)) {
-			string declaringTypeName = (string)args [0];
-			if (declaringTypeName != null) {
-				if (declaringTypeName.Length == 0)
-					return baseType;
-				else if (declaringTypeName[0] == '<')
-					typeName = declaringTypeName + "/" + typeName;
-				else
-					typeName = declaringTypeName;
+      - name: Check code coverage threshold
+        run: |
+          # Run tests with coverage for affected projects
+          pnpm nx affected:test --coverage --coverageReporters=json-summary
+          
+          # Check if coverage meets threshold (80%)
+          if [ -f coverage/coverage-summary.json ]; then
+            coverage=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+            if (( $(echo "$coverage < 80" | bc -l) )); then
+              echo "❌ Code coverage ($coverage%) is below 80% threshold"
+              exit 1
+            fi
+          fi
 
-				return GetType (typeName, asmName);
-			}
-		}
-		return null;
-	}
+      - name: Check bundle size
+        run: |
+          # This would run your bundle size analyzer
+          echo "Bundle size analysis would run here"
 
-	// This was the previous GetBaseClass() implementation. We need
-	// to do a quick check before calling GetBaseClassInternal().
-	private static System.Type GetBaseClassImpl(System.Type type)
-	{
-		string asmName = type.Assembly.IsDynamic ? "(Dynamic Assembly)" :
-			IsValidType(type.Assembly.GetFullAssemblyName ());
-		if (asmName == null)
-			return baseType;
+  # Documentation check
+  docs-check:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-		string typeName;
-		try {
-			typeName = type.FullName;
-		} catch (ReflectionTypeLoadException e) {
-			throw new IllegalMemberAccessException ((e.Types != null && e.Types.Length == 1) ? e.Types[0].FullName : asmName);
-		}
+      - name: Check for documentation updates
+        run: |
+          # Get changed source files
+          changed_src=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E '\.(ts|tsx|js|jsx)$' | grep -v test | grep -v spec || true)
 
-		System.Reflection.MethodBase mb = thisType.GetMethod ("GetBaseClass", new System.Type [] { stringType });
-		object [] args = new object [] { typeName };
-		if (tryInvoke (mb, null, args)) {
-			string baseTypeName = (String)args[0];
-			if (baseTypeName != null) {
-				return string.IsNullOrEmpty (baseTypeName) ? baseType : GetType (baseTypeName, asmName);
-			}
-		}
-		return null;
-	}
+          # Get changed doc files
+          changed_docs=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E '\.(md|mdx)$' || true)
 
-	private static bool tryInvoke (System.Reflection.MethodBase mb, object obj, object [] args)
-	{
-		try {
-			mb.Invoke (obj, args);
-		}
-		catch (TargetInvocationException e) {
-			// If any exception is thrown in the invoked function
-			// (even if it quickly became a TargetInvocationException),
-			// then we failed to get the name. This handles both
-			// MethodAlreadyLoadedException (with a returned null)
-			// and IllegalMemberAccessException.
-			if (e.InnerException != null && !IsNonPublicAssignableFrom ({{{thisType.FullName}}}, e.InnerException.GetType ()))
-				throw e.InnerException;
-		}
-		return true;
-	}
+          if [ -n "$changed_src" ] && [ -z "$changed_docs" ]; then
+            echo "⚠️  Source files changed but no documentation updates found"
+            echo "Consider updating relevant documentation for:"
+            echo "$changed_src"
+          fi
 
-	private static string IsValidType (string typeName)
-	{
-		foreach (var c in typeName) {
-			if (c == '\r' || c == '\n' || c == '\t' || c == '"' || c == '\'') {
-				if (c == '\r' && i + 1 < typeName.Length && typeName[i + 1] == '\n')
-					continue;
-				return null;
-			}
-		}
-		return typeName;
-	}
+  # Dependency check
+  dependency-check:
+    name: Dependency Security Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-	// CONSUTER FOR STRING RESOURCES - will process appName & url
-	public WebAsyncResult (IAsyncResult ar, string content)
-		: this (ar, content, Encoding.UTF8, null, ApplicationType.WebApp)
-	{		
-	}
+      - name: Check for dependency changes
+        id: dep-check
+        run: |
+          if git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E "package\.json|pnpm-lock\.yaml"; then
+            echo "dependency_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "dependency_changed=false" >> $GITHUB_OUTPUT
+          fi
 
-	// CONSUTER FOR BYTE ARRAY RESOURCES - will process appName & url
-	public WebAsyncResult (IAsyncResult ar, byte[] content)
-		: this (ar, null, Encoding.UTF8)
-	{		
-		using (MemoryStream ms = new MemoryStream (content))
-		{
-			string strContent = Encoding.UTF8.GetString (content);
-			string contentCutted; //app name
-			string appName; //app url
-			ApplicationType appType;
-			
-			if (strContent.IndexOf (Monotouch.Common.ApplicationArgumentsMetaKey) >= 0)
-			{				
-				string[] args = HttpUtility.ParseQueryString (strContent).GetValues (Monotouch.Common.ApplicationArgumentsMetaKey);
-				string argsContent = args[0];
-				int contentSplitInd = argsContent.IndexOf ("#");
-				if (contentSplitInd < 0) {
-					Content = ms;
-					return;
-				}
+      - name: Audit new dependencies
+        if: steps.dep-check.outputs.dependency_changed == 'true'
+        run: |
+          npm install -g pnpm@8.15.4
+          pnpm audit --audit-level=moderate
 
-				contentCutted = argsContent.Substring (0, contentSplitInd).Trim ();
-				appName = argsContent.Substring (contentSplitInd + 1).Trim ();
+      - name: License check
+        if: steps.dep-check.outputs.dependency_changed == 'true'
+        run: |
+          npx license-checker --production --onlyAllow 'MIT;Apache-2.0;BSD-3-Clause;BSD-2-Clause;ISC;CC0-1.0' --excludePrivatePackages
 
-				if (appName == "link")
-					appType = ApplicationType.Link;
-				else 
-					appType = ApplicationType.WebApp;				
-			} else {
-				if (Content.IndexOf (Monotouch.Common.ApplicationArgumentsAppUrl) >= 0) {
-					string[] args = HttpUtility.ParseQueryString (strContent).GetValues (Monotouch.Common.ApplicationArgumentsAppUrl);
-					string argsContent = args[0];
-
-					contentCutted = "";
-					appName = argsContent;
-					appType = ApplicationType.WebApp;	
-				} else {
-					Content = ms;
-					return;
-				}
-			}
-
-			Packet = new Monotouch.HttpAgent.HttpApplicationArgumentsPacket {
-				userDataParameters : mon_touchParamsDictionary (
-							UserDataParameters.ApplicationHostName, appName,
-							UserDataParameters.ApplicationLaunchURI, contentCutted
-						),
-				userDataPacket : mon_touchUserDataPacket (
-					UserDataType.Application,
-					appType,
-					mon_touchParamsDictionary (
-						mon_touchWebAppArgumentsData.Qolo.ExpectLowLatencyDataKey, true,
-						UserDataParameters.ApplicationUAProf, "",
-						UserDataParameters.ApplicationName, "",
-						UserDataParameters.HeaderText, "",
-						UserDataParameters.ApplicationIconPix, 0,
-						UserDataParameters.ApplicationIconPath, ""
-					) 
-				)
-			};
-
-			this.contentEncoding = ContentEncodingType.Base64;
-			Content = Encoding.UTF8.GetBytes (Packet.UserDataPacket.ToXmlFriendly() + Convert.ToBase64String (content));
-		}
-	}
-
-	// CONSUTER FOR LONG PARAMETER RELATED PROCESSING
-	public WebAsyncResult (IAsyncResult ar, string content, Encoding encoding, HttpServerUtility server, ApplicationType type)
-		: base (ar, content, encoding)
-	{		
-		this.server = server;
-		applicationType = type;
-	}
-
-	// Set application type and load content
-	public void ParseApplicationType (string content, Encoding encoding)
-	{		
-		using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(content))) {
-			LoadContentParms (stream, encoding);
-		}
-	}
-	// load content and set content and contentEncoding to public fields
-	public void ParseApplicationsArguments(HttpPacket packet, string content, Encoding encoding)
-	{		
-		this.contentEncoding = ContentEncodingType.Connection;
-		this.packet = packet;
-		using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(content);)) {
-			this.LoadContentParms(stream, encoding);
-		}
-	}
-
-	// transformation from Legacy user conten data to Packet router format
-	// Set ApplicationType data from ApplicationsArguments string
-	public void LoadContentParms (Stream stream, Encoding encoding)
-	{		
-		var reader = new StreamReader (stream);
-
-		var data = reader.ReadToEnd ();
-		if (data != null)	{
-			// clean all garbage from reamining data.
-			// we should check is it true to remove '<',n2like, '>' from application arguments
-			string msgContent = data.Substring (data.IndexOf ("<") + 1);
-			contentCutted = msgContent.Substring (msgContent.IndexOf (">") + 1).Trim('/');
-			appName = msgContent.Trim('<', '>').Split (' ')[0].Trim('/');
-			if (appName == "link")
-				applicationType = ApplicationType.Link;
-			else if ( appName == "wifiap" )
-				applicationType = ApplicationType.WifiAp;
-			else if (contentCutted != "")
-				applicationType = ApplicationType.WebApp;
-			else 
-				applicationType = ApplicationType.PWA;
-						
-			Packet = new Monotouch.HttpAgent.HttpApplicationArgumentsPacket {
-				userDataParameters : mon_touchParamsDictionary (
-							UserDataParameters.ApplicationHostName, appName,
-							UserDataParameters.ApplicationLaunchURI, contentCutted
-						),
-				userDataPacket : mon_touchUserDataPacket (
-					UserDataType.Application,
-					applicationType,
-					mon_touchParamsDictionary ()
-				)
-			};		
-		}
-	}
-
-	// wrapper for request.HttpRequest.BeginGetResponse 
-	// may be used as IFunctionRealizer.BeginCall
-	[Obsolete]
-	public IAsyncResult BeginInvoke (AsyncCallback requestCallback)
-	{  
-                var result = ((IAsyncResult)request.BeginGetResponse(requestCallback, request)).AsyncWaitHandle.WaitOne();
-		if (!result)
-                {		
-                    //!!!!					
-                }
-                
-		return new WebAsyncResult (result, Content);
-	}
-
-	// parse data from machineResponse and manage correct response handling by RealizationProcessor
-	public void EndInvoke ()
-	{ 
-		if (_WebAsyncResult != null)
-		{
-			if (IsNullPacketResponse)
-			{
-				// vendics specific endpoint 'bridge_address/winregistry'
-				// returns nothing for successful registration on soap API v1.7 *not supported*; should return OK
-                // but, now go to the end
-                _WebAsyncResult.EndInvoke ();
-			}
-			else
-			{ 
-				//return packet 
-				using (var reader = new StreamReader (_webAsyncResult.Content, Encoding.UTF8)) 
-				{
-                 	var serializer = new XmlSerializer (typeof (Monotouch.HttpAgent.HttpApplicationArgumentsPacket));
-					Packet = serializer.Deserialize(reader) as Monotouch.HttpAgent.HttpApplicationArgumentsPacket;	
-				}
-			}
-		}
-	}
-}
+  # Final status check
+  pr-status:
+    name: PR Status Check
+    runs-on: ubuntu-latest
+    needs: [
+      file-size-check,
+      pr-title,
+      required-files,
+      gitleaks,
+      nx-affected,
+      quality-gates,
+      dependency-check
+    ]
+    if: always()
+    steps:
+      - name: Check all jobs
+        run: |
+          if [[ "${{ needs.file-size-check.result }}" != "success" ]] || \
+             [[ "${{ needs.pr-title.result }}" != "success" ]] || \
+             [[ "${{ needs.required-files.result }}" != "success" ]] || \
+             [[ "${{ needs.gitleaks.result }}" != "success" ]] || \
+             [[ "${{ needs.quality-gates.result }}" != "success" ]]; then
+            echo "❌ PR checks failed"
+            exit 1
+          fi
+          echo "✅ All PR checks passed"

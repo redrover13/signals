@@ -1,224 +1,144 @@
-# Dulce de Saigon - F&B Data Platform
+# Dulce de Saigon F&B Data Platform (`saigon-signals`)
 
-> Enterprise-grade Nx monorepo for Dulce de Saigon's data-driven F&B platform in Vietnam 🇻🇳
+Welcome to the `saigon-signals` repository, the core of the **Dulce de Saigon F&B Data Platform**. This project is a comprehensive, cloud-native data platform designed to capture, process, and analyze food and beverage data, specifically tailored for the Vietnamese market context.
 
-## 🚀 Overview
+This monorepo, managed with [Nx](https://nx.dev/), contains all the necessary applications, libraries, and infrastructure configurations to run the platform on Google Cloud Platform (GCP).
 
-This repository contains the complete infrastructure and applications for Dulce de Saigon, a real-time data analytics and automation platform designed specifically for the Vietnamese F&B market.
+## Architecture Overview
 
-### Key Features
-
-- **Real-time Analytics**: Track customer behavior, sales, and inventory in real-time
-- **AI-Powered Insights**: Leverage Vertex AI for business intelligence and automation
-- **Multi-channel Integration**: Connect with POS systems, delivery platforms, and social media
-- **Compliance-Ready**: Built with Vietnamese data privacy laws in mind
-- **Cost-Optimized**: Maximizes Google Cloud free-tier resources
-
-## 🏗️ Architecture
-
-### Core Components
-
-- **Framework**: Nx Monorepo with PNPM workspace
-- **Language**: TypeScript (Google Style Guide)
-- **Cloud**: Google Cloud Platform (asia-southeast1)
-- **CI/CD**: GitHub Actions with Workload Identity Federation
-- **Security**: Multi-layer scanning (TruffleHog, Secretlint, GitGuardian)
-
-### System Architecture
+The platform is built on an event-driven, serverless architecture to ensure scalability, reliability, and cost-effectiveness.
 
 ```mermaid
-flowchart TD
-    A[Web Client] -->|API Calls| B[API Service]
-    B -->|Pub/Sub| C[PUB/SUB TOPICS]
-    C --> D[INGEST WORKER]
-    D --> E[BIGQUERY]
-    C --> F[AGENTS WORKER]
-    F --> E
-    G[CLOUD STORAGE] --> H[BACKUP]
-    I[EXTERNAL SYSTEMS] --> B
-    J[VERTEX AI] --> F
-    
-    subgraph GCP
-        B
-        C
-        D
-        E
-        F
-        G
-        H
+graph TD
+    subgraph "Data Sources"
+        A[POS Systems]
+        B[Mobile Apps]
+        C[Inventory Systems]
     end
-    
-    subgraph CLIENTS
-        A
-        I
+
+    subgraph "GCP Infrastructure (Managed by Terraform)"
+        A & B & C --> D[API Gateway];
+        D --> E[Pub/Sub: raw_events];
+        E --> F[Cloud Function: event-parser];
+        F --> G[Pub/Sub: dulce.agents];
+        G --> H[Cloud Run: agents];
+        H --> I[BigQuery: dulce.agent_runs];
+        H --> J[Other GCP Services];
     end
-    
-    subgraph AI
-        J
-    end
+
+    style F fill:#f9f,stroke:#333,stroke-width:2px
+    style H fill:#f9f,stroke:#333,stroke-width:2px
+    style I fill:#bbf,stroke:#333,stroke-width:2px
 ```
 
-### Data Flow
+### Key Components:
 
-1. **Web Client** sends events to the **API Service**
-2. **API Service** publishes events to **Pub/Sub Topics**
-3. **Ingest Worker** consumes events and writes to **BigQuery**
-4. **Agents Worker** processes complex tasks using **Vertex AI**
-5. **External Systems** can also send data through the API
-6. **Cloud Storage** provides backup and file storage
+-   **`event-parser` (Cloud Function)**: A serverless function that triggers on new messages in a Pub/Sub topic. It validates, standardizes, and enriches raw incoming data before publishing it to the `dulce.agents` topic for further processing.
+-   **`agents` (Cloud Run Service)**: A containerized application that consumes messages from the `dulce.agents` topic. It runs various data processing agents (e.g., for analytics, machine learning, or operational tasks) and logs the results of each run to the `dulce.agent_runs` table in BigQuery.
+-   **`dulce.agents` (Pub/Sub Topic)**: A central message bus for distributing standardized events to the `agents` service.
+-   **`dulce.agent_runs` (BigQuery Table)**: A data warehouse table that serves as an immutable log of all agent activities, providing a clear audit trail and data source for analytics.
+-   **Infrastructure as Code (Terraform)**: All GCP resources (Pub/Sub topics, BigQuery tables, Cloud Run services, Cloud Functions, IAM policies, etc.) are defined and managed using [Terraform](https://www.terraform.io/) in the [`infra/terraform`](./infra/terraform) directory.
+-   **Nx Monorepo**: The entire project is structured as a monorepo using [Nx](https://nx.dev), which helps manage shared dependencies, streamline build processes, and maintain a consistent development environment.
 
-## 📦 Project Structure
-
-```
-apps/
-├── agents/      # AI-powered business intelligence agents
-├── api/         # RESTful API backend
-└── web/         # Customer-facing web application
-
-libs/
-├── agents/      # Shared agent utilities and tools
-└── gcp/         # Google Cloud Platform integrations
-
-infra/
-└── terraform/  # Infrastructure as Code
-
-docs/
-├── AGENTS_WORKFLOW_GUIDE.md
-├── DEPLOY_CHECKLIST.md
-├── WIF_SETUP_GUIDE.md
-└── CRITICAL_IMPROVEMENTS.md
-```
-
-## 🔧 Setup & Installation
+## Setup and Installation
 
 ### Prerequisites
 
-- Node.js 18, 20, or 22
-- PNPM 8.x
-- Google Cloud SDK
-- Git
+Before you begin, ensure you have the following installed:
+*   [Node.js](https://nodejs.org/) (v18 or higher, as defined in `.nvmrc`)
+*   [pnpm](https://pnpm.io/installation)
+*   [Google Cloud SDK](https://cloud.google.com/sdk/docs/install)
 
-### Quick Start
+### Installation Steps
 
-```bash
-# Clone the repository
-git clone https://github.com/redrover13/signals.git
-cd signals
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-org/saigon-signals.git
+    cd saigon-signals
+    ```
 
-# Install dependencies
-pnpm install
+2.  **Install dependencies:**
+    This project uses `pnpm` for package management.
+    ```bash
+    pnpm install
+    ```
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your configuration
+## Environment Variables
 
-# Run development server
-nx serve api
-```
-
-### Environment Variables
-
-Create a `.env` file with the following variables:
+Create a `.env` file in the root of the repository and add the following variables. These are essential for connecting to GCP services during local development and testing.
 
 ```env
-NODE_ENV=development
-PORT=3000
-GCP_PROJECT_ID=your-gcp-project-id
-BQ_DATASET=dulce
-PUBSUB_TOPIC=dulce.events
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/dulce
-LOG_LEVEL=info
+# .env
+
+# Google Cloud Platform Configuration
+GCP_PROJECT_ID="saigon-signals"
+GCP_REGION="asia-southeast1" # Or your preferred region
+
+# Name of the GCS bucket for Terraform state
+TF_STATE_BUCKET="saigon-signals-tf-state"
+
+# Add any other secrets or environment-specific variables here
+# Example:
+# DATABASE_URL="your-database-connection-string"
 ```
 
-## 🚦 CI/CD Pipeline
+-   `GCP_PROJECT_ID`: Your Google Cloud project ID.
+-   `GCP_REGION`: The GCP region where resources will be deployed.
+-   `TF_STATE_BUCKET`: The GCS bucket used for storing the Terraform remote state.
 
-Our automated pipeline includes:
+## Running Locally
 
-1. **Security Scanning**: Automated secret detection on every commit
-2. **Multi-version Testing**: Tests on Node 18, 20, and 22
-3. **Smart Builds**: Nx affected commands build only changed projects
-4. **Gradual Deployment**: 10% → 50% → 100% traffic migration
-5. **Regional Deployment**: Optimized for Vietnam (asia-southeast1)
+You can run the different applications within the monorepo using Nx commands.
 
-## 🔐 Security & Compliance
+-   **Run the `agents` service:**
+    ```bash
+    npx nx serve agents
+    ```
+-   **Run the `api` service:**
+    ```bash
+    npx nx serve api
+    ```
 
-### Security Features
+## Running Tests
 
-- **Workload Identity Federation** for keyless GCP authentication
-- **Pre-commit hooks** with secret scanning
-- **Encrypted secrets management** using Google Secret Manager
-- **Least privilege principle** for all service accounts
-
-### Vietnamese Compliance
-
-- **Data Localization**: All customer data stored in Vietnam region
-- **Privacy Protection**: Compliant with Vietnamese data privacy laws
-- **Audit Trails**: Complete logging for all data access
-
-## 📝 Documentation
-
-- [Agents Workflow Guide](docs/AGENTS_WORKFLOW_GUIDE.md) - Detailed guide on agent development
-- [Deployment Checklist](docs/DEPLOY_CHECKLIST.md) - Step-by-step deployment instructions
-- [WIF Setup Guide](docs/WIF_SETUP_GUIDE.md) - Workload Identity Federation setup
-- [Critical Improvements](docs/CRITICAL_IMPROVEMENTS.md) - Important updates and fixes
-
-## 🧪 Testing
-
+### Unit Tests
+To run unit tests for a specific application or library:
 ```bash
-# Run all tests
-nx run-many --target=test
+# Test the 'agents' application
+npx nx test agents
 
-# Run tests for affected projects
-nx affected:test
-
-# Run e2e tests
-nx e2e web-e2e
+# Test the 'gcp' library
+npx nx test gcp
 ```
 
-## 🚀 Deployment
+### End-to-End (E2E) Tests
+The E2E test suite validates the entire data processing workflow, from publishing a message to a Pub/Sub topic to verifying the data in BigQuery.
 
-Deployments are automated via GitHub Actions when pushing to main:
-
+To run the E2E tests, execute the following script:
 ```bash
-git add .
-git commit -m "feat: your feature description"
-git push origin main
+python tests/e2e_workflow.py
 ```
+*Note: Ensure your local environment is authenticated with GCP (`gcloud auth application-default login`) before running the E2E tests.*
 
-The pipeline will:
-1. Run security scans
-2. Execute tests
-3. Build affected projects
-4. Deploy to Google Cloud Run
+## Deployment (CI/CD)
 
-## 📊 Monitoring
+Deployment is automated using **Google Cloud Build** and is defined in the [`cloudbuild.yaml`](./cloudbuild.yaml) file at the root of the repository.
 
-- **Logs**: Google Cloud Logging
-- **Metrics**: Google Cloud Monitoring
-- **Alerts**: Configured for critical issues
+### CI/CD Process:
 
-## 🤝 Contributing
+1.  **Trigger**: The Cloud Build pipeline is automatically triggered on every push to the `main` branch.
+2.  **Build**: Docker images for the `agents` and other services are built and pushed to the Google Artifact Registry.
+3.  **Test**: Unit tests are executed to ensure code quality and correctness.
+4.  **Deploy**:
+    *   The `event-parser` Cloud Function is deployed.
+    *   The `agents` service is deployed to Cloud Run.
+    *   Terraform is used to apply any infrastructure changes.
 
-1. Create a feature branch
-2. Make your changes
-3. Ensure tests pass
-4. Submit a pull request
+This automated process ensures that every change pushed to the main branch is built, tested, and deployed consistently and reliably.
 
-## 🌏 Vietnamese Localization
+## Compliance and Vietnamese Market Context
 
-This platform is designed specifically for the Vietnamese F&B market with:
+This platform is architected with a strong focus on compliance and cultural relevance for the Vietnamese market.
 
-- **Local Currency Support**: VND integration
-- **Vietnamese Language UI**: Full localization
-- **Cultural Adaptation**: Menu planning and marketing aligned with Vietnamese preferences
-- **Regional Compliance**: Adherence to Vietnamese business regulations
-
-## 📄 License
-
-Proprietary - Dulce de Saigon © 2024
-
----
-
-## Pipeline Simulation
-
-This project includes automated testing and deployment pipelines. Every commit triggers the full CI/CD workflow.
+-   **Data Compliance**: Adheres to Vietnam's Personal Data Protection Law (PDPL), including data localization requirements. All data is processed and stored in the `asia-southeast1` GCP region.
+-   **Market Fit**: Data models and processing logic are designed to accommodate the unique characteristics of the Vietnamese F&B industry, from currency (VND) and payment methods to local dining habits.

@@ -16,7 +16,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
  *                 status:
  *                   type: string
  */
-export default async function (fastify: FastifyInstance) {
+export async function healthRoutes(fastify: FastifyInstance) {
   fastify.get(
     "/",
     async function (_request: FastifyRequest, reply: FastifyReply) {

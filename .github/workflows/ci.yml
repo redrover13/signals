@@ -38,7 +38,7 @@ jobs:
 
       - name: Install TruffleHog
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: pip install trufflehog
+        run: pip install trufflehog==2.10.0
 
       - name: Trufflehog Scan
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

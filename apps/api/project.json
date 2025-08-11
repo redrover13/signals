@@ -1,0 +1,33 @@
+{
+  "name": "api",
+  "sourceRoot": "apps/api/src",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node dist/apps/api/main.js",
+        "dependsOn": ["build"]
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+  "command": "tsc -p apps/api/tsconfig.json && node -e 'require(\"fs\").cpSync(\"apps/api/src/routes\", \"dist/apps/api/routes\", { recursive: true })'"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'lint placeholder'",
+        "cwd": "apps/api"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'test placeholder'"
+      }
+    }
+  }
+}

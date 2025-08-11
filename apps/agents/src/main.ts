@@ -1,29 +1,26 @@
+import Fastify from "fastify";
+import { runAgent } from "@dulce-de-saigon/agents-lib";
+import { agentsRoutes } from "../../api/src/routes/agents";
+import health from "../../api/src/routes/health";
+
+const fastify = Fastify({
+  logger: true,
+});
+
+console.log('AGENT LIB', runAgent);
+
+fastify.register(health);
+fastify.register(agentsRoutes);
+
 /**
- * Agents worker — Cloud Run service.
- * Subscribes to dulce.agents Pub/Sub topic.
- * Not deployed or enabled until you're ready.
+ * Run the server!
  */
-
-import { runAgent } from "@dulce/agents";
-
-async function handleMessage(message: any) {
-  console.log("Received agent task:", message);
-  // Example: call runAgent with dummy config
-  const output = await runAgent(message.task || "default task", {
-    tools: {},
-    complete: async (prompt) => `Echo: ${prompt}`
-  });
-  console.log("Agent output:", output);
-}
-
-export async function start() {
-  console.log("Agents service starting (placeholder)");
-  // Here you'd wire Pub/Sub subscription logic
-}
-
-if (require.main === module) {
-  start().catch(err => {
-    console.error(err);
+const start = async () => {
+  try {
+    await fastify.listen({ port: 3000 });
+  } catch (err) {
+    fastify.log.error(err);
     process.exit(1);
-  });
-}
+  }
+};
+start();

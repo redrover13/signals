@@ -1,1 +1,1 @@
-project_id = "saigon-signals"
+gcp_project_id = "saigon-signals"

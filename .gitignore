@@ -17,8 +17,3 @@ update-provider-no-condition.bat
 .github/instructions/nx.instructions.md
 
 
-#Ignore vscode AI rules
-.github/copilot-instructions.md
-
-# dbt credentials
-adk/services/analytics/dbt/profiles.yml

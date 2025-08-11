@@ -1,6 +1,6 @@
 # Enable the Secret Manager API
 resource "google_project_service" "secretmanager" {
-  project                    = var.project_id
+  project                    = var.gcp_project_id
   service                    = "secretmanager.googleapis.com"
   disable_on_destroy         = false
   disable_dependent_services = true
@@ -8,7 +8,7 @@ resource "google_project_service" "secretmanager" {
 
 # Create the secret for the Dulce API Key
 resource "google_secret_manager_secret" "dulce_api_key" {
-  project = var.project_id
+  project = var.gcp_project_id
   secret_id = "DULCE_API_KEY"
 
   replication {

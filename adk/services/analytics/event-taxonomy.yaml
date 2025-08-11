@@ -1,0 +1,55 @@
+# GA4 Foundational Event Taxonomy
+# Part of the Analytics Service within the Agent Developer Kit (ADK)
+
+events:
+  - name: page_view
+    description: "Fires when a user views a page. This is often collected automatically."
+    parameters:
+      - name: page_location
+        description: "The URL of the page (e.g., https://www.example.com/page-path)."
+      - name: page_title
+        description: "The title of the page."
+      - name: page_path
+        description: "The path portion of the URL (e.g., /page-path)."
+
+  - name: login
+    description: "Fires when a user successfully logs in."
+    parameters:
+      - name: method
+        description: "The method used for login (e.g., 'google', 'email', 'github')."
+      - name: user_id
+        description: "The persistent, non-PII user identifier."
+
+  - name: sign_up
+    description: "Fires when a user successfully creates a new account."
+    parameters:
+      - name: method
+        description: "The method used for sign-up (e.g., 'google', 'email', 'github')."
+      - name: user_id
+        description: "The persistent, non-PII user identifier created upon sign-up."
+
+  - name: purchase
+    description: "Fires when a user completes a purchase."
+    parameters:
+      - name: transaction_id
+        description: "A unique identifier for the transaction."
+      - name: value
+        description: "The total value of the purchase."
+      - name: currency
+        description: "The currency of the transaction (e.g., 'USD')."
+      - name: items
+        description: "An array of items purchased."
+      - name: tax
+        description: "The tax amount for the transaction."
+      - name: shipping
+        description: "The shipping cost for the transaction."
+
+  - name: form_submission
+    description: "Fires when a user submits a form."
+    parameters:
+      - name: form_id
+        description: "A unique identifier for the form that was submitted."
+      - name: form_name
+        description: "A human-readable name for the form (e.g., 'Contact Us', 'Newsletter Signup')."
+      - name: form_destination
+        description: "The URL the form was submitted to."

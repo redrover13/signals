@@ -12,29 +12,34 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Setup pnpm
+      - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 8.15.4
-
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Derive SHAs
+        uses: nrwl/nx-set-shas@v4
+
       - name: Lint Code
-        run: pnpm nx lint
+        run: pnpm nx affected:lint --base=$NX_BASE --head=$NX_HEAD
 
       - name: Build Projects
-        run: pnpm nx build
+        run: pnpm nx affected:build --base=$NX_BASE --head=$NX_HEAD
 
       - name: Run Tests
-        run: pnpm nx test
+        run: pnpm nx affected:test --base=$NX_BASE --head=$NX_HEAD
 
       - name: Upload Coverage Artifact
         uses: actions/upload-artifact@v4
@@ -111,3 +116,4 @@ jobs:
           terraform init
           terraform workspace select production || terraform workspace new production
           terraform apply -auto-approve -var-file="prod.auto.tfvars"
+

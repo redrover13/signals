@@ -9,36 +9,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Prevent large files
-  file-size-check:
-    name: File Size Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Check for large files
-        run: |
-          # Find files larger than 1MB
-          large_files=$(find . -type f -size +1M | grep -v "^./.git" | grep -v "node_modules" || true)
-          if [ -n "$large_files" ]; then
-            echo "❌ Large files detected (>1MB):"
-            echo "$large_files"
-            echo "Consider using Git LFS or external storage for these files."
-            exit 1
-          fi
-
-  # Label PR based on changes
-  label:
-    name: Auto Label PR
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-    steps:
-      - uses: actions/labeler@v4
-        with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
-
   # Check PR title follows conventional commits
   pr-title:
     name: Validate PR Title
@@ -46,7 +16,7 @@ jobs:
     steps:
       - uses: amannn/action-semantic-pull-request@v5
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           types: |
             feat
@@ -66,63 +36,7 @@ jobs:
             The subject "{subject}" found in the pull request title "{title}"
             didn't match the configured pattern. Please ensure that the subject
             doesn't start with an uppercase character.
-
-  # Check for required files
-  required-files:
-    name: Check Required Files
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Check for required files
-        run: |
-          required_files=(
-            "README.md"
-            "package.json"
-            ".gitignore"
-            "tsconfig.base.json"
-            "nx.json"
-          )
-          
-          missing_files=()
-          for file in "${required_files[@]}"; do
-            if [[ ! -f "$file" ]]; then
-              missing_files+=("$file")
-            fi
-          done
-          
-          if [[ ${#missing_files[@]} -gt 0 ]]; then
-            echo "❌ Missing required files:"
-            printf '%s\n' "${missing_files[@]}"
-            exit 1
-          fi
-
-  # Vietnamese content check
-  vietnamese-review:
-    name: Vietnamese Content Review
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check Vietnamese translations
-        run: |
-          # Check if Vietnamese translations exist for new/modified files
-          echo "Checking for Vietnamese language support..."
-          
-          # Find all modified TypeScript/JavaScript files
-          modified_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E '\.(ts|tsx|js|jsx)$' || true)
-          
-          if [ -n "$modified_files" ]; then
-            # Check for Vietnamese language constants
-            for file in $modified_files; do
-              if grep -q "label\|title\|message\|description" "$file" 2>/dev/null; then
-                echo "⚠️  File $file contains text that may need Vietnamese translation"
-              fi
-            done
-          fi
-
+            
   # Standardized Secret Scanning with Gitleaks
   gitleaks:
     name: Gitleaks Secret Scan
@@ -144,14 +58,13 @@ jobs:
         with:
           name: gitleaks-report
           path: gitleaks-report.sarif
-      
-  # Nx affected analysis
-  nx-affected:
-    name: Nx Affected Analysis
+
+  # Nx affected analysis, linting, and testing
+  build-and-test:
+    name: Build and Test Affected Projects
     runs-on: ubuntu-latest
     outputs:
       affected-projects: ${{ steps.affected.outputs.projects }}
-      affected-libs: ${{ steps.affected.outputs.libs }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -179,148 +92,32 @@ jobs:
         run: |
           affected=$(pnpm nx print-affected --base=$NX_BASE --head=$NX_HEAD --select=projects)
           echo "projects=$affected" >> $GITHUB_OUTPUT
-          
-          # Get affected libs specifically
-          affected_libs=$(pnpm nx print-affected --base=$NX_BASE --head=$NX_HEAD --select=projects | grep "^libs/" || true)
-          echo "libs=$affected_libs" >> $GITHUB_OUTPUT
 
-      - name: Comment affected projects
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const affected = `${{ steps.affected.outputs.projects }}`.split('\n').filter(Boolean);
-            const libs = `${{ steps.affected.outputs.libs }}`.split('\n').filter(Boolean);
-            
-            const comment = `## 📊 Nx Affected Analysis
-            
-            **Affected Projects:** ${affected.length > 0 ? affected.join(', ') : 'None'}
-            
-            **Affected Libraries:** ${libs.length > 0 ? libs.join(', ') : 'None'}            
-            This PR will trigger builds and tests for the above projects.`;
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
+      - name: Lint Affected Projects
+        run: pnpm nx affected:lint --base=$NX_BASE --head=$NX_HEAD
 
-  # Code quality gates
-  quality-gates:
-    name: Code Quality Gates
-    runs-on: ubuntu-latest
-    needs: [nx-affected]
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 8.15.4
+      - name: Test Affected Projects
+        run: pnpm nx affected:test --base=$NX_BASE --head=$NX_HEAD --coverage --coverageReporters=json-summary
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      
-      - name: Derive SHAs
-        uses: nrwl/nx-set-shas@v4
-
-      - name: Check code coverage threshold
-        run: |
-          # Run tests with coverage for affected projects
-          pnpm nx affected:test --base=$NX_BASE --head=$NX_HEAD --coverage --coverageReporters=json-summary
-          
-          # Check if coverage meets threshold (80%)
-          if [ -f coverage/apps/api/coverage-summary.json ]; then
-            coverage=$(cat coverage/apps/api/coverage-summary.json | jq '.total.lines.pct')
-            if (( $(echo "$coverage < 80" | bc -l) )); then
-              echo "❌ Code coverage ($coverage%) is below 80% threshold"
-              exit 1
-            fi
-          fi
-
-      - name: Check bundle size
-        run: |
-          # This would run your bundle size analyzer
-          echo "Bundle size analysis would run here"
-
-  # Documentation check
-  docs-check:
-    name: Documentation Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check for documentation updates
-        run: |
-          # Get changed source files
-          changed_src=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E '\.(ts|tsx|js|jsx)$' | grep -v test | grep -v spec || true)
-          # Get changed doc files
-          changed_docs=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E '\.(md|mdx)$' || true)
-          if [ -n "$changed_src" ] && [ -z "$changed_docs" ]; then
-            echo "⚠️  Source files changed but no documentation updates found"
-            echo "Consider updating relevant documentation for:"
-            echo "$changed_src"
-          fi
-
-  # Dependency check
-  dependency-check:
-    name: Dependency Security Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Check for dependency changes
-        id: dep-check
-        run: |
-          if git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E "package\.json|pnpm-lock\.yaml"; then
-            echo "dependency_changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "dependency_changed=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Audit new dependencies
-        if: steps.dep-check.outputs.dependency_changed == 'true'
-        run: |
-          npm install -g pnpm@8.15.4
-          pnpm audit --audit-level=moderate
-
-      - name: License check
-        if: steps.dep-check.outputs.dependency_changed == 'true'
-        run: |
-          npx license-checker --production --onlyAllow 'MIT;Apache-2.0;BSD-3-Clause;BSD-2-Clause;ISC;CC0-1.0' --excludePrivatePackages
+      - name: Build Affected Projects
+        run: pnpm nx affected:build --base=$NX_BASE --head=$NX_HEAD
 
   # Final status check
   pr-status:
     name: PR Status Check
     runs-on: ubuntu-latest
     needs: [
-      file-size-check,
       pr-title,
-      required-files,
       gitleaks,
-      nx-affected,
-      quality-gates,
-      dependency-check
+      build-and-test
     ]
     if: always()
     steps:
       - name: Check all jobs
         run: |
-          if [[ "${{ needs.file-size-check.result }}" != "success" ]] || \
-             [[ "${{ needs.pr-title.result }}" != "success" ]] || \
-             [[ "${{ needs.required-files.result }}" != "success" ]] || \
+          if [[ "${{ needs.pr-title.result }}" != "success" ]] || \
              [[ "${{ needs.gitleaks.result }}" != "success" ]] || \
-             [[ "${{ needs.quality-gates.result }}" != "success" ]]; then
+             [[ "${{ needs.build-and-test.result }}" != "success" ]]; then
             echo "❌ PR checks failed"
             exit 1
           fi

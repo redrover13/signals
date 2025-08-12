@@ -81,8 +81,53 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # Diagnostic: Check for pnpm-lock.yaml and pnpm-workspace.yaml
+      - name: Check for pnpm-lock.yaml and pnpm-workspace.yaml
+        run: |
+          echo "Checking for pnpm-lock.yaml and pnpm-workspace.yaml in $PWD"
+          ls -l pnpm-lock.yaml pnpm-workspace.yaml || (echo "Missing lockfile or workspace file!" && exit 1)
+
+      # Diagnostic: Print working directory and list files
+      - name: Print working directory and list files
+        run: |
+          pwd
+          ls -al
+
+      # Diagnostic: Print pnpm config and workspace info
+      - name: Print pnpm config and workspace info
+        run: |
+          pnpm config list
+          pnpm workspaces list || true
+
+      # Diagnostic: Run pnpm doctor
+      - name: Run pnpm doctor
+        run: pnpm doctor || true
+
+        # Diagnostic: Check for pnpm-lock.yaml and pnpm-workspace.yaml
+        - name: Check for pnpm-lock.yaml and pnpm-workspace.yaml
+          run: |
+            echo "Checking for pnpm-lock.yaml and pnpm-workspace.yaml in $PWD"
+            ls -l pnpm-lock.yaml pnpm-workspace.yaml || (echo "Missing lockfile or workspace file!" && exit 1)
+
+        # Diagnostic: Print working directory and list files
+        - name: Print working directory and list files
+          run: |
+            pwd
+            ls -al
+
+        # Diagnostic: Print pnpm config and workspace info
+        - name: Print pnpm config and workspace info
+          run: |
+            pnpm config list
+            pnpm workspaces list || true
+
+        # Diagnostic: Run pnpm doctor
+        - name: Run pnpm doctor
+          run: pnpm doctor || true
 
       - name: Derive SHAs
         uses: nrwl/nx-set-shas@v4

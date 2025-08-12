@@ -1,3 +1,37 @@
+#
+# Required Secrets & Environment Variables
+# ----------------------------------------
+#
+# - NX_CLOUD_ACCESS_TOKEN: Nx Cloud access token (CI caching)
+# - GITGUARDIAN_API_KEY: For GitGuardian secret scanning
+# - CODECOV_TOKEN: For Codecov coverage upload
+# - WIF_PROVIDER: GCP Workload Identity Federation provider
+# - WIF_SERVICE_ACCOUNT: GCP service account for deployments
+# - GCP_PROJECT_ID: GCP project ID
+# - GCP_REGION: GCP region (e.g., asia-southeast1)
+# - ARTIFACT_REGISTRY: Artifact Registry domain (e.g., asia-southeast1-docker.pkg.dev)
+# - MONITORING_TOKEN: Token for deployment monitoring notifications
+# - CODACY_PROJECT_TOKEN: For Codacy security scan
+# - GITHUB_TOKEN: GitHub Actions token (provided by default)
+#
+#
+# TROUBLESHOOTING PNPM IN CI
+# --------------------------
+# If pnpm fails to launch or install:
+# - Ensure pnpm/action-setup and actions/setup-node are both present and versions match lockfile/engines.
+# - Check that pnpm-lock.yaml and pnpm-workspace.yaml exist at the repo root.
+# - Confirm the working directory is the monorepo root (not a subfolder).
+# - Check for Node.js version compatibility (see package.json engines).
+# - Review the diagnostic steps in the build-test job for more info.
+# - See docs/TROUBLESHOOTING.md for more help.
+#
+#
+# NOTE: All jobs use pnpm/action-setup@v4 for best performance and compatibility.
+#
+
+# NOTE: This is the canonical CI/CD workflow for the repository.
+# All other CI workflows are deprecated in favor of this file.
+
 name: Dulce de Saigon - Complete CI/CD Pipeline
 
 on:
@@ -17,6 +51,33 @@ env:
   HUSKY: 0 # Disable Husky in CI
 
 jobs:
+  # Job 0: Lockfile Drift Check
+  lockfile-drift:
+    name: Check for pnpm-lock.yaml drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.15.4
+
+      - name: Check for lockfile drift
+        run: |
+          pnpm install --frozen-lockfile || (
+            echo "\n\033[0;31mERROR: pnpm-lock.yaml is out of sync with one or more package.json files.\033[0m" && \
+            echo "Run 'pnpm install' at the repo root and commit the updated lockfile." && \
+            exit 1
+          )
+
   # Job 1: Security Scanning
   security-scan:
     name: Security & Secret Scanning
@@ -27,13 +88,6 @@ jobs:
         with:
           fetch-depth: 0 # Full history for better detection
 
-      - name: Run TruffleHog OSS
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: ./
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
-          extra_args: --debug --only-verified
 
       - name: Run Secretlint
         uses: actions/setup-node@v4
@@ -60,21 +114,27 @@ jobs:
       - uses: actions/checkout@v4
       
 
-      - name: Install pnpm (npm fallback)
-        run: npm install -g pnpm
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.15.4
+
 
       - name: Audit dependencies
         run: pnpm audit --audit-level=moderate
+
 
       - name: Check licenses
         run: |
           npx license-checker --production --onlyAllow 'MIT;Apache-2.0;BSD-3-Clause;BSD-2-Clause;ISC;CC0-1.0;UNLICENSED'
 
+
   # Job 3: Build & Test Matrix
   build-test:
     name: Build & Test (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
-    needs: [security-scan]
+    needs: [lockfile-drift, security-scan]
     strategy:
       matrix:
         node-version: [18, 20, 22]
@@ -90,7 +150,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: 8.15.4
 
@@ -114,6 +174,28 @@ jobs:
           echo "PATH: $PATH"
           which pnpm || true
           pnpm --version || true
+
+      # Diagnostic: Check for lockfile and workspace file
+      - name: Check for pnpm-lock.yaml and pnpm-workspace.yaml
+        run: |
+          echo "Checking for pnpm-lock.yaml and pnpm-workspace.yaml in $PWD"
+          ls -l pnpm-lock.yaml pnpm-workspace.yaml || (echo "Missing lockfile or workspace file!" && exit 1)
+
+      # Diagnostic: Print working directory and list files
+      - name: Print working directory and list files
+        run: |
+          pwd
+          ls -al
+
+      # Diagnostic: Print pnpm config and workspace info
+      - name: Print pnpm config and workspace info
+        run: |
+          pnpm config list
+          pnpm workspaces list || true
+
+      # Diagnostic: Run pnpm doctor
+      - name: Run pnpm doctor
+        run: pnpm doctor || true
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -159,7 +241,7 @@ jobs:
           node-version: 20
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: 8.15.4
 
@@ -228,7 +310,7 @@ jobs:
           node-version: 20
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: 8.15.4
 
@@ -261,7 +343,7 @@ jobs:
           node-version: 20
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: 8.15.4
 

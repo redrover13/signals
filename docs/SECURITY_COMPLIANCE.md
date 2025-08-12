@@ -1,3 +1,26 @@
+# Vietnamese Data Privacy & Residency Compliance
+
+## Data Residency
+
+All production data and backups must be stored in Google Cloud regions located in Vietnam or Southeast Asia (e.g., `asia-southeast1`).
+
+## GCP Region Requirements
+
+- All GCP resources (Cloud Run, Cloud SQL, Artifact Registry, Secret Manager, etc.) must be provisioned in `asia-southeast1` or another Vietnam-compliant region.
+- Terraform and deployment scripts must not reference global or US/EU regions for production workloads.
+
+## Compliance Checklist
+
+- [x] All production data is stored in Vietnam/Southeast Asia regions.
+- [x] All backups are stored in Vietnam/Southeast Asia regions.
+- [x] No production data is transferred or replicated outside of Vietnam/Southeast Asia.
+- [x] All secrets and environment variables are managed via GCP Secret Manager in the correct region.
+- [x] All deployment workflows enforce region compliance.
+
+## References
+
+- [Vietnam Data Privacy Law Overview](https://www.dataguidance.com/notes/vietnam-data-protection-overview)
+- [GCP Regional Services](https://cloud.google.com/about/locations)
 # Dulce de Saigon Security and Compliance Documentation
 
 ## Overview

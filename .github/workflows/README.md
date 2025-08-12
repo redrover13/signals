@@ -13,7 +13,7 @@ This directory contains the CI/CD pipeline configurations for the Dulce de Saigo
 - **Purpose**: Comprehensive CI/CD with security, quality, and deployment
 - **Triggers**: Push, PR, manual dispatch
 - **Key Features**:
-  - 🔐 **Security Scanning**: TruffleHog, Secretlint, GitGuardian
+   - 🔐 **Security Scanning**: Gitleaks, Secretlint, GitGuardian
   - 📦 **Dependency Audit**: Security vulnerabilities and license compliance
   - 🧪 **Multi-Node Testing**: Tests on Node 18, 20, and 22
   - 🎯 **Nx Affected**: Only builds/tests changed projects

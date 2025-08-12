@@ -1,144 +1,150 @@
-# Dulce de Saigon F&B Data Platform (`saigon-signals`)
+<div align="center">
+<img src="docs/imgs/logo.png" width="200">
 
-Welcome to the `saigon-signals` repository, the core of the **Dulce de Saigon F&B Data Platform**. This project is a comprehensive, cloud-native data platform designed to capture, process, and analyze food and beverage data, specifically tailored for the Vietnamese market context.
+[![GitHub Release][release-img]][release]
+[![Test][test-img]][test]
+[![Go Report Card][go-report-img]][go-report]
+[![License: Apache-2.0][license-img]][license]
+[![GitHub Downloads][github-downloads-img]][release]
+![Docker Pulls][docker-pulls]
 
-This monorepo, managed with [Nx](https://nx.dev/), contains all the necessary applications, libraries, and infrastructure configurations to run the platform on Google Cloud Platform (GCP).
+[📖 Documentation][docs]
+</div>
 
-## Architecture Overview
+Trivy ([pronunciation][pronunciation]) is a comprehensive and versatile security scanner.
+Trivy has *scanners* that look for security issues, and *targets* where it can find those issues.
 
-The platform is built on an event-driven, serverless architecture to ensure scalability, reliability, and cost-effectiveness.
+Targets (what Trivy can scan):
 
-```mermaid
-graph TD
-    subgraph "Data Sources"
-        A[POS Systems]
-        B[Mobile Apps]
-        C[Inventory Systems]
-    end
+- Container Image
+- Filesystem
+- Git Repository (remote)
+- Virtual Machine Image
+- Kubernetes
+- AWS
 
-    subgraph "GCP Infrastructure (Managed by Terraform)"
-        A & B & C --> D[API Gateway];
-        D --> E[Pub/Sub: raw_events];
-        E --> F[Cloud Function: event-parser];
-        F --> G[Pub/Sub: dulce.agents];
-        G --> H[Cloud Run: agents];
-        H --> I[BigQuery: dulce.agent_runs];
-        H --> J[Other GCP Services];
-    end
+Scanners (what Trivy can find there):
 
-    style F fill:#f9f,stroke:#333,stroke-width:2px
-    style H fill:#f9f,stroke:#333,stroke-width:2px
-    style I fill:#bbf,stroke:#333,stroke-width:2px
-```
+- OS packages and software dependencies in use (SBOM)
+- Known vulnerabilities (CVEs)
+- IaC issues and misconfigurations
+- Sensitive information and secrets
+- Software licenses
 
-### Key Components:
+Trivy supports most popular programming languages, operating systems, and platforms. For a complete list, see the [Scanning Coverage] page.
 
--   **`event-parser` (Cloud Function)**: A serverless function that triggers on new messages in a Pub/Sub topic. It validates, standardizes, and enriches raw incoming data before publishing it to the `dulce.agents` topic for further processing.
--   **`agents` (Cloud Run Service)**: A containerized application that consumes messages from the `dulce.agents` topic. It runs various data processing agents (e.g., for analytics, machine learning, or operational tasks) and logs the results of each run to the `dulce.agent_runs` table in BigQuery.
--   **`dulce.agents` (Pub/Sub Topic)**: A central message bus for distributing standardized events to the `agents` service.
--   **`dulce.agent_runs` (BigQuery Table)**: A data warehouse table that serves as an immutable log of all agent activities, providing a clear audit trail and data source for analytics.
--   **Infrastructure as Code (Terraform)**: All GCP resources (Pub/Sub topics, BigQuery tables, Cloud Run services, Cloud Functions, IAM policies, etc.) are defined and managed using [Terraform](https://www.terraform.io/) in the [`infra/terraform`](./infra/terraform) directory.
--   **Nx Monorepo**: The entire project is structured as a monorepo using [Nx](https://nx.dev), which helps manage shared dependencies, streamline build processes, and maintain a consistent development environment.
+To learn more, go to the [Trivy homepage][homepage] for feature highlights, or to the [Documentation site][docs] for detailed information.
 
-## Setup and Installation
+## Quick Start
 
-### Prerequisites
+### Get Trivy
 
-Before you begin, ensure you have the following installed:
-*   [Node.js](https://nodejs.org/) (v18 or higher, as defined in `.nvmrc`)
-*   [pnpm](https://pnpm.io/installation)
-*   [Google Cloud SDK](https://cloud.google.com/sdk/docs/install)
+Trivy is available in most common distribution channels. The full list of installation options is available in the [Installation] page. Here are a few popular examples:
 
-### Installation Steps
+- `brew install trivy`
+- `docker run aquasec/trivy`
+- Download binary from <https://github.com/aquasecurity/trivy/releases/latest/>
+- See [Installation] for more
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/your-org/saigon-signals.git
-    cd saigon-signals
-    ```
+Trivy is integrated with many popular platforms and applications. The complete list of integrations is available in the [Ecosystem] page. Here are a few popular examples:
 
-2.  **Install dependencies:**
-    This project uses `pnpm` for package management.
-    ```bash
-    pnpm install
-    ```
+- [GitHub Actions](https://github.com/aquasecurity/trivy-action)
+- [Kubernetes operator](https://github.com/aquasecurity/trivy-operator)
+- [VS Code plugin](https://github.com/aquasecurity/trivy-vscode-extension)
+- See [Ecosystem] for more
 
-## Environment Variables
+### Canary builds
+There are canary builds ([Docker Hub](https://hub.docker.com/r/aquasec/trivy/tags?page=1&name=canary), [GitHub](https://github.com/aquasecurity/trivy/pkgs/container/trivy/75776514?tag=canary), [ECR](https://gallery.ecr.aws/aquasecurity/trivy#canary) images and [binaries](https://github.com/aquasecurity/trivy/actions/workflows/canary.yaml)) as generated every push to main branch.
 
-Create a `.env` file in the root of the repository and add the following variables. These are essential for connecting to GCP services during local development and testing.
+Please be aware: canary builds might have critical bugs, it's not recommended for use in production.
 
-```env
-# .env
+### General usage
 
-# Google Cloud Platform Configuration
-GCP_PROJECT_ID="saigon-signals"
-GCP_REGION="asia-southeast1" # Or your preferred region
-
-# Name of the GCS bucket for Terraform state
-TF_STATE_BUCKET="saigon-signals-tf-state"
-
-# Add any other secrets or environment-specific variables here
-# Example:
-# DATABASE_URL="your-database-connection-string"
-```
-
--   `GCP_PROJECT_ID`: Your Google Cloud project ID.
--   `GCP_REGION`: The GCP region where resources will be deployed.
--   `TF_STATE_BUCKET`: The GCS bucket used for storing the Terraform remote state.
-
-## Running Locally
-
-You can run the different applications within the monorepo using Nx commands.
-
--   **Run the `agents` service:**
-    ```bash
-    npx nx serve agents
-    ```
--   **Run the `api` service:**
-    ```bash
-    npx nx serve api
-    ```
-
-## Running Tests
-
-### Unit Tests
-To run unit tests for a specific application or library:
 ```bash
-# Test the 'agents' application
-npx nx test agents
-
-# Test the 'gcp' library
-npx nx test gcp
+trivy <target> [--scanners <scanner1,scanner2>] <subject>
 ```
 
-### End-to-End (E2E) Tests
-The E2E test suite validates the entire data processing workflow, from publishing a message to a Pub/Sub topic to verifying the data in BigQuery.
+Examples:
 
-To run the E2E tests, execute the following script:
 ```bash
-python tests/e2e_workflow.py
+trivy image python:3.4-alpine
 ```
-*Note: Ensure your local environment is authenticated with GCP (`gcloud auth application-default login`) before running the E2E tests.*
 
-## Deployment (CI/CD)
+<details>
+<summary>Result</summary>
 
-Deployment is automated using **Google Cloud Build** and is defined in the [`cloudbuild.yaml`](./cloudbuild.yaml) file at the root of the repository.
+https://user-images.githubusercontent.com/1161307/171013513-95f18734-233d-45d3-aaf5-d6aec687db0e.mov
 
-### CI/CD Process:
+</details>
 
-1.  **Trigger**: The Cloud Build pipeline is automatically triggered on every push to the `main` branch.
-2.  **Build**: Docker images for the `agents` and other services are built and pushed to the Google Artifact Registry.
-3.  **Test**: Unit tests are executed to ensure code quality and correctness.
-4.  **Deploy**:
-    *   The `event-parser` Cloud Function is deployed.
-    *   The `agents` service is deployed to Cloud Run.
-    *   Terraform is used to apply any infrastructure changes.
+```bash
+trivy fs --scanners vuln,secret,config myproject/
+```
 
-This automated process ensures that every change pushed to the main branch is built, tested, and deployed consistently and reliably.
+<details>
+<summary>Result</summary>
 
-## Compliance and Vietnamese Market Context
+https://user-images.githubusercontent.com/1161307/171013917-b1f37810-f434-465c-b01a-22de036bd9b3.mov
 
-This platform is architected with a strong focus on compliance and cultural relevance for the Vietnamese market.
+</details>
 
--   **Data Compliance**: Adheres to Vietnam's Personal Data Protection Law (PDPL), including data localization requirements. All data is processed and stored in the `asia-southeast1` GCP region.
--   **Market Fit**: Data models and processing logic are designed to accommodate the unique characteristics of the Vietnamese F&B industry, from currency (VND) and payment methods to local dining habits.
+```bash
+trivy k8s --report summary cluster
+```
+
+<details>
+<summary>Result</summary>
+
+![k8s summary](docs/imgs/trivy-k8s.png)
+
+</details>
+
+## FAQ
+
+### How to pronounce the name "Trivy"?
+
+`tri` is pronounced like **tri**gger, `vy` is pronounced like en**vy**.
+
+## Want more? Check out Aqua
+
+If you liked Trivy, you will love Aqua which builds on top of Trivy to provide even more enhanced capabilities for a complete security management offering.  
+You can find a high level comparison table specific to Trivy users [here](https://github.com/aquasecurity/resources/blob/main/trivy-aqua.md).  
+In addition check out the <https://aquasec.com> website for more information about our products and services.
+If you'd like to contact Aqua or request a demo, please use this form: <https://www.aquasec.com/demo>
+
+## Community
+
+Trivy is an [Aqua Security][aquasec] open source project.  
+Learn about our open source work and portfolio [here][oss].  
+Contact us about any matter by opening a GitHub Discussion [here][discussions]
+Join our [Slack community][slack] to stay up to date with community efforts.
+
+Please ensure to abide by our [Code of Conduct][code-of-conduct] during all interactions.
+
+[test]: https://github.com/aquasecurity/trivy/actions/workflows/test.yaml
+[test-img]: https://github.com/aquasecurity/trivy/actions/workflows/test.yaml/badge.svg
+[go-report]: https://goreportcard.com/report/github.com/aquasecurity/trivy
+[go-report-img]: https://goreportcard.com/badge/github.com/aquasecurity/trivy
+[release]: https://github.com/aquasecurity/trivy/releases
+[release-img]: https://img.shields.io/github/release/aquasecurity/trivy.svg?logo=github
+[github-downloads-img]: https://img.shields.io/github/downloads/aquasecurity/trivy/total?logo=github
+[docker-pulls]: https://img.shields.io/docker/pulls/aquasec/trivy?logo=docker&label=docker%20pulls%20%2F%20trivy
+[license]: https://github.com/aquasecurity/trivy/blob/main/LICENSE
+[license-img]: https://img.shields.io/badge/License-Apache%202.0-blue.svg
+[homepage]: https://trivy.dev
+[docs]: https://aquasecurity.github.io/trivy
+[pronunciation]: #how-to-pronounce-the-name-trivy
+[slack]: https://slack.aquasec.com
+[code-of-conduct]: https://github.com/aquasecurity/community/blob/main/CODE_OF_CONDUCT.md
+
+[Installation]:https://aquasecurity.github.io/trivy/latest/getting-started/installation/
+[Ecosystem]: https://aquasecurity.github.io/trivy/latest/ecosystem/
+[Scanning Coverage]: https://aquasecurity.github.io/trivy/latest/getting-started/coverage/
+
+[alpine]: https://ariadne.space/2021/06/08/the-vulnerability-remediation-lifecycle-of-alpine-containers/
+[rego]: https://www.openpolicyagent.org/docs/latest/#rego
+[sigstore]: https://www.sigstore.dev/
+
+[aquasec]: https://aquasec.com
+[oss]: https://www.aquasec.com/products/open-source-projects/
+[discussions]: https://github.com/aquasecurity/trivy/discussions

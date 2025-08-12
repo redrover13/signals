@@ -1,0 +1,26 @@
+{
+  "name": "legacy-event-parser",
+  "sourceRoot": "apps/legacy_event_parser",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'No build step for legacy-event-parser (Node.js Cloud Function)'"
+      }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "gcloud functions deploy legacyEventParser --region=asia-southeast1 --runtime=nodejs18 --trigger-topic=legacy-events --entry-point=legacyEventParser --project=chimera-prod-392817 --source=apps/legacy_event_parser --set-env-vars=NODE_ENV=production"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'No tests defined for legacy-event-parser'"
+      }
+    }
+  },
+  "tags": ["gcp", "cloud-function", "legacy-event-parser"]
+}

@@ -1,3 +1,13 @@
+# Ignore Terraform provider binaries and directories
+infra/terraform/.terraform/
+*.exe
+*.dll
+*.bin
+*.so
+*.dylib
+*.zip
+*.tar.gz
+infra/terraform/.terraform.lock.hcl
 node_modules/
 dist/
 .env

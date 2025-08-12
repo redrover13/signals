@@ -1,5 +1,0 @@
-# DEPRECATED: This workflow is superseded by _deploy-gcp.yml.
-# Please use .github/workflows/_deploy-gcp.yml for all deployment operations.
-on:
-
-  push:

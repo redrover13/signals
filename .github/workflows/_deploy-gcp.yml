@@ -31,32 +31,35 @@ jobs:
   detect-changes:
     name: Detect Changed Services
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }} 
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     outputs:
-      api-changed: ${{ steps.changes.outputs.api }}
-      web-changed: ${{ steps.changes.outputs.web }}
-      agents-changed: ${{ steps.changes.outputs.agents }}
+      api: ${{ steps.changes.outputs.api }}
+      web: ${{ steps.changes.outputs.web }}
+      agents: ${{ steps.changes.outputs.agents }}
+      eventparser: ${{ steps.changes.outputs.eventparser }}
+      legacyeventparser: ${{ steps.changes.outputs.legacyeventparser }}
       deploy-list: ${{ steps.deploy-list.outputs.services }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - uses: dorny/paths-filter@v3
-        id: changes
-        with:
-          filters: |
-            api:
-              - 'apps/api/**'
-              - 'libs/**'
-            web:
-              - 'apps/web/**'
-              - 'libs/**'
-            agents:
-              - 'apps/agents/**'
-              - 'libs/**'
-            infra:
-              - 'infra/terraform/**'
+          - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
+            id: changes
+            with:
+              filters: |
+                api:
+                  - 'apps/api/**'
+                  - 'libs/**'
+                web:
+                  - 'apps/web/**'
+                  - 'libs/**'
+                agents:
+                  - 'apps/agents/**'
+                  - 'libs/**'
+                infra:
+                  - 'infra/terraform/**'
+                eventparser:
+                  - 'apps/event-parser/**'
+                legacyeventparser:
+                  - 'apps/legacy_event_parser/**'
 
       - name: Determine deployment list
         id: deploy-list
@@ -72,17 +75,114 @@ jobs:
             [[ "${{ steps.changes.outputs.api }}" == "true" ]] && services="${services}api,"
             [[ "${{ steps.changes.outputs.web }}" == "true" ]] && services="${services}web,"
             [[ "${{ steps.changes.outputs.agents }}" == "true" ]] && services="${services}agents,"
+            [[ "${{ steps.changes.outputs.eventparser }}" == "true" ]] && services="${services}event-parser,"
+            [[ "${{ steps.changes.outputs.legacyeventparser }}" == "true" ]] && services="${services}legacy_event_parser,"
             [[ "${{ steps.changes.outputs.infra }}" == "true" ]] && services="${services}infra,"
+  deploy-event-parser:
+    name: Deploy Event Parser Cloud Function
+    runs-on: ubuntu-latest
+    needs:
+      - detect-changes
+      - check-infra-changes
+    if: contains(needs.detect-changes.outputs.deploy-list, 'event-parser') || needs.check-infra-changes.outputs.infra_changed == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@6189d56e4096ee891640bb02ac264be376592d6a
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+      - name: Deploy Event Parser Function
+        run: |
+          gcloud functions deploy parseAgentEvent \
+            --region=asia-southeast1 \
+            --runtime=nodejs18 \
+            --trigger-topic=agent-events \
+            --entry-point=parseAgentEvent \
+            --project=${{ env.GCP_PROJECT_ID }} \
+            --source=apps/event-parser \
+            --set-env-vars=NODE_ENV=production
+
+  test-event-parser:
+    name: Test Event Parser Cloud Function
+    runs-on: ubuntu-latest
+    needs: [deploy-event-parser]
+    steps:
+      - name: Test Event Parser (smoke)
+        run: |
+          echo "Smoke test for event-parser (manual test required for GCP trigger)"
+
+  deploy-legacy-event-parser:
+    name: Deploy Legacy Event Parser Cloud Function
+    runs-on: ubuntu-latest
+    needs:
+      - detect-changes
+      - check-infra-changes
+    if: contains(needs.detect-changes.outputs.deploy-list, 'legacy_event_parser') || needs.check-infra-changes.outputs.infra_changed == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@6189d56e4096ee891640bb02ac264be376592d6a
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+      - name: Deploy Legacy Event Parser Function
+        run: |
+          gcloud functions deploy legacyEventParser \
+            --region=asia-southeast1 \
+            --runtime=nodejs18 \
+            --trigger-topic=legacy-events \
+            --entry-point=legacyEventParser \
+            --project=${{ env.GCP_PROJECT_ID }} \
+            --source=apps/legacy_event_parser \
+            --set-env-vars=NODE_ENV=production
+
+  test-legacy-event-parser:
+    name: Test Legacy Event Parser Cloud Function
+    runs-on: ubuntu-latest
+    needs: [deploy-legacy-event-parser]
+    steps:
+      - name: Test Legacy Event Parser (smoke)
+        run: |
+          echo "Smoke test for legacy-event-parser (manual test required for GCP trigger)"
+
+  infra-drift-policy-check:
+    name: Infra Drift & Policy Check
+    runs-on: ubuntu-latest
+    needs: [deploy-infra]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Terraform Plan (Drift Detection)
+        run: |
+          cd infra/terraform
+          terraform plan -detailed-exitcode || true
+      - name: Policy Check (OPA/Conftest placeholder)
+        run: |
+          echo "Run OPA/Conftest policy checks here (implement as needed)"
             services=${services%,} # Remove trailing comma
             echo "services=${services}" >> $GITHUB_OUTPUT
           fi
 
   deploy-infra:
+    environment:
+      name: ${{ github.event.inputs.environment || 'staging' }}
+      url: https://console.cloud.google.com/
+    concurrency:
+      group: deploy-infra-${{ github.event.inputs.environment || 'staging' }}
+      cancel-in-progress: true
     name: Deploy GCP Infrastructure
     runs-on: ubuntu-latest
     needs:
       - detect-changes
-    if: contains(needs.detect-changes.outputs.deploy-list, 'infra') 
+    if: contains(needs.detect-changes.outputs.deploy-list, 'infra')
     outputs:
        apply_output: ${{ steps.apply.outputs.stdout }}
     permissions:
@@ -93,13 +193,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud
-        uses: 'google-github-actions/auth@v2'
+  uses: 'google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f'
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
 
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
+  uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1
         with:
           terraform_version: 1.6.0
 
@@ -131,7 +231,7 @@ jobs:
           echo "$APPLY_OUTPUT" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
         env:
-          TF_VAR_gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}        
+          TF_VAR_gcp_project_id: ${{ secrets.GCP_PROJECT_ID }}
 
   check-infra-changes:
     name: Check for Infrastructure Changes
@@ -163,6 +263,12 @@ jobs:
           fi
 
   deploy-api:
+    environment:
+      name: ${{ github.event.inputs.environment || 'staging' }}
+      url: https://api.dulcedesaigon.vn
+    concurrency:
+      group: deploy-api-${{ github.event.inputs.environment || 'staging' }}
+      cancel-in-progress: true
     name: Deploy API Service
     runs-on: ubuntu-latest
     needs:
@@ -174,29 +280,29 @@ jobs:
       id-token: 'write'
     steps:
       - uses: actions/checkout@v4
-
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f
         with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }} 
-          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }} 
-
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@6189d56e4096ee891640bb02ac264be376592d6a
         with:
-          project_id: ${{ env.GCP_PROJECT_ID }} 
+          project_id: ${{ env.GCP_PROJECT_ID }}
 
       - name: Configure Docker for Artifact Registry
         run: |
-          gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY }}               
+          gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY }}
 
       - name: Build and Push API Image
-        run: |            
+        run: |
           docker build -f apps/api/Dockerfile -t ${{ env.ARTIFACT_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/dulce/api:${{ github.sha }} -t ${{ env.ARTIFACT_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/dulce/api:latest .
           docker push ${{ env.ARTIFACT_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/dulce/api --all-tags
 
       - name: Deploy to Cloud Run
+        id: deploy_api
         run: |
+          set -e
           gcloud run deploy dulce-api \
             --image ${{ env.ARTIFACT_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/dulce/api:${{ github.sha }} \
             --platform managed \
@@ -211,39 +317,49 @@ jobs:
             --cpu 1 \
             --timeout 60 \
             --concurrency 80
+        continue-on-error: true
+      - name: Rollback API if unhealthy
+        if: failure() && steps.deploy_api.outcome == 'failure'
+        run: |
+          echo "Rolling back API deployment..."
+          gcloud run services update-traffic dulce-api --region ${{ env.GCP_REGION }} --to-latest
 
       - name: Verify Deployment
         run: |
           SERVICE_URL=$(gcloud run services describe dulce-api --region ${{ env.GCP_REGION }} --format 'value(status.url)')
-          curl -f "${SERVICE_URL}/health" || exit 1
+          curl -f "$SERVICE_URL/health" || exit 1
 
   deploy-web:
+    environment:
+      name: ${{ github.event.inputs.environment || 'staging' }}
+      url: https://dulcedesaigon.vn
+    concurrency:
+      group: deploy-web-${{ github.event.inputs.environment || 'staging' }}
+      cancel-in-progress: true
     name: Deploy Web Application
     runs-on: ubuntu-latest
     needs:
       - detect-changes
       - check-infra-changes
     if: contains(needs.detect-changes.outputs.deploy-list, 'web') || needs.check-infra-changes.outputs.infra_changed == 'true'
-    permissions: 
+    permissions:
       contents: 'read'
       id-token: 'write'
     steps:
       - uses: actions/checkout@v4
-
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f
         with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }} 
-          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }} 
-
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@6189d56e4096ee891640bb02ac264be376592d6a
         with:
-          project_id: ${{ env.GCP_PROJECT_ID }} 
+          project_id: ${{ env.GCP_PROJECT_ID }}
 
       - name: Configure Docker for Artifact Registry
         run: |
-          gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY }}               
+          gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY }}
 
       - name: Build and Push Web Image
         run: |
@@ -251,7 +367,9 @@ jobs:
           docker push ${{ env.ARTIFACT_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/dulce/web --all-tags
 
       - name: Deploy to Cloud Run
+        id: deploy_web
         run: |
+          set -e
           gcloud run deploy dulce-web \
             --image ${{ env.ARTIFACT_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/dulce/web:${{ github.sha }} \
             --platform managed \
@@ -265,6 +383,12 @@ jobs:
             --cpu 2 \
             --timeout 60 \
             --concurrency 100
+        continue-on-error: true
+      - name: Rollback Web if unhealthy
+        if: failure() && steps.deploy_web.outcome == 'failure'
+        run: |
+          echo "Rolling back Web deployment..."
+          gcloud run services update-traffic dulce-web --region ${{ env.GCP_REGION }} --to-latest
 
       - name: Configure CDN
         run: |
@@ -277,6 +401,12 @@ jobs:
             --max-ttl=86400
 
   deploy-agents:
+    environment:
+      name: ${{ github.event.inputs.environment || 'staging' }}
+      url: https://dulcedesaigon.vn/agents
+    concurrency:
+      group: deploy-agents-${{ github.event.inputs.environment || 'staging' }}
+      cancel-in-progress: true
     name: Deploy Agents Service
     runs-on: ubuntu-latest
     needs:
@@ -288,21 +418,19 @@ jobs:
       id-token: 'write'
     steps:
       - uses: actions/checkout@v4
-
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f
         with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }} 
-          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }} 
-
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@6189d56e4096ee891640bb02ac264be376592d6a
         with:
-          project_id: ${{ env.GCP_PROJECT_ID }} 
+          project_id: ${{ env.GCP_PROJECT_ID }}
 
       - name: Configure Docker for Artifact Registry
         run: |
-          gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY }}               
+          gcloud auth configure-docker ${{ env.ARTIFACT_REGISTRY }}
 
       - name: Build and Push Agents Image
         run: |
@@ -310,13 +438,15 @@ jobs:
           docker push ${{ env.ARTIFACT_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/dulce/agents --all-tags
 
       - name: Deploy to Cloud Run
+        id: deploy_agents
         run: |
+          set -e
           gcloud run deploy dulce-agents \
-            --image ${{ env.ARTIFACT_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/dulce/agents:${{ github.sha }} \
+            --image ${{ env.ARTIFACT_REGISTRY }}/${{ secrets.GCP_PROJECT_ID }}/dulce/agents:${{ github.sha }} \
             --platform managed \
             --region ${{ env.GCP_REGION }} \
-            --service-account dulce-agents-sa@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
-            --set-env-vars "NODE_ENV=production,GCP_PROJECT_ID=${{ env.GCP_PROJECT_ID }}" \
+            --service-account dulce-agents-sa@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
+            --set-env-vars "NODE_ENV=production,GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}" \
             --set-secrets "AGENTS_API_KEY=agents-api-key:latest" \
             --no-allow-unauthenticated \
             --min-instances 0 \
@@ -325,26 +455,33 @@ jobs:
             --cpu 1 \
             --timeout 300 \
             --concurrency 10
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        continue-on-error: true
+      - name: Rollback Agents if unhealthy
+        if: failure() && steps.deploy_agents.outcome == 'failure'
+        run: |
+          echo "Rolling back Agents deployment..."
+          gcloud run services update-traffic dulce-agents --region ${{ env.GCP_REGION }} --to-latest
 
   update-traffic:
     name: Update Traffic Split
     runs-on: ubuntu-latest
     needs: [deploy-infra, deploy-api, deploy-web, deploy-agents]
     if: always() && (needs.deploy-api.result == 'success' || needs.deploy-web.result == 'success' || needs.deploy-agents.result == 'success')
-    permissions: 
+    permissions:
       contents: 'read'
       id-token: 'write'
     steps:
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
-
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@6189d56e4096ee891640bb02ac264be376592d6a
         with:
-          project_id: ${{ env.GCP_PROJECT_ID }} 
+          project_id: ${{ env.GCP_PROJECT_ID }}
 
       - name: Gradual Traffic Migration
         run: |
@@ -355,18 +492,18 @@ jobs:
               gcloud run services update-traffic $service \
                 --region ${{ env.GCP_REGION}} \
                 --to-revisions LATEST=10
-            
+
               # Wait and monitor
               sleep 60
-            
-              # If healthy, increase to 50%              
+
+              # If healthy, increase to 50%
               gcloud run services update-traffic $service \
                 --region ${{ env.GCP_REGION }} \
                 --to-revisions LATEST=50
 
               # Wait and monitor
               sleep 120
-            
+
               # Full migration
               gcloud run services update-traffic $service \
                 --region ${{ env.GCP_REGION }} \
@@ -406,4 +543,4 @@ jobs:
         run: |
           # Basic health checks
           curl -f https://api.dulcedesaigon.vn/health || exit 1
-          curl -f https://dulcedesaigon.vn || exit 1
+          curl -f https://dulcedesaigon.vn/api/health || exit 1

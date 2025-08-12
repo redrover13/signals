@@ -23,6 +23,7 @@
     "@nrwl/node": "^19.8.4",
     "@nx/workspace": "18.0.6",
     "@secretlint/secretlint-rule-preset-recommend": "^8.1.0",
+    "@types/lodash": "^4.17.20",
     "@types/node": "18.19.34",
     "fs-extra": "^11.3.1",
     "nx": "18.0.6",
@@ -32,8 +33,12 @@
   },
   "packageManager": "pnpm@8.15.4",
   "dependencies": {
+    "@google-analytics/data": "^5.2.0",
     "@google-cloud/aiplatform": "^5.4.0",
+    "@google-cloud/bigquery": "8.1.1",
+    "@google-cloud/storage": "7.16.0",
     "fastify": "^5.4.0",
-    "google-auth-library": "^10.2.1"
+    "google-auth-library": "^10.2.1",
+    "lodash": "^4.17.21"
   }
 }

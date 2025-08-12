@@ -1,3 +1,38 @@
+# Production Deployment Approval & Rollback SOP
+
+## Required Reviewer Roles for Production
+
+Production deployments require approval from designated reviewers. These reviewers must be assigned in the GitHub Environment settings for `production`.
+
+**Recommended roles:**
+- Lead Engineer
+- DevOps Engineer
+- CTO or delegated release manager
+
+## Manual Approval Process
+
+1. Open a Pull Request targeting the `main` branch.
+2. Ensure all required status checks pass (CI, security, tests).
+3. When the deployment workflow runs, it will pause at the `production` environment approval step.
+4. A required reviewer must approve the deployment in the GitHub UI (Settings > Environments > production > Required reviewers).
+5. Once approved, the workflow will proceed to deploy to production.
+
+## SOP for Deployment Failure & Rollback
+
+1. **Monitor the deployment:**
+  - The workflow will run health checks after deployment.
+  - If a health check fails, the workflow will attempt an automatic rollback to the previous stable version.
+2. **Manual rollback:**
+  - If the automatic rollback fails or further issues are detected, trigger a manual rollback using the GCP Console or CLI:
+    - `gcloud run services update-traffic <service> --region <region> --to-latest`
+3. **Notify stakeholders:**
+  - Inform the team and stakeholders of the rollback and incident.
+4. **Post-mortem:**
+  - Document the failure, root cause, and remediation steps in the incident log.
+
+**See also:**
+- [SECURITY_COMPLIANCE.md](SECURITY_COMPLIANCE.md)
+- [WIF_SETUP_GUIDE.md](WIF_SETUP_GUIDE.md)
 # Dulce de Saigon Deployment Guide
 
 ## Overview

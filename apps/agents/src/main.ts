@@ -1,7 +1,7 @@
 import Fastify from "fastify";
 import { runAgent } from "@dulce-de-saigon/agents-lib";
 import { agentsRoutes } from "../../api/src/routes/agents";
-import health from "../../api/src/routes/health";
+import { healthRoutes } from "../../api/src/routes/health";
 import { VertexAIClient, VertexAIClientConfig } from "adk/services/vertex";
 
 const fastify = Fastify({
@@ -39,14 +39,14 @@ fastify.post("/api/v1/agent-predict", async (request, reply) => {
     reply.status(500).send({
       success: false,
       message: "An error occurred during prediction.",
-      error: error.name, // e.g., 'PredictionAPIError'
+  error: error instanceof Error ? error.name : 'UnknownError', // e.g., 'PredictionAPIError'
     });
   }
 });
 
 console.log("AGENT LIB", runAgent);
 
-fastify.register(health);
+fastify.register(healthRoutes);
 fastify.register(agentsRoutes);
 
 /**
@@ -55,7 +55,7 @@ fastify.register(agentsRoutes);
 const start = async () => {
   try {
     await fastify.listen({ port: 3000 }); // Because you have "bind: '0.0.0.0'" in your ecosystem.config, Fastify will bind to all available network interfaces for your service. Note that in production, localhost (127.0.0.1) does not refer to the local machine for external network services like load balancers or Kubernetes services. They won't route to it.
-  except (err) {
+  } catch (err) {
     fastify.log.error(err);
     process.exit(1); // Kết thúc tiến trình Node.js. 
   }

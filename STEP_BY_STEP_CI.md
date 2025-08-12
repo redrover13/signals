@@ -23,7 +23,7 @@ git push
 ---
 
 # Stage 3: Add Lint, Audit, and Secret Scanning (Optional)
-- Add jobs for `pnpm lint`, `pnpm audit`, and secret scanning tools (e.g., TruffleHog, Secretlint) after basic build/test is green.
+- Add jobs for `pnpm lint`, `pnpm audit`, and secret scanning tools (e.g., Gitleaks, Secretlint) after basic build/test is green.
 
 ---
 

@@ -1,28 +1,47 @@
-# Ignore Terraform provider binaries and directories
+# Terraform and provider binaries
 infra/terraform/.terraform/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
 *.exe
 *.dll
-*.bin
 *.so
 *.dylib
+*.bin
 *.zip
 *.tar.gz
 infra/terraform/.terraform.lock.hcl
+
+# Node/Nx/Build artifacts
 node_modules/
 dist/
+out/
+coverage/
+.nx/
+.next/
+build/
+tmp/
+.cache/
+
+# Environment and local config
 .env
 .env.*
 *.local
 *.log
-.cache/
+*.tsbuildinfo
+
+# System files
 .DS_Store
+Thumbs.db
+
+# IDE/editor
 .idea/
 .vscode/
-*.tsbuildinfo
-.nx/
+
+# Misc/legacy
 fix-repository-case.bat
 update-provider-no-condition.bat
-
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
 

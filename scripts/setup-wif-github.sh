@@ -109,7 +109,7 @@ echo "  --member=\"principalSet://iam.googleapis.com/projects/${PROJECT_NUMBER}/
 # Create secrets in Secret Manager
 echo "🔐 Creating secrets in Secret Manager..."
 # Database URL placeholder
-echo -n "postgresql://user:pass@localhost:5432/dulce" | \
+echo -n "<SET_THIS_IN_SECRET_MANAGER_LATER>" | \
   gcloud secrets create dulce-db-url --data-file=- || echo "Secret already exists"
 
 # Agents API key placeholder  

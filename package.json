@@ -3,10 +3,6 @@
   "name": "nx-monorepo",
   "version": "1.0.0",
   "private": true,
-  "engines": {
-    "node": ">=18 <21 || >=22",
-    "pnpm": ">=8 <9"
-  },
   "scripts": {
     "nx": "nx",
     "start": "nx serve",
@@ -31,7 +27,6 @@
     "ts-node": "10.9.2",
     "typescript": "5.4.5"
   },
-  "packageManager": "pnpm@8.15.4",
   "dependencies": {
     "@google-analytics/data": "^5.2.0",
     "@google-cloud/aiplatform": "^5.4.0",
@@ -40,5 +35,9 @@
     "fastify": "^5.4.0",
     "google-auth-library": "^10.2.1",
     "lodash": "^4.17.21"
+  },
+  "packageManager": "pnpm@10.0.0",
+  "engines": {
+    "node": ">=18 <21 || >=22"
   }
 }

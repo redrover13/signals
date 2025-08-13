@@ -10,7 +10,7 @@
 | `CMS_PROVIDER` | `sanity` | `` |
 | `CONTENTFUL_DELIVERY_TOKEN` | `` | `` |
 | `CONTENTFUL_SPACE_ID` | `` | `` |
-| `DATABASE_URL` | `postgresql://postgres:postgres@localhost:5432/dulce` | `postgresql://postgres:postgres@localhost:5432/saigon-signals` |
+| `DATABASE_URL` | `<REDACTED>` | `<REDACTED>` |
 | `ENABLE_VERTEX_AI` | `` | `false` |
 | `FIREBASE_PROJECT_ID` | `your-firebase-project-id` | `` |
 | `GCP_LOCATION` | `us-central1` | `` |

@@ -112,7 +112,7 @@ echo "🔐 Creating secrets in Secret Manager..."
 echo -n "<SET_THIS_IN_SECRET_MANAGER_LATER>" | \
   gcloud secrets create dulce-db-url --data-file=- || echo "Secret already exists"
 
-# Agents API key placeholder  
+# Agents API key placeholder
 echo -n "your-agents-api-key" | \
   gcloud secrets create agents-api-key --data-file=- || echo "Secret already exists"
 

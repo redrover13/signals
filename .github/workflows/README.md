@@ -161,4 +161,12 @@ pnpm nx print-affected --base=main
 
 ---
 
+## Quick Rules of Thumb
+
+- Pin every third-party action to a full-length commit SHA.
+- Use pnpm v10 in CI (pnpm/action-setup with version: 10) and enable Node cache in setup-node.
+- Disable Nx daemon in CI: set `NX_DAEMON: "false"` in job env if needed.
+- Upload one SARIF per tool/category for GitHub Code Scanning.
+- Gate external scanners (e.g., GitGuardian) on the presence of required secrets to avoid red runs.
+
 For questions or issues, contact the DevOps team or create an issue in the repository.

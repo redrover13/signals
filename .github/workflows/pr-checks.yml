@@ -9,12 +9,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Check PR title follows conventional commits
   pr-title:
     name: Validate PR Title
     runs-on: ubuntu-latest
     steps:
-      - uses: amannn/action-semantic-pull-request@v5
+      - uses: amannn/action-semantic-pull-request@fdd4d3ddf614fbcd8c29e4b106d3bbe0cb2c605d
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -36,101 +35,75 @@ jobs:
             The subject "{subject}" found in the pull request title "{title}"
             didn't match the configured pattern. Please ensure that the subject
             doesn't start with an uppercase character.
-            
-  # Standardized Secret Scanning with Gitleaks
+
   gitleaks:
     name: Gitleaks Secret Scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
         with:
           fetch-depth: 0
-      - name: Set base and head SHAs
-        uses: nrwl/nx-set-shas@v4
-      - uses: gitleaks/gitleaks-action@v2
+      - uses: gitleaks/gitleaks-action@bf2dc8e55639c1e091e9b45970152e4313705814
         with:
           source: '.'
-          compare: ${{ env.NX_BASE }}...${{ env.NX_HEAD }}
           report_format: sarif
           report_path: gitleaks-report.sarif
       - name: Upload Gitleaks report as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882
         with:
           name: gitleaks-report
           path: gitleaks-report.sarif
 
-  # Nx affected analysis, linting, and testing
   build-and-test:
     name: Build and Test Affected Projects
     runs-on: ubuntu-latest
-    outputs:
-      affected-projects: ${{ steps.affected.outputs.projects }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
         with:
           fetch-depth: 0
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@f2b2b233b538f500472c7274c7012f57857d8ce0
         with:
-          version: 8.15.4
+          version: 10
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@5e2628c959b9ade56971c0afcebbe5332d44b398
         with:
           node-version: 20
           cache: 'pnpm'
 
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Diagnostic: Check for pnpm-lock.yaml and pnpm-workspace.yaml
       - name: Check for pnpm-lock.yaml and pnpm-workspace.yaml
         run: |
           echo "Checking for pnpm-lock.yaml and pnpm-workspace.yaml in $PWD"
           ls -l pnpm-lock.yaml pnpm-workspace.yaml || (echo "Missing lockfile or workspace file!" && exit 1)
 
-      # Diagnostic: Print working directory and list files
       - name: Print working directory and list files
         run: |
           pwd
           ls -al
 
-      # Diagnostic: Print pnpm config and workspace info
       - name: Print pnpm config and workspace info
         run: |
           pnpm config list
           pnpm workspaces list || true
 
-      # Diagnostic: Run pnpm doctor
       - name: Run pnpm doctor
         run: pnpm doctor || true
 
-        # Diagnostic: Check for pnpm-lock.yaml and pnpm-workspace.yaml
-        - name: Check for pnpm-lock.yaml and pnpm-workspace.yaml
-          run: |
-            echo "Checking for pnpm-lock.yaml and pnpm-workspace.yaml in $PWD"
-            ls -l pnpm-lock.yaml pnpm-workspace.yaml || (echo "Missing lockfile or workspace file!" && exit 1)
-
-        # Diagnostic: Print working directory and list files
-        - name: Print working directory and list files
-          run: |
-            pwd
-            ls -al
-
-        # Diagnostic: Print pnpm config and workspace info
-        - name: Print pnpm config and workspace info
-          run: |
-            pnpm config list
-            pnpm workspaces list || true
-
-        # Diagnostic: Run pnpm doctor
-        - name: Run pnpm doctor
-          run: pnpm doctor || true
-
       - name: Derive SHAs
-        uses: nrwl/nx-set-shas@v4
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "NX_BASE=${{ github.event.pull_request.base.sha }}" >> $GITHUB_ENV
+            echo "NX_HEAD=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
+          else
+            echo "NX_BASE=${{ github.event.before }}" >> $GITHUB_ENV
+            echo "NX_HEAD=${{ github.sha }}" >> $GITHUB_ENV
+          fi
 
       - name: Get affected projects
         id: affected
@@ -147,15 +120,10 @@ jobs:
       - name: Build Affected Projects
         run: pnpm nx affected:build --base=$NX_BASE --head=$NX_HEAD
 
-  # Final status check
   pr-status:
     name: PR Status Check
     runs-on: ubuntu-latest
-    needs: [
-      pr-title,
-      gitleaks,
-      build-and-test
-    ]
+    needs: [pr-title, gitleaks, build-and-test]
     if: always()
     steps:
       - name: Check all jobs

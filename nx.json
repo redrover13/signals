@@ -1,19 +1,13 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "npmScope": "nx-monorepo",
-  "affected": {
-    "defaultBase": "main"
-  },
+  "affected": { "defaultBase": "main" },
   "tasksRunnerOptions": {
     "default": {
       "runner": "nx/tasks-runners/default",
-      "options": {
-        "cacheableOperations": ["build", "lint", "test"]
-      }
+      "options": { "cacheableOperations": ["build", "lint", "test"] }
     }
   },
-  "workspaceLayout": {
-    "appsDir": "apps",
-    "libsDir": "libs"
-  }
+  "workspaceLayout": { "appsDir": "apps", "libsDir": "libs" },
+  "nxCloudAccessToken": "M2U1YzRlYWQtNmU1MS00MGJhLTlmMTUtNjBmOTgwNjc3YTU4fHJlYWQtd3JpdGU="
 }

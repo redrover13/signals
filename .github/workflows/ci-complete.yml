@@ -68,8 +68,6 @@ jobs:
 
       - name: Install pnpm
         uses: pnpm/action-setup@f2b2b233b538f500472c7274c7012f57857d8ce0
-        with:
-          version: 10
 
       - name: Check for lockfile drift
         run: |
@@ -119,8 +117,6 @@ jobs:
 
       - name: Install pnpm
         uses: pnpm/action-setup@f2b2b233b538f500472c7274c7012f57857d8ce0
-        with:
-          version: 10
 
 
       - name: Audit dependencies
@@ -153,8 +149,6 @@ jobs:
 
       - name: Install pnpm
         uses: pnpm/action-setup@f2b2b233b538f500472c7274c7012f57857d8ce0
-        with:
-          version: 10
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -250,8 +244,6 @@ jobs:
 
       - name: Install pnpm
         uses: pnpm/action-setup@f2b2b233b538f500472c7274c7012f57857d8ce0
-        with:
-          version: 10
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -319,8 +311,6 @@ jobs:
 
       - name: Install pnpm
         uses: pnpm/action-setup@f2b2b233b538f500472c7274c7012f57857d8ce0
-        with:
-          version: 10
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -352,8 +342,6 @@ jobs:
 
       - name: Install pnpm
         uses: pnpm/action-setup@f2b2b233b538f500472c7274c7012f57857d8ce0
-        with:
-          version: 10
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

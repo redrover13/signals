@@ -97,6 +97,8 @@ steps:
 substitutions:
   _ARTIFACT_REGISTRY: 'asia-southeast1-docker.pkg.dev'
   _GCP_REGION: 'asia-southeast1'
+  _DULCE_AGENTS_TOPIC: 'dulce.agents'
+  _DULCE_AGENT_RUNS_TABLE: 'dulce_agent_runs'
 
 images:
   - '${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/agent-runner:${_GITHUB_SHA}'

@@ -91,7 +91,7 @@ def verify_event_in_bigquery(
             results = list(query_job.result(timeout=30))
             
             if results:
-                retrieved_row = dict(results[0])
+                retrieved_row = results[0]
                 original_timestamp = datetime.fromisoformat(original_payload["timestamp"])
                 retrieved_timestamp = retrieved_row["timestamp"].replace(tzinfo=timezone.utc)
                 time_diff = abs((retrieved_timestamp - original_timestamp).total_seconds())

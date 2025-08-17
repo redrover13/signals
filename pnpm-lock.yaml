@@ -23,6 +23,9 @@ importers:
       '@google-cloud/bigquery':
         specifier: 8.1.1
         version: 8.1.1
+      '@google-cloud/secret-manager':
+        specifier: ^6.1.0
+        version: 6.1.0
       '@google-cloud/storage':
         specifier: 7.16.0
         version: 7.16.0
@@ -916,6 +919,10 @@ packages:
   '@google-cloud/pubsub@4.11.0':
     resolution: {integrity: sha512-xWxJAlyUGd6OPp97u8maMcI3xVXuHjxfwh6Dr7P/P+6NK9o446slJobsbgsmK0xKY4nTK8m5uuJrhEKapfZSmQ==}
     engines: {node: '>=14.0.0'}
+
+  '@google-cloud/secret-manager@6.1.0':
+    resolution: {integrity: sha512-IrXjT1z2yW98htydkopcxdhNVh4rpAzO3oTVzKymfdnzmzCKWVxhfwYWWvIor1bzgQN4sa21Wv0CMDokJyTt7A==}
+    engines: {node: '>=18'}
 
   '@google-cloud/storage@7.16.0':
     resolution: {integrity: sha512-7/5LRgykyOfQENcm6hDKP8SX/u9XxE5YOiWOkgkwcoO+cG8xT/cyOvp9wwN3IxfdYgpHs8CE7Nq2PKX2lNaEXw==}
@@ -6685,6 +6692,12 @@ snapshots:
       p-defer: 3.0.0
     transitivePeerDependencies:
       - encoding
+      - supports-color
+
+  '@google-cloud/secret-manager@6.1.0':
+    dependencies:
+      google-gax: 5.0.3
+    transitivePeerDependencies:
       - supports-color
 
   '@google-cloud/storage@7.16.0':

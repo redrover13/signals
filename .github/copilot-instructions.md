@@ -1,113 +1,163 @@
-# Dulce de Saigon F&B Data Platform - Developer Instructions
+# Qodo AI Assistant - Enhanced Project Instructions
 
-This document provides essential information for developers working on the Dulce de Saigon F&B Data Platform, focusing on the "Memory Bank" feature and overall project guidelines.
+This document provides comprehensive instructions for the Qodo AI assistant to ensure it provides maximum support and leverages the full potential of the configured MCP servers for the "Dulce de Saigon" F&B Data Platform.
 
-## About This Project
+## 1. About This Project
 
-The "Dulce de Saigon" project is designed to be a leading Food & Beverage (F&B) data platform specifically tailored for the Vietnamese market. Its core component, the "Memory Bank," acts as a centralized repository for all F&B-related data, including menu items, pricing, customer preferences, sales analytics, and supply chain information. The primary objectives are:
+The "Dulce de Saigon" project is a leading Food & Beverage (F&B) data platform for the Vietnamese market. Its "Memory Bank" centralizes all F&B data, including menus, pricing, customer preferences, and sales analytics. The platform is built on Google Cloud Platform (GCP) and emphasizes scalability, real-time analytics, and compliance with Vietnamese data privacy laws.
 
-*   **Data Centralization:** Consolidate data from various sources into a single, accessible location.
-*   **Vietnamese Market Focus:** Tailor data structures and processes to meet unique local requirements.
-*   **Google Cloud Integration:** Leverage GCP for scalable, secure, and cost-effective data solutions.
-*   **Compliance:** Adherence to Vietnamese data privacy laws and regulations.
-*   **Real-time Analytics:** Provide immediate insights into sales, inventory, and customer behavior.
+## 2. Core Technologies & Frameworks
 
-## Core Technologies & Frameworks
+- **Cloud Provider:** Google Cloud Platform (GCP)
+- **Infrastructure as Code:** Terraform
+- **Monorepo Management:** Nx
+- **Programming Language:** TypeScript (Node.js v18+)
+- **Package Manager:** PNPM
+- **Frontend:** Next.js (React)
+- **CI/CD:** GitHub Actions, Nx Cloud
 
-The platform is built on a modern technology stack to ensure scalability, maintainability, and performance.
+## 3. Project Structure
 
-*   **Google Cloud Platform (GCP):** The primary cloud provider.
-    *   [Cloud Run](https://cloud.google.com/run/docs): For stateless microservices and APIs.
-    *   [Cloud Functions](https://cloud.google.com/functions/docs): For event-driven processing.
-    *   [BigQuery](https://cloud.google.com/bigquery/docs): For analytical data warehousing.
-    *   [Cloud SQL (PostgreSQL)](https://cloud.google.com/sql/docs): For transactional data.
-    *   [Cloud Storage](https://cloud.google.com/storage/docs): For object storage (media, backups).
-    *   [Pub/Sub](https://cloud.google.com/pubsub/docs): For asynchronous messaging.
-    *   [Cloud Build](https://cloud.google.com/cloud-build/docs): For CI/CD pipelines.
-    *   [Artifact Registry](https://cloud.google.com/artifact-registry/docs): For container image storage.
-    *   [Terraform](https://www.terraform.io/docs): For Infrastructure as Code.
-*   **Nx Monorepo:** For managing multiple applications and libraries within a single repository.
-    *   [Nx Documentation](https://nx.dev/getting-started/intro)
-*   **TypeScript:** Primary programming language for backend and frontend.
-    *   [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
-    *   Node.js: v18.x LTS (refer to `.nvmrc` for specific version).
-    *   [Node.js Documentation](https://nodejs.org/docs/)
-*   **PNPM:** Preferred package manager for efficiency in monorepos.
-    *   [PNPM Documentation](https://pnpm.io/documentation)
-*   **Frontend (Web Dashboard):** React.js.
-    *   [React Documentation](https://react.dev/learn)
+- `apps/`: Independent applications (API, web, mobile, agents).
+- `libs/`: Shared libraries (GCP clients, data models, auth, etc.).
+- `docs/`: Project documentation.
+- `infra/`: Terraform configurations.
+- `tests/`: End-to-end and integration tests.
+- `.github/`: GitHub configurations, including these instructions.
 
-## Project Structure
+## 4. Coding Style & Conventions
 
-The project follows an Nx monorepo structure, organizing code into distinct `apps/` and `libs/` directories.
+- **Formatting:** Enforced by Prettier and ESLint.
+- **Asynchronous Operations:** Use `async/await`.
+- **Immutability:** Prioritize where possible.
+- **Naming:** `camelCase` for attributes, `PascalCase` for entities, `DDS-` prefix for internal IDs.
+- **Comments:** Use JSDoc for all public APIs and complex logic.
 
-*   `apps/`: Contains independent applications/microservices.
-    *   `api/`: REST API services for data ingestion and management.
-    *   `web/`: Web dashboard application (e.g., React-based).
-    *   `mobile/`: Mobile application (if applicable).
-    *   `agents/`: AI agents for data processing and automation.
-*   `libs/`: Contains shared libraries and utilities used across applications.
-    *   `gcp/`: Google Cloud Platform client integrations and helpers.
-    *   `data-models/`: Shared data models and interfaces.
-    *   `analytics/`: Utilities for analytics processing.
-    *   `auth/`: Authentication and authorization logic.
-    *   `vietnamese-localization/`: Components and utilities for Vietnamese language and cultural adaptations.
-*   `docs/`: Comprehensive project documentation, architectural diagrams, and guides.
-*   `infra/`: Terraform configurations for deploying GCP infrastructure.
-*   `tests/`: End-to-end (E2E) and integration tests that span multiple services.
-*   `.github/`: GitHub-specific configurations, including Copilot instructions and workflows.
-*   `.codacy/`: Codacy static analysis configurations.
+## 5. MCP Server Integration: Guidelines for Qodo
 
-## Coding Style & Conventions
+This section details how to use the 27 configured MCP servers to maximize your effectiveness. Adhere to these guidelines when assisting with development tasks.
 
-Adherence to consistent coding standards ensures readability, maintainability, and quality across the codebase.
+### Core & Development Servers
 
-*   **General Style:** Automated formatting is enforced using Prettier (`.prettierrc`) and linting with ESLint (`.eslintrc.json`). Ensure these tools are correctly configured and run before committing code.
-*   **Language-Specific Guidelines:**
-    *   **TypeScript/Node.js:**
-        *   All asynchronous operations must use `async/await` for better readability and error handling.
-        *   Prioritize immutability where possible.
-        *   Ensure robust error handling for all API interactions and critical business logic.
-    *   **React (if applicable):**
-        *   Always use functional components and React Hooks for state management and side effects.
-        *   Prefer composition over inheritance.
-*   **Naming Conventions:**
-    *   Use `camelCase` for attribute names (`menuItemId`, `itemName`).
-    *   Use `PascalCase` for entity names (`MenuItem`, `CustomerOrder`).
-    *   All internal IDs should be prefixed with `DDS-` (e.g., `DDS-MENU-`, `DDS-ORDER-`).
-    *   Vietnamese characters are allowed in names and descriptions where appropriate for localization, ensuring proper UTF-8 encoding.
-*   **Comments & Documentation:**
-    *   Write clear, concise comments for complex logic, public APIs, and any non-obvious code.
-    *   Use JSDoc for documenting functions, classes, and types where applicable.
-*   **`sudo` on Windows Developer Setting:**
-    *   **Purpose:** This setting specifically provides elevated privileges to access directories or files that typical user permissions might restrict on Windows. It is primarily relevant when running commands that interact with the file system on a deeper level, especially in environments involving WSL (Windows Subsystem for Linux), Docker, or global Node.js/PNPM package installations.
-    *   **When to Use:** You might encounter permission errors during local development operations like:
-        *   Running `pnpm install` or `pnpm store prune` if the PNPM content-addressable store is located in a privileged directory or if there are conflicts with cached packages.
-        *   Interacting with certain system-level development tools that expect wider file system access.
-        *   Performing operations within Docker Desktop's shared drives that require elevated permissions.
-    *   **Important Note:** Use `sudo` **only when explicitly necessary** and when encountering permission errors. Avoid its blanket use for all commands, as it can mask underlying configuration issues or pose security risks by granting unnecessary privileges to processes. Always understand what a command does before executing it with `sudo`.
+1.  **`github`**: **Primary tool for repository interaction.**
+    -   **Use for:** Creating/reviewing PRs, managing issues, searching for code, and understanding repository structure.
+    -   **Guidelines:** Before making code changes, always check for related open issues or PRs. When creating a new feature, start by creating a new issue.
 
-## CI/CD Pipeline Overview
+2.  **`git`**: **For all local Git operations.**
+    -   **Use for:** Reading file history, checking for local changes, and understanding branch differences.
+    -   **Guidelines:** Use this to analyze the history of a file before making changes to understand its evolution.
 
-The project incorporates a robust Continuous Integration/Continuous Deployment (CI/CD) pipeline to automate the software delivery process. (Refer to [`docs/CI_CD_WORKFLOW.md`](docs/CI_CD_WORKFLOW.md) for more details).
+3.  **`filesystem`**: **For interacting with the local file system.**
+    -   **Use for:** Reading, writing, and listing files and directories. Creating new files and modules.
+    -   **Guidelines:** Always use this server to read files before editing them. When creating new components, use this to create the necessary files and directories according to the project structure.
 
-1.  **Code Commit:** Changes pushed to the repository trigger automated workflows.
-2.  **Static Analysis:** Codacy runs various code quality and security checks ([`.codacy.yml`](.codacy.yml)).
-3.  **Automated Testing:** Unit, integration, and end-to-end tests are executed. Nx's `affected` commands are used to only build and test changed projects.
-4.  **Build:** Container images are built for microservices and stored in Artifact Registry.
-5.  **Deployment:** Built artifacts are deployed to respective GCP services (e.g., Cloud Run, Cloud Functions, GKE) in a progressive manner.
-6.  **Monitoring:** Post-deployment, Cloud Monitoring and Logging ensure the health and performance of the deployed services.
+4.  **`sequentialthinking`**: **For planning and complex problem-solving.**
+    -   **Use for:** Breaking down complex tasks into smaller, manageable steps. Planning the implementation of new features.
+    -   **Guidelines:** Before starting any non-trivial task, use this server to outline a clear plan of action.
 
-## Important Do's and Don'ts
+5.  **`fetch`**: **For accessing external web content.**
+    -   **Use for:** Fetching data from external APIs, reading documentation from websites, or accessing web content.
+    -   **Guidelines:** Use this to gather information from external sources when needed for a task.
 
-Follow these critical guidelines to maintain code quality, security, and project integrity:
+6.  **`memory`**: **For knowledge persistence.**
+    -   **Use for:** Storing and retrieving information related to the project, such as architectural decisions, common patterns, and important notes.
+    -   **Guidelines:** Use this to build a knowledge base about the project to improve your context and understanding over time.
 
-*   **DO NOT** commit API keys, secrets, or sensitive configuration data directly into the repository. Use [Google Cloud Secret Manager](https://cloud.google.com/secret-manager) and adhere to the guidelines in [`docs/SECRETS.md`](docs/SECRETS.md).
-*   **DO NOT** bypass CI/CD checks without explicit approval from a lead engineer.
-*   **DO NOT** introduce breaking changes to data models, APIs, or interfaces without corresponding updates to all affected services and clear documentation.
-*   **DO NOT** use hardcoded values for environment-specific configurations (e.g., database URLs, API endpoints). Use environment variables or Secret Manager.
-*   **ALWAYS** write comprehensive unit tests for all new utility functions, components, and critical business logic. Aim for high test coverage.
-*   **ALWAYS** ensure your code is linted and properly formatted before committing. Use `pnpm lint` and `pnpm format` commands.
-*   **ALWAYS** adhere strictly to Vietnamese data privacy regulations (Personal Data Protection Law). Consult [`.kilocode/rules/vietnamese-compliance.md`](.kilocode/rules/vietnamese-compliance.md) for detailed requirements regarding data residency, consent, and subject rights.
-*   **ALWAYS** review and approve pull requests thoroughly before merging.
-*   **ALWAYS** consider the performance and cost implications of any new features or architectural changes, especially regarding GCP resource usage (`.kilocode/rules/google-cloud-optimization.md`). Optimize for efficiency and free-tier usage where possible.
+7.  **`time`**: **For time-related operations.**
+    -   **Use for:** Getting the current time, converting timezones, and performing other time-related calculations.
+    -   **Guidelines:** Use this whenever you need to work with dates and times to ensure accuracy.
+
+8.  **`everything`**: **For testing and debugging MCP integrations.**
+    -   **Use for:** Verifying that the MCP client is working correctly and for testing new MCP features.
+    -   **Guidelines:** Use this as a diagnostic tool if you suspect issues with the MCP connection.
+
+### Data & Databases
+
+9.  **`databases` (Google's MCP Toolbox)**: **For all database interactions.**
+    -   **Use for:** Querying and managing data in PostgreSQL, BigQuery, and other databases.
+    -   **Guidelines:** Use this to interact with the project's databases for data retrieval, updates, and schema exploration.
+
+10. **`chroma`**: **For vector search and embeddings.**
+    -   **Use for:** Implementing semantic search, RAG (Retrieval-Augmented Generation), and other AI-powered features.
+    -   **Guidelines:** Use this when you need to work with vector embeddings for tasks like similarity search or content recommendations.
+
+### Web & API
+
+11. **`exa`**: **For AI-native web search.**
+    -   **Use for:** Performing intelligent searches to find relevant information, code examples, and documentation.
+    -   **Guidelines:** Use this as your primary search tool to get more accurate and context-aware results.
+
+12. **`netlify` & `cloudflare`**: **For managing deployments and cloud infrastructure.**
+    -   **Use for:** Interacting with Netlify and Cloudflare for deployments, DNS management, and other platform-specific tasks.
+    -   **Guidelines:** Use these servers to automate deployment and infrastructure management tasks.
+
+13. **`apimatic`**: **For OpenAPI/Swagger validation.**
+    -   **Use for:** Validating and linting OpenAPI specifications to ensure they are compliant and well-formed.
+    -   **Guidelines:** Before making changes to any API, use this to validate the OpenAPI specification.
+
+### Platforms & Docs
+
+14. **`notion`**: **For accessing project documentation in Notion.**
+    -   **Use for:** Reading and updating project documentation, roadmaps, and notes stored in Notion.
+    -   **Guidelines:** Use this to keep the project's documentation in sync with the codebase.
+
+15. **`mslearn`**: **For accessing Microsoft's official documentation.**
+    -   **Use for:** Getting accurate and up-to-date information on Microsoft technologies, including TypeScript and VS Code.
+    -   **Guidelines:** Use this as a primary source for technical documentation related to Microsoft products.
+
+16. **`firebase`**: **For interacting with Firebase services.**
+    -   **Use for:** Managing Firebase projects, including Firestore, Authentication, and Hosting.
+    -   **Guidelines:** Use this to automate Firebase-related tasks.
+
+### Nx, Node.js, Google & Website Building
+
+17. **`nx`**: **For managing the Nx monorepo.**
+    -   **Use for:** Running Nx commands, analyzing the project graph, and generating new code.
+    -   **Guidelines:** Use this as your primary tool for interacting with the Nx workspace.
+
+18. **`google-cloud-run`**: **For deploying to Google Cloud Run.**
+    -   **Use for:** Automating the deployment of services to Google Cloud Run.
+    -   **Guidelines:** Use this to streamline your deployment workflow.
+
+19. **`google-maps`**: **For Google Maps Platform assistance.**
+    -   **Use for:** Getting help with the Google Maps API, including code samples and documentation.
+    -   **Guidelines:** Use this when you need to work with Google Maps.
+
+20. **`algolia`**: **For implementing search features.**
+    -   **Use for:** Integrating Algolia's search-as-a-service into your applications.
+    -   **Guidelines:** Use this to build powerful and fast search experiences.
+
+21. **`browserbase` & `browserstack`**: **For browser automation and testing.**
+    -   **Use for:** Running automated browser tests, performing cross-browser compatibility checks, and automating web interactions.
+    -   **Guidelines:** Use these to ensure your web applications are robust and work correctly across all major browsers.
+
+22. **`builtwith`**: **For identifying website technologies.**
+    -   **Use for:** Analyzing the technology stack of any website.
+    -   **Guidelines:** Use this to research competitors or to understand the technologies used by other websites.
+
+23. **`magic` (21st.dev)**: **For generating UI components.**
+    -   **Use for:** Creating UI components based on design specifications.
+    -   **Guidelines:** Use this to accelerate your frontend development workflow.
+
+24. **`make`**: **For workflow automation.**
+    -   **Use for:** Creating and managing automated workflows with Make.com.
+    -   **Guidelines:** Use this to automate repetitive tasks and integrate different services.
+
+25. **`devhub`**: **For content management.**
+    -   **Use for:** Managing content for your websites and applications.
+    -   **Guidelines:** Use this to streamline your content management workflow.
+	
+26. **`node`**: **For Node.js specific tasks.**
+    -   **Use for:** Running Node.js scripts, managing packages, and other Node.js related tasks.
+    -   **Guidelines:** Use this for all your Node.js development needs.
+
+27. **`google`**: **For general Google Cloud interactions.**
+    -   **Use for:** Interacting with various Google Cloud services not covered by other more specific servers.
+    -   **Guidelines:** Use this as a general-purpose tool for Google Cloud.
+
+## 6. Important Do's and Don'ts
+
+- **DO NOT** commit secrets. Use Google Cloud Secret Manager.
+- **ALWAYS** write comprehensive unit tests.
+- **ALWAYS** adhere to Vietnamese data privacy regulations.
+- **ALWAYS** optimize for performance and cost on GCP.

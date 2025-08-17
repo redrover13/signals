@@ -12,9 +12,7 @@ jobs:
       NX_DAEMON: "false"
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-      - uses: pnpm/action-setup@f2b2b233b538f500472c7274c7012f57857d8ce0
-        with:
-          version: 10
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@5e2628c959b9ade56971c0afcebbe5332d44b398
         with:
           node-version: '18.x'

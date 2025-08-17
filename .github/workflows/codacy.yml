@@ -39,15 +39,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup pnpm and Node.js
+        uses: pnpm/action-setup@v3
         with:
-          node-version: '20' # Or your project's required Node.js version
+          version: 8
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install Prettier globally
+        run: pnpm add -g prettier
 
       - name: Display Node.js and PNPM versions
         run: |
           node -v
-          pnpm -v # Assuming pnpm is installed or installed as part of your Node.js setup if needed
+          pnpm -v
+          prettier --version
 
       - name: Run Codacy Analysis CLI
         uses: codacy/codacy-analysis-cli-action@d840f886c4bd4edc059706d09c6a1586111c540b

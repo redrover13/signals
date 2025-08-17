@@ -116,7 +116,8 @@ def main():
         success = verify_event_in_bigquery(bigquery_client, event_id, sample_payload)
         exit(0 if success else 1)
         
-    except Exception:
+    except Exception as e:
+        print(f"E2E test failed with an exception: {e}")
         exit(1)
 
 

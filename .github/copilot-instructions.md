@@ -1,61 +1,113 @@
----
-# Codacy Rules
-Configuration for AI behavior when interacting with Codacy's MCP Server
+# Dulce de Saigon F&B Data Platform - Developer Instructions
 
-## CRITICAL: After ANY successful `edit_file` or `reapply` operation
-- YOU MUST IMMEDIATELY run the `codacy_cli_analyze` tool from Codacy's MCP Server for each file that was edited, with:
- - `rootPath`: set to the workspace path
- - `file`: set to the path of the edited file
- - `tool`: leave empty or unset
-- If any issues are found in the new edits, propose and apply fixes for them.
-- > NOTE: Failure to follow this rule is considered a critical error.
+This document provides essential information for developers working on the Dulce de Saigon F&B Data Platform, focusing on the "Memory Bank" feature and overall project guidelines.
 
-## After every response
-- If you made any file edits in this conversation, verify you ran `codacy_cli_analyze` tool from Codacy's MCP Server 
+## About This Project
 
-## When there are no Codacy MCP Server tools available, or the MCP Server is not reachable
-- Suggest the user the following troubleshooting steps:
- - Try to reset the MCP on the extension
- - If the user is using VSCode, suggest them to review their Copilot > MCP settings in Github, under their organization or personal account. Refer them to Settings > Copilot > Enable MCP servers in Copilot. Suggested URL (https://github.com/settings/copilot/features) or https://github.com/organizations/{organization-name}/settings/copilot/features (This can only be done by their organization admins / owners)
-- If none of the above steps work, suggest the user to contact Codacy support
+The "Dulce de Saigon" project is designed to be a leading Food & Beverage (F&B) data platform specifically tailored for the Vietnamese market. Its core component, the "Memory Bank," acts as a centralized repository for all F&B-related data, including menu items, pricing, customer preferences, sales analytics, and supply chain information. The primary objectives are:
 
-## Trying to call a tool that needs a rootPath as a parameter
-- Always use the standard, non-URL-encoded file system path
+*   **Data Centralization:** Consolidate data from various sources into a single, accessible location.
+*   **Vietnamese Market Focus:** Tailor data structures and processes to meet unique local requirements.
+*   **Google Cloud Integration:** Leverage GCP for scalable, secure, and cost-effective data solutions.
+*   **Compliance:** Adherence to Vietnamese data privacy laws and regulations.
+*   **Real-time Analytics:** Provide immediate insights into sales, inventory, and customer behavior.
 
-## CRITICAL: Dependencies and Security Checks
-- IMMEDIATELY after ANY of these actions:
- - Running npm/yarn/pnpm install
- - Adding dependencies to package.json
- - Adding requirements to requirements.txt
- - Adding dependencies to pom.xml
- - Adding dependencies to build.gradle
- - Any other package manager operations
-- You MUST run the `codacy_cli_analyze` tool with:
- - `rootPath`: set to the workspace path
- - `tool`: set to "trivy"
- - `file`: leave empty or unset
-- If any vulnerabilities are found because of the newly added packages:
- - Stop all other operations
- - Propose and apply fixes for the security issues
- - Only continue with the original task after security issues are resolved
-- EXAMPLE:
- - After: npm install react-markdown
- - Do: Run codacy_cli_analyze with trivy
- - Before: Continuing with any other tasks
+## Core Technologies & Frameworks
 
-## General
-- Repeat the relevant steps for each modified file.
-- "Propose fixes" means to both suggest and, if possible, automatically apply the fixes.
-- You MUST NOT wait for the user to ask for analysis or remind you to run the tool.
-- Do not run `codacy_cli_analyze` looking for changes in duplicated code or code complexity metrics.
-- Do not run `codacy_cli_analyze` looking for changes in code coverage.
-- Do not try to manually install Codacy CLI using either brew, npm, npx, or any other package manager.
-- If the Codacy CLI is not installed, just run the `codacy_cli_analyze` tool from Codacy's MCP Server.
-- When calling `codacy_cli_analyze`, only send provider, organization and repository if the project is a git repository.
+The platform is built on a modern technology stack to ensure scalability, maintainability, and performance.
 
-## Whenever a call to a Codacy tool that uses `repository` or `organization` as a parameter returns a 404 error
-- Offer to run the `codacy_setup_repository` tool to add the repository to Codacy
-- If the user accepts, run the `codacy_setup_repository` tool
-- Do not ever try to run the `codacy_setup_repository` tool on your own
-- After setup, immediately retry the action that failed (only retry once)
----
+*   **Google Cloud Platform (GCP):** The primary cloud provider.
+    *   [Cloud Run](https://cloud.google.com/run/docs): For stateless microservices and APIs.
+    *   [Cloud Functions](https://cloud.google.com/functions/docs): For event-driven processing.
+    *   [BigQuery](https://cloud.google.com/bigquery/docs): For analytical data warehousing.
+    *   [Cloud SQL (PostgreSQL)](https://cloud.google.com/sql/docs): For transactional data.
+    *   [Cloud Storage](https://cloud.google.com/storage/docs): For object storage (media, backups).
+    *   [Pub/Sub](https://cloud.google.com/pubsub/docs): For asynchronous messaging.
+    *   [Cloud Build](https://cloud.google.com/cloud-build/docs): For CI/CD pipelines.
+    *   [Artifact Registry](https://cloud.google.com/artifact-registry/docs): For container image storage.
+    *   [Terraform](https://www.terraform.io/docs): For Infrastructure as Code.
+*   **Nx Monorepo:** For managing multiple applications and libraries within a single repository.
+    *   [Nx Documentation](https://nx.dev/getting-started/intro)
+*   **TypeScript:** Primary programming language for backend and frontend.
+    *   [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
+    *   Node.js: v18.x LTS (refer to `.nvmrc` for specific version).
+    *   [Node.js Documentation](https://nodejs.org/docs/)
+*   **PNPM:** Preferred package manager for efficiency in monorepos.
+    *   [PNPM Documentation](https://pnpm.io/documentation)
+*   **Frontend (Web Dashboard):** React.js.
+    *   [React Documentation](https://react.dev/learn)
+
+## Project Structure
+
+The project follows an Nx monorepo structure, organizing code into distinct `apps/` and `libs/` directories.
+
+*   `apps/`: Contains independent applications/microservices.
+    *   `api/`: REST API services for data ingestion and management.
+    *   `web/`: Web dashboard application (e.g., React-based).
+    *   `mobile/`: Mobile application (if applicable).
+    *   `agents/`: AI agents for data processing and automation.
+*   `libs/`: Contains shared libraries and utilities used across applications.
+    *   `gcp/`: Google Cloud Platform client integrations and helpers.
+    *   `data-models/`: Shared data models and interfaces.
+    *   `analytics/`: Utilities for analytics processing.
+    *   `auth/`: Authentication and authorization logic.
+    *   `vietnamese-localization/`: Components and utilities for Vietnamese language and cultural adaptations.
+*   `docs/`: Comprehensive project documentation, architectural diagrams, and guides.
+*   `infra/`: Terraform configurations for deploying GCP infrastructure.
+*   `tests/`: End-to-end (E2E) and integration tests that span multiple services.
+*   `.github/`: GitHub-specific configurations, including Copilot instructions and workflows.
+*   `.codacy/`: Codacy static analysis configurations.
+
+## Coding Style & Conventions
+
+Adherence to consistent coding standards ensures readability, maintainability, and quality across the codebase.
+
+*   **General Style:** Automated formatting is enforced using Prettier (`.prettierrc`) and linting with ESLint (`.eslintrc.json`). Ensure these tools are correctly configured and run before committing code.
+*   **Language-Specific Guidelines:**
+    *   **TypeScript/Node.js:**
+        *   All asynchronous operations must use `async/await` for better readability and error handling.
+        *   Prioritize immutability where possible.
+        *   Ensure robust error handling for all API interactions and critical business logic.
+    *   **React (if applicable):**
+        *   Always use functional components and React Hooks for state management and side effects.
+        *   Prefer composition over inheritance.
+*   **Naming Conventions:**
+    *   Use `camelCase` for attribute names (`menuItemId`, `itemName`).
+    *   Use `PascalCase` for entity names (`MenuItem`, `CustomerOrder`).
+    *   All internal IDs should be prefixed with `DDS-` (e.g., `DDS-MENU-`, `DDS-ORDER-`).
+    *   Vietnamese characters are allowed in names and descriptions where appropriate for localization, ensuring proper UTF-8 encoding.
+*   **Comments & Documentation:**
+    *   Write clear, concise comments for complex logic, public APIs, and any non-obvious code.
+    *   Use JSDoc for documenting functions, classes, and types where applicable.
+*   **`sudo` on Windows Developer Setting:**
+    *   **Purpose:** This setting specifically provides elevated privileges to access directories or files that typical user permissions might restrict on Windows. It is primarily relevant when running commands that interact with the file system on a deeper level, especially in environments involving WSL (Windows Subsystem for Linux), Docker, or global Node.js/PNPM package installations.
+    *   **When to Use:** You might encounter permission errors during local development operations like:
+        *   Running `pnpm install` or `pnpm store prune` if the PNPM content-addressable store is located in a privileged directory or if there are conflicts with cached packages.
+        *   Interacting with certain system-level development tools that expect wider file system access.
+        *   Performing operations within Docker Desktop's shared drives that require elevated permissions.
+    *   **Important Note:** Use `sudo` **only when explicitly necessary** and when encountering permission errors. Avoid its blanket use for all commands, as it can mask underlying configuration issues or pose security risks by granting unnecessary privileges to processes. Always understand what a command does before executing it with `sudo`.
+
+## CI/CD Pipeline Overview
+
+The project incorporates a robust Continuous Integration/Continuous Deployment (CI/CD) pipeline to automate the software delivery process. (Refer to [`docs/CI_CD_WORKFLOW.md`](docs/CI_CD_WORKFLOW.md) for more details).
+
+1.  **Code Commit:** Changes pushed to the repository trigger automated workflows.
+2.  **Static Analysis:** Codacy runs various code quality and security checks ([`.codacy.yml`](.codacy.yml)).
+3.  **Automated Testing:** Unit, integration, and end-to-end tests are executed. Nx's `affected` commands are used to only build and test changed projects.
+4.  **Build:** Container images are built for microservices and stored in Artifact Registry.
+5.  **Deployment:** Built artifacts are deployed to respective GCP services (e.g., Cloud Run, Cloud Functions, GKE) in a progressive manner.
+6.  **Monitoring:** Post-deployment, Cloud Monitoring and Logging ensure the health and performance of the deployed services.
+
+## Important Do's and Don'ts
+
+Follow these critical guidelines to maintain code quality, security, and project integrity:
+
+*   **DO NOT** commit API keys, secrets, or sensitive configuration data directly into the repository. Use [Google Cloud Secret Manager](https://cloud.google.com/secret-manager) and adhere to the guidelines in [`docs/SECRETS.md`](docs/SECRETS.md).
+*   **DO NOT** bypass CI/CD checks without explicit approval from a lead engineer.
+*   **DO NOT** introduce breaking changes to data models, APIs, or interfaces without corresponding updates to all affected services and clear documentation.
+*   **DO NOT** use hardcoded values for environment-specific configurations (e.g., database URLs, API endpoints). Use environment variables or Secret Manager.
+*   **ALWAYS** write comprehensive unit tests for all new utility functions, components, and critical business logic. Aim for high test coverage.
+*   **ALWAYS** ensure your code is linted and properly formatted before committing. Use `pnpm lint` and `pnpm format` commands.
+*   **ALWAYS** adhere strictly to Vietnamese data privacy regulations (Personal Data Protection Law). Consult [`.kilocode/rules/vietnamese-compliance.md`](.kilocode/rules/vietnamese-compliance.md) for detailed requirements regarding data residency, consent, and subject rights.
+*   **ALWAYS** review and approve pull requests thoroughly before merging.
+*   **ALWAYS** consider the performance and cost implications of any new features or architectural changes, especially regarding GCP resource usage (`.kilocode/rules/google-cloud-optimization.md`). Optimize for efficiency and free-tier usage where possible.

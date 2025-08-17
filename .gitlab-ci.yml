@@ -1,0 +1,150 @@
+#
+# GitLab CI/CD Pipeline for Dulce de Saigon - Memory Bank
+#
+# This pipeline replicates the functionality of the existing Google Cloud Build
+# configuration, ensuring comprehensive CI/CD for the Dulce de Saigon platform.
+#
+stages:
+  - install_dependencies
+  - security_and_lint
+  - test
+  - build
+  - deploy
+
+# Global variables & Default settings
+variables:
+  GCP_PROJECT_ID: "your-gcp-project-id" # Must be configured in GitLab CI/CD settings
+  GCP_REGION: "asia-southeast1"
+  ARTIFACT_REGISTRY: "asia-southeast1-docker.pkg.dev"
+  NX_BASE: ${CI_MERGE_REQUEST_TARGET_BRANCH_SHA:-main}
+  NX_HEAD: ${CI_COMMIT_SHA}
+  NX_DAEMON: "false"
+
+default:
+  image: node:20
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}-pnpm
+    paths:
+      - .pnpm-store
+      - node_modules/
+    policy: pull-push
+
+# Base job for pnpm setup
+.pnpm_base:
+  before_script:
+    - npm install -g pnpm
+    - pnpm config set store-dir ~/.pnpm-store
+    - pnpm install --frozen-lockfile
+
+# Stage 1: Install Dependencies
+install_dependencies:
+  stage: install_dependencies
+  extends: .pnpm_base
+  script:
+    - echo "Dependencies installed and lockfile is valid."
+
+# Stage 2: Security Scans & Linters
+sast_scan:
+  stage: security_and_lint
+  extends: .pnpm_base
+  script:
+    - npm install -g secretlint @secretlint/secretlint-rule-preset-recommend
+    - secretlint "**/*"
+    - pnpm nx format:check
+    - pnpm nx affected:lint --base=$NX_BASE --head=$NX_HEAD
+  allow_failure: true
+
+dependency_audit:
+    stage: security_and_lint
+    extends: .pnpm_base
+    script:
+        - pnpm audit --audit-level=high --prod
+
+# Stage 3: Testing
+unit_tests:
+    stage: test
+    extends: .pnpm_base
+    script:
+        - pnpm nx affected:test --base=$NX_BASE --head=$NX_HEAD --coverage
+    coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+    artifacts:
+        reports:
+          junit: "**/test-results/**/*.xml"
+          coverage_report:
+            coverage_format: cobertura
+            path: "coverage/**/cobertura-coverage.xml"
+        paths:
+          - "coverage/"
+        expire_in: 1 day
+
+e2e_tests:
+  stage: test
+  extends: .pnpm_base
+  script:
+    - pnpm nx affected:e2e --base=$NX_BASE --head=$NX_HEAD
+  rules:
+    - when: manual
+
+# Stage 4: Build & Containerize
+build_services:
+  stage: build
+  extends: .pnpm_base
+  script:
+    - pnpm nx affected:build --base=$NX_BASE --head=$NX_HEAD
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 hour
+
+containerize_and_scan:
+  stage: build
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  needs: [build_services]
+  before_script:
+    - |
+      echo $GCP_SA_KEY | base64 -d > /tmp/gcp-key.json
+      if [ -s /tmp/gcp-key.json ]; then
+        docker login -u _json_key --password-stdin https://${ARTIFACT_REGISTRY} < /tmp/gcp-key.json
+      else
+        echo "GCP_SA_KEY is not configured. Docker login skipped."
+      fi
+    - apk add --no-cache curl
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.34.0
+  script:
+    - |
+      for service in apps/*; do
+        if [ -f "$service/Dockerfile" ]; then
+          SERVICE_NAME=$(basename "$service")
+          IMAGE_TAG="${ARTIFACT_REGISTRY}/${GCP_PROJECT_ID}/dulce/${SERVICE_NAME}:${CI_COMMIT_SHA}"
+          echo "Building ${SERVICE_NAME}..."
+          docker build -f "${service}/Dockerfile" -t "${IMAGE_TAG}" .
+          echo "Scanning ${IMAGE_TAG} with Trivy..."
+          trivy image --exit-code 1 --severity HIGH,CRITICAL "${IMAGE_TAG}"
+          echo "Pushing ${IMAGE_TAG} to Artifact Registry..."
+          docker push "${IMAGE_TAG}"
+        fi
+      done
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Stage 5: Deploy
+deploy_gcp:
+  stage: deploy
+  image: google/cloud-sdk:latest
+  needs: [containerize_and_scan]
+  before_script:
+    - echo $GCP_SA_KEY | base64 -d > /tmp/gcp-key.json
+    - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+    - gcloud config set project ${GCP_PROJECT_ID}
+  script:
+    # Deploy API Service
+    - gcloud run deploy dulce-api --image ${ARTIFACT_REGISTRY}/${GCP_PROJECT_ID}/dulce/api:${CI_COMMIT_SHA} --platform managed --region ${GCP_REGION} --allow-unauthenticated
+    # Deploy Agents Service
+    - gcloud run deploy dulce-agents --image ${ARTIFACT_REGISTRY}/${GCP_PROJECT_ID}/dulce/agents:${CI_COMMIT_SHA} --platform managed --region ${GCP_REGION}
+    # Deploy Cloud Function
+    - gcloud functions deploy event-parser --entry-point parseAgentEvent --runtime nodejs20 --trigger-topic dulce.agents --region=${GCP_REGION} --source=apps/event-parser
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual

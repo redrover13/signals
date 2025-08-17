@@ -39,6 +39,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Or your project's required Node.js version
+
+      - name: Display Node.js and PNPM versions
+        run: |
+          node -v
+          pnpm -v # Assuming pnpm is installed or installed as part of your Node.js setup if needed
+
       - name: Run Codacy Analysis CLI
         uses: codacy/codacy-analysis-cli-action@d840f886c4bd4edc059706d09c6a1586111c540b
         with:

@@ -26,13 +26,13 @@ steps:
   # Step 2: Run linting for all affected projects
   - name: 'gcr.io/cloud-builders/npm'
     id: 'Run Linting'
-    args: ['-pnpm', 'nx', 'affected', '--target=lint', '--headless']
+    args: ['-pnpm', 'nx', 'affected', '--target=lint', '--base=HEAD~1', '--head=HEAD']
     entrypoint: 'npx'
 
   # Step 3: Run unit tests for all affected projects
   - name: 'gcr.io/cloud-builders/npm'
     id: 'Run Unit Tests'
-    args: ['-pnpm', 'nx', 'affected', '--target=test', '--headless']
+    args: ['-pnpm', 'nx', 'affected', '--target=test', '--base=HEAD~1', '--head=HEAD']
     entrypoint: 'npx'
 
   # Step 4: Validate Terraform configuration

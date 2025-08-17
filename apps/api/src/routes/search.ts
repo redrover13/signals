@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 const fs = require('fs');
 const path = require('path');
+const _ = require('lodash');
 
 interface SearchRequest {
   tool: string;
@@ -149,7 +150,8 @@ async function searchInFile(filePath: string, query: string, ciTerms: string[]):
     let relevance = 0;
     
     // Search for exact query matches (highest weight)
-    const queryRegex = new RegExp(query, 'gi');
+    const safeQuery = _.escapeRegExp(query);
+    const queryRegex = new RegExp(safeQuery, 'gi');
     const queryMatches = content.match(queryRegex);
     if (queryMatches) {
       relevance += queryMatches.length * 10;

@@ -54,7 +54,17 @@ def publish_event(
     """Publishes a single event to the specified Pub/Sub topic."""
     data = json.dumps(payload).encode("utf-8")
     future = publisher_client.publish(topic_path, data)
-    return future.result(timeout=30)
+    try:
+        return future.result(timeout=30)
+    except exceptions.GoogleAPICallError as api_error:
+        print(f"Google API call error while publishing event: {api_error}")
+        raise
+    except exceptions.TimeoutError as timeout_error:
+        print(f"Timeout error while publishing event: {timeout_error}")
+        raise
+    except Exception as e:
+        print(f"Unexpected error while publishing event: {e}")
+        raise
 
 
 def verify_event_in_bigquery(

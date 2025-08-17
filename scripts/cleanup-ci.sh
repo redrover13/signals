@@ -24,7 +24,8 @@ rm -f .gitlab-ci.yml
 # Backup and replace Cloud Build config
 echo "Backing up original cloudbuild.yaml..."
 mv cloudbuild.yaml cloudbuild-original.yaml.bak
-mv cloudbuild-optimized.yaml cloudbuild.yaml
+# Skipping replacement as cloudbuild-optimized.yaml does not exist
+# Ensure cloudbuild.yaml is backed up only
 
 echo "✅ CI/CD cleanup complete!"
 echo ""

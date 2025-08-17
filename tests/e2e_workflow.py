@@ -95,8 +95,8 @@ def verify_event_in_bigquery(
                 
         except exceptions.NotFound:
             return False
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"An error occurred while querying BigQuery: {e}")
             
         time.sleep(POLLING_INTERVAL_SECONDS)
     

@@ -1,0 +1,66 @@
+# .codacy.yml configuration for Dulce de Saigon F&B Data Platform
+
+# Configure Codacy analysis settings
+---
+engines:
+  # Static analysis engines to be enabled.
+  # Based on previous analysis, these engines cover various aspects of code quality,
+  # security, and maintainability for the project's technology stack.
+  - dartanalyzer:
+      enabled: false  # Assuming Dart is not a primary language in this monorepo unless specified otherwise
+  - eslint:
+      enabled: true
+      # Custom ESLint configuration, if required.
+      # This file will contain specific rules and plugins like @typescript-eslint/eslint-plugin.
+      # Ensure this path is correct relative to the repository root.
+      config: ./.eslintrc.json
+  - lizard: # Code complexity analysis
+      enabled: true
+      config: .codacy/tools-configs/lizard.json # Example path for custom lizard config
+  - pmd:
+      enabled: false # PMD is primarily for Java, assuming no Java code unless specified.
+  - pylint:
+      enabled: false # For Python, enable if Python services are part of the monorepo.
+  - revive: # Go linter, enable if Go services are part of the monorepo.
+      enabled: false
+  - semgrep: # For security analysis and custom rules across multiple languages
+      enabled: true
+      # Reference custom Semgrep rules located in the repository, e.g., in a `.semgrep` directory
+      config: ./.semgrep/rules.yaml # Example path for custom Semgrep rules
+  - trivy: # For container image and dependency vulnerability scanning
+      enabled: true
+      # Trivy typically scans images or file systems from CI.
+      # While specific config isn't usually set directly in .codacy.yml for Trivy,
+      # its inclusion here indicates its enablement. Further configuration
+      # might be in specialized files or CI/CD pipelines directly invoking Trivy.
+
+exclude_paths:
+  # Files and directories to be excluded from Codacy analysis.
+  # These are typically generated files, third-party libraries, or configuration files
+  # that are not part of the primary codebase needing direct analysis.
+  - "node_modules/**"       # Standard Node.js dependencies
+  - "dist/**"               # Compiled/build output directories
+  - "build/**"              # Another common build output directory
+  - "coverage/**"           # Test coverage reports
+  - "vendor/**"             # Third-party vendor libraries (if any, common in Go/PHP)
+  - "**/*.min.js"           # Minified JavaScript files
+  - "**/*.d.ts"             # TypeScript declaration files (generated)
+  - "apps/*/generated/**"   # Specific generated code within applications
+  - "libs/*/generated/**"   # Specific generated code within libraries
+  - "infra/terraform/**"    # Terraform configuration might be analyzed by other tools, but excluded from general code analysis engines here.
+  - "**/*.spec.ts"          # Exclude test files from static analysis unless specific test linting is desired.
+  - "**/*.test.ts"          # More test files
+  - ".husky/**"             # Git hooks
+  - ".kilocode/**"          # Internal tool configurations
+  - ".github/copilot-instructions.md" # Exclude this instruction file from code analysis.
+
+# Additional notes regarding CI runner permissions:
+# While the "sudo on Windows developer setting" is primarily a local development concern,
+# it's important to ensure that the Codacy CI runner environment has the necessary
+# permissions to execute the chosen analysis tools. For most static analysis tools,
+# standard user permissions are sufficient. However, if any engine (e.g., Trivy for
+# full system scans or if bespoke tools requiring elevated access were added)
+# were to require escalated privileges, it would need to be configured in the CI
+# environment executing Codacy (e.g., GitLab CI runners) rather than in this
+# .codacy.yml file itself. This is generally handled by the CI/CD platform's agent configuration.
+# For Trivy, ensure the CI runner has sufficient pull access to Docker images if scanning them.

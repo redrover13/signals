@@ -18,22 +18,27 @@
     "@nx/next": "19.8.4",
     "@nx/node": "19.8.4",
     "@nx/workspace": "19.8.4",
-    "@secretlint/secretlint-rule-preset-recommend": "^8.1.0",
+    "@secretlint/secretlint-rule-preset-recommend": "^8.5.0",
     "@types/lodash": "^4.17.20",
     "@types/node": "18.19.34",
     "fs-extra": "^11.3.1",
     "koa": "2.16.2",
     "nx": "19.8.4",
-    "secretlint": "^8.1.0",
+    "secretlint": "^8.5.0",
     "ts-node": "10.9.2",
     "typescript": "5.8.3"
   },
+  "pnpm": {
+    "overrides": {
+      "koa": "^2.16.2"
+    }
+  },
   "dependencies": {
     "@google-analytics/data": "^5.2.0",
-    "@google-cloud/aiplatform": "^5.4.0",
+    "@google-cloud/aiplatform": "^5.5.0",
     "@google-cloud/bigquery": "8.1.1",
     "@google-cloud/storage": "7.16.0",
-    "fastify": "^5.4.0",
+    "fastify": "^5.5.0",
     "google-auth-library": "^10.2.1",
     "lodash": "^4.17.21"
   },
@@ -51,7 +56,8 @@
     "overrides": {
       "@swc/core": "^1.3.86",
       "@swc/helpers": "^0.5.4",
-      "@types/react": "^18.2.0"
+      "@types/react": "^18.2.0",
+      "koa": "^2.16.2"
     }
   }
 }

@@ -17,7 +17,6 @@
           "outputPath": "dist/apps/web-development"
         },
         "production": {
-          "buildTarget": "web:build:production",
           "outputPath": "dist/apps/web-production"
         }
       }

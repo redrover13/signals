@@ -81,7 +81,7 @@ steps:
       - '--platform=managed'
       - '--no-allow-unauthenticated'
       - '--service-account=agent-runner-sa@${PROJECT_ID}.iam.gserviceaccount.com'
-
+      - '--set-env-vars=GCP_PROJECT_ID=${PROJECT_ID},DULCE_AGENTS_TOPIC=${_DULCE_AGENTS_TOPIC},DULCE_AGENT_RUNS_TABLE=${_DULCE_AGENT_RUNS_TABLE}'
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-api'
     args:

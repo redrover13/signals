@@ -1,4 +1,0 @@
-
-# DEPRECATED: This workflow is superseded by ci-complete.yml.
-# Please use .github/workflows/ci-complete.yml for all CI/CD operations.
-

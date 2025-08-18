@@ -402,8 +402,7 @@ substitutions:
         y_bad = "a: : :\n- not a mapping root"
         self.assertIsNone(_safe_load_yaml(y_bad))
 
-if __name__ == "__main__":
-    unittest.main()
+# (Removed from here; add at the very end of the file)
 
 class TestDiscoverCloudBuildPath(unittest.TestCase):
     def test_candidate_detection_order_prefers_first_existing(self):

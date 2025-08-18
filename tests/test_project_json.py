@@ -30,7 +30,12 @@ def validate_core(cfg: dict) -> None:
     assert isinstance(schema, str) and schema.endswith("nx/schemas/project-schema.json"), \
         f'Expected $schema to reference nx project-schema.json, got: {schema}'
     assert cfg.get("projectType") == "application", f'Expected projectType "application", got: {cfg.get("projectType")}'
-    assert cfg.get("sourceRoot") == "apps/web", f'Expected sourceRoot "apps/web", got: {cfg.get("sourceRoot")}'
+    assert cfg.get("name") == PROJECT_NAME, f'Expected name "{PROJECT_NAME}", got: {cfg.get("name")}'
+    schema = cfg.get("$schema")
+    assert isinstance(schema, str) and schema.endswith("nx/schemas/project-schema.json"), \
+        f'Expected $schema to reference nx project-schema.json, got: {schema}'
+    assert cfg.get("projectType") == "application", f'Expected projectType "application", got: {cfg.get("projectType")}'
+    assert cfg.get("sourceRoot") == f"apps/{PROJECT_NAME}", f'Expected sourceRoot "apps/{PROJECT_NAME}", got: {cfg.get("sourceRoot")}'
     tags = cfg.get("tags")
     assert isinstance(tags, list), f"tags should be an array, got: {type(tags).__name__}"
 

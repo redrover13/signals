@@ -112,13 +112,10 @@ def test_dev_dependencies_expected_versions_and_consistency(package_data: dict) 
 
     # Nx packages should all be pinned to the same version
     nx_entries = {k: v for k, v in dev.items() if k.startswith("@nx/")}
-    # We expect at least the commonly used Nx packages to be present
+    expected_nx_version = "19.8.4"
     for expected_key in ["@nx/jest", "@nx/js", "@nx/linter", "@nx/next", "@nx/node", "@nx/workspace"]:
         assert expected_key in nx_entries, f"devDependencies should include {expected_key}"
-    assert set(nx_entries.values()) == {"19.8.4"}, "All @nx/* devDependencies should be pinned to 19.8.4"
-
-    # Core Nx CLI is also present in devDependencies
-    assert set(nx_entries.values()) == {NX_VERSION}, f"All @nx/* devDependencies should be pinned to {NX_VERSION}"
+    assert set(nx_entries.values()) == {expected_nx_version}, f"All @nx/* devDependencies should be pinned to {expected_nx_version}"
 
     # Core Nx CLI is also present in devDependencies
     # (Redundant assertion removed; already checked above)

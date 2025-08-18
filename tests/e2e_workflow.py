@@ -35,7 +35,20 @@ POLLING_INTERVAL_SECONDS = 5
 
 
 def generate_sample_payload() -> tuple[dict, str]:
-    """Generates a realistic sample agent event payload with a unique ID."""
+    """
+    Generate a realistic sample agent event payload and a unique event ID.
+    
+    Returns:
+        tuple[dict, str]: A tuple containing:
+            - payload: dict with keys:
+                - event_id (str): unique UUID for the event
+                - agent_id (str): generated test agent identifier
+                - session_id (str): generated test session identifier
+                - timestamp (str): ISO 8601 UTC timestamp for the event
+                - event_type (str): fixed value "e2e_test_event"
+                - data (dict): metadata including `test_run_id` (same as `event_id`) and `source`
+            - event_id: the same UUID string present in payload['event_id']
+    """
     event_id = str(uuid.uuid4())
     payload = {
         "event_id": event_id,
@@ -51,7 +64,22 @@ def generate_sample_payload() -> tuple[dict, str]:
 def publish_event(
     publisher_client: pubsub_v1.PublisherClient, topic_path: str, payload: dict
 ) -> str:
-    """Publishes a single event to the specified Pub/Sub topic."""
+    """
+    Publish a single JSON-serializable event to a Pub/Sub topic and return the Pub/Sub message ID.
+    
+    The payload is serialized to JSON and published to the provided topic path. This call waits up to 30 seconds for the publish to complete.
+    
+    Parameters:
+        publisher_client (pubsub_v1.PublisherClient): The Pub/Sub publisher client used to publish the event.
+        topic_path (str): Fully-qualified Pub/Sub topic path (e.g., "projects/{project}/topics/{topic}").
+        payload (dict): JSON-serializable event payload to publish.
+    
+    Returns:
+        str: The Pub/Sub message ID for the published message.
+    
+    Raises:
+        GoogleAPICallError, TimeoutError, Exception: Re-raises exceptions from the publisher client if publishing fails or times out.
+    """
     data = json.dumps(payload).encode("utf-8")
     future = publisher_client.publish(topic_path, data)
     try:
@@ -70,7 +98,21 @@ def publish_event(
 def verify_event_in_bigquery(
     bigquery_client: bigquery.Client, event_id: str, original_payload: dict
 ) -> bool:
-    """Polls BigQuery to verify the event was processed and inserted correctly."""
+    """
+    Verify that an event with the given event_id was ingested into BigQuery by polling the target table.
+    
+    Polls the configured BigQuery table until POLLING_TIMEOUT_SECONDS elapses (sleeping POLLING_INTERVAL_SECONDS between attempts) and checks a single matching row for:
+    - matching event_id, agent_id, and session_id against original_payload, and
+    - timestamp difference < 2 seconds between the stored row and original_payload["timestamp"].
+    
+    Parameters:
+        event_id (str): The event identifier to query for.
+        original_payload (dict): The original event payload; must include "event_id", "agent_id",
+            "session_id", and "timestamp" (ISO 8601 string) used for verification.
+    
+    Returns:
+        bool: True if a matching row is found within the timeout window and validations pass; False otherwise.
+    """
     query = """
         SELECT event_id, agent_id, session_id, timestamp
         FROM `{}.{}.{}`

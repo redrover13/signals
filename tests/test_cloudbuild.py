@@ -89,7 +89,64 @@ def test_contains_expected_build_and_push_steps_in_order():
     scan_agent_pattern = r"name:\s*'aquasec/trivy:latest'.*?id:\s*'scan-agent-runner'.*?args:.*?- 'image'.*?--exit-code.*?1.*?--severity.*?HIGH,CRITICAL.*?\$\{_ARTIFACT_REGISTRY\}.*?/dulce/agent-runner:\$\{_GITHUB_SHA\}"
     scan_api_pattern = r"name:\s*'aquasec/trivy:latest'.*?id:\s*'scan-api'.*?args:.*?- 'image'.*?--exit-code.*?1.*?--severity.*?HIGH,CRITICAL.*?\$\{_ARTIFACT_REGISTRY\}.*?/dulce/api:\$\{_GITHUB_SHA\}"
 
-    # Push steps
+    if HAVE_YAML:
+        data = _safe_yaml_load(text)
+        assert isinstance(data, dict), "cloudbuild.yaml should parse to a mapping"
+        steps = data.get("steps", [])
+        # Define expected steps in order (by id)
+        expected_ids = [
+            "build-agent-runner",
+            "build-api",
+            "scan-agent-runner",
+            "scan-api",
+            "push-agent-runner",
+            "push-api",
+            # Optionally add deploy steps if needed
+        ]
+        found_ids = [step.get("id") for step in steps if "id" in step]
+        # Check that expected steps appear in order
+        idx = 0
+        for eid in expected_ids:
+            while idx < len(found_ids) and found_ids[idx] != eid:
+                idx += 1
+            assert idx < len(found_ids), f"Step with id '{eid}' not found in order"
+            idx += 1
+        # Optionally, check details of each step
+        # Example: check build-agent-runner uses correct docker image and args
+        build_agent = next((s for s in steps if s.get("id") == "build-agent-runner"), None)
+        assert build_agent is not None, "Missing build-agent-runner step"
+        assert build_agent.get("name") == "gcr.io/cloud-builders/docker", "build-agent-runner should use docker builder"
+        assert "build" in build_agent.get("args", []), "build-agent-runner should have 'build' in args"
+        # Repeat for other steps as needed
+    else:
+        # Fallback: break down checks into simpler regexes or string searches
+        # Check for build-agent-runner step
+        assert "id: 'build-agent-runner'" in text, "Missing build-agent-runner step"
+        assert "name: 'gcr.io/cloud-builders/docker'" in text, "Missing docker builder for build-agent-runner"
+        assert "apps/agents/Dockerfile" in text, "Missing Dockerfile path for agent-runner"
+        # Check for build-api step
+        assert "id: 'build-api'" in text, "Missing build-api step"
+        assert "apps/api/Dockerfile" in text, "Missing Dockerfile path for api"
+        # Check for scan steps
+        assert "id: 'scan-agent-runner'" in text, "Missing scan-agent-runner step"
+        assert "id: 'scan-api'" in text, "Missing scan-api step"
+        assert "aquasec/trivy:latest" in text, "Missing trivy scan image"
+        # Check for push steps
+        assert "id: 'push-agent-runner'" in text, "Missing push-agent-runner step"
+        assert "id: 'push-api'" in text, "Missing push-api step"
+        # Optionally check order by searching for indices
+        def find_index(s): return text.find(s)
+        ids_in_order = [
+            "id: 'build-agent-runner'",
+            "id: 'build-api'",
+            "id: 'scan-agent-runner'",
+            "id: 'scan-api'",
+            "id: 'push-agent-runner'",
+            "id: 'push-api'",
+        ]
+        indices = [find_index(s) for s in ids_in_order]
+        assert all(i >= 0 for i in indices), "Some expected steps not found"
+        assert indices == sorted(indices), "Steps are not in expected order"
     push_agent_pattern = r"id:\s*'push-agent-runner'.*?args:\s*\[\s*'push',\s*'\$\{_ARTIFACT_REGISTRY\}.*?/dulce/agent-runner:\$\{_GITHUB_SHA\}'\s*\]"
     push_api_pattern = r"id:\s*'push-api'.*?args:\s*\[\s*'push',\s*'\$\{_ARTIFACT_REGISTRY\}.*?/dulce/api:\$\{_GITHUB_SHA\}'\s*\]"
 

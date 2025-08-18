@@ -158,6 +158,9 @@ This section details how to use the 27 configured MCP servers to maximize your e
 ## 6. Important Do's and Don'ts
 
 - **DO NOT** commit secrets. Use Google Cloud Secret Manager.
+- **DO NOT** use placeholder or sample secrets in code or docs (e.g., "secret123"); use environment references and redacted examples.
+- **ALWAYS** ensure logs and error messages do not contain secrets or PII; scrub before persisting.
+- **ALWAYS** rotate credentials immediately upon suspected exposure and update Secret Manager versions accordingly.
 - **ALWAYS** write comprehensive unit tests.
 - **ALWAYS** adhere to Vietnamese data privacy regulations.
 - **ALWAYS** optimize for performance and cost on GCP.

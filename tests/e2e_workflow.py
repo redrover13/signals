@@ -59,7 +59,7 @@ def publish_event(
     except exceptions.GoogleAPICallError as api_error:
         print(f"Google API call error while publishing event: {api_error}")
         raise
-    except exceptions.TimeoutError as timeout_error:
+    except TimeoutError as timeout_error:
         print(f"Timeout error while publishing event: {timeout_error}")
         raise
     except Exception as e:

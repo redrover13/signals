@@ -56,23 +56,16 @@ class TestWorkflowSchema:
     def test_workflows_directory_exists(self):
         assert WORKFLOWS_DIR.exists(), "Expected .github/workflows directory to exist"
 
-     def test_each_workflow_is_valid_yaml_with_minimal_schema(self):
-         missing = []
-         for path in iter_workflows():
--            try:
--                doc = load_yaml(path)
-                 missing.append(str(path))
-         assert not missing, f"Missing minimal schema in workflows: {missing}"
+    def test_each_workflow_is_valid_yaml_with_minimal_schema(self):
+        missing = []
+        for path in iter_workflows():
             try:
                 doc = load_yaml(path)
             except Exception as e:
-                # Only treat real PyYAML parse errors as failures; allow skips or other errors to propagate
                 if yaml is not None and isinstance(e, yaml.YAMLError):  # type: ignore[attr-defined]
                     pytest.fail(f"YAML parsing error in {path}: {e}")
                 raise
-             if not has_minimal_schema(doc):
-                 missing.append(path)
-         assert not missing, f"Missing minimal schema in workflows: {missing}"
+            if not has_minimal_schema(doc):
                 missing.append(str(path))
         assert not missing, f"Workflows missing minimal schema (name, on, jobs): {missing}"
 

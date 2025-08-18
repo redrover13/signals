@@ -376,9 +376,7 @@ options:
         self.assertIn("gcr.io/example/image1:tag", "\n".join(images))
         self.assertIn("gcr.io/example/image2:tag", "\n".join(images))
 
-if __name__ == "__main__":
-    unittest.main()
-
+class TestYamlHelpers(unittest.TestCase):
     def test_extract_list_block_from_text_stops_at_next_key(self):
         text = """
 images:
@@ -388,7 +386,7 @@ substitutions:
   _FOO: bar
 """
         images = _extract_list_block_from_text(text, "images")
-        self.assertEqual([ "one", "two" ], [i for i in (s.strip() for s in images) if i in ("one","two")])
+        self.assertEqual(["one", "two"], [i for i in (s.strip() for s in images) if i in ("one","two")])
 
     def test_safe_load_yaml_valid_and_invalid(self):
         # Valid YAML mapping
@@ -403,6 +401,9 @@ substitutions:
         # Invalid YAML should return None gracefully
         y_bad = "a: : :\n- not a mapping root"
         self.assertIsNone(_safe_load_yaml(y_bad))
+
+if __name__ == "__main__":
+    unittest.main()
 
 class TestDiscoverCloudBuildPath(unittest.TestCase):
     def test_candidate_detection_order_prefers_first_existing(self):

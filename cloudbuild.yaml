@@ -3,7 +3,6 @@
 # CI tasks are handled by GitHub Actions
 
 steps:
-  # Build and push container images
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-agent-runner'
     args:
@@ -24,13 +23,12 @@ steps:
       - 'apps/api/Dockerfile'
       - '.'
 
-  # Security scan containers
+  # Security scan containers by image tag
   - name: 'aquasec/trivy:0.53.0'
     id: 'scan-agent-runner'
     args:
       - 'image'
-      - '--input'
-      - 'agent-runner.tar'
+      - '${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/agent-runner:${_GITHUB_SHA}'
       - '--exit-code'
       - '1'
       - '--severity'
@@ -39,8 +37,7 @@ steps:
     id: 'scan-api'
     args:
       - 'image'
-      - '--input'
-      - 'api.tar'
+      - '${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/api:${_GITHUB_SHA}'
       - '--exit-code'
       - '1'
       - '--severity'

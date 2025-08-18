@@ -51,7 +51,6 @@ def is_pinned_action(uses: str) -> bool:
     return False
 def has_minimal_schema(doc: dict) -> bool:
     return isinstance(doc, dict) and "name" in doc and "on" in doc and "jobs" in doc and isinstance(doc["jobs"], dict)
-
 @pytest.mark.describe("GitHub Workflows - Structure and Schema")
 class TestWorkflowSchema:
     def test_workflows_directory_exists(self):

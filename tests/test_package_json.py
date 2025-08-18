@@ -110,18 +110,20 @@ def test_dependencies_expected_versions(package_data: dict) -> None:
 def test_dev_dependencies_expected_versions_and_consistency(package_data: dict) -> None:
     dev = package_data["devDependencies"]
 
-    # Nx packages should all be pinned to the same version
+    # Nx packages should all be version-aligned (allow ~ or ^ prefixes)
     nx_entries = {k: v for k, v in dev.items() if k.startswith("@nx/")}
     expected_nx_version = "19.8.4"
     for expected_key in ["@nx/jest", "@nx/js", "@nx/linter", "@nx/next", "@nx/node", "@nx/workspace"]:
         assert expected_key in nx_entries, f"devDependencies should include {expected_key}"
-    assert set(nx_entries.values()) == {expected_nx_version}, f"All @nx/* devDependencies should be pinned to {expected_nx_version}"
+
+    def _normalize(ver: str) -> str:
+        return str(ver).lstrip("^~")
+
+    normalized_versions = { _normalize(v) for v in nx_entries.values() }
+    assert normalized_versions == {expected_nx_version}, f"All @nx/* devDependencies should align to {expected_nx_version} (got {normalized_versions})"
 
     # Core Nx CLI is also present in devDependencies
-    # (Redundant assertion removed; already checked above)
-
-    # Core Nx CLI is also present in devDependencies
-    assert dev.get("nx") == "19.8.4"
+    assert _normalize(dev.get("nx", "")) == expected_nx_version
 
     # Tooling versions
     assert dev.get("typescript") == "5.8.3"

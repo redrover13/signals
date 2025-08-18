@@ -131,7 +131,7 @@ def test_contains_expected_build_and_push_steps_in_order():
         # Check for scan steps
         assert "id: 'scan-agent-runner'" in text, "Missing scan-agent-runner step"
         assert "id: 'scan-api'" in text, "Missing scan-api step"
-        assert "aquasec/trivy:latest" in text, "Missing trivy scan image"
+        assert "aquasec/trivy:0.53.0" in text, "Missing trivy scan image"
         # Check for push steps
         assert "id: 'push-agent-runner'" in text, "Missing push-agent-runner step"
         assert "id: 'push-api'" in text, "Missing push-api step"

@@ -359,11 +359,8 @@ class TestHelperExtraction(unittest.TestCase):
         # The line with trailing comment should not be captured
         self.assertNotIn("deploy-api", ids, "Lines with trailing comments should not be matched by _extract_step_ids_from_text")
 
-if __name__ == "__main__":
-    unittest.main()
-
+class TestListBlockExtraction(unittest.TestCase):
     def test_extract_list_block_from_text_basic(self):
-        # Simple top-level list with two-space indentation and dash-prefixed items
         text = """
 steps:
   - id: build-api
@@ -378,6 +375,9 @@ options:
         self.assertIsInstance(images, list)
         self.assertIn("gcr.io/example/image1:tag", "\n".join(images))
         self.assertIn("gcr.io/example/image2:tag", "\n".join(images))
+
+if __name__ == "__main__":
+    unittest.main()
 
     def test_extract_list_block_from_text_stops_at_next_key(self):
         text = """

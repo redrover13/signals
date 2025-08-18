@@ -75,6 +75,7 @@ def test_contains_expected_build_and_push_steps_in_order():
         r"- '-f'.*?apps/agents/Dockerfile",
         r"- '\.'"
     ]
+    build_agent_pattern = r"name:\s*'gcr\.io/cloud-builders/docker'.*?id:\s*'build-agent-runner'.*?args:.*?- 'build'.*?- '-t'.*?\$\{_ARTIFACT_REGISTRY\}.*?/dulce/agent-runner:\$\{_GITHUB_SHA\}.*?- '-f'.*?apps/agents/Dockerfile.*?-\s*'\.'"
     build_api_pattern = r"name:\s*'gcr\.io/cloud-builders/docker'.*?id:\s*'build-api'.*?args:.*?- 'build'.*?- '-t'.*?\$\{_ARTIFACT_REGISTRY\}.*?/dulce/api:\$\{_GITHUB_SHA\}.*?- '-f'.*?apps/api/Dockerfile.*?-\s*'\.'"
     # Break down the build-api step into simpler patterns
     build_api_patterns = [

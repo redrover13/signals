@@ -51,7 +51,7 @@ class TestWorkflowSchema:
         for path in iter_workflows():
             try:
                 doc = load_yaml(path)
-            except Exception as e:
+            except yaml.YAMLError as e:
                 pytest.fail(f"YAML parsing error in {path}: {e}")
             if not has_minimal_schema(doc):
                 missing.append(str(path))

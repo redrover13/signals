@@ -39,8 +39,8 @@ function parseScalar(val) {
 
 function parseFlowSeq(text) {
   // Parse simple flow sequence: ['a', 'b', 'c']
-  let s = text.trim();
-  if (!(s.startsWith('[') && s.endsWith(']'))) return s;
+  let s = String(text).trim();
+  if (!(s.startsWith('[') && s.endsWith(']'))) return [parseScalar(s)];
   s = s.slice(1, -1);
   const items = [];
   let cur = '';
@@ -54,7 +54,6 @@ function parseFlowSeq(text) {
     }
     if (ch === '\\') {
       esc = true;
-      cur += ch;
       continue;
     }
     if (!inDouble && ch === "'") {

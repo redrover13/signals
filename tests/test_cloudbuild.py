@@ -170,7 +170,23 @@ def test_contains_expected_build_and_push_steps_in_order():
         deploy_function_pattern, deploy_runner_pattern, deploy_api_pattern
     ]:
         assert re.search(pat, text, flags=re.DOTALL), f"Expected to match pattern: {pat[:60]}..."
-
+    patterns = [
+        ("build_agent_pattern", build_agent_pattern),
+        ("build_api_pattern", build_api_pattern),
+        ("scan_agent_pattern", scan_agent_pattern),
+        ("scan_api_pattern", scan_api_pattern),
+        ("push_agent_pattern", push_agent_pattern),
+        ("push_api_pattern", push_api_pattern),
+        ("deploy_function_pattern", deploy_function_pattern),
+        ("deploy_runner_pattern", deploy_runner_pattern),
+        ("deploy_api_pattern", deploy_api_pattern),
+    ]
+    for idx, (name, pat) in enumerate(patterns):
+        assert re.search(pat, text, flags=re.DOTALL), (
+            f"Pattern #{idx+1} '{name}' failed to match.\n"
+            f"Pattern: {pat[:80]}...\n"
+            f"Text snippet: {text[:200]}..."
+        )
     # Enforce logical ordering: build -> scan -> push -> deploy (coarse check via index positions)
     build_agent_idx = re.search(build_agent_pattern, text, flags=re.DOTALL).start()
     build_api_idx = re.search(build_api_pattern, text, flags=re.DOTALL).start()

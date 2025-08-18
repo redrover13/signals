@@ -87,8 +87,8 @@ def test_contains_expected_build_and_push_steps_in_order():
     ]
     # Scan steps
     # Scan steps
-    scan_agent_pattern = r"name:\s*'aquasec/trivy:latest'.*?id:\s*'scan-agent-runner'.*?args:.*?- 'image'.*?--exit-code.*?1.*?--severity.*?HIGH,CRITICAL.*?\$\{_ARTIFACT_REGISTRY\}.*?/dulce/agent-runner:\$\{_GITHUB_SHA\}"
-    scan_api_pattern = r"name:\s*'aquasec/trivy:latest'.*?id:\s*'scan-api'.*?args:.*?- 'image'.*?--exit-code.*?1.*?--severity.*?HIGH,CRITICAL.*?\$\{_ARTIFACT_REGISTRY\}.*?/dulce/api:\$\{_GITHUB_SHA\}"
+    scan_agent_pattern = r"name:\s*'aquasec/trivy:0\.53\.0'.*?id:\s*'scan-agent-runner'.*?args:.*?- 'image'.*?--exit-code.*?1.*?--severity.*?HIGH,CRITICAL.*?\$\{_ARTIFACT_REGISTRY\}.*?/dulce/agent-runner:\$\{_GITHUB_SHA\}"
+    scan_api_pattern  = r"name:\s*'aquasec/trivy:0\.53\.0'.*?id:\s*'scan-api'.*?args:.*?- 'image'.*?--exit-code.*?1.*?--severity.*?HIGH,CRITICAL.*?\$\{_ARTIFACT_REGISTRY\}.*?/dulce/api:\$\{_GITHUB_SHA\}"
 
     if HAVE_YAML:
         data = _safe_yaml_load(text)

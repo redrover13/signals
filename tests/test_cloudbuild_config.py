@@ -162,7 +162,7 @@ class TestCloudBuildStructure(unittest.TestCase):
             opts = self.data.get("options", {})
             self.assertIsInstance(opts, dict, "options should be a mapping")
             self.assertEqual(opts.get("machineType"), "E2_HIGHCPU_8")
-            self.assertIn(opts.get("logging"), ("CLOUD_LOGGING_ONLY", "CLOUD_LOGGING_ONLY"))
+            self.assertEqual(opts.get("logging"), "CLOUD_LOGGING_ONLY")
 
 class TestCloudBuildSteps(unittest.TestCase):
     @classmethod

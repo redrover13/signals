@@ -118,7 +118,10 @@ def test_dev_dependencies_expected_versions_and_consistency(package_data: dict) 
     assert set(nx_entries.values()) == {"19.8.4"}, "All @nx/* devDependencies should be pinned to 19.8.4"
 
     # Core Nx CLI is also present in devDependencies
-    assert dev.get("nx") == "19.8.4"
+    assert set(nx_entries.values()) == {NX_VERSION}, f"All @nx/* devDependencies should be pinned to {NX_VERSION}"
+
+    # Core Nx CLI is also present in devDependencies
+    assert dev.get("nx") == NX_VERSION
 
     # Tooling versions
     assert dev.get("typescript") == "5.8.3"

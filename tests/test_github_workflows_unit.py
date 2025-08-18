@@ -44,20 +44,23 @@ class TestIsPinnedAction:
     @pytest.mark.parametrize(
         "uses,expected",
         [
-         [
-             ("actions/checkout", False),               # no '@' -> not pinned
-             ("actions/checkout@", False),              # empty ref after '@' -> not pinned
-             ("actions/checkout@v4", True),             # explicit tag -> pinned
-             ("actions/checkout@main", False),          # main branch -> not pinned
-             ("actions/checkout@master", False),        # master branch -> not pinned
-             ("actions/checkout@latest", False),        # latest -> not pinned
-             ("owner/repo@1234567", False),             # short SHA/branch-like -> not pinned under stricter rules
-             ("owner/repo@feature-branch", False),      # branch -> not pinned
-             ("docker://alpine", False),                # docker ref without '@' -> not pinned per current logic
-             ("docker://alpine@sha256:deadbeef", True), # docker digest -> pinned
-             ("path/to/action@ v1.2.3 ", True),         # ref with whitespace trimmed -> pinned
-             ("path/to/action@    ", False),            # whitespace-only ref -> empty after strip -> not pinned
-         ],
+@pytest.mark.parametrize(
+    "uses,expected",
+    [
+        ("actions/checkout", False),               # no '@' -> not pinned
+        ("actions/checkout@", False),              # empty ref after '@' -> not pinned
+        ("actions/checkout@v4", True),             # explicit tag -> pinned
+        ("actions/checkout@main", False),          # main branch -> not pinned
+        ("actions/checkout@master", False),        # master branch -> not pinned
+        ("actions/checkout@latest", False),        # latest -> not pinned
+        ("owner/repo@1234567", False),             # short SHA/branch-like -> not pinned under stricter rules
+        ("owner/repo@feature-branch", False),      # branch -> not pinned
+        ("docker://alpine", False),                # docker ref without '@' -> not pinned per current logic
+        ("docker://alpine@sha256:deadbeef", True), # docker digest -> pinned
+        ("path/to/action@ v1.2.3 ", True),         # ref with whitespace trimmed -> pinned
+        ("path/to/action@    ", False),            # whitespace-only ref -> empty after strip -> not pinned
+    ],
+)
         ids=[
             "no_ref",
             "empty_ref",

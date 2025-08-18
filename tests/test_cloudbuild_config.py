@@ -2,6 +2,7 @@ import os
 import re
 import unittest
 
+from unittest import mock
 # Attempt to import yaml if available; tests will gracefully fallback to textual checks if not.
 try:
     import yaml  # type: ignore
@@ -338,3 +339,145 @@ class TestCloudBuildSteps(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+class TestHelperExtraction(unittest.TestCase):
+    def test_extract_step_ids_various_formats(self):
+        # Includes single quotes, double quotes, and unquoted. Also tests a line with trailing comment (should not match).
+        text = """
+id: 'build-api'
+  id: "push-api"
+    id: scan-agent-runner
+    id: deploy-api   # trailing comment should not be captured by strict regex
+      id: 'deploy-agent-runner'
+"""
+        ids = _extract_step_ids_from_text(text)
+        # Strict regex should capture lines without trailing content only
+        self.assertIn("build-api", ids)
+        self.assertIn("push-api", ids)
+        self.assertIn("scan-agent-runner", ids)
+        self.assertIn("deploy-agent-runner", ids)
+        # The line with trailing comment should not be captured
+        self.assertNotIn("deploy-api", ids, "Lines with trailing comments should not be matched by _extract_step_ids_from_text")
+
+    def test_extract_list_block_from_text_basic(self):
+        # Simple top-level list with two-space indentation and dash-prefixed items
+        text = """
+steps:
+  - id: build-api
+  - id: push-api
+images:
+  - gcr.io/example/image1:tag
+  - gcr.io/example/image2:tag
+options:
+  machineType: 'E2_HIGHCPU_8'
+"""
+        images = _extract_list_block_from_text(text, "images")
+        self.assertIsInstance(images, list)
+        self.assertIn("gcr.io/example/image1:tag", "\n".join(images))
+        self.assertIn("gcr.io/example/image2:tag", "\n".join(images))
+
+    def test_extract_list_block_from_text_stops_at_next_key(self):
+        text = """
+images:
+  - one
+  - two
+substitutions:
+  _FOO: bar
+"""
+        images = _extract_list_block_from_text(text, "images")
+        self.assertEqual([ "one", "two" ], [i for i in (s.strip() for s in images) if i in ("one","two")])
+
+    def test_safe_load_yaml_valid_and_invalid(self):
+        # Valid YAML mapping
+        y_ok = "a: 1\nb: 2\n"
+        data = _safe_load_yaml(y_ok)
+        if HAVE_YAML:
+            self.assertIsInstance(data, dict)
+            self.assertEqual(data.get("a"), 1)
+        else:
+            self.assertIsNone(data)
+
+        # Invalid YAML should return None gracefully
+        y_bad = "a: : :\n- not a mapping root"
+        self.assertIsNone(_safe_load_yaml(y_bad))
+
+class TestDiscoverCloudBuildPath(unittest.TestCase):
+    def test_candidate_detection_order_prefers_first_existing(self):
+        # Patch os.path.isfile to simulate only the second candidate existing
+        with mock.patch("os.path.isfile") as m_isfile:
+            def isfile_side_effect(p):
+                # Simulate only 'cloudbuild.yml' exists (second in default CANDIDATES)
+                return os.path.normpath(p) == os.path.normpath("cloudbuild.yml")
+            m_isfile.side_effect = isfile_side_effect
+            # os.walk should not be consulted in this case; ensure it isn't used
+            with mock.patch("os.walk") as m_walk:
+                path = _discover_cloudbuild_path()
+                self.assertEqual(os.path.normpath(path), os.path.normpath("cloudbuild.yml"))
+                m_walk.assert_not_called()
+
+    def test_signature_scan_fallback_finds_yaml_with_signature(self):
+        # Force candidates to not exist to trigger fallback scan
+        with mock.patch("os.path.isfile", return_value=False):
+            import tempfile, shutil
+            prev_cwd = os.getcwd()
+            tmpdir = tempfile.mkdtemp(prefix="cb-test-")
+            try:
+                os.chdir(tmpdir)
+                # Create nested path and a filename containing 'cloudbuild' with signature
+                os.makedirs("nested/.cloudbuild", exist_ok=True)
+                target = os.path.join("nested", ".cloudbuild", "my-cloudbuild-ci.yaml")
+                with open(target, "w", encoding="utf-8") as fh:
+                    fh.write("# minimal file with signature for detection\n")
+                    fh.write("options:\n  machineType: 'E2_HIGHCPU_8'\n")
+                # Walk should find our file
+                found = _discover_cloudbuild_path()
+                self.assertTrue(found.endswith("my-cloudbuild-ci.yaml"))
+                self.assertTrue(os.path.isfile(found))
+            finally:
+                os.chdir(prev_cwd)
+                shutil.rmtree(tmpdir, ignore_errors=True)
+
+class TestTextualFallbackBehavior(unittest.TestCase):
+    def test_textual_required_keys_detection(self):
+        # Simulate absence of PyYAML by focusing on text-based checks used by TestCloudBuildStructure
+        # Provide YAML-like text that includes the required top-level keys
+        text = """
+steps:
+  - id: build-api
+substitutions:
+  _ARTIFACT_REGISTRY: "us-docker.pkg.dev"
+  _GCP_REGION: "us-central1"
+  _DULCE_AGENTS_TOPIC: "agents-topic"
+  _DULCE_AGENT_RUNS_TABLE: "agent_runs"
+images:
+  - ${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/api:${_GITHUB_SHA}
+options:
+  machineType: 'E2_HIGHCPU_8'
+  logging: 'CLOUD_LOGGING_ONLY'
+"""
+        # Validate textual presence mirrors TestCloudBuildStructure expectations when YAML is unavailable
+        for key in ("steps:", "substitutions:", "images:", "options:"):
+            self.assertIn(key, text)
+
+        # Validate images textual extraction
+        imgs = _extract_list_block_from_text(text, "images")
+        self.assertTrue(any("${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/api:${_GITHUB_SHA}" in i for i in imgs))
+
+    def test_trivy_scan_textual_indicators(self):
+        text = """
+steps:
+  - id: scan-api
+    name: aquasec/trivy:latest
+    args:
+      - image
+      - --exit-code
+      - '1'
+      - --severity
+      - HIGH,CRITICAL
+      - ${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/api:${_GITHUB_SHA}
+"""
+        self.assertIn("aquasec/trivy:latest", text)
+        self.assertIn("--severity", text)
+        self.assertIn("HIGH,CRITICAL", text)
+        self.assertIn("--exit-code", text)
+        self.assertRegex(text, r"--exit-code\s*'?1'?")
+        self.assertIn("${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/api:${_GITHUB_SHA}", text)

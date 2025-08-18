@@ -5,6 +5,7 @@ import re
 # Tests will still run under unittest if pytest is not installed,
 # by providing equivalent assertions and a unittest.TestCase fallback.
 try:
+    import pytest  # type: ignore
     HAS_PYTEST = True
 except Exception:  # pragma: no cover
     HAS_PYTEST = False

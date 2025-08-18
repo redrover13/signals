@@ -79,7 +79,7 @@ class TestWebProjectJson(unittest.TestCase):
         # Basic values
         self.assertEqual(data["name"], "web", "Project 'name' should be 'web'")
         self.assertIsInstance(data["$schema"], str)
-        self.assertTrue(data["$schema"].ends_with if hasattr(data["$schema"], "ends_with") else True)  # not strict
+        self.assertTrue(data["$schema"].endswith("project-schema.json"), "The $schema value should end with 'project-schema.json'")
         self.assertEqual(data["projectType"], "application")
         self.assertEqual(data["sourceRoot"], "apps/web")
         self.assertIsInstance(data["tags"], list)

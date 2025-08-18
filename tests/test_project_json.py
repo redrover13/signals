@@ -83,7 +83,8 @@ def validate_lint_target(lint: dict) -> None:
     assert isinstance(options, dict), "lint.options must be an object"
     patterns = options.get("lintFilePatterns")
     assert isinstance(patterns, list) and any(p == "apps/web/**/*.{ts,tsx,js,jsx}" for p in patterns), \
-        f'lint.options.lintFilePatterns must include "apps/web/**/*{{ts,tsx,js,jsx}}", got: {patterns}'
+    assert isinstance(patterns, list) and any(p == LINT_FILE_PATTERN for p in patterns), \
+        f'lint.options.lintFilePatterns must include "{LINT_FILE_PATTERN}", got: {patterns}'
 
 def validate_targets(cfg: dict) -> None:
     targets = cfg.get("targets")

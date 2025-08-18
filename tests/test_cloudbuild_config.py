@@ -471,7 +471,7 @@ options:
         text = """
 steps:
   - id: scan-api
-    name: aquasec/trivy:latest
+    name: aquasec/trivy:0.53.0
     args:
       - image
       - --exit-code
@@ -480,7 +480,7 @@ steps:
       - HIGH,CRITICAL
       - ${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/api:${_GITHUB_SHA}
 """
-        self.assertIn("aquasec/trivy:latest", text)
+        self.assertIn("aquasec/trivy:0.53.0", text)
         self.assertIn("--severity", text)
         self.assertIn("HIGH,CRITICAL", text)
         self.assertIn("--exit-code", text)

@@ -8,7 +8,7 @@ from pathlib import Path
 try:
     import yaml  # type: ignore
     HAVE_YAML = True
-except Exception:
+except ImportError:
     HAVE_YAML = False
 
 def _find_cloudbuild_file():

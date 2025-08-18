@@ -26,18 +26,29 @@ def iter_workflows():
 
 def is_pinned_action(uses: str) -> bool:
     """
-    Consider an action 'pinned' if it includes an explicit version or SHA after '@'.
-    E.g., actions/checkout@v4, docker://image@sha256:..., owner/repo/path@<sha/tag>.
+    Treat as pinned only if:
+    - docker:// refs use an explicit digest (e.g., @sha256:<digest>)
+    - GitHub actions use a full 40-hex commit SHA, or a semver-like tag (v1, v1.2.3)
+    Branch names (e.g., main, master, feature/*) and 'latest' are not pinned.
     """
     if "@" not in uses:
         return False
+    if uses.startswith("docker://"):
+        return "@sha256:" in uses.lower()
     _, ref = uses.split("@", 1)
     ref = ref.strip()
-    # Consider non-empty ref as pinned. Disallow bare 'main', 'master', or empty.
     if not ref:
         return False
-    return ref not in {"main", "master", "latest"}
-
+    low = ref.lower()
+    if low in {"main", "master", "latest", "head"}:
+        return False
+    # Full commit SHA
+    if re.fullmatch(r"[0-9a-fA-F]{40}", ref):
+        return True
+    # v1 or v1.2.3 tags
+    if re.fullmatch(r"v?\d+(?:\.\d+){0,2}", ref):
+        return True
+    return False
 def has_minimal_schema(doc: dict) -> bool:
     return isinstance(doc, dict) and "name" in doc and "on" in doc and "jobs" in doc and isinstance(doc["jobs"], dict)
 

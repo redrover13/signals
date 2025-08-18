@@ -5,7 +5,7 @@ from pathlib import Path
 
 try:
     import yaml  # type: ignore
-except Exception:
+except ImportError:
     yaml = None
 
 import pytest

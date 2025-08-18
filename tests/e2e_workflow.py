@@ -80,6 +80,8 @@ def publish_event(
     Raises:
         GoogleAPICallError, TimeoutError, Exception: Re-raises exceptions from the publisher client if publishing fails or times out.
     """
+    from concurrent.futures import TimeoutError as FuturesTimeoutError
+
     data = json.dumps(payload).encode("utf-8")
     future = publisher_client.publish(topic_path, data)
     try:
@@ -87,13 +89,12 @@ def publish_event(
     except exceptions.GoogleAPICallError as api_error:
         print(f"Google API call error while publishing event: {api_error}")
         raise
-    except TimeoutError as timeout_error:
+    except FuturesTimeoutError as timeout_error:
         print(f"Timeout error while publishing event: {timeout_error}")
         raise
     except Exception as e:
         print(f"Unexpected error while publishing event: {e}")
         raise
-
 
 def verify_event_in_bigquery(
     bigquery_client: bigquery.Client, event_id: str, original_payload: dict

@@ -25,26 +25,26 @@ steps:
       - '.'
 
   # Security scan containers
-  - name: 'aquasec/trivy:latest'
+  - name: 'aquasec/trivy:0.53.0'
     id: 'scan-agent-runner'
-    args: 
+    args:
       - 'image'
+      - '--input'
+      - 'agent-runner.tar'
       - '--exit-code'
       - '1'
       - '--severity'
       - 'HIGH,CRITICAL'
-      - '${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/agent-runner:${_GITHUB_SHA}'
-
-  - name: 'aquasec/trivy:latest'
+  - name: 'aquasec/trivy:0.53.0'
     id: 'scan-api'
-    args: 
+    args:
       - 'image'
+      - '--input'
+      - 'api.tar'
       - '--exit-code'
       - '1'
       - '--severity'
       - 'HIGH,CRITICAL'
-      - '${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/api:${_GITHUB_SHA}'
-
   # Push images
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-agent-runner'

@@ -64,7 +64,7 @@ def find_codacy_config() -> Optional[str]:
                     try:
                         with open(candidate, "r", encoding="utf-8") as fh:
                             content = fh.read(2048)  # read the beginning
-                        if re.search(r"(?m)^\s*runtimes\s*:\s*$", content) and re.search(r"(?m)^\s*tools\s*:\s*$", content):
+                        if runtimes_pattern.search(content) and tools_pattern.search(content):
                             return candidate
                     except Exception:
                         # Ignore unreadable files

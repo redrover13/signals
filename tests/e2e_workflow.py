@@ -70,6 +70,7 @@ def publish_event(
     The payload is serialized to JSON and published to the provided topic path. This call waits up to 30 seconds for the publish to complete.
     
     Parameters:
+        publisher_client (pubsub_v1.PublisherClient): The Pub/Sub publisher client used to publish the event.
         topic_path (str): Fully-qualified Pub/Sub topic path (e.g., "projects/{project}/topics/{topic}").
         payload (dict): JSON-serializable event payload to publish.
     

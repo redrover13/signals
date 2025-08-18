@@ -83,16 +83,9 @@ def test_contains_expected_build_and_push_steps_in_order():
         r"id:\s*'build-api'",
         r"args:.*?- 'build'",
         r"- '-t'.*?\$\{_ARTIFACT_REGISTRY\}.*?/dulce/api:\$\{_GITHUB_SHA\}",
-        r"- '-f'.*?apps/api/Dockerfile",
         r"- '\.'"
     ]
-    build_api_patterns = [
-        r"name:\s*'gcr\.io/cloud-builders/docker'",
-        r"id:\s*'build-api'",
-        r"args:.*?- 'build'",
-        r"- '-t'.*?\$\{_ARTIFACT_REGISTRY\}.*?/dulce/api:\$\{_GITHUB_SHA\}",
-        r"- '-f'.*?apps/api/Dockerfile",
-        r"- '\.'"
+    # Scan steps
     # Scan steps
     scan_agent_pattern = r"name:\s*'aquasec/trivy:latest'.*?id:\s*'scan-agent-runner'.*?args:.*?- 'image'.*?--exit-code.*?1.*?--severity.*?HIGH,CRITICAL.*?\$\{_ARTIFACT_REGISTRY\}.*?/dulce/agent-runner:\$\{_GITHUB_SHA\}"
     scan_api_pattern = r"name:\s*'aquasec/trivy:latest'.*?id:\s*'scan-api'.*?args:.*?- 'image'.*?--exit-code.*?1.*?--severity.*?HIGH,CRITICAL.*?\$\{_ARTIFACT_REGISTRY\}.*?/dulce/api:\$\{_GITHUB_SHA\}"

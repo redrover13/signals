@@ -104,15 +104,11 @@ class TestHasMinimalSchema:
 
 
 class TestIterWorkflowsBehavior:
-    def test_iter_workflows_skips_when_directory_missing(self, ghwf, tmp_path):
-        # Point to a non-existent directory to trigger pytest.skip within iter_workflows
-        ghwf.WORKFLOWS_DIR = tmp_path / "does_not_exist"
         gen = ghwf.iter_workflows()
-        with pytest.raises(Exception) as excinfo:
+        with pytest.raises(pytest.SkipException) as excinfo:
             next(gen)
         # Ensure the skip reason matches
         assert "No .github/workflows directory found" in str(excinfo.value)
-
     def test_iter_workflows_globs_yaml_and_sorts(self, ghwf, tmp_path):
         # Create a temporary workflows directory with mixed files
         ghwf.WORKFLOWS_DIR = tmp_path

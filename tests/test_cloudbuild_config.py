@@ -337,18 +337,16 @@ class TestCloudBuildSteps(unittest.TestCase):
             self.assertIn("dulce-api", args_api)
             self.assertIn("--allow-unauthenticated", args_api)
 
-if __name__ == "__main__":
-    unittest.main()
 class TestHelperExtraction(unittest.TestCase):
     def test_extract_step_ids_various_formats(self):
         # Includes single quotes, double quotes, and unquoted. Also tests a line with trailing comment (should not match).
         text = """
-id: 'build-api'
-  id: "push-api"
-    id: scan-agent-runner
-    id: deploy-api   # trailing comment should not be captured by strict regex
-      id: 'deploy-agent-runner'
-"""
+        id: 'build-api'
+          id: "push-api"
+            id: scan-agent-runner
+            id: deploy-api   # trailing comment should not be captured by strict regex
+              id: 'deploy-agent-runner'
+        """
         ids = _extract_step_ids_from_text(text)
         # Strict regex should capture lines without trailing content only
         self.assertIn("build-api", ids)
@@ -357,6 +355,9 @@ id: 'build-api'
         self.assertIn("deploy-agent-runner", ids)
         # The line with trailing comment should not be captured
         self.assertNotIn("deploy-api", ids, "Lines with trailing comments should not be matched by _extract_step_ids_from_text")
+
+if __name__ == "__main__":
+    unittest.main()
 
     def test_extract_list_block_from_text_basic(self):
         # Simple top-level list with two-space indentation and dash-prefixed items

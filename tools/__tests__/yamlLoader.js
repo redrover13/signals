@@ -170,8 +170,11 @@ function loadYamlFile(path) {
   if (parseYaml) {
     try {
       return parseYaml(text);
-    } catch {
-      // fall back to basic parser
+    } catch (err) {
+      // Only fall back for syntax-related parse errors; rethrow others
+      if (!(err && err.name && /YAML|Parse/i.test(String(err.name)))) {
+        throw err;
+      }
     }
   }
   return basicYamlParse(text);

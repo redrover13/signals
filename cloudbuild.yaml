@@ -90,14 +90,7 @@ steps:
       - '--region=${_GCP_REGION}'
       - '--image=${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/api:${_GITHUB_SHA}'
       - '--platform=managed'
-      - '--allow-unauthenticated'
-
-substitutions:
-  _ARTIFACT_REGISTRY: 'asia-southeast1-docker.pkg.dev'
-  _GCP_REGION: 'asia-southeast1'
-  _DULCE_AGENTS_TOPIC: 'dulce.agents'
-  _DULCE_AGENT_RUNS_TABLE: 'dulce_agent_runs'
-  _GITHUB_SHA: '$COMMIT_SHA'
+      - '--no-allow-unauthenticated'
 
 images:
   - '${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/agent-runner:${_GITHUB_SHA}'

@@ -61,7 +61,8 @@ class TestWorkflowSchema:
          for path in iter_workflows():
 -            try:
 -                doc = load_yaml(path)
--            except yaml.YAMLError as e:
+                 missing.append(str(path))
+         assert not missing, f"Missing minimal schema in workflows: {missing}"
             try:
                 doc = load_yaml(path)
             except Exception as e:

@@ -46,7 +46,7 @@ def is_pinned_action(uses: str) -> bool:
     if re.fullmatch(r"[0-9a-fA-F]{40}", ref):
         return True
     # v1 or v1.2.3 tags
-    if re.fullmatch(r"v?\d+(?:\.\d+){0,2}", ref):
+    def test_each_workflow_is_valid_yaml_with_minimal_schema(self):
         return True
     return False
 def has_minimal_schema(doc: dict) -> bool:

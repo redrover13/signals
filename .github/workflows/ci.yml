@@ -1,33 +1,43 @@
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-      - uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
-      - name: Set Nx base/head SHAs
-        uses: nrwl/nx-set-shas@v4
-      - id: affected
-        name: Determine affected projects
-        shell: bash
-        run: |
-          set -euo pipefail
-          projects=$(pnpm exec nx print-affected --select=projects || true)
-          if [ -z "$projects" ]; then
-            echo "projects=" >> "$GITHUB_OUTPUT"
-            echo "has-affected=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "projects=$projects" >> "$GITHUB_OUTPUT"
-            echo "has-affected=true" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Install Dependencies
-        run: |
-          pnpm install
-      - name: Run Tests
-        run: |
-          pnpm test
+    name: CI
+    on:
+      push:
+        branches: [main, develop]
+      pull_request:
+        branches: [main, develop]
+    env:
+      NODE_VERSION: 20
+      PNPM_VERSION: 9
+    jobs:
+      build-and-test:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+            with:
+              fetch-depth: 0
+          - uses: actions/setup-node@v4
+            with:
+              node-version: ${{ env.NODE_VERSION }}
+              cache: pnpm
+          - uses: pnpm/action-setup@v4
+            with:
+              version: ${{ env.PNPM_VERSION }}
+              run_install: false
+          - name: Install Dependencies
+            run: pnpm install
+          - name: Set Nx base/head SHAs
+            uses: nrwl/nx-set-shas@v4
+          - id: affected
+            name: Determine affected projects
+            shell: bash
+            run: |2
+              set -euo pipefail
+              projects=$(pnpm exec nx print-affected --select=projects || true)
+              if [ -z "$projects" ]; then
+                echo "projects=" >> "$GITHUB_OUTPUT"
+                echo "has-affected=false" >> "$GITHUB_OUTPUT"
+              else
+                echo "projects=$projects" >> "$GITHUB_OUTPUT"
+                echo "has-affected=true" >> "$GITHUB_OUTPUT"
+              fi
+          - name: Run Tests
+            run: pnpm test

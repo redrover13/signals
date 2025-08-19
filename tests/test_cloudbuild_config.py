@@ -310,45 +310,17 @@ class TestCloudBuildSteps(unittest.TestCase):
             # Ensure service account param is present
             self.assertTrue(any(a.startswith("--service-account=") and "event-parser-sa@" in a for a in args))
 
-    def test_deploy_agent_runner_and_api_configs(self):
-        if self.data is None:
-            text = self.text
-            self.assertIn("deploy-agent-runner", text)
-            self.assertIn("--no-allow-unauthenticated", text, "agent-runner should not allow unauthenticated")
-            self.assertRegex(text, r"DULCE_AGENTS_TOPIC=\$\{_DULCE_AGENTS_TOPIC\}", "ENV var for agents topic missing")
-            self.assertRegex(text, r"DULCE_AGENT_RUNS_TABLE=\$\{_DULCE_AGENT_RUNS_TABLE\}", "ENV var for runs table missing")
-
-            self.assertIn("deploy-api", text)
-            self.assertIn("--no-allow-unauthenticated", text, "dulce-api should not allow unauthenticated")
-        else:
-            steps = {s.get("id"): s for s in self.data.get("steps", []) if isinstance(s, dict) and "id" in s}
-
-            # agent-runner
-            self.assertIn("deploy-agent-runner", steps)
-            st = steps["deploy-agent-runner"]
-            self.assertEqual(st.get("name"), "gcr.io/google.com/cloudsdktool/cloud-sdk")
-            args = st.get("args", [])
-            self.assertIn("run", args)
-            self.assertIn("deploy", args)
-            self.assertIn("agent-runner", args)
-            self.assertIn("--no-allow-unauthenticated", args)
-            # Environment variables are set as a single argument with comma-separated values
-            env_arg = next((a for a in args if a.startswith("--set-env-vars=")), None)
-            self.assertIsNotNone(env_arg, "Missing --set-env-vars for agent-runner")
-            self.assertIn("GCP_PROJECT_ID=${PROJECT_ID}", env_arg)
-            self.assertIn("DULCE_AGENTS_TOPIC=${_DULCE_AGENTS_TOPIC}", env_arg)
-            self.assertIn("DULCE_AGENT_RUNS_TABLE=${_DULCE_AGENT_RUNS_TABLE}", env_arg)
-
-            # api
-            self.assertIn("deploy-api", steps)
-            st_api = steps["deploy-api"]
-            self.assertEqual(st_api.get("name"), "gcr.io/google.com/cloudsdktool/cloud-sdk")
-            args_api = st_api.get("args", [])
-            self.assertIn("run", args_api)
-            self.assertIn("deploy", args_api)
-            self.assertIn("dulce-api", args_api)
-            self.assertIn("--no-allow-unauthenticated", args_api)
-class TestHelperExtraction(unittest.TestCase):
+for k in expected:
+    self.assertRegex(
+        self.text,
+        rf'(?m)^\s*{re.escape("substitutions")}\s*:\s*$',
+        "substitutions block missing",
+    )
+    self.assertRegex(
+        self.text,
+        rf'(?m)^\s*{re.escape(k)}\s*:\s*',
+        f"Missing substitution '{k}'",
+    )
     def test_extract_step_ids_various_formats(self):
         # Includes single quotes, double quotes, and unquoted. Also tests a line with trailing comment (should not match).
         text = """

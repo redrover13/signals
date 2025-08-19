@@ -240,9 +240,8 @@ def test_no_unauthenticated_for_agent_runner_and_allowed_for_api():
     text = _load_text(path)
     # Ensure agent-runner has no-allow-unauthenticated
     assert "--no-allow-unauthenticated" in text, "agent-runner should disallow unauthenticated access"
-    # Ensure api has allow-unauthenticated
-    assert "--allow-unauthenticated" in text, "api should allow unauthenticated access for public endpoints"
-
+    # Ensure api explicitly disallows unauthenticated access
+    assert "--no-allow-unauthenticated" in text, "api should not allow unauthenticated access"
 def test_service_accounts_and_env_vars_present_for_deployments():
     path = _find_cloudbuild_file()
     text = _load_text(path)

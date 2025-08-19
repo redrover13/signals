@@ -125,23 +125,19 @@ class TestCloudBuildStructure(unittest.TestCase):
     def test_substitutions_have_expected_keys(self):
         expected = {"_ARTIFACT_REGISTRY", "_GCP_REGION", "_DULCE_AGENTS_TOPIC", "_DULCE_AGENT_RUNS_TABLE"}
         if self.data is None:
-            for k in expected:
--                self.assertRegex(self.text, rf'^\s*{re.escape("substitutions")}:\s*$', "substitutions block missing")
--                self.assertRegex(
--                    self.text,
--                    rf'^\s*{re.escape(k)}\s*:\s*',
--                    f"Missing substitution '{k}'",
-                self.assertRegex(
-                    self.text,
-                    rf'(?m)^\s*{re.escape("substitutions")}\s*:\s*$',
-                    "substitutions block missing",
-                )
-                self.assertRegex(
-                    self.text,
-                    rf'(?m)^\s*{re.escape(k)}\s*:\s*',
-                    f"Missing substitution '{k}'",
-                )
-        else:
+         if self.data is None:
+             for k in expected:
+                 self.assertRegex(
+                     self.text,
+                     rf'(?m)^\s*{re.escape("substitutions")}\s*:\s*$',
+                     "substitutions block missing",
+                 )
+                 self.assertRegex(
+                     self.text,
+                     rf'(?m)^\s*{re.escape(k)}\s*:\s*',
+                     f"Missing substitution '{k}'",
+                 )
+         else:
             subs = self.data.get("substitutions", {})
             self.assertIsInstance(subs, dict, "substitutions should be a mapping")
             self.assertTrue(expected.issubset(set(subs.keys())), f"substitutions missing keys: {expected - set(subs.keys())}")

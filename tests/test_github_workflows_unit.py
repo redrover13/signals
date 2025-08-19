@@ -111,7 +111,6 @@ class TestIterWorkflowsBehavior:
         with pytest.raises(pytest.SkipException) as excinfo:
             next(gen)
         # Ensure the skip reason matches
-class TestIterWorkflowsBehavior:
     def test_iter_workflows_skips_if_no_dir(self, ghwf):
         """
         Should raise pytest.SkipException if the workflows directory does not exist.

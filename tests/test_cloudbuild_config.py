@@ -310,7 +310,7 @@ class TestCloudBuildSteps(unittest.TestCase):
             self.assertRegex(text, r"DULCE_AGENT_RUNS_TABLE=\$\{_DULCE_AGENT_RUNS_TABLE\}", "ENV var for runs table missing")
 
             self.assertIn("deploy-api", text)
-            self.assertIn("--allow-unauthenticated", text, "dulce-api should allow unauthenticated")
+            self.assertIn("--no-allow-unauthenticated", text, "dulce-api should not allow unauthenticated")
         else:
             steps = {s.get("id"): s for s in self.data.get("steps", []) if isinstance(s, dict) and "id" in s}
 
@@ -338,8 +338,7 @@ class TestCloudBuildSteps(unittest.TestCase):
             self.assertIn("run", args_api)
             self.assertIn("deploy", args_api)
             self.assertIn("dulce-api", args_api)
-            self.assertIn("--allow-unauthenticated", args_api)
-
+            self.assertIn("--no-allow-unauthenticated", args_api)
 class TestHelperExtraction(unittest.TestCase):
     def test_extract_step_ids_various_formats(self):
         # Includes single quotes, double quotes, and unquoted. Also tests a line with trailing comment (should not match).

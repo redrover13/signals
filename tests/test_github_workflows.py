@@ -24,7 +24,28 @@ def iter_workflows():
     for p in sorted(WORKFLOWS_DIR.glob("*.y*ml")):
         yield p
 
-    # v1, v1.2 or v1.2.3 tags (v-prefix required to avoid ambiguous numeric refs)
+def is_pinned_action(uses: str) -> bool:
+    """
+    Treat as pinned only if:
+    - docker:// refs use an explicit digest (e.g., @sha256:<digest>)
+    - GitHub Actions refs use a full 40-hex commit SHA, or a v-prefixed semver-like tag (v1, v1.2.3)
+    Branch names (e.g., main, master, feature/*) and 'latest' are not pinned.
+    """
+    if "@" not in uses:
+        return False
+    if uses.startswith("docker://"):
+        return "@sha256:" in uses.lower()
+    _, ref = uses.split("@", 1)
+    ref = ref.strip()
+    if not ref:
+        return False
+    low = ref.lower()
+    if low in {"main", "master", "latest", "head"}:
+        return False
+    # Full commit SHA (40 hex characters)
+    if re.fullmatch(r"[0-9a-f]{40}", ref, flags=re.IGNORECASE):
+        return True
+    # v1, v1.2, v1.2.3 (require v-prefix to avoid ambiguous numeric refs)
     if re.fullmatch(r"v\d+(?:\.\d+){0,2}$", ref):
         return True
     return False

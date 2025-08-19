@@ -154,7 +154,7 @@ def test_contains_expected_build_and_push_steps_in_order():
     # Deploy steps
     deploy_function_pattern = r"name:\s*'gcr\.io/google\.com/cloudsdktool/cloud-sdk'.*?id:\s*'deploy-cloud-function'.*?args:.*?'functions'.*?'deploy'.*?'event-parser'.*?'--project=\$\{PROJECT_ID\}'.*?'--region=\$\{_GCP_REGION\}'.*?'--trigger-topic=dulce\.agents'.*?'--runtime=nodejs20'.*?'--source=apps/event-parser'.*?'--entry-point=parseAgentEvent'.*?'--service-account=event-parser-sa@\$\{PROJECT_ID\}\.iam\.gserviceaccount\.com'"
     deploy_runner_pattern = r"id:\s*'deploy-agent-runner'.*?args:.*?'run'.*?'deploy'.*?'agent-runner'.*?'--project=\$\{PROJECT_ID\}'.*?'--region=\$\{_GCP_REGION\}'.*?'--image=\$\{_ARTIFACT_REGISTRY\}.*?/dulce/agent-runner:\$\{_GITHUB_SHA\}'.*?'--platform=managed'.*?'--no-allow-unauthenticated'.*?'--service-account=agent-runner-sa@\$\{PROJECT_ID\}\.iam\.gserviceaccount\.com'.*?'--set-env-vars=GCP_PROJECT_ID=\$\{PROJECT_ID\},DULCE_AGENTS_TOPIC=\$\{_DULCE_AGENTS_TOPIC\},DULCE_AGENT_RUNS_TABLE=\$\{_DULCE_AGENT_RUNS_TABLE\}'"
-    deploy_api_pattern = r"id:\s*'deploy-api'.*?args:.*?'run'.*?'deploy'.*?'dulce-api'.*?'--project=\$\{PROJECT_ID\}'.*?'--region=\$\{_GCP_REGION\}'.*?'--image=\$\{_ARTIFACT_REGISTRY\}.*?/dulce/api:\$\{_GITHUB_SHA\}'.*?'--platform=managed'.*?'--allow-unauthenticated'"
+    deploy_api_pattern = r"id:\s*'deploy-api'.*?args:.*?'run'.*?'deploy'.*?'dulce-api'.*?'--project=\$\{PROJECT_ID\}'.*?'--region=\$\{_GCP_REGION\}'.*?'--image=\$\{_ARTIFACT_REGISTRY\}.*?/dulce/api:\$\{_GITHUB_SHA\}'.*?'--platform=managed'.*?'--no-allow-unauthenticated'"
 
     for pat in [
         build_agent_pattern, build_api_pattern,

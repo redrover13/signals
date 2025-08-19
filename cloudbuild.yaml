@@ -9,7 +9,6 @@ substitutions:
   _DULCE_AGENT_RUNS_TABLE: 'dulce_agent_runs'
 
 steps:
-steps:
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-agent-runner'
     args:

@@ -46,7 +46,6 @@ class TestIsPinnedAction:
         [
 @pytest.mark.parametrize(
     "uses,expected",
-    [
         ("actions/checkout", False),               # no '@' -> not pinned
         ("actions/checkout@", False),              # empty ref after '@' -> not pinned
         ("actions/checkout@v4", True),             # explicit tag -> pinned

@@ -126,10 +126,19 @@ class TestCloudBuildStructure(unittest.TestCase):
         expected = {"_ARTIFACT_REGISTRY", "_GCP_REGION", "_DULCE_AGENTS_TOPIC", "_DULCE_AGENT_RUNS_TABLE"}
         if self.data is None:
             for k in expected:
-                self.assertRegex(self.text, rf'^\s*{re.escape("substitutions")}:\s*$', "substitutions block missing")
+-                self.assertRegex(self.text, rf'^\s*{re.escape("substitutions")}:\s*$', "substitutions block missing")
+-                self.assertRegex(
+-                    self.text,
+-                    rf'^\s*{re.escape(k)}\s*:\s*',
+-                    f"Missing substitution '{k}'",
                 self.assertRegex(
                     self.text,
-                    rf'^\s*{re.escape(k)}\s*:\s*',
+                    rf'(?m)^\s*{re.escape("substitutions")}\s*:\s*$',
+                    "substitutions block missing",
+                )
+                self.assertRegex(
+                    self.text,
+                    rf'(?m)^\s*{re.escape(k)}\s*:\s*',
                     f"Missing substitution '{k}'",
                 )
         else:

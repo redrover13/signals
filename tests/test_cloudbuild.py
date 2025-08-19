@@ -258,7 +258,7 @@ def test_scans_block_build_on_high_or_critical_vulns():
     path = _find_cloudbuild_file()
     text = _load_text(path)
     # Check both scans have exit code 1 and severity HIGH,CRITICAL
-    occurrences = re.findall(r"aquasec/trivy:latest.*?args:.*?--exit-code\s*'\s*1\s*'.*?--severity\s*'\s*HIGH,CRITICAL\s*'", text, flags=re.DOTALL)
+    occurrences = re.findall(r"aquasec/trivy:0\.53\.0.*?args:.*?--exit-code\s*'\s*1\s*'.*?--severity\s*'\s*HIGH,CRITICAL\s*'", text, flags=re.DOTALL)
     assert len(occurrences) >= 2, "Both images should be scanned with exit-code 1 and severity HIGH,CRITICAL"
 
 def test_build_args_use_github_sha_and_artifact_registry():

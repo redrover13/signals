@@ -3,7 +3,7 @@
 # Script to update Secret Manager secrets with actual values
 # Run this in Google Cloud Shell or authenticated environment
 
-PROJECT_ID="saigon-signals"
+PROJECT_ID="${GCP_PROJECT_ID:-$(gcloud config get-value project)}"
 
 echo "🔐 Updating Secret Manager secrets..."
 echo "Please provide the actual values for your secrets:"

@@ -102,20 +102,13 @@ class TestIsPinnedAction:
 class TestHasMinimalSchema:
     @pytest.mark.parametrize(
         "doc,expected",
-        class TestIterWorkflowsBehavior:
-            def test_iter_workflows_skips_if_no_dir(self, ghwf):
-                """
-                Should raise pytest.SkipException if the workflows directory does not exist.
-                """
-                gen = ghwf.iter_workflows()
-                with pytest.raises(pytest.SkipException) as excinfo:
-                    next(gen)
-                assert "No .github/workflows directory found" in str(excinfo.value)
-            "missing_on",
-            "jobs_not_dict",
-            "doc_not_dict",
-            "valid_with_job_dict",
+        [
+            ({"name": "n", "on": {"push": None}, "jobs": {}}, True),   # valid_with_job_dict
+            ({"name": "n", "jobs": {}}, False),                        # missing_on
+            ({"name": "n", "on": {"push": None}, "jobs": []}, False),  # jobs_not_dict
+            (["not", "a", "dict"], False),                             # doc_not_dict
         ],
+        ids=["valid_with_job_dict", "missing_on", "jobs_not_dict", "doc_not_dict"],
     )
     def test_has_minimal_schema_various(self, ghwf, doc, expected):
         assert ghwf.has_minimal_schema(doc) is expected

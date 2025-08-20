@@ -429,18 +429,24 @@ class TestCloudBuildSteps(unittest.TestCase):
             # Ensure service account param is present
             self.assertTrue(any(a.startswith("--service-account=") and "event-parser-sa@" in a for a in args))
 
-for k in expected:
-    self.assertRegex(
-        self.text,
-        rf'(?m)^\s*{re.escape("substitutions")}\s*:\s*$',
-        "substitutions block missing",
-    )
-    self.assertRegex(
-        self.text,
-        rf'(?m)^\s*{re.escape(k)}\s*:\s*',
-        f"Missing substitution '{k}'",
-    )
+class TestHelperExtraction(unittest.TestCase):
     def test_extract_step_ids_various_formats(self):
+        # Includes single quotes, double quotes, and unquoted. Also tests a line with trailing comment (should not match).
+        text = """
+        id: 'build-api'
+          id: "push-api"
+            id: scan-agent-runner
+            id: deploy-api   # trailing comment should not be captured by strict regex
+              id: 'deploy-agent-runner'
+        """
+        ids = _extract_step_ids_from_text(text)
+        # Strict regex should capture lines without trailing content only
+        self.assertIn("build-api", ids)
+        self.assertIn("push-api", ids)
+        self.assertIn("scan-agent-runner", ids)
+        self.assertIn("deploy-agent-runner", ids)
+        # The line with trailing comment should not be captured
+        self.assertNotIn("deploy-api", ids, "Lines with trailing comments should not be matched by _extract_step_ids_from_text")
         # Includes single quotes, double quotes, and unquoted. Also tests a line with trailing comment (should not match).
         text = """
         id: 'build-api'

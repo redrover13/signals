@@ -342,7 +342,7 @@ setup_storage() {
             
             # Set lifecycle policy for build artifacts
             if [[ "$bucket_name" == *"build-artifacts"* ]]; then
-                cat > lifecycle.json << EOF
+                gsutil lifecycle set - "gs://$bucket_name" << EOF
 {
   "lifecycle": {
     "rule": [
@@ -354,8 +354,6 @@ setup_storage() {
   }
 }
 EOF
-                gsutil lifecycle set lifecycle.json "gs://$bucket_name"
-                rm lifecycle.json
             fi
         else
             log_info "Storage bucket $bucket_name already exists"

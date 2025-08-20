@@ -44,7 +44,12 @@ jobs:
   health-check:
     name: Health Check
     runs-on: ubuntu-latest
-    if: github.event.schedule == '*/15 * * * *' || inputs.check_type == 'health' || inputs.check_type == 'comprehensive'
+    if: >
+      ${{ 
+        github.event_name == 'schedule' ||
+        (github.event_name == 'workflow_dispatch' &&
+         (inputs.check_type == 'health' || inputs.check_type == 'comprehensive'))
+      }}
     strategy:
       matrix:
         environment: [production, staging]

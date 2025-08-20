@@ -125,20 +125,26 @@ export function getMCPServerRecommendations(useCase: string): {
 /**
  * Generate MCP configuration for specific use case
  */
-export function generateMCPConfig(useCase: string, environment: Environment = 'development'): Partial<MCPEnvironmentConfig> {
+export function generateMCPConfig(
+  useCase: string,
+  environment: Environment = 'development',
+  options: { exclusive?: boolean } = {}
+): Partial<MCPEnvironmentConfig> {
   const recommendations = getMCPServerRecommendations(useCase);
   const baseConfig = getCurrentConfig();
-  
+
   const enabledServerIds = [
     ...recommendations.essential,
     ...recommendations.recommended
   ];
-  
-  const servers = baseConfig.servers.map(server => ({
-    ...server,
-    enabled: enabledServerIds.includes(server.id)
-  }));
-  
+
+  const servers = baseConfig.servers.map(server => {
+    if (enabledServerIds.includes(server.id)) {
+      return { ...server, enabled: true };
+    }
+    return options.exclusive ? { ...server, enabled: false } : server;
+  });
+
   return {
     environment,
     servers,

@@ -348,10 +348,15 @@ export class ServerHealthService extends EventEmitter {
     const stats = Array.from(this.healthStats.values());
     const totalServers = stats.length;
     const healthyServers = stats.filter(s => s.consecutiveFailures === 0).length;
-    const unhealthyServers = stats.filter(s => s.consecutiveFailures > 0 && s.consecutiveFailures < 3).length;
-    const criticalServers = stats.filter(s => s.consecutiveFailures >= 3).length;
+    const getThreshold = (id: string) =>
+      this.config.servers.find(s => s.id === id)?.healthCheck?.failureThreshold ?? 3;
+    const unhealthyServers = stats.filter(s =>
+      s.consecutiveFailures > 0 && s.consecutiveFailures < getThreshold(s.serverId)
+    ).length;
+    const criticalServers = stats.filter(s =>
+      s.consecutiveFailures >= getThreshold(s.serverId)
+    ).length;
     const averageUptime = stats.reduce((sum, s) => sum + s.uptime, 0) / totalServers || 0;
-
     return {
       totalServers,
       healthyServers,

@@ -367,7 +367,6 @@ class TestCloudBuildSteps(unittest.TestCase):
                 self.assertIn("--severity", args)
                 self.assertIn("HIGH,CRITICAL", args)
                 # No tar input expected when scanning by image tag
-            steps = {s.get("id"): s for s in self.data.get("steps", []) if isinstance(s, dict) and "id" in s}
             for sid, img in expected.items():
                 self.assertIn(sid, steps, f"Missing scan step {sid}")
                 st = steps[sid]

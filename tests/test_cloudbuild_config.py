@@ -324,7 +324,7 @@ class TestCloudBuildSteps(unittest.TestCase):
     def test_scan_steps_use_trivy_with_strict_severity_and_exit_code(self):
         expected = {
             "scan-agent-runner": "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/agent-runner:${_GITHUB_SHA}",
-            "scan-api": "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/api:${_GITHUB_SHA}",
+            "scan-api":           "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/api:${_GITHUB_SHA}",
         }
         if self.data is None:
             self.assertIn("aquasec/trivy:0.53.0", self.text, "Missing trivy scanner in steps")
@@ -332,11 +332,41 @@ class TestCloudBuildSteps(unittest.TestCase):
             self.assertIn("--severity", self.text)
             self.assertIn("HIGH,CRITICAL", self.text)
             self.assertIn("--exit-code", self.text)
-            self.assertRegex(self.text, r"--exit-code\s*'?1'?", "Trivy scanner should fail on findings (exit code 1)")
-            # Ensure tar inputs are present (we scan saved images)
-            self.assertIn("agent-runner.tar", self.text)
-            self.assertIn("api.tar", self.text)
+            self.assertRegex(
+                self.text,
+                r"--exit-code\s*'?1'?",
+                "Trivy scanner should fail on findings (exit code 1)",
+            )
+            # Ensure image-tag targets are present (scan by tag, not tar)
+            self.assertIn(
+                "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/agent-runner:${_GITHUB_SHA}",
+                self.text,
+            )
+            self.assertIn(
+                "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/api:${_GITHUB_SHA}",
+                self.text,
+            )
         else:
+            steps = {
+                s.get("id"): s
+                for s in self.data.get("steps", [])
+                if isinstance(s, dict) and "id" in s
+            }
+            for sid, img in expected.items():
+                self.assertIn(sid, steps, f"Missing scan step {sid}")
+                st = steps[sid]
+                self.assertEqual(st.get("name"), "aquasec/trivy:0.53.0")
+                args = st.get("args", [])
+                self.assertIsInstance(args, list)
+                # Expected args are in order, but assert presence rather than exact sequence
+                self.assertIn("image", args)
+                # Ensure the registry image reference is scanned (also fixes Ruff B007)
+                self.assertIn(img, args)
+                self.assertIn("--exit-code", args)
+                self.assertIn("1", args)
+                self.assertIn("--severity", args)
+                self.assertIn("HIGH,CRITICAL", args)
+                # No tar input expected when scanning by image tag
             steps = {s.get("id"): s for s in self.data.get("steps", []) if isinstance(s, dict) and "id" in s}
             for sid, img in expected.items():
                 self.assertIn(sid, steps, f"Missing scan step {sid}")

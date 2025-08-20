@@ -209,7 +209,9 @@ export function getMCPPerformanceMetrics(mcpService: MCPService): {
     healthyServers: systemHealth.healthyServers,
     averageResponseTime: 0, // Would need to track this
     totalRequests,
-    errorRate: systemHealth.criticalServers / systemHealth.totalServers * 100
+    errorRate: systemHealth.totalServers === 0
+      ? 0
+      : (systemHealth.criticalServers / systemHealth.totalServers) * 100
   };
 }
 

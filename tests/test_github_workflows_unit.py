@@ -102,20 +102,15 @@ class TestIsPinnedAction:
 class TestHasMinimalSchema:
     @pytest.mark.parametrize(
         "doc,expected",
-        [
-            ({"name": "WF", "on": ["push"], "jobs": {}}, True),  # minimal valid
-            ({"on": ["push"], "jobs": {}}, False),               # missing name
-            ({"name": "WF", "jobs": {}}, False),                 # missing on
-            ({"name": "WF", "on": [], "jobs": []}, False),       # jobs not dict
-            ([], False),                                         # not a dict
-            (
-                {"name": "WF", "on": {}, "jobs": {"build": {}}},
-                True,  # valid: jobs is a dict
-            ),
-        ],
-        ids=[
-            "valid_minimal",
-            "missing_name",
+        class TestIterWorkflowsBehavior:
+            def test_iter_workflows_skips_if_no_dir(self, ghwf):
+                """
+                Should raise pytest.SkipException if the workflows directory does not exist.
+                """
+                gen = ghwf.iter_workflows()
+                with pytest.raises(pytest.SkipException) as excinfo:
+                    next(gen)
+                assert "No .github/workflows directory found" in str(excinfo.value)
             "missing_on",
             "jobs_not_dict",
             "doc_not_dict",

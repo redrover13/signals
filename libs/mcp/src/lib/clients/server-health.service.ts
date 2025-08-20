@@ -199,9 +199,10 @@ export class ServerHealthService extends EventEmitter {
       const response = await this.mcpClient.sendRequest({
         id: `health-check-${Date.now()}`,
         method: 'ping',
-        timeout
+        timeout,
+        serverId: config.id
       });
-
+      // …
       const responseTime = Date.now() - startTime;
       const healthy = !response.error;
 

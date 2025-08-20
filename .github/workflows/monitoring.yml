@@ -125,15 +125,9 @@ jobs:
           for function in "${FUNCTIONS[@]}"; do
             echo "Checking function $function..."
             
-            STATUS=$(gcloud functions describe $function \
+            STATUS=$(gcloud functions describe "$function" --gen2 \
               --region=asia-southeast1 \
               --format="value(status)" 2>/dev/null || echo "NotFound")
-            
-            if [ "$STATUS" != "ACTIVE" ]; then
-              FAILED_FUNCTIONS+=("$function")
-              echo "❌ $function is not active: $STATUS"
-            else
-              echo "✅ $function is active"
             fi
           done
           

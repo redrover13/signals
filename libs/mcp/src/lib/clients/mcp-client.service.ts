@@ -231,10 +231,12 @@ export class MCPClientService extends EventEmitter {
     }
 
     const startTime = Date.now();
+    let routedServerId: string | undefined;
 
     try {
       // Route the request
       const serverId = await this.requestRouter.routeRequest(request);
+      routedServerId = serverId;
       const connection = this.connections.get(serverId);
 
       if (!connection || connection.status !== 'connected') {
@@ -261,7 +263,7 @@ export class MCPClientService extends EventEmitter {
           message: error instanceof Error ? error.message : 'Unknown error',
           data: error,
         },
-        serverId: request.serverId || 'unknown',
+        serverId: routedServerId || request.serverId || 'unknown',
         duration: Date.now() - startTime,
       };
 

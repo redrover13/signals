@@ -30,6 +30,10 @@ git commit -m "chore: add pnpm-lock.yaml for CI consistency"
 ## Stage 5: Add Google Cloud Secrets
 
 - When deploying, ensure these secrets are set in GitHub:
+  - GCP_PROJECT_ID
+  - WIF_PROVIDER
+  - WIF_SERVICE_ACCOUNT
+  - NX_CLOUD_ACCESS_TOKEN
 
 ## Ask for Help if You Hit Errors
 

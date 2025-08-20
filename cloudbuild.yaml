@@ -59,6 +59,7 @@ steps:
 
   # Deploy services
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
     id: 'deploy-cloud-function'
     args:
       - 'functions'
@@ -72,7 +73,6 @@ steps:
       - '--source=apps/event-parser'
       - '--entry-point=parseAgentEvent'
       - '--service-account=event-parser-sa@${PROJECT_ID}.iam.gserviceaccount.com'
-
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-agent-runner'
     args:

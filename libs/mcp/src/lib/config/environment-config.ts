@@ -41,7 +41,7 @@ const DEVELOPMENT_CONFIG: MCPEnvironmentConfig = {
     healthCheck: server.healthCheck
       ? {
           ...server.healthCheck,
-          interval: Math.min(server.healthCheck.interval, 60000),
+          interval: Math.min(server.healthCheck.interval ?? 60000, 60000),
         }
       : undefined,
   })),

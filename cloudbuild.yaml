@@ -48,14 +48,17 @@ steps:
       - '1'
       - '--severity'
       - 'HIGH,CRITICAL'
-  # Push images
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-agent-runner'
-    args: ['push', '${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/agent-runner:${_GITHUB_SHA}']
+    args: 
+      - 'push'
+      - '${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/agent-runner:${_GITHUB_SHA}'
 
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-api'
-    args: ['push', '${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/api:${_GITHUB_SHA}']
+    args: 
+      - 'push'
+      - '${_ARTIFACT_REGISTRY}/${PROJECT_ID}/dulce/api:${_GITHUB_SHA}'
 
   # Deploy services
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'

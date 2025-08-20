@@ -35,18 +35,6 @@ The "Dulce de Saigon" project is a leading Food & Beverage (F&B) data platform f
 
 ## 5. MCP Server Integration: Guidelines for Qodo
 
-Note: The set of available MCP servers varies by environment and repository configuration. Use these guidelines for supported servers only.
-
-- Current availability and setup instructions: see docs/mcp/INDEX.md
-- To request or add a new MCP server: open an issue using the "MCP Server Request" template and link proposed provisioning/config files.
-
-The following guidance describes how to use commonly supported servers when they are available.
-## 6. Important Do's and Don'ts
-
-- **DO NOT** commit secrets. Use Google Cloud Secret Manager.
-- **DO NOT** use placeholder or sample secrets in code or docs (e.g., "secret123"); use environment references and redacted examples.
-- **ALWAYS** ensure logs and error messages do not contain secrets or PII; scrub before persisting.
-- **ALWAYS** rotate credentials immediately upon suspected exposure and update Secret Manager versions accordingly.
 - **ALWAYS** write comprehensive unit tests.
 - **ALWAYS** adhere to Vietnamese data privacy regulations.
 - **ALWAYS** optimize for performance and cost on GCP.

@@ -1,8 +1,15 @@
 const yaml = require('yaml');
 
 /**
- * parseWorkflowYaml: Parses YAML content safely and returns JS object.
- * Throws on invalid YAML.
+ * Parse YAML workflow content into a JavaScript value.
+ *
+ * Safely parses the provided YAML string and returns the resulting JS representation.
+ * If the YAML contains parse errors an Error is thrown whose message summarizes the
+ * problems and whose `details` property contains the original yaml.Document errors.
+ *
+ * @param {string} content - YAML document text to parse.
+ * @returns {*} The parsed JavaScript representation of the YAML (typically an object).
+ * @throws {Error} If the YAML is invalid; the thrown error includes a `details` array of parse errors.
  */
 function parseWorkflowYaml(content) {
   const doc = yaml.parseDocument(content);
@@ -15,8 +22,21 @@ function parseWorkflowYaml(content) {
 }
 
 /**
- * validateBasicWorkflowShape: Returns an array of strings describing problems found.
- * If empty array, the workflow meets our basic expectations.
+ * Validate that a workflow object conforms to the project's expected basic GitHub Actions shape.
+ *
+ * Performs structural checks and returns a list of human-readable problems found. An empty array
+ * indicates the workflow meets the validator's basic expectations.
+ *
+ * Checks include (non-exhaustive): presence and non-empty workflow.name; top-level permissions.contents === 'read';
+ * required triggers under `on` (push.branches array, pull_request.branches array, workflow_dispatch present);
+ * concurrency block with a group containing `${{ github.workflow }}` and `cancel-in-progress: true`;
+ * presence of required environment keys (NODE_VERSION, PNPM_VERSION, NX_CLOUD_ACCESS_TOKEN, NX_DAEMON, HUSKY);
+ * a jobs.setup job with `runs-on: ubuntu-latest`, permissions.contents === 'read', outputs containing
+ * `affected-projects` and `has-affected`, and required setup steps (checkout, setup-node, pnpm/action-setup,
+ * nrwl/nx-set-shas, and an "Determine affected projects" bash step with id `affected`).
+ *
+ * @param {object} workflow - Parsed workflow object to validate.
+ * @return {string[]} Array of problem messages; empty if no problems were found.
  */
 function validateBasicWorkflowShape(workflow) {
   const problems = [];
@@ -123,8 +143,14 @@ function validateBasicWorkflowShape(workflow) {
 }
 
 /**
- * findStrayTopLevelStepsBlocks: returns the count of top-level "steps" keys not under a job.
- * The GitHub Actions schema expects "steps" under a job; root-level steps are invalid.
+ * Count top-level "steps" keys in a workflow object (stray root-level steps not under any job).
+ *
+ * Performs a shallow check of the workflow object and returns the number of top-level
+ * "steps" properties found (0 or 1). This flags invalid GitHub Actions workflows that
+ * place `steps` at the root instead of within a job.
+ *
+ * @param {object} workflow - Parsed workflow object (e.g., result of YAML parse).
+ * @return {number} The count of stray top-level `steps` blocks (0 or 1).
  */
 function findStrayTopLevelStepsBlocks(workflow) {
   let count = 0;

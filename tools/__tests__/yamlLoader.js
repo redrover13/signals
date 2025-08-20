@@ -19,6 +19,16 @@ try {
   }
 }
 
+/**
+ * Remove matching surrounding single or double quotes from a string.
+ *
+ * Trims whitespace, and if the trimmed value starts and ends with the same
+ * quote character (' or "), returns the inner content. If the input is falsy
+ * (e.g., null, undefined, empty string) the original value is returned.
+ *
+ * @param {string|null|undefined} s - Input string that may be quoted.
+ * @return {string|null|undefined} The trimmed, unquoted string, or the original falsy value.
+ */
 function unquote(s) {
   if (!s) return s;
   const t = s.trim();
@@ -28,6 +38,15 @@ function unquote(s) {
   return t;
 }
 
+/**
+ * Convert a trimmed YAML scalar token into a JS boolean, null, or string.
+ *
+ * Recognizes the literals "true" -> true, "false" -> false, and "null" or "~" -> null.
+ * All other values are returned as an unquoted string (numbers remain strings to avoid coercion).
+ *
+ * @param {string} val - The scalar text to parse (may contain surrounding quotes or whitespace).
+ * @return {boolean|null|string} The parsed JavaScript value.
+ */
 function parseScalar(val) {
   let v = val.trim();
   if (v === 'true') return true;
@@ -37,6 +56,17 @@ function parseScalar(val) {
   return unquote(v);
 }
 
+/**
+ * Parse a simple YAML flow sequence (e.g. `[a, "b,c", 'd']`) into an array of scalar values.
+ *
+ * Accepts a string (or value coerced to string). If the input is not a bracketed flow
+ * sequence, returns an array containing the parsed scalar of the whole input. When parsing
+ * a bracketed sequence, preserves quoted items (single or double quotes), supports backslash
+ * escapes inside items, and splits on commas that are not inside quotes.
+ *
+ * @param {string|any} text - The text to parse as a flow sequence or scalar.
+ * @returns {Array<null|boolean|string>} An array of parsed scalar values (null, booleans, or strings).
+ */
 function parseFlowSeq(text) {
   // Parse simple flow sequence: ['a', 'b', 'c']
   let s = String(text).trim();
@@ -77,6 +107,16 @@ function parseFlowSeq(text) {
   return items;
 }
 
+/**
+ * Parse a small subset of YAML into a JavaScript object using a lightweight, indentation-based parser.
+ *
+ * This fallback parser handles common cloudbuild.yaml-like structures: nested mappings, block lists (lines starting with `- `),
+ * simple inline flow sequences (bracketed `[a, b]`) and scalar values (`true`, `false`, `null`, `~`, or quoted strings).
+ * It is intentionally small and permissive—suitable when a full YAML library is unavailable or when only basic YAML features are needed.
+ *
+ * @param {string} yamlText - YAML document text to parse.
+ * @return {Object} Parsed representation as plain JavaScript objects and arrays.
+ */
 function basicYamlParse(yamlText) {
   const lines = yamlText.split(/\r?\n/);
   const root = {};
@@ -164,6 +204,17 @@ function basicYamlParse(yamlText) {
   return root;
 }
 
+/**
+ * Load and parse a YAML file from disk, preferring an installed YAML library and falling back to a minimal built-in parser.
+ *
+ * Attempts to parse the file contents with the external `parseYaml` implementation (if available). If that parser throws
+ * an error that appears to be a YAML syntax/parse error, this function falls back to the internal `basicYamlParse`.
+ * Non-syntax errors thrown by the external parser are rethrown.
+ *
+ * @param {string} path - Filesystem path to the YAML file.
+ * @return {any} The parsed YAML structure (objects/arrays/primitives).
+ * @throws {*} Rethrows any non-syntax error raised by the external parser.
+ */
 function loadYamlFile(path) {
   const text = fs.readFileSync(path, 'utf8');
   if (parseYaml) {

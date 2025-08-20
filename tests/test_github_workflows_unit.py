@@ -16,8 +16,16 @@ import importlib.util
 
 def _import_ghwf(unique_name: str = "ghwf_mod"):
     """
-    Import tests/test_github_workflows.py as a module with a unique name so we can
-    directly access its helper functions without relying on package imports.
+    Load tests/test_github_workflows.py from the same directory as this file as a module and return it.
+    
+    This imports the file by path under the provided unique module name so callers can access its functions
+    and fixtures without using the package import system.
+    
+    Parameters:
+        unique_name (str): The module name to assign to the imported module (defaults to "ghwf_mod").
+    
+    Returns:
+        module: The loaded module object for tests/test_github_workflows.py.
     """
     target = Path(__file__).with_name("test_github_workflows.py")
     spec = importlib.util.spec_from_file_location(unique_name, target)
@@ -30,12 +38,28 @@ def _import_ghwf(unique_name: str = "ghwf_mod"):
 @pytest.fixture
 def ghwf():
     # Base import that reflects the environment's availability of PyYAML at import time
+    """
+    pytest fixture that imports and returns the tests/test_github_workflows module.
+    
+    The import is performed via a dedicated loader so the returned module reflects the environment
+    state (for example, whether PyYAML was available at import time).
+    
+    Returns:
+        module: The dynamically loaded tests/test_github_workflows module.
+    """
     return _import_ghwf("ghwf_mod_default")
 
 
 @pytest.fixture
 def ghwf_with_yaml():
     # Ensure we have PyYAML available for tests that rely on parsing
+    """
+    Pytest fixture that loads the tests/test_github_workflows.py module with PyYAML available.
+    
+    Skips the test if PyYAML is not installed. Returns the imported test module (loaded under the module name "ghwf_mod_with_yaml").
+    Returns:
+        module: The loaded tests/test_github_workflows module.
+    """
     pytest.importorskip("yaml")
     return _import_ghwf("ghwf_mod_with_yaml")
 

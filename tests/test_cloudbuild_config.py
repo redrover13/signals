@@ -24,6 +24,21 @@ CANDIDATES = [
 
 def _discover_cloudbuild_path():
     # Prefer candidates in order
+    """
+    Discover the filesystem path to the project's Cloud Build configuration.
+    
+    Search strategy:
+    1. Return the first existing path from the ordered CANDIDATES list.
+    2. If none of the candidates exist, recursively scan the repository for YAML files whose filename contains "cloudbuild" (case-insensitive) and whose contents include the signature "E2_HIGHCPU_8". While scanning, skip directories that commonly contain irrelevant or large contents (".git", "node_modules", "dist", "build", ".venv", ".tox", ".cache").
+    3. If no matching file is found, return the default "cloudbuild.yaml".
+    
+    Returns:
+        str: Path to the discovered Cloud Build file or the default "cloudbuild.yaml" if none found.
+    
+    Notes:
+    - File reads during the signature scan ignore I/O errors and continue scanning other files.
+    - The function performs filesystem access and os.walk traversal.
+    """
     for p in CANDIDATES:
         if os.path.isfile(p):
             return p
@@ -49,10 +64,28 @@ def _discover_cloudbuild_path():
 CLOUDBUILD_PATH = _discover_cloudbuild_path()
 
 def _load_text(path):
+    """
+    Read and return the contents of a file as a UTF-8 string.
+    
+    Parameters:
+        path (str): Path to the file to read.
+    
+    Returns:
+        str: File contents decoded as UTF-8.
+    """
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
 
 def _safe_load_yaml(text):
+    """
+    Attempt to parse YAML text with PyYAML and return the parsed mapping if the root is a dict.
+    
+    Parameters:
+        text (str): YAML content to parse.
+    
+    Returns:
+        dict | None: Parsed YAML as a dict when PyYAML is available and the document root is a mapping; otherwise None (PyYAML not available, parse error, or non-dict root).
+    """
     if not HAVE_YAML:
         return None
     try:
@@ -64,6 +97,18 @@ def _safe_load_yaml(text):
 
 def _extract_step_ids_from_text(text):
     # Robustly capture ids in YAML like: id: 'build-api' or id: build-api
+    """
+    Extract YAML-like step IDs from plain text.
+    
+    Scans each line for top-level `id: <value>` entries (quotes optional) and returns the captured values.
+    Ignores lines with comments after the id and trims surrounding whitespace.
+    
+    Parameters:
+        text (str): Multiline text to scan for `id:` entries.
+    
+    Returns:
+        list[str]: Ordered list of extracted id values (strings).
+    """
     ids = []
     for line in text.splitlines():
         m = re.match(r'^\s*id:\s*[\'"]?([^\'"#]+)[\'"]?\s*$', line)
@@ -73,9 +118,16 @@ def _extract_step_ids_from_text(text):
 
 def _extract_list_block_from_text(text, block_key):
     """
-    Extract a simple YAML top-level list block by key, e.g. images:, steps:, etc. 
-    This is a very naive extractor intended as a fallback when PyYAML is unavailable.
-    It only inspects indentation 0/2 spaces and dash-started list items.
+    Extract a top-level YAML list block (e.g., "images", "steps") from raw text as a naive fallback when a YAML parser is unavailable.
+    
+    Searches for a top-level line matching "<block_key>:" and collects subsequent list items that start with exactly two-space indentation and a dash ("  - item"). Collection stops when another top-level key (non-indented) is encountered. Returns the list item strings (dash removed and trimmed). Returns an empty list if the key is not found or no items are present.
+    
+    Parameters:
+        text (str): Raw file contents to scan.
+        block_key (str): Top-level YAML key name to locate (without trailing colon).
+    
+    Returns:
+        list[str]: Extracted list item values as strings.
     """
     lines = text.splitlines()
     collecting = False
@@ -108,6 +160,16 @@ class TestCloudBuildConfigPresence(unittest.TestCase):
 class TestCloudBuildStructure(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        """
+        Prepare class-level fixtures for Cloud Build tests.
+        
+        Checks that the discovered Cloud Build file exists and loads its contents for tests. If the file is missing, raises unittest.SkipTest to skip the test class. On success it sets two class attributes:
+        - text: raw UTF-8 text content of the Cloud Build file (from _load_text)
+        - data: parsed YAML mapping or None (result of _safe_load_yaml)
+        
+        Raises:
+            unittest.SkipTest: if the Cloud Build file does not exist at CLOUDBUILD_PATH.
+        """
         if not os.path.isfile(CLOUDBUILD_PATH):
             raise unittest.SkipTest(f"Cloud Build file not found at {CLOUDBUILD_PATH}")
         cls.text = _load_text(CLOUDBUILD_PATH)
@@ -123,6 +185,18 @@ class TestCloudBuildStructure(unittest.TestCase):
                 self.assertIn(key, self.data, f"Missing top-level key '{key}' in Cloud Build YAML")
 
     def test_substitutions_have_expected_keys(self):
+        """
+        Check that the Cloud Build configuration defines the expected substitution keys.
+        
+        This test verifies the presence of the substitutions block and that it contains the keys
+        _ARTIFACT_REGISTRY, _GCP_REGION, _DULCE_AGENTS_TOPIC, and _DULCE_AGENT_RUNS_TABLE.
+        
+        - When YAML parsing produced a dict (self.data is not None): asserts that `substitutions`
+          is a mapping and that it contains the expected keys.
+        - When YAML parsing is unavailable (self.data is None): performs textual checks on
+          self.text to ensure a top-level `substitutions:` block exists and that each expected
+          substitution key is present in the text.
+        """
         expected = {"_ARTIFACT_REGISTRY", "_GCP_REGION", "_DULCE_AGENTS_TOPIC", "_DULCE_AGENT_RUNS_TABLE"}
         if self.data is None:
          if self.data is None:
@@ -173,6 +247,17 @@ class TestCloudBuildStructure(unittest.TestCase):
 class TestCloudBuildSteps(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        """
+        Prepare class-level test fixtures for Cloud Build tests.
+        
+        Reads the discovered Cloud Build file and initializes class attributes used by tests:
+        - sets `text` to the file's raw UTF-8 contents,
+        - sets `data` to the parsed YAML dict (or None if YAML parsing is unavailable or fails),
+        - sets `expected_ids` to the list of step IDs that tests will validate.
+        
+        Raises:
+            unittest.SkipTest: if the Cloud Build file does not exist at the discovered path.
+        """
         if not os.path.isfile(CLOUDBUILD_PATH):
             raise unittest.SkipTest(f"Cloud Build file not found at {CLOUDBUILD_PATH}")
         cls.text = _load_text(CLOUDBUILD_PATH)
@@ -192,6 +277,11 @@ class TestCloudBuildSteps(unittest.TestCase):
         ]
 
     def test_all_expected_step_ids_present(self):
+        """
+        Assert that every expected Cloud Build step id from self.expected_ids is present in the discovered configuration.
+        
+        Uses the parsed YAML steps (self.data) when available; otherwise falls back to extracting `id:` lines from the raw text (self.text). Fails the test with an assertion message naming the missing id if any expected id is absent.
+        """
         if self.data is None:
             ids = _extract_step_ids_from_text(self.text)
         else:
@@ -386,6 +476,19 @@ class TestDiscoverCloudBuildPath(unittest.TestCase):
         with mock.patch("os.path.isfile") as m_isfile:
             def isfile_side_effect(p):
                 # Simulate only 'cloudbuild.yml' exists (second in default CANDIDATES)
+                """
+                Return True only when the given path corresponds to the test fixture 'cloudbuild.yml'.
+                
+                This function is intended as a side-effect replacement for os.path.isfile in tests.
+                It normalizes the provided path and compares it to "cloudbuild.yml", returning True
+                when they match and False otherwise.
+                
+                Parameters:
+                    p (str): Path to check.
+                
+                Returns:
+                    bool: True if normalized `p` equals "cloudbuild.yml", otherwise False.
+                """
                 return os.path.normpath(p) == os.path.normpath("cloudbuild.yml")
             m_isfile.side_effect = isfile_side_effect
             # os.walk should not be consulted in this case; ensure it isn't used

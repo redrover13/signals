@@ -67,18 +67,19 @@ def publish_event(
     """
     Publish a single JSON-serializable event to a Pub/Sub topic and return the Pub/Sub message ID.
     
-    The payload is serialized to JSON and published to the provided topic path. This call waits up to 30 seconds for the publish to complete.
+    Serializes `payload` to JSON and publishes it to `topic_path`, waiting up to 30 seconds for the publish to complete.
     
     Parameters:
-        publisher_client (pubsub_v1.PublisherClient): The Pub/Sub publisher client used to publish the event.
-        topic_path (str): Fully-qualified Pub/Sub topic path (e.g., "projects/{project}/topics/{topic}").
-        payload (dict): JSON-serializable event payload to publish.
+        topic_path (str): Fully-qualified Pub/Sub topic path, e.g. "projects/{project}/topics/{topic}".
+        payload (dict): JSON-serializable event payload.
     
     Returns:
         str: The Pub/Sub message ID for the published message.
     
     Raises:
-        GoogleAPICallError, TimeoutError, Exception: Re-raises exceptions from the publisher client if publishing fails or times out.
+        google.api_core.exceptions.GoogleAPICallError: If the Pub/Sub API returns an error.
+        concurrent.futures.TimeoutError: If the publish does not complete within 30 seconds.
+        Exception: For any other unexpected publishing errors (re-raised).
     """
     from concurrent.futures import TimeoutError as FuturesTimeoutError
 

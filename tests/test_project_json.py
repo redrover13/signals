@@ -17,16 +17,23 @@ Focus:
 
 def find_web_project_json():
     """
-    Attempt to locate the web app's NX project.json.
-    Strategy:
-      1) Prefer apps/web/project.json if it exists.
-      2) Search for any project.json that contains indicators for the 'web' app:
-         - "name": "web" or "sourceRoot": "apps/web"
-         - Executors referencing @nx/next:build or @nx/next:server
+    Locate the NX "web" application's project.json and return its absolute path.
+    
+    Search order:
+    1. If "apps/web/project.json" exists, return it.
+    2. Otherwise, scan the repository for files named "project.json" and select files that appear to describe the web app. A file is considered a candidate if any of the following are true:
+       - its top-level "name" is "web",
+       - its "sourceRoot" is "apps/web",
+       - it has both a "build" target with executor "@nx/next:build" and a "serve" target with executor "@nx/next:server".
+    
+    Selection:
+    - If multiple candidates are found, the function returns the candidate with the shortest path (prefers canonical locations like apps/web/project.json).
+    
     Returns:
-      Absolute path to the project.json file.
+        str: Absolute path to the located project.json.
+    
     Raises:
-      FileNotFoundError if no suitable file is found.
+        FileNotFoundError: If no suitable project.json can be found.
     """
     candidates = []
     # Direct expected path
@@ -66,6 +73,18 @@ def find_web_project_json():
 class TestWebProjectJson(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        """
+        Initialize class-wide test fixtures by locating the web project's project.json and loading its JSON content.
+        
+        Sets:
+            project_json_path (str): Absolute path to the located apps/web project.json.
+            data (dict): Parsed JSON content of the project.json.
+        
+        Raises:
+            FileNotFoundError: If no candidate project.json can be found by find_web_project_json().
+            json.JSONDecodeError: If the located file is not valid JSON.
+            OSError: If the file cannot be opened.
+        """
         cls.project_json_path = find_web_project_json()
         with open(cls.project_json_path, "r", encoding="utf-8") as f:
             cls.data = json.load(f)
@@ -88,6 +107,18 @@ class TestWebProjectJson(unittest.TestCase):
         self.assertIn("nx/schemas/project-schema.json", data["$schema"])
 
     def test_build_target_configuration(self):
+        """
+        Verify the `build` target in project.json is correctly configured for the web app.
+        
+        Asserts:
+        - The build executor is "@nx/next:build".
+        - `outputs` exists and includes "{options.outputPath}".
+        - `defaultConfiguration` is "production".
+        - `options.outputPath` equals "dist/apps/web".
+        - `configurations` contains "development" and "production" with:
+          - development.outputPath == "dist/apps/web-development"
+          - production.outputPath == "dist/apps/web-production"
+        """
         build = self.data["targets"]["build"]
         # Executor and basic settings
         self.assertEqual(build.get("executor"), "@nx/next:build")
@@ -144,6 +175,11 @@ class TestWebProjectJson(unittest.TestCase):
 
     def test_no_empty_targets(self):
         # Ensure target sections contain content and aren't empty dicts
+        """
+        Verify that the "build", "serve", and "lint" targets exist in the project.json, are mappings (dicts), and are not empty.
+        
+        This test asserts each required target is present under `targets`, has type `dict`, and contains at least one key (i.e., is not an empty dictionary).
+        """
         targets = self.data["targets"]
         for key in ["build", "serve", "lint"]:
             self.assertIn(key, targets, f"Missing target: {key}")

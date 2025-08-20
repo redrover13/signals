@@ -13,6 +13,14 @@ except ImportError:
 
 def _find_cloudbuild_file():
     # Expand search to a few common directories without walking entire repo to keep tests fast.
+    """
+    Locate the repository's Cloud Build configuration file.
+    
+    Searches common directories (infra, deploy, ops, project root) for "cloudbuild.yaml" or "cloudbuild.yml" and returns the first match. If not found there, performs a shallow recursive glob for files matching "cloudbuild.*yml". Returns a pathlib.Path for the discovered file.
+    
+    Raises:
+        FileNotFoundError: If no cloudbuild YAML file is found.
+    """
     extra_dirs = ["infra", "deploy", "ops", "."]
     for d in extra_dirs:
         p1 = Path(d) / "cloudbuild.yaml"
@@ -27,10 +35,31 @@ def _find_cloudbuild_file():
     raise FileNotFoundError("cloudbuild.yaml not found in repository")
 
 def _load_text(path: Path) -> str:
+    """
+    Read and return the UTF-8 text contents of a file.
+    
+    Parameters:
+        path (Path): Path to the file to read.
+    
+    Returns:
+        str: File contents decoded as UTF-8.
+    """
     with path.open("r", encoding="utf-8") as f:
         return f.read()
 
 def _safe_yaml_load(text: str):
+    """
+    Safely parse YAML text when PyYAML is available; otherwise return None.
+    
+    Parameters:
+        text (str): YAML document as a string.
+    
+    Returns:
+        The Python object produced by `yaml.safe_load(text)` (e.g., dict, list, or scalar), or `None` if PyYAML is not installed.
+    
+    Raises:
+        yaml.YAMLError: If PyYAML is available but the input is invalid YAML (propagated from `yaml.safe_load`).
+    """
     if not HAVE_YAML:
         return None
     return yaml.safe_load(text)
@@ -58,8 +87,18 @@ def test_top_level_sections_and_basic_structure():
 
 def test_contains_expected_build_and_push_steps_in_order():
     """
-    Focus on the diff: ensure docker build for agent-runner and api,
-    trivy scans, then docker push, then deploys, in a plausible order.
+    Assert that the Cloud Build configuration contains the expected build, scan, push, and deploy steps for both the agent-runner and API, and that those steps appear in a plausible build -> scan -> push -> deploy order.
+    
+    When PyYAML is available, the test parses the YAML and:
+    - Verifies the existence and relative ordering of steps with IDs:
+      "build-agent-runner", "build-api", "scan-agent-runner", "scan-api", "push-agent-runner", "push-api".
+    - Checks that the "build-agent-runner" step uses the Docker builder and includes a "build" arg.
+    
+    When PyYAML is unavailable, the test falls back to conservative text/regex checks and:
+    - Confirms presence of Docker build steps (including Dockerfile paths for apps/agents and apps/api), Trivy scan steps, push steps, and deploy steps.
+    - Uses regular expressions to ensure build steps tag images into the configured artifact registry with the ${_GITHUB_SHA} tag, Trivy scans use exit-code 1 and severity HIGH,CRITICAL, push steps push the correctly tagged images, and deploy steps reference those images and include expected flags (region/project/platform/service-account/no-allow-unauthenticated and required env vars).
+    
+    Finally, the test enforces coarse ordering constraints for both agent-runner and API workflows by locating matched patterns and asserting build < scan < push < deploy, and it requires the function deployment to occur before or alongside service deploys.
     """
     path = _find_cloudbuild_file()
     text = _load_text(path)
@@ -136,7 +175,16 @@ def test_contains_expected_build_and_push_steps_in_order():
         assert "id: 'push-agent-runner'" in text, "Missing push-agent-runner step"
         assert "id: 'push-api'" in text, "Missing push-api step"
         # Optionally check order by searching for indices
-        def find_index(s): return text.find(s)
+        def find_index(s): """
+Return the index of the first occurrence of substring `s` in the surrounding `text` string.
+
+Parameters:
+    s (str): Substring to search for.
+
+Returns:
+    int: Lowest index of `s` in `text`, or -1 if not found.
+"""
+return text.find(s)
         ids_in_order = [
             "id: 'build-agent-runner'",
             "id: 'build-api'",
@@ -224,6 +272,11 @@ def test_substitutions_and_images_sections():
             assert line in text, f"Missing expected substitution/image line: {line}"
 
 def test_options_section_has_expected_values():
+    """
+    Verify the cloudbuild options section sets the expected machineType and logging.
+    
+    When YAML support is available, parses the cloudbuild file and asserts that options.machineType == "E2_HIGHCPU_8" and options.logging == "CLOUD_LOGGING_ONLY". When YAML is not available, performs conservative substring checks for the same keys/values in the file text.
+    """
     path = _find_cloudbuild_file()
     text = _load_text(path)
     if HAVE_YAML:
@@ -262,6 +315,12 @@ def test_scans_block_build_on_high_or_critical_vulns():
     assert len(occurrences) >= 2, "Both images should be scanned with exit-code 1 and severity HIGH,CRITICAL"
 
 def test_build_args_use_github_sha_and_artifact_registry():
+    """
+    Verify build steps tag images using the GitHub SHA and push to the configured Artifact Registry.
+    
+    Reads the repository's Cloud Build config and asserts that build steps for both `agent-runner` and `api`
+    include a `-t` image tag referencing `${_ARTIFACT_REGISTRY}` and `${_GITHUB_SHA}` (e.g. `...agent-runner:${_GITHUB_SHA}` and `...api:${_GITHUB_SHA}`).
+    """
     path = _find_cloudbuild_file()
     text = _load_text(path)
     # Verify both build steps tag with ${_GITHUB_SHA} and use ${_ARTIFACT_REGISTRY}
@@ -275,6 +334,16 @@ def test_deployments_use_correct_images_from_build():
     assert re.search(r"--image=\$\{_ARTIFACT_REGISTRY\}/\$\{PROJECT_ID\}/dulce/api:\$\{_GITHUB_SHA\}", text)
 
 def test_security_best_practices_flags_present():
+    """
+    Verify the cloudbuild configuration includes required security and deployment flags.
+    
+    Checks that the Cloud Build file sets:
+    - platform explicitly to "managed"
+    - region templated as ${_GCP_REGION}
+    - project templated as ${PROJECT_ID}
+    
+    These flags ensure builds run on Cloud Build's managed platform and use repository-level region/project substitutions.
+    """
     path = _find_cloudbuild_file()
     text = _load_text(path)
     # Ensure platform managed is explicitly set

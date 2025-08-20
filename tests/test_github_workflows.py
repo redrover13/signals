@@ -13,12 +13,30 @@ import pytest
 WORKFLOWS_DIR = Path(".github/workflows")
 
 def load_yaml(path: Path):
+    """
+    Load and parse a GitHub Actions workflow YAML file, skipping the test if PyYAML is unavailable.
+    
+    If PyYAML is not installed the test is skipped via pytest.skip. Otherwise the file at `path`
+    is opened with UTF-8 encoding and parsed with `yaml.safe_load`.
+    
+    Parameters:
+        path (Path): Path to the YAML file to load.
+    
+    Returns:
+        The Python object produced by `yaml.safe_load` (commonly a dict, list, or None).
+    """
     if yaml is None:
         pytest.skip("PyYAML not available to parse GitHub workflow YAML files")
     with path.open("r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 def iter_workflows():
+    """
+    Yield all workflow YAML file paths from the repository's .github/workflows directory.
+    
+    If the workflows directory does not exist, the test is skipped via pytest.skip.
+    Yields Path objects for files matching the glob pattern "*.y*ml", returned in sorted order.
+    """
     if not WORKFLOWS_DIR.exists():
         pytest.skip("No .github/workflows directory found")
     for p in sorted(WORKFLOWS_DIR.glob("*.y*ml")):
@@ -26,10 +44,21 @@ def iter_workflows():
 
 def is_pinned_action(uses: str) -> bool:
     """
-    Treat as pinned only if:
-    - docker:// refs use an explicit digest (e.g., @sha256:<digest>)
-    - GitHub Actions refs use a full 40-hex commit SHA, or a v-prefixed semver-like tag (v1, v1.2.3)
-    Branch names (e.g., main, master, feature/*) and 'latest' are not pinned.
+    Determine whether a GitHub Actions or Docker `uses` reference is pinned.
+    
+    A reference is considered pinned when it cannot float to newer code:
+    - Docker image references (`docker://...@sha256:<digest>`) are pinned only if they include a sha256 digest.
+    - GitHub Actions references (`owner/repo@ref`) are pinned if `ref` is:
+      - a full 40-character commit SHA (hex), or
+      - a `v`-prefixed tag that looks like semver (e.g., `v1`, `v1.2`, `v1.2.3`).
+    
+    Not pinned examples: missing `@`, empty ref, branch names (`main`, `master`, `head`), `latest`, or other branch-like refs.
+    
+    Parameters:
+        uses (str): the raw `uses` string from a workflow step (e.g., "actions/checkout@v2" or "docker://alpine@sha256:...").
+    
+    Returns:
+        bool: True if the reference is considered pinned, False otherwise.
     """
     if "@" not in uses:
         return False
@@ -50,6 +79,17 @@ def is_pinned_action(uses: str) -> bool:
         return True
     return False
 def has_minimal_schema(doc: dict) -> bool:
+    """
+    Return True if the parsed YAML document appears to be a minimal GitHub Actions workflow.
+    
+    Checks that the value is a dict containing the top-level keys "name", "on", and "jobs", and that "jobs" itself is a dict (the minimal structure required for a valid workflow file).
+    
+    Parameters:
+        doc (dict): Parsed YAML document representing a GitHub Actions workflow.
+    
+    Returns:
+        bool: True when the document has the minimal workflow schema, False otherwise.
+    """
     return isinstance(doc, dict) and "name" in doc and "on" in doc and "jobs" in doc and isinstance(doc["jobs"], dict)
 @pytest.mark.describe("GitHub Workflows - Structure and Schema")
 class TestWorkflowSchema:
@@ -150,8 +190,9 @@ class TestWorkflowSecurity:
 
     def test_permissions_are_not_overly_broad(self):
         """
-        If 'permissions' are set at the workflow or job level, ensure they are not 'write-all'.
-        Allow read-all, or explicit scoped permissions.
+        Validate that workflow- or job-level GitHub Actions `permissions` do not use the overly-broad value `write-all`.
+        
+        This test iterates all workflows and collects any occurrences where `permissions` is set to the string `"write-all"` or where an individual permission key is assigned `"write-all"`, at either the workflow level or within a job's `permissions` mapping. If any violations are found, the test fails and reports the workflow path and permission location(s).
         """
         violations = []
         for path in iter_workflows():
@@ -186,6 +227,16 @@ class TestWorkflowSecurity:
 @pytest.mark.describe("GitHub Workflows - Jobs and Steps Validations")
 class TestWorkflowJobs:
     def test_each_job_has_at_least_one_step(self):
+        """
+        Verify every job in discovered workflow files contains at least one step.
+        
+        Scans all workflow YAML files yielded by iter_workflows(), loads each document, and inspects its `jobs` mapping. A job is considered valid if:
+        - it is not a mapping (non-dict jobs are ignored), or
+        - it has a non-empty `steps` list, or
+        - it declares `uses` (reusable-workflow or composite usage) and omits `steps` (matrix-only or reusable-workflow jobs are allowed to have no steps).
+        
+        Any job that is a dict and has no `steps` (and does not use `uses`) is reported as an offender and causes the test to fail with their workflow path and job id.
+        """
         offenders = []
         for path in iter_workflows():
             doc = load_yaml(path)

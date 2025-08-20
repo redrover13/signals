@@ -10,8 +10,18 @@ import pytest
 
 def _find_package_json(start_dir: Path | None = None) -> Path:
     """
-    Attempt to locate package.json by walking up from the current
-    test directory and falling back to the current working directory.
+    Locate the nearest package.json by walking up the directory tree from a start directory (up to 8 levels) and, if not found, falling back to the current working directory.
+    
+    If start_dir is omitted, traversal begins at the directory containing this test module. The function returns the Path to the first package.json found.
+    
+    Parameters:
+        start_dir (Path | None): Directory to start searching from. Defaults to the test file's parent directory.
+    
+    Returns:
+        Path: Path to the located package.json.
+    
+    Raises:
+        FileNotFoundError: If no package.json is found after searching the parent chain and the current working directory.
     """
     start_dir = (start_dir or Path(__file__).resolve().parent)
     for _ in range(8):
@@ -29,6 +39,16 @@ def _find_package_json(start_dir: Path | None = None) -> Path:
 
 @pytest.fixture(scope="session")
 def package_data() -> dict:
+    """
+    Load and return the repository's package.json content as a dict.
+    
+    This function locates package.json (using _find_package_json), reads it with UTF-8 encoding,
+    and parses the JSON into a Python dictionary suitable for test assertions.
+    
+    Raises:
+        FileNotFoundError: If package.json cannot be located.
+        json.JSONDecodeError: If package.json contains invalid JSON.
+    """
     path = _find_package_json()
     with path.open("r", encoding="utf-8") as f:
         return json.load(f)
@@ -36,6 +56,20 @@ def package_data() -> dict:
 
 def test_top_level_fields_present_and_types(package_data: dict) -> None:
     # Required keys at the top level
+    """
+    Validate that package.json contains required top-level keys, that those keys have the expected types, and that several critical fields match exact expected values.
+    
+    Checks performed:
+    - Presence of top-level keys: "type", "name", "version", "private", "scripts", "devDependencies", "dependencies", "packageManager", "pnpm", and "engines".
+    - Types: verifies that values for those keys have the expected types (e.g., "scripts" is a dict, "private" is a bool).
+    - Exact values: enforces specific values for "type" ("module"), "name" ("nx-monorepo"), "version" ("1.0.0"), and that "private" is True.
+    
+    Parameters:
+        package_data (dict): Parsed package.json content to be validated.
+    
+    Raises:
+        AssertionError: If any required key is missing, a value has an unexpected type, or a field does not match its expected value.
+    """
     required = [
         "type",
         "name",
@@ -84,6 +118,11 @@ def test_scripts_are_defined_correctly(package_data: dict) -> None:
 
 
 def test_package_manager_and_node_engines(package_data: dict) -> None:
+    """
+    Verify packageManager and Node engine constraint values in package.json.
+    
+    Asserts that packageManager is "pnpm@10.0.0" and that an "node" entry exists in the engines section with the exact constraint ">=18 <21 || >=22".
+    """
     assert package_data["packageManager"] == "pnpm@10.0.0"
     engines = package_data["engines"]
     assert "node" in engines
@@ -91,6 +130,22 @@ def test_package_manager_and_node_engines(package_data: dict) -> None:
 
 
 def test_dependencies_expected_versions(package_data: dict) -> None:
+    """
+    Assert that specific top-level dependencies exist in package.json and have the exact expected versions.
+    
+    This test checks a fixed set of dependency keys and verifies each is present in package_data["dependencies"] with the exact version string listed below:
+    - @google-analytics/data: ^5.2.0
+    - @google-cloud/aiplatform: ^5.5.0
+    - @google-cloud/bigquery: 8.1.1
+    - @google-cloud/secret-manager: ^6.1.0
+    - @google-cloud/storage: 7.16.0
+    - fastify: ^5.5.0
+    - google-auth-library: ^10.2.1
+    - lodash: ^4.17.21
+    
+    Parameters:
+        package_data (dict): Parsed package.json content (the fixture providing the full package.json as a dictionary).
+    """
     deps = package_data["dependencies"]
     expected = {
         "@google-analytics/data": "^5.2.0",
@@ -117,6 +172,13 @@ def test_dev_dependencies_expected_versions_and_consistency(package_data: dict) 
         assert expected_key in nx_entries, f"devDependencies should include {expected_key}"
 
     def _normalize(ver: str) -> str:
+        """
+        Normalize a package version string by removing a leading caret (^) or tilde (~).
+        
+        Takes the input, coerces it to a string, and returns the string with any leading
+        '^' or '~' characters removed. Other characters (including additional prefixes
+        or whitespace) are preserved.
+        """
         return str(ver).lstrip("^~")
 
     normalized_versions = { _normalize(v) for v in nx_entries.values() }
@@ -138,6 +200,14 @@ def test_dev_dependencies_expected_versions_and_consistency(package_data: dict) 
 
 
 def test_pnpm_overrides_and_only_built_dependencies(package_data: dict) -> None:
+    """
+    Validate the package.json's pnpm configuration.
+    
+    Checks that the pnpm section contains "onlyBuiltDependencies" and "overrides". Verifies that onlyBuiltDependencies includes at least the entries {"@parcel/watcher", "nx", "protobufjs", "sharp"} and that specific keys in pnpm.overrides exist with the exact expected version strings (e.g., "@swc/core": "^1.3.86", "@swc/helpers": "^0.5.4", "@types/react": "^18.2.0", "koa": "^2.16.2").
+    
+    Parameters:
+        package_data (dict): Parsed package.json content provided by the test fixture.
+    """
     pnpm_cfg = package_data["pnpm"]
     assert "onlyBuiltDependencies" in pnpm_cfg
     assert "overrides" in pnpm_cfg
@@ -159,8 +229,9 @@ def test_pnpm_overrides_and_only_built_dependencies(package_data: dict) -> None:
 
 def test_all_declared_versions_follow_basic_semver(package_data: dict) -> None:
     """
-    Validate that versions look like semver (optionally prefixed with ^ or ~).
-    This applies to dependencies, devDependencies, and pnpm.overrides.
+    Assert that all declared dependency versions follow a basic semver format.
+    
+    Checks dependencies, devDependencies, and pnpm.overrides in the provided package_data for versions that match a simple semantic version pattern (optionally prefixed with `^` or `~`, and allowing pre-release/build metadata). If any non-matching entries are found, the test fails with an assertion listing the offending group keys and values.
     """
     semver_re = re.compile(r"^[~^]?\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$")
     groups = {

@@ -5,7 +5,8 @@
     "baseUrl": ".",
     "paths": {
       "@dulce-de-saigon/agents-lib": ["libs/agents/src/index.ts"],
-      "@dulce/gcp": ["libs/gcp/src/index.ts"]
+      "@dulce/gcp": ["libs/gcp/src/index.ts"],
+      "@nx-monorepo/mcp": ["libs/mcp/src/index.ts"]
     },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,

@@ -13,4 +13,20 @@ resource "google_bigquery_dataset" "dulce" {
   description                 = "Primary dataset for the Dulce de Saigon data platform."
   location                    = var.gcp_region
   default_table_expiration_ms = 7776000000 # 90 days
+  labels = {
+    environment = var.environment
+    project     = "dulce-de-saigon"
+    owner       = "data-team"
+    purpose     = "analytics"
+  }
+
+  access {
+    role          = "roles/bigquery.dataViewer"
+    user_by_email = "analytics-team@dulce.com"
+  }
+
+  access {
+    role          = "roles/bigquery.dataEditor"
+    user_by_email = "data-engineering@dulce.com"
+  }
 }

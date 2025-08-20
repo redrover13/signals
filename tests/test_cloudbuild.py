@@ -175,16 +175,9 @@ def test_contains_expected_build_and_push_steps_in_order():
         assert "id: 'push-agent-runner'" in text, "Missing push-agent-runner step"
         assert "id: 'push-api'" in text, "Missing push-api step"
         # Optionally check order by searching for indices
-        def find_index(s): """
-Return the index of the first occurrence of substring `s` in the surrounding `text` string.
-
-Parameters:
-    s (str): Substring to search for.
-
-Returns:
-    int: Lowest index of `s` in `text`, or -1 if not found.
-"""
-return text.find(s)
+        def find_index(s: str) -> int:
+            "Return index of substring s in text, or -1 if not found."
+            return text.find(s)
         ids_in_order = [
             "id: 'build-agent-runner'",
             "id: 'build-api'",

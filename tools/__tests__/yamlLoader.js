@@ -170,10 +170,13 @@ function loadYamlFile(path) {
     try {
       return parseYaml(text);
     } catch (err) {
-      // Only fall back for syntax-related parse errors; rethrow others
-      if (!(err && err.name && /YAML|Parse/i.test(String(err.name)))) {
+      const name = String(err && err.name || '');
+      const msg = String(err && (err.message || err.reason) || '');
+      const isSyntax = /YAML|Parse|Syntax/i.test(name) || /unexpected|bad indentation|mapping values|flow sequence|end of/i.test(msg);
+      if (!isSyntax) {
         throw err;
       }
+      // fall through to basic parser only for likely syntax errors
     }
   }
   return basicYamlParse(text);

@@ -57,7 +57,7 @@ jobs:
       - name: Generate cache key
         id: cache-key
         run: |
-          echo "key=node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}" >> $GITHUB_OUTPUT
+          echo "key=node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}" >> "$GITHUB_OUTPUT"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

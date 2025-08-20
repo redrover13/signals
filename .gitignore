@@ -48,3 +48,4 @@ update-provider-no-condition.bat
 
 package-lock.json
 servers/
+.venv/

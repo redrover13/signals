@@ -12,13 +12,13 @@ echo ""
 # JWT Secret
 echo "Generating JWT secret..."
 JWT_SECRET=$(openssl rand -base64 32)
-echo "$JWT_SECRET" | gcloud secrets versions add jwt-secret --data-file=- --project="$PROJECT_ID"
+printf %s "$JWT_SECRET" | gcloud secrets versions add jwt-secret --data-file=- --project="$PROJECT_ID"
 echo "✅ JWT secret updated"
 
 # Encryption Key
 echo "Generating encryption key..."
 ENCRYPTION_KEY=$(openssl rand -base64 32)
-echo "$ENCRYPTION_KEY" | gcloud secrets versions add encryption-key --data-file=- --project="$PROJECT_ID"
+printf %s "$ENCRYPTION_KEY" | gcloud secrets versions add encryption-key --data-file=- --project="$PROJECT_ID"
 echo "✅ Encryption key updated"
 
 # Database URL (you'll need to provide this)

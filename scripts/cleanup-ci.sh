@@ -21,12 +21,23 @@ rm -f .github/workflows/test-wif.yml
 echo "Removing GitLab CI configuration..."
 rm -f .gitlab-ci.yml
 
-# Backup and replace Cloud Build config
-echo "Backing up original cloudbuild.yaml..."
-mv cloudbuild.yaml cloudbuild-original.yaml.bak
-# Skipping replacement as cloudbuild-optimized.yaml does not exist
-# Ensure cloudbuild.yaml is backed up only
-
+echo "Checking Cloud Build configuration..."
+if [[ -f cloudbuild.yaml ]]; then
+  if grep -q "Optimized Cloud Build configuration" cloudbuild.yaml; then
+    echo "cloudbuild.yaml appears to be the optimized version; skipping backup."
+  else
+    echo "Backing up legacy cloudbuild.yaml to cloudbuild-original.yaml.bak..."
+    mv cloudbuild.yaml cloudbuild-original.yaml.bak
+    if [[ -f cloudbuild-optimized.yaml ]]; then
+      echo "Installing optimized Cloud Build config..."
+      cp cloudbuild-optimized.yaml cloudbuild.yaml
+    else
+      echo "Note: cloudbuild-optimized.yaml not found. Only backup performed."
+    fi
+  fi
+else
+  echo "No cloudbuild.yaml found; nothing to back up."
+fi
 echo "✅ CI/CD cleanup complete!"
 echo ""
 echo "📋 Summary of changes:"

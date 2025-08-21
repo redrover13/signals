@@ -309,11 +309,17 @@ export class MCPClientService extends EventEmitter {
         return;
       }
 
+      let buffer = '';
+      const cleanup = () => {
+        process.stdout.off('data', onData);
+        clearTimeout(timeoutId);
+      };
       const timeoutId = setTimeout(() => {
+        cleanup();
         reject(new Error(`Request timeout after ${timeout}ms`));
       }, timeout);
 
-      // Send JSON-RPC request
+      // Send JSON-RPC request (newline-delimited)
       const jsonRpcRequest = {
         jsonrpc: '2.0',
         id: request.id,
@@ -323,25 +329,29 @@ export class MCPClientService extends EventEmitter {
 
       process.stdin.write(JSON.stringify(jsonRpcRequest) + '\n');
 
-      // Listen for response
       const onData = (data: Buffer) => {
-        try {
-          const response = JSON.parse(data.toString());
-          if (response.id === request.id) {
-            clearTimeout(timeoutId);
-            process.stdout.off('data', onData);
-
-            if (response.error) {
-              reject(new Error(response.error.message));
-            } else {
-              resolve(response.result);
+        buffer += data.toString();
+        let idx: number;
+        while ((idx = buffer.indexOf('\n')) !== -1) {
+          const line = buffer.slice(0, idx).trim();
+          buffer = buffer.slice(idx + 1);
+          if (!line) continue;
+          try {
+            const response = JSON.parse(line);
+            if (response.id === request.id) {
+              cleanup();
+              if (response.error) {
+                reject(new Error(response.error.message));
+              } else {
+                resolve(response.result);
+              }
+              return;
             }
+          } catch {
+            // Ignore malformed lines; continue buffering
           }
-        } catch (error) {
-          // Ignore parsing errors, might be partial data
         }
       };
-
       process.stdout.on('data', onData);
     });
   }

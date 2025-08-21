@@ -421,7 +421,7 @@ jobs:
   notify:
     name: Deployment Notification
     runs-on: ubuntu-latest
-    needs: [determine-environment, deploy-to-gcp, post-deployment]
+    needs: [determine-environment, build-for-deployment, deploy-to-gcp, post-deployment]
     if: always() && needs.determine-environment.outputs.should-deploy == 'true'
     steps:
       - name: Notify Slack - Success

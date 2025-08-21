@@ -29,3 +29,9 @@ resource "google_project_iam_member" "mcp_aiplatform_user" {
   role    = "roles/aiplatform.user"
   member  = "serviceAccount:${google_service_account.agent_runner.email}"
 }
+
+resource "google_project_iam_member" "mcp_bigquery_job_user" {
+  project = var.gcp_project_id
+  role    = "roles/bigquery.jobUser"
+  member  = "serviceAccount:${google_service_account.agent_runner.email}"
+}

@@ -18,3 +18,16 @@ resource "google_bigquery_table" "agent_runs" {
 ]
 EOF
 }
+
+# BigQuery table for raw data ingestion
+resource "google_bigquery_table" "raw_data" {
+  dataset_id = google_bigquery_dataset.dulce.dataset_id
+  table_id   = "raw_data"
+  schema     = <<EOF
+[
+  {"name": "id", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "timestamp", "type": "TIMESTAMP", "mode": "REQUIRED"},
+  {"name": "payload", "type": "JSON", "mode": "NULLABLE"}
+]
+EOF
+}

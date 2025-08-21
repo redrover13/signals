@@ -128,8 +128,8 @@ const PRODUCTION_CONFIG: MCPEnvironmentConfig = {
     healthCheck: server.healthCheck
       ? {
           ...server.healthCheck,
-          interval: Math.max(server.healthCheck.interval, 300000), // At least 5 minutes
-          failureThreshold: Math.max(server.healthCheck.failureThreshold, 5),
+          interval: Math.max(server.healthCheck.interval ?? 300000, 300000), // At least 5 minutes
+          failureThreshold: Math.max(server.healthCheck.failureThreshold ?? 5, 5),
         }
       : undefined,
   })),

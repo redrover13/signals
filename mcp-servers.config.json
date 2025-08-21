@@ -1,0 +1,566 @@
+{
+  "version": "2.0.0",
+  "description": "MCP Server Configuration for Signals Project - WIF Enabled",
+  "schema": "https://schemas.signals.dev/mcp-config/v2.0.0",
+  "metadata": {
+    "lastUpdated": "2024-12-19T00:00:00Z",
+    "configVersion": "2.0.0",
+    "maintainer": "Signals DevOps Team"
+  },
+  "wif": {
+    "enabled": true,
+    "provider": "${WIF_PROVIDER}",
+    "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
+    "projectId": "${GCP_PROJECT_ID}",
+    "region": "${GCP_REGION:-us-central1}",
+    "secretManager": {
+      "enabled": true,
+      "projectId": "${GCP_PROJECT_ID}",
+      "keyRing": "mcp-secrets",
+      "location": "${GCP_REGION:-us-central1}"
+    }
+  },
+  "environments": {
+    "development": {
+      "global": {
+        "version": "2.0.0",
+        "defaultTimeout": "${MCP_DEFAULT_TIMEOUT:-15000}",
+        "defaultRetry": {
+          "attempts": 2,
+          "delay": 500,
+          "backoff": "linear"
+        },
+        "healthMonitoring": {
+          "enabled": true,
+          "interval": 30000,
+          "alertThreshold": 2
+        },
+        "logging": {
+          "level": "debug",
+          "destination": "console",
+          "includeRequestResponse": true,
+          "structured": true
+        },
+        "security": {
+          "enableTLS": false,
+          "validateCertificates": false,
+          "maxRequestSize": 52428800,
+          "rateLimiting": {
+            "enabled": false
+          }
+        },
+        "errorHandling": {
+          "gracefulDegradation": true,
+          "fallbackServers": ["memory", "time"],
+          "maxConcurrentFailures": 2
+        }
+      },
+      "enabledServers": [
+        "filesystem",
+        "git",
+        "github",
+        "memory",
+        "sequentialthinking",
+        "time",
+        "fetch",
+        "databases",
+        "nx",
+        "node",
+        "google",
+        "exa",
+        "apimatic"
+      ],
+      "serverOverrides": {
+        "github": {
+          "connection": {
+            "timeout": 10000
+          },
+          "healthCheck": {
+            "interval": 60000,
+            "failureThreshold": 2
+          },
+          "auth": {
+            "secretName": "github-token-dev"
+          }
+        },
+        "databases": {
+          "options": {
+            "bigqueryProjectId": "${GCP_PROJECT_ID}",
+            "datasets": ["analytics_dev", "signals_dev", "events_dev"]
+          },
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          }
+        },
+        "google": {
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          },
+          "options": {
+            "services": ["bigquery", "storage", "secretmanager"]
+          }
+        },
+        "exa": {
+          "auth": {
+            "secretName": "exa-api-key-dev"
+          }
+        }
+      }
+    },
+    "staging": {
+      "global": {
+        "version": "2.0.0",
+        "defaultTimeout": "${MCP_DEFAULT_TIMEOUT:-30000}",
+        "defaultRetry": {
+          "attempts": 3,
+          "delay": 1000,
+          "backoff": "exponential"
+        },
+        "healthMonitoring": {
+          "enabled": true,
+          "interval": 60000,
+          "alertThreshold": 3
+        },
+        "logging": {
+          "level": "info",
+          "destination": "gcp-logging",
+          "includeRequestResponse": false,
+          "structured": true
+        },
+        "security": {
+          "enableTLS": true,
+          "validateCertificates": true,
+          "maxRequestSize": 20971520,
+          "rateLimiting": {
+            "enabled": true,
+            "requestsPerMinute": 1000,
+            "burstLimit": 100
+          }
+        },
+        "errorHandling": {
+          "gracefulDegradation": true,
+          "fallbackServers": ["memory", "time", "filesystem"],
+          "maxConcurrentFailures": 3
+        }
+      },
+      "enabledServers": [
+        "filesystem",
+        "git",
+        "github",
+        "memory",
+        "sequentialthinking",
+        "time",
+        "fetch",
+        "databases",
+        "nx",
+        "node",
+        "google",
+        "exa",
+        "apimatic",
+        "builtwith"
+      ],
+      "serverOverrides": {
+        "github": {
+          "connection": {
+            "timeout": 20000,
+            "retry": {
+              "attempts": 3,
+              "delay": 1000,
+              "backoff": "exponential"
+            }
+          },
+          "healthCheck": {
+            "interval": 120000,
+            "failureThreshold": 3
+          },
+          "auth": {
+            "secretName": "github-token-staging"
+          }
+        },
+        "databases": {
+          "options": {
+            "bigqueryProjectId": "${GCP_PROJECT_ID}",
+            "datasets": ["analytics_staging", "signals_staging", "events_staging"]
+          },
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          }
+        },
+        "google": {
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          },
+          "options": {
+            "services": ["bigquery", "storage", "secretmanager", "aiplatform"]
+          }
+        },
+        "exa": {
+          "auth": {
+            "secretName": "exa-api-key-staging"
+          }
+        }
+      }
+    },
+    "production": {
+      "global": {
+        "version": "2.0.0",
+        "defaultTimeout": "${MCP_DEFAULT_TIMEOUT:-45000}",
+        "defaultRetry": {
+          "attempts": 5,
+          "delay": 2000,
+          "backoff": "exponential"
+        },
+        "healthMonitoring": {
+          "enabled": true,
+          "interval": 300000,
+          "alertThreshold": 5
+        },
+        "logging": {
+          "level": "warn",
+          "destination": "gcp-logging",
+          "includeRequestResponse": false,
+          "structured": true,
+          "sampling": {
+            "enabled": true,
+            "rate": 0.1
+          }
+        },
+        "security": {
+          "enableTLS": true,
+          "validateCertificates": true,
+          "maxRequestSize": 10485760,
+          "rateLimiting": {
+            "enabled": true,
+            "requestsPerMinute": 500,
+            "burstLimit": 50
+          },
+          "ipWhitelist": {
+            "enabled": true,
+            "allowedRanges": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+          }
+        },
+        "errorHandling": {
+          "gracefulDegradation": true,
+          "fallbackServers": ["memory", "time"],
+          "maxConcurrentFailures": 5,
+          "circuitBreaker": {
+            "enabled": true,
+            "failureThreshold": 10,
+            "recoveryTimeout": 60000
+          }
+        }
+      },
+      "enabledServers": [
+        "filesystem",
+        "git",
+        "github",
+        "memory",
+        "sequentialthinking",
+        "time",
+        "fetch",
+        "databases",
+        "nx",
+        "node",
+        "google",
+        "exa",
+        "builtwith"
+      ],
+      "serverOverrides": {
+        "github": {
+          "connection": {
+            "timeout": 45000,
+            "retry": {
+              "attempts": 5,
+              "delay": 2000,
+              "backoff": "exponential"
+            }
+          },
+          "healthCheck": {
+            "interval": 300000,
+            "failureThreshold": 5
+          },
+          "auth": {
+            "secretName": "github-token-prod"
+          }
+        },
+        "databases": {
+          "options": {
+            "bigqueryProjectId": "${GCP_PROJECT_ID}",
+            "datasets": ["analytics", "signals", "events"]
+          },
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          },
+          "connection": {
+            "timeout": 60000,
+            "poolSize": 10
+          }
+        },
+        "google": {
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          },
+          "options": {
+            "services": ["bigquery", "storage", "secretmanager", "aiplatform", "cloudrun"]
+          },
+          "connection": {
+            "timeout": 60000
+          }
+        },
+        "exa": {
+          "auth": {
+            "secretName": "exa-api-key-prod"
+          },
+          "connection": {
+            "timeout": 30000
+          }
+        }
+      }
+    },
+    "test": {
+      "global": {
+        "version": "2.0.0",
+        "defaultTimeout": 5000,
+        "defaultRetry": {
+          "attempts": 1,
+          "delay": 100,
+          "backoff": "linear"
+        },
+        "healthMonitoring": {
+          "enabled": false,
+          "interval": 0,
+          "alertThreshold": 0
+        },
+        "logging": {
+          "level": "error",
+          "destination": "console",
+          "includeRequestResponse": false,
+          "structured": false
+        },
+        "security": {
+          "enableTLS": false,
+          "validateCertificates": false,
+          "maxRequestSize": 1048576,
+          "rateLimiting": {
+            "enabled": false
+          }
+        },
+        "errorHandling": {
+          "gracefulDegradation": false,
+          "fallbackServers": [],
+          "maxConcurrentFailures": 1
+        }
+      },
+      "enabledServers": [
+        "memory",
+        "time",
+        "filesystem"
+      ],
+      "serverOverrides": {
+        "memory": {
+          "connection": {
+            "timeout": 1000
+          }
+        },
+        "time": {
+          "connection": {
+            "timeout": 1000
+          }
+        },
+        "filesystem": {
+          "connection": {
+            "timeout": 2000
+          },
+          "options": {
+            "allowedDirectories": ["/tmp", "./test-fixtures"]
+          }
+        }
+      }
+    }
+  },
+  "integrations": {
+    "gcp": {
+      "enabled": true,
+      "projectId": "${GCP_PROJECT_ID}",
+      "region": "${GCP_REGION:-us-central1}",
+      "services": ["bigquery", "storage", "secretmanager", "aiplatform", "cloudrun"],
+      "auth": {
+        "type": "wif",
+        "provider": "${WIF_PROVIDER}",
+        "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+      },
+      "secretManager": {
+        "enabled": true,
+        "prefix": "mcp-${NODE_ENV:-development}",
+        "caching": {
+          "enabled": true,
+          "ttl": 3600
+        }
+      }
+    },
+    "nx": {
+      "enabled": true,
+      "workspaceRoot": ".",
+      "configPath": "nx.json",
+      "cacheDirectory": ".nx/cache"
+    },
+    "github": {
+      "enabled": true,
+      "owner": "${GITHUB_OWNER}",
+      "repo": "${GITHUB_REPO}",
+      "defaultBranch": "main",
+      "auth": {
+        "type": "secret-manager",
+        "secretName": "github-token-${NODE_ENV:-development}"
+      }
+    }
+  },
+  "monitoring": {
+    "healthChecks": {
+      "enabled": true,
+      "interval": "${HEALTH_CHECK_INTERVAL:-60000}",
+      "timeout": "${HEALTH_CHECK_TIMEOUT:-10000}",
+      "retries": 3,
+      "endpoints": [
+        "/health",
+        "/ready",
+        "/metrics"
+      ]
+    },
+    "metrics": {
+      "enabled": true,
+      "collectInterval": "${METRICS_INTERVAL:-30000}",
+      "retentionDays": "${METRICS_RETENTION:-7}",
+      "exporters": ["prometheus", "gcp-monitoring"]
+    },
+    "alerts": {
+      "enabled": true,
+      "channels": ["gcp-logging", "slack"],
+      "thresholds": {
+        "errorRate": "${ALERT_ERROR_RATE:-5}",
+        "responseTime": "${ALERT_RESPONSE_TIME:-30000}",
+        "consecutiveFailures": "${ALERT_CONSECUTIVE_FAILURES:-3}",
+        "memoryUsage": 85,
+        "cpuUsage": 80
+      },
+      "escalation": {
+        "enabled": true,
+        "levels": [
+          {
+            "threshold": 3,
+            "channels": ["gcp-logging"]
+          },
+          {
+            "threshold": 5,
+            "channels": ["gcp-logging", "slack"]
+          },
+          {
+            "threshold": 10,
+            "channels": ["gcp-logging", "slack", "pagerduty"]
+          }
+        ]
+      }
+    },
+    "tracing": {
+      "enabled": true,
+      "provider": "gcp-trace",
+      "samplingRate": "${TRACE_SAMPLING_RATE:-0.1}"
+    }
+  },
+  "security": {
+    "authentication": {
+      "required": true,
+      "methods": ["wif", "gcp-service-account"],
+      "wif": {
+        "enabled": true,
+        "provider": "${WIF_PROVIDER}",
+        "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
+        "tokenLifetime": 3600
+      },
+      "secretManager": {
+        "enabled": true,
+        "prefix": "mcp-${NODE_ENV:-development}",
+        "projectId": "${GCP_PROJECT_ID}",
+        "caching": {
+          "enabled": true,
+          "ttl": 1800
+        }
+      }
+    },
+    "authorization": {
+      "enabled": true,
+      "provider": "gcp-iam",
+      "roles": {
+        "mcp-user": {
+          "permissions": [
+            "filesystem.read",
+            "git.status",
+            "memory.get",
+            "time.get",
+            "fetch.get"
+          ]
+        },
+        "mcp-developer": {
+          "permissions": [
+            "filesystem.read",
+            "filesystem.write",
+            "git.status",
+            "git.commit",
+            "memory.get",
+            "memory.set",
+            "time.get",
+            "fetch.get",
+            "fetch.post",
+            "nx.run",
+            "node.execute"
+          ]
+        },
+        "mcp-admin": {
+          "permissions": [
+            "*"
+          ]
+        }
+      },
+      "defaultRole": "mcp-user"
+    },
+    "encryption": {
+      "enabled": true,
+      "provider": "gcp-kms",
+      "keyRing": "mcp-encryption",
+      "location": "${GCP_REGION:-us-central1}"
+    },
+    "audit": {
+      "enabled": true,
+      "destination": "gcp-audit-logs",
+      "events": ["auth", "config-change", "server-start", "server-stop", "error"]
+    }
+  },
+  "validation": {
+    "schema": {
+      "enabled": true,
+      "strict": true
+    },
+    "environmentVariables": {
+      "required": [
+        "GCP_PROJECT_ID",
+        "WIF_PROVIDER",
+        "WIF_SERVICE_ACCOUNT"
+      ],
+      "optional": [
+        "NODE_ENV",
+        "GCP_REGION",
+        "GITHUB_OWNER",
+        "GITHUB_REPO",
+        "MCP_DEFAULT_TIMEOUT",
+        "HEALTH_CHECK_INTERVAL",
+        "METRICS_INTERVAL"
+      ]
+    }
+  }
+}

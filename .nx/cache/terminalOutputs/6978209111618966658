@@ -1,0 +1,39 @@
+Compiling TypeScript files for project "mcp"...
+[1m[31m[96mlibs/mcp/src/lib/clients/mcp-client.service.ts[0m:[93m165[0m:[93m11[0m - [91merror[0m[90m TS7022: [0m'process' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.[39m[22m
+[1m[31m[39m[22m
+[1m[31m[7m165[0m     const process = spawn(command, args, {[39m[22m
+[1m[31m[7m   [0m [91m          ~~~~~~~[0m[39m[22m
+[1m[31m[96mlibs/mcp/src/lib/clients/mcp-client.service.ts[0m:[93m167[0m:[93m17[0m - [91merror[0m[90m TS2448: [0mBlock-scoped variable 'process' used before its declaration.[39m[22m
+[1m[31m[39m[22m
+[1m[31m[7m167[0m       env: { ...process.env, ...this.getEnvironmentVariables(config) },[39m[22m
+[1m[31m[7m   [0m [91m                ~~~~~~~[0m[39m[22m
+[1m[31m[39m[22m
+[1m[31m  [96mlibs/mcp/src/lib/clients/mcp-client.service.ts[0m:[93m165[0m:[93m11[0m[39m[22m
+[1m[31m    [7m165[0m     const process = spawn(command, args, {[39m[22m
+[1m[31m    [7m   [0m [96m          ~~~~~~~[0m[39m[22m
+[1m[31m    'process' is declared here.[39m[22m
+[1m[31m[96mlibs/mcp/src/lib/config/server-registry.ts[0m:[93m208[0m:[93m38[0m - [91merror[0m[90m TS4111: [0mProperty 'GCP_PROJECT_ID' comes from an index signature, so it must be accessed with ['GCP_PROJECT_ID'].[39m[22m
+[1m[31m[39m[22m
+[1m[31m[7m208[0m       bigqueryProjectId: process.env.GCP_PROJECT_ID,[39m[22m
+[1m[31m[7m   [0m [91m                                     ~~~~~~~~~~~~~~[0m[39m[22m
+[1m[31m[96mlibs/mcp/src/lib/config/server-registry.ts[0m:[93m222[0m:[93m29[0m - [91merror[0m[90m TS4111: [0mProperty 'CHROMA_URL' comes from an index signature, so it must be accessed with ['CHROMA_URL'].[39m[22m
+[1m[31m[39m[22m
+[1m[31m[7m222[0m       endpoint: process.env.CHROMA_URL || 'http://localhost:8000',[39m[22m
+[1m[31m[7m   [0m [91m                            ~~~~~~~~~~[0m[39m[22m
+[1m[31m[96mlibs/mcp/src/lib/config/server-registry.ts[0m:[93m461[0m:[93m30[0m - [91merror[0m[90m TS4111: [0mProperty 'GCP_PROJECT_ID' comes from an index signature, so it must be accessed with ['GCP_PROJECT_ID'].[39m[22m
+[1m[31m[39m[22m
+[1m[31m[7m461[0m       projectId: process.env.GCP_PROJECT_ID,[39m[22m
+[1m[31m[7m   [0m [91m                             ~~~~~~~~~~~~~~[0m[39m[22m
+[1m[31m[96mlibs/mcp/src/lib/config/server-registry.ts[0m:[93m462[0m:[93m27[0m - [91merror[0m[90m TS4111: [0mProperty 'GCP_REGION' comes from an index signature, so it must be accessed with ['GCP_REGION'].[39m[22m
+[1m[31m[39m[22m
+[1m[31m[7m462[0m       region: process.env.GCP_REGION || 'us-central1',[39m[22m
+[1m[31m[7m   [0m [91m                          ~~~~~~~~~~[0m[39m[22m
+[1m[31m[96mlibs/mcp/src/lib/config/server-registry.ts[0m:[93m722[0m:[93m30[0m - [91merror[0m[90m TS4111: [0mProperty 'GCP_PROJECT_ID' comes from an index signature, so it must be accessed with ['GCP_PROJECT_ID'].[39m[22m
+[1m[31m[39m[22m
+[1m[31m[7m722[0m       projectId: process.env.GCP_PROJECT_ID,[39m[22m
+[1m[31m[7m   [0m [91m                             ~~~~~~~~~~~~~~[0m[39m[22m
+[1m[31m[96mlibs/mcp/src/lib/config/server-registry.ts[0m:[93m723[0m:[93m27[0m - [91merror[0m[90m TS4111: [0mProperty 'GCP_REGION' comes from an index signature, so it must be accessed with ['GCP_REGION'].[39m[22m
+[1m[31m[39m[22m
+[1m[31m[7m723[0m       region: process.env.GCP_REGION || 'us-central1',[39m[22m
+[1m[31m[7m   [0m [91m                          ~~~~~~~~~~[0m[39m[22m
+[1m[31m[39m[22m

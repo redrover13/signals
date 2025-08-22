@@ -3,7 +3,7 @@
   "description": "MCP Server Configuration for Signals Project - WIF Enabled",
   "schema": "https://schemas.signals.dev/mcp-config/v2.0.0",
   "metadata": {
-    "lastUpdated": "2024-12-19T00:00:00Z",
+  "lastUpdated": "2025-08-22T00:00:00Z",
     "configVersion": "2.0.0",
     "maintainer": "Signals DevOps Team"
   },
@@ -56,19 +56,21 @@
         }
       },
       "enabledServers": [
-        "filesystem",
-        "git",
-        "github",
-        "memory",
-        "sequentialthinking",
-        "time",
-        "fetch",
-        "databases",
-        "nx",
-        "node",
-        "google",
-        "exa",
-        "apimatic"
+  "filesystem",
+  "git",
+  "github",
+  "memory",
+  "sequentialthinking",
+  "time",
+  "fetch",
+  "databases",
+  "nx",
+  "node",
+  "google",
+  "exa",
+  "apimatic",
+  "toolbox",
+  "cloudrun"
       ],
       "serverOverrides": {
         "github": {
@@ -146,20 +148,22 @@
         }
       },
       "enabledServers": [
-        "filesystem",
-        "git",
-        "github",
-        "memory",
-        "sequentialthinking",
-        "time",
-        "fetch",
-        "databases",
-        "nx",
-        "node",
-        "google",
-        "exa",
-        "apimatic",
-        "builtwith"
+  "filesystem",
+  "git",
+  "github",
+  "memory",
+  "sequentialthinking",
+  "time",
+  "fetch",
+  "databases",
+  "nx",
+  "node",
+  "google",
+  "exa",
+  "apimatic",
+  "builtwith",
+  "toolbox",
+  "cloudrun"
       ],
       "serverOverrides": {
         "github": {
@@ -255,19 +259,21 @@
         }
       },
       "enabledServers": [
-        "filesystem",
-        "git",
-        "github",
-        "memory",
-        "sequentialthinking",
-        "time",
-        "fetch",
-        "databases",
-        "nx",
-        "node",
-        "google",
-        "exa",
-        "builtwith"
+  "filesystem",
+  "git",
+  "github",
+  "memory",
+  "sequentialthinking",
+  "time",
+  "fetch",
+  "databases",
+  "nx",
+  "node",
+  "google",
+  "exa",
+  "builtwith",
+  "toolbox",
+  "cloudrun"
       ],
       "serverOverrides": {
         "github": {
@@ -541,6 +547,127 @@
       "events": ["auth", "config-change", "server-start", "server-stop", "error"]
     }
   },
+
+  "serverCatalog": [
+    {
+      "id": "everything",
+      "name": "Everything (reference)",
+      "repo": "https://github.com/modelcontextprotocol/servers/tree/main/src/everything",
+      "category": "reference",
+      "description": "Reference/test server with prompts, resources, and tools. Good for functional testing and examples.",
+      "recommendedAuth": "none",
+      "notes": "Useful for local development and example tooling."
+    },
+    {
+      "id": "fetch",
+      "name": "Fetch",
+      "repo": "https://github.com/modelcontextprotocol/servers/tree/main/src/fetch",
+      "category": "reference",
+      "description": "Web content fetching and conversion for LLM use.",
+      "recommendedAuth": "none",
+      "notes": "Consider URL allowlists and response size limits for security."
+    },
+    {
+      "id": "filesystem",
+      "name": "Filesystem",
+      "repo": "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem",
+      "category": "reference",
+      "description": "Secure file operations with configurable access controls.",
+      "recommendedAuth": "service-account or secret-manager",
+      "notes": "Use strict allowedDirectories and careful ACLs when enabling."
+    },
+    {
+      "id": "git",
+      "name": "Git",
+      "repo": "https://github.com/modelcontextprotocol/servers/tree/main/src/git",
+      "category": "reference",
+      "description": "Tools to read, search, and manipulate Git repositories.",
+      "recommendedAuth": "ssh-key or token",
+      "notes": "Limit write operations in production."
+    },
+    {
+      "id": "memory",
+      "name": "Memory",
+      "repo": "https://github.com/modelcontextprotocol/servers/tree/main/src/memory",
+      "category": "reference",
+      "description": "Knowledge graph-based persistent memory system.",
+      "recommendedAuth": "api-key or secret-manager",
+      "notes": "Ensure encryption at rest for persisted stores."
+    },
+    {
+      "id": "sequentialthinking",
+      "name": "Sequential Thinking",
+      "repo": "https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking",
+      "category": "reference",
+      "description": "Dynamic and reflective problem-solving through thought sequences.",
+      "recommendedAuth": "none",
+      "notes": "Used for advanced agent reasoning workflows."
+    },
+    {
+      "id": "time",
+      "name": "Time",
+      "repo": "https://github.com/modelcontextprotocol/servers/tree/main/src/time",
+      "category": "reference",
+      "description": "Time and timezone conversion capabilities.",
+      "recommendedAuth": "none",
+      "notes": "Low-risk utility server."
+    },
+    {
+      "id": "apify",
+      "name": "Apify",
+      "repo": "https://github.com/apify/actors-mcp-server",
+      "category": "third-party",
+      "description": "Actors MCP Server for large-scale web scraping and extraction.",
+      "recommendedAuth": "api-key",
+      "notes": "Useful for crawling external menus and pricing data. Consider rate limits and robots.txt."
+    },
+    {
+      "id": "vectorstores",
+      "name": "Vector Stores (pinecone/qdrant/chroma)",
+      "repo": "https://github.com/modelcontextprotocol/servers (various community repos)",
+      "category": "third-party",
+      "description": "Vector DB adapters for semantic search (Pinecone, Qdrant, Chroma, etc.).",
+      "recommendedAuth": "api-key",
+      "notes": "Add specific server only after picking a provider; ensure index access controls."
+    },
+    {
+      "id": "meilisearch",
+      "name": "Meilisearch",
+      "repo": "https://github.com/meilisearch/meilisearch-mcp",
+      "category": "third-party",
+      "description": "Full-text & semantic search integration.",
+      "recommendedAuth": "api-key",
+      "notes": "Good for fast site search and product/menu search."
+    },
+    {
+      "id": "redis",
+      "name": "Redis",
+      "repo": "https://github.com/redis/mcp-redis/",
+      "category": "third-party",
+      "description": "Redis key-value store integration and Redis Cloud API.",
+      "recommendedAuth": "api-key or managed-provider-credentials",
+      "notes": "Useful for caching and ephemeral memory layers. Ensure network ACLs."
+    }
+    ,
+    {
+      "id": "toolbox",
+      "name": "MCP Toolbox (googleapis/genai-toolbox)",
+      "repo": "https://github.com/googleapis/genai-toolbox",
+      "category": "google",
+      "description": "Open-source MCP server to safely expose database tools on GCP (BigQuery, AlloyDB, etc.).",
+      "recommendedAuth": "wif / service-account",
+      "notes": "Configure tools.yaml and prefer IAM/WIF for DB access."
+    },
+    {
+      "id": "cloudrun",
+      "name": "Cloud Run MCP (GoogleCloudPlatform/cloud-run-mcp)",
+      "repo": "https://github.com/GoogleCloudPlatform/cloud-run-mcp",
+      "category": "google",
+      "description": "Reference MCP server and deployment pattern for hosting MCP servers on Cloud Run.",
+      "recommendedAuth": "gcp-iap or wif",
+      "notes": "Use Cloud Run and IAM to host MCP implementations."
+    }
+  ],
   "validation": {
     "schema": {
       "enabled": true,

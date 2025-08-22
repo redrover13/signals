@@ -21,7 +21,6 @@ on:
 
 env:
   NODE_VERSION: '20'
-  PNPM_VERSION: '10'
 
 permissions:
   contents: read
@@ -107,8 +106,6 @@ jobs:
 
       - name: Setup Node.js & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -167,8 +164,6 @@ jobs:
 
       - name: Setup Node.js & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -426,6 +421,7 @@ jobs:
     steps:
       - name: Notify Slack - Success
         if: success()
+        if: vars.SLACK_WEBHOOK_URL != ''
         uses: 8398a7/action-slack@v3
         with:
           status: success
@@ -438,10 +434,11 @@ jobs:
             Version: ${{ needs.build-for-deployment.outputs.build-version }}
             Commit: ${{ github.sha }}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
 
       - name: Notify Slack - Failure
         if: failure()
+        if: vars.SLACK_WEBHOOK_URL != ''
         uses: 8398a7/action-slack@v3
         with:
           status: failure
@@ -454,7 +451,7 @@ jobs:
             Commit: ${{ github.sha }}
             Please check the logs and consider rollback if necessary.
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
 
       # Create GitHub release for production deployments
       - name: Create GitHub Release

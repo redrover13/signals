@@ -30,7 +30,6 @@ on:
 
 env:
   NODE_VERSION: '20'
-  PNPM_VERSION: '10'
 
 permissions:
   contents: read
@@ -214,8 +213,6 @@ jobs:
 
       - name: Setup Node.js & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -328,8 +325,6 @@ jobs:
 
       - name: Setup Node.js & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -536,6 +531,7 @@ jobs:
             console.log(summary);
 
       - name: Notify Slack - Daily Summary
+        if: vars.SLACK_WEBHOOK_URL != ''
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ needs.health-check.result == 'success' && needs.performance-check.result == 'success' && needs.security-monitoring.result == 'success' && needs.infrastructure-monitoring.result == 'success' && 'success' || 'warning' }}
@@ -549,4 +545,4 @@ jobs:
             Security: ${{ needs.security-monitoring.result }}
             Infrastructure: ${{ needs.infrastructure-monitoring.result }}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}

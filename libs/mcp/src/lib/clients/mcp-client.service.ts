@@ -4,7 +4,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { MCPServerConfig, MCPConnectionConfig } from '../config/mcp-config.schema';
+import { MCPServerConfig } from '../config/mcp-config.schema';
 import { getCurrentConfig, getCurrentEnvironment } from '../config/environment-config';
 import { ServerHealthService } from './server-health.service';
 import { RequestRouter } from './request-router.service';
@@ -12,7 +12,7 @@ import { RequestRouter } from './request-router.service';
 export interface MCPRequest {
   id: string;
   method: string;
-  params?: any;
+  params?: Record<string, unknown>;
   serverId?: string; // Optional: route to specific server
   timeout?: number;
   retries?: number;
@@ -20,11 +20,11 @@ export interface MCPRequest {
 
 export interface MCPResponse {
   id: string;
-  result?: any;
+  result?: unknown;
   error?: {
     code: number;
     message: string;
-    data?: any;
+    data?: unknown;
   };
   serverId: string;
   duration: number;
@@ -36,8 +36,8 @@ export interface MCPServerConnection {
   status: 'connecting' | 'connected' | 'disconnected' | 'error';
   lastConnected?: Date;
   lastError?: Error;
-  process?: any; // Child process for stdio connections
-  client?: any; // HTTP/WebSocket client
+  process?: NodeJS.Process; // Child process for stdio connections
+  client?: Record<string, unknown>; // HTTP/WebSocket client
 }
 
 /**
@@ -209,7 +209,7 @@ export class MCPClientService extends EventEmitter {
   /**
    * Connect via WebSocket
    */
-  private async connectWebSocket(connection: MCPServerConnection): Promise<void> {
+  private async connectWebSocket(/* connection: MCPServerConnection */): Promise<void> {
     // WebSocket implementation would go here
     throw new Error('WebSocket connections not yet implemented');
   }
@@ -217,7 +217,7 @@ export class MCPClientService extends EventEmitter {
   /**
    * Connect via TCP
    */
-  private async connectTcp(connection: MCPServerConnection): Promise<void> {
+  private async connectTcp(/* connection: MCPServerConnection */): Promise<void> {
     // TCP implementation would go here
     throw new Error('TCP connections not yet implemented');
   }
@@ -278,7 +278,7 @@ export class MCPClientService extends EventEmitter {
   private async sendRequestToServer(
     connection: MCPServerConnection,
     request: MCPRequest,
-  ): Promise<any> {
+  ): Promise<unknown> {
     const config = connection.config;
     const timeout = request.timeout || config.connection.timeout || 30000;
 
@@ -286,7 +286,7 @@ export class MCPClientService extends EventEmitter {
       case 'stdio':
         return this.sendStdioRequest(connection, request, timeout);
       case 'http':
-        return this.sendHttpRequest(connection, request, timeout);
+        return this.sendHttpRequest();
       default:
         throw new Error(
           `Request sending not implemented for connection type: ${config.connection.type}`,
@@ -301,7 +301,7 @@ export class MCPClientService extends EventEmitter {
     connection: MCPServerConnection,
     request: MCPRequest,
     timeout: number,
-  ): Promise<any> {
+  ): Promise<unknown> {
     return new Promise((resolve, reject) => {
       const process = connection.process;
       if (!process) {
@@ -359,16 +359,7 @@ export class MCPClientService extends EventEmitter {
   /**
    * Send HTTP request
    */
-  private async sendHttpRequest(
-    connection: MCPServerConnection,
-    request: MCPRequest,
-    timeout: number,
-  ): Promise<any> {
-    const client = connection.client;
-    if (!client) {
-      throw new Error('No HTTP client available');
-    }
-
+  private async sendHttpRequest(): Promise<unknown> {
     // Implementation would use fetch or axios
     throw new Error('HTTP request sending not yet implemented');
   }
@@ -462,14 +453,14 @@ export class MCPClientService extends EventEmitter {
     return headers;
   }
 
-  private async waitForConnection(connection: MCPServerConnection): Promise<void> {
+  private async waitForConnection(/* connection: MCPServerConnection */): Promise<void> {
     // Wait for initial handshake or connection confirmation
     return new Promise((resolve) => {
       setTimeout(resolve, 1000); // Simple timeout for now
     });
   }
 
-  private async testHttpConnection(connection: MCPServerConnection): Promise<void> {
+  private async testHttpConnection(/* connection: MCPServerConnection */): Promise<void> {
     // Test HTTP connection with a simple request
     // Implementation would depend on the specific HTTP client used
   }

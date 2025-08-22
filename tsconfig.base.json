@@ -4,9 +4,9 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "@dulce-de-saigon/agents-lib": ["libs/agents/src/index.ts"],
-      "@dulce/gcp": ["libs/gcp/src/index.ts"],
-      "@nx-monorepo/mcp": ["libs/mcp/src/index.ts"]
+      "@dulce-de-saigon/agents-lib": ["dist/libs/agents/src/index.d.ts"],
+      "@dulce/gcp": ["dist/libs/gcp/src/index.d.ts"],
+      "@nx-monorepo/mcp": ["dist/libs/mcp/src/index.d.ts"]
     },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
@@ -22,5 +22,6 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": ["node_modules", "tmp"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", "**/*.js"]
 }

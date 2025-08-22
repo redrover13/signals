@@ -54,6 +54,44 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
 
+      # This enables task distribution via Nx Cloud. Run before deps are installed.
+      - name: Start Nx Cloud run
+        if: ${{ secrets.NX_CLOUD_ACCESS_TOKEN != '' }}
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+        run: npx nx start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
+
+      # If NX token isn't provided as a secret, fetch it from Secret Manager via WIF.
+      - name: Authenticate to GCP via Workload Identity (WIF)
+        if: ${{ secrets.NX_CLOUD_ACCESS_TOKEN == '' && secrets.GCP_PROJECT_ID != '' && secrets.WIF_PROVIDER != '' && secrets.GCP_SA_EMAIL != '' }}
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: Install gcloud SDK
+        if: ${{ secrets.NX_CLOUD_ACCESS_TOKEN == '' && secrets.GCP_PROJECT_ID != '' && secrets.WIF_PROVIDER != '' && secrets.GCP_SA_EMAIL != '' }}
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Fetch NX token from Secret Manager and export
+        if: ${{ secrets.NX_CLOUD_ACCESS_TOKEN == '' && secrets.GCP_PROJECT_ID != '' && secrets.WIF_PROVIDER != '' && secrets.GCP_SA_EMAIL != '' }}
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          NX_SECRET_NAME: ${{ secrets.NX_SECRET_NAME || 'NX-Token' }}
+        run: |
+          NX_SECRET_VERSION=${NX_SECRET_VERSION:-2}
+          echo "Accessing secret projects/${GCP_PROJECT_ID}/secrets/${NX_SECRET_NAME}/versions/${NX_SECRET_VERSION}"
+          NX_TOKEN=$(gcloud secrets versions access "$NX_SECRET_VERSION" --secret="$NX_SECRET_NAME" --project="$GCP_PROJECT_ID")
+          if [ -n "$NX_TOKEN" ]; then
+            echo "NX token fetched; injecting into environment"
+            echo "NX_CLOUD_ACCESS_TOKEN=$NX_TOKEN" >> $GITHUB_ENV
+          else
+            echo "Failed to fetch NX token from Secret Manager; ensure the secret exists and the service account has Secret Manager Accessor role."
+            exit 1
+          fi
+
       - name: Generate cache key
         id: cache-key
         run: |
@@ -332,7 +370,7 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: [setup, build]
-    if: false  # Disabled until Playwright is properly configured
+    if: false # Disabled until Playwright is properly configured
     strategy:
       matrix:
         browser: [chromium, firefox]
@@ -360,6 +398,9 @@ jobs:
 
       - name: Install dependencies if cache miss
         run: pnpm install --frozen-lockfile
+
+      - name: Set Nx SHAs
+        uses: nrwl/nx-set-shas@v4
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -400,17 +441,32 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+          fetch-depth: 0
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+      - name: Setup Node.js & pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.pnpm-store
+            .nx/cache
+          key: ${{ needs.setup.outputs.cache-key }}
+
+      - name: Install dependencies if cache miss
+        run: pnpm install --frozen-lockfile
+
+      - name: Set Nx SHAs
+        uses: nrwl/nx-set-shas@v4
 
       - name: Configure Docker for Artifact Registry
         run: |
@@ -486,23 +542,7 @@ jobs:
     needs: [setup, security, quality, test, build, deploy, release]
     if: always()
     steps:
-      - name: Notify Slack on failure
-        if: failure() && vars.SLACK_WEBHOOK_URL != ''
-        uses: 8398a7/action-slack@v3
-        with:
-          status: failure
-          channel: '#ci-cd'
-        env:
-          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
-
-      - name: Notify Slack on success
-        if: success() && github.ref == 'refs/heads/main' && vars.SLACK_WEBHOOK_URL != ''
-        uses: 8398a7/action-slack@v3
-        with:
-          status: success
-          channel: '#deployments'
-        env:
-          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
+      # Slack notifications removed - Slack is not owned by this repository
 
       # Update deployment status
       - name: Update deployment status

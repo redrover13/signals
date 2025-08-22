@@ -6,6 +6,7 @@
 import { EventEmitter } from 'events';
 import { MCPServerConfig } from '../config/mcp-config.schema';
 import { getCurrentConfig } from '../config/environment-config';
+import { MCPClientService, MCPServerConnection } from './mcp-client.service';
 
 export interface HealthCheckResult {
   serverId: string;
@@ -31,13 +32,13 @@ export interface ServerHealthStats {
  * Server Health Monitoring Service
  */
 export class ServerHealthService extends EventEmitter {
-  private mcpClient: any; // MCPClientService reference
+  private mcpClient: MCPClientService; // MCPClientService reference
   private healthCheckIntervals = new Map<string, NodeJS.Timeout>();
   private healthStats = new Map<string, ServerHealthStats>();
   private isRunning = false;
   private config = getCurrentConfig();
 
-  constructor(mcpClient: any) {
+  constructor(mcpClient: MCPClientService) {
     super();
     this.mcpClient = mcpClient;
   }
@@ -79,7 +80,7 @@ export class ServerHealthService extends EventEmitter {
     this.isRunning = false;
 
     // Clear all intervals
-    for (const [serverId, interval] of this.healthCheckIntervals) {
+    for (const [, interval] of this.healthCheckIntervals) {
       clearInterval(interval);
     }
     this.healthCheckIntervals.clear();
@@ -125,14 +126,13 @@ export class ServerHealthService extends EventEmitter {
    */
   private async performHealthCheck(serverConfig: MCPServerConfig): Promise<HealthCheckResult> {
     const startTime = Date.now();
-    const serverId = serverConfig.id;
 
     try {
       // Get server connection status
-      const connection = this.mcpClient.getServerStatus(serverId);
+      const connection = this.mcpClient.getServerStatus(serverConfig.id);
       
       if (!connection || connection.status !== 'connected') {
-        throw new Error(`Server ${serverId} is not connected`);
+        throw new Error(`Server ${serverConfig.id} is not connected`);
       }
 
       // Perform health check based on connection type
@@ -144,7 +144,7 @@ export class ServerHealthService extends EventEmitter {
           ({ healthy, responseTime } = await this.checkStdioHealth(connection, serverConfig));
           break;
         case 'http':
-          ({ healthy, responseTime } = await this.checkHttpHealth(connection, serverConfig));
+          ({ healthy, responseTime } = await this.checkHttpHealth());
           break;
         default:
           // For other connection types, just check if connection exists
@@ -153,35 +153,34 @@ export class ServerHealthService extends EventEmitter {
       }
 
       const result: HealthCheckResult = {
-        serverId,
+        serverId: serverConfig.id,
         healthy,
         responseTime,
         timestamp: new Date()
       };
 
-      this.updateHealthStats(serverId, result);
+      this.updateHealthStats(serverConfig.id, result);
       
       if (healthy) {
-        this.emit('serverHealthy', serverId, result);
+        this.emit('serverHealthy', serverConfig.id, result);
       } else {
-        this.emit('serverUnhealthy', serverId, result);
+        this.emit('serverUnhealthy', serverConfig.id, result);
       }
 
       return result;
 
-    } catch (error) {
+    } catch {
       const result: HealthCheckResult = {
-        serverId,
+        serverId: serverConfig.id,
         healthy: false,
-        error: error as Error,
         timestamp: new Date()
       };
 
-      this.updateHealthStats(serverId, result);
-      this.emit('serverUnhealthy', serverId, result);
+      this.updateHealthStats(serverConfig.id, result);
+      this.emit('serverUnhealthy', serverConfig.id, result);
       
       // Handle consecutive failures
-      await this.handleHealthCheckFailure(serverConfig, result);
+      await this.handleHealthCheckFailure(serverConfig);
 
       return result;
     }
@@ -190,16 +189,15 @@ export class ServerHealthService extends EventEmitter {
   /**
    * Check stdio server health
    */
-  private async checkStdioHealth(connection: any, config: MCPServerConfig): Promise<{ healthy: boolean; responseTime: number }> {
+  private async checkStdioHealth(_connection: MCPServerConnection, config: MCPServerConfig): Promise<{ healthy: boolean; responseTime: number }> {
     const startTime = Date.now();
-    const timeout = config.healthCheck?.timeout || 5000;
 
     try {
       // Send a simple ping request
       const response = await this.mcpClient.sendRequest({
         id: `health-check-${Date.now()}`,
         method: 'ping',
-        timeout,
+        timeout: config.healthCheck?.timeout || 5000,
         serverId: config.id
       });
       // …
@@ -208,7 +206,7 @@ export class ServerHealthService extends EventEmitter {
 
       return { healthy, responseTime };
 
-    } catch (error) {
+    } catch {
       return { healthy: false, responseTime: Date.now() - startTime };
     }
   }
@@ -216,20 +214,17 @@ export class ServerHealthService extends EventEmitter {
   /**
    * Check HTTP server health
    */
-  private async checkHttpHealth(connection: any, config: MCPServerConfig): Promise<{ healthy: boolean; responseTime: number }> {
+  private async checkHttpHealth(): Promise<{ healthy: boolean; responseTime: number }> {
     const startTime = Date.now();
-    const timeout = config.healthCheck?.timeout || 5000;
 
     try {
       // Use health check endpoint if specified, otherwise use base URL
-      const endpoint = config.healthCheck?.endpoint || config.connection.endpoint;
-      
       // Perform HTTP health check (implementation would use fetch)
       // For now, just return healthy if connection exists
       const responseTime = Date.now() - startTime;
       return { healthy: true, responseTime };
 
-    } catch (error) {
+    } catch {
       return { healthy: false, responseTime: Date.now() - startTime };
     }
   }
@@ -270,7 +265,7 @@ export class ServerHealthService extends EventEmitter {
   /**
    * Handle health check failure
    */
-  private async handleHealthCheckFailure(serverConfig: MCPServerConfig, result: HealthCheckResult): Promise<void> {
+  private async handleHealthCheckFailure(serverConfig: MCPServerConfig): Promise<void> {
     const stats = this.healthStats.get(serverConfig.id);
     if (!stats) {
       return;

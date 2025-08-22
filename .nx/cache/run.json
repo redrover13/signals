@@ -1,20 +1,20 @@
 {
   "run": {
-    "command": "nx build web --verbose",
-    "startTime": "2025-08-22T05:43:49.619Z",
-    "endTime": "2025-08-22T05:44:01.146Z",
+    "command": "nx run gcp:lint",
+    "startTime": "2025-08-22T08:15:57.555Z",
+    "endTime": "2025-08-22T08:15:57.581Z",
     "inner": false
   },
   "tasks": [
     {
-      "taskId": "web:build:production",
-      "target": "build",
-      "projectName": "web",
-      "hash": "6414300357943287483",
-      "startTime": "2025-08-22T05:43:49.627Z",
-      "endTime": "2025-08-22T05:44:01.139Z",
+      "taskId": "gcp:lint",
+      "target": "lint",
+      "projectName": "gcp",
+      "hash": "15155664017633900211",
+      "startTime": "2025-08-22T08:15:57.576Z",
+      "endTime": "2025-08-22T08:15:57.579Z",
       "params": "",
-      "cacheStatus": "cache-miss",
+      "cacheStatus": "local-cache-hit",
       "status": 0
     }
   ]

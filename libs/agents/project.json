@@ -9,7 +9,13 @@
         "outputPath": "dist/libs/agents",
         "main": "libs/agents/src/index.ts",
         "tsConfig": "libs/agents/tsconfig.lib.json"
-      }
+      },
+      "dependsOn": [
+        {
+          "target": "build",
+          "projects": "dependencies"
+        }
+      ]
     },
     "lint": {
       "executor": "@nx/eslint:lint",

@@ -7,7 +7,6 @@ import { MCPClientService, MCPRequest, MCPResponse } from './clients/mcp-client.
 import { ServerHealthService, HealthCheckResult, ServerHealthStats } from './clients/server-health.service';
 import { RequestRouter } from './clients/request-router.service';
 import { getCurrentConfig, getCurrentEnvironment } from './config/environment-config';
-import { MCPServerConfig } from './config/mcp-config.schema';
 
 /**
  * Main MCP Service - Simplified interface for all MCP operations
@@ -58,7 +57,7 @@ export class MCPService {
   /**
    * Send request to MCP servers
    */
-  async request(method: string, params?: any, options?: {
+  async request(method: string, params?: Record<string, unknown>, options?: {
     serverId?: string;
     timeout?: number;
     retries?: number;
@@ -84,21 +83,21 @@ export class MCPService {
   /**
    * Git operations
    */
-  async git(operation: string, params?: any): Promise<MCPResponse> {
+  async git(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`git.${operation}`, params, { serverId: 'git' });
   }
 
   /**
    * File system operations
    */
-  async fs(operation: string, params?: any): Promise<MCPResponse> {
+  async fs(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`fs.${operation}`, params, { serverId: 'filesystem' });
   }
 
   /**
    * Memory operations
    */
-  async memory(operation: string, params?: any): Promise<MCPResponse> {
+  async memory(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`memory.${operation}`, params, { serverId: 'memory' });
   }
 
@@ -112,7 +111,7 @@ export class MCPService {
   /**
    * Time operations
    */
-  async time(operation: string, params?: any): Promise<MCPResponse> {
+  async time(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`time.${operation}`, params, { serverId: 'time' });
   }
 
@@ -121,28 +120,28 @@ export class MCPService {
   /**
    * GitHub operations
    */
-  async github(operation: string, params?: any): Promise<MCPResponse> {
+  async github(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`github.${operation}`, params, { serverId: 'github' });
   }
 
   /**
    * Nx workspace operations
    */
-  async nx(operation: string, params?: any): Promise<MCPResponse> {
+  async nx(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`nx.${operation}`, params, { serverId: 'nx' });
   }
 
   /**
    * Node.js operations
    */
-  async node(operation: string, params?: any): Promise<MCPResponse> {
+  async node(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`node.${operation}`, params, { serverId: 'node' });
   }
 
   /**
    * API validation
    */
-  async validateAPI(spec: any): Promise<MCPResponse> {
+  async validateAPI(spec: Record<string, unknown>): Promise<MCPResponse> {
     return this.request('api.validate', { spec }, { serverId: 'apimatic' });
   }
 
@@ -151,21 +150,21 @@ export class MCPService {
   /**
    * Database operations
    */
-  async database(operation: string, params?: any): Promise<MCPResponse> {
+  async database(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`db.${operation}`, params, { serverId: 'databases' });
   }
 
   /**
    * BigQuery operations
    */
-  async bigquery(query: string, params?: any): Promise<MCPResponse> {
+  async bigquery(query: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request('bigquery.query', { query, ...params }, { serverId: 'databases' });
   }
 
   /**
    * Vector/embedding operations
    */
-  async vector(operation: string, params?: any): Promise<MCPResponse> {
+  async vector(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`vector.${operation}`, params, { serverId: 'chroma' });
   }
 
@@ -174,14 +173,14 @@ export class MCPService {
   /**
    * Web search operations
    */
-  async search(query: string, options?: any): Promise<MCPResponse> {
+  async search(query: string, options?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request('search.query', { query, ...options }, { serverId: 'exa' });
   }
 
   /**
    * Web fetch operations
    */
-  async fetch(url: string, options?: any): Promise<MCPResponse> {
+  async fetch(url: string, options?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request('fetch.get', { url, ...options }, { serverId: 'fetch' });
   }
 
@@ -190,28 +189,28 @@ export class MCPService {
   /**
    * Google Cloud Platform operations
    */
-  async gcp(service: string, operation: string, params?: any): Promise<MCPResponse> {
+  async gcp(service: string, operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`gcp.${service}.${operation}`, params, { serverId: 'google' });
   }
 
   /**
    * Google Cloud Run operations
    */
-  async cloudRun(operation: string, params?: any): Promise<MCPResponse> {
+  async cloudRun(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`cloudrun.${operation}`, params, { serverId: 'google-cloud-run' });
   }
 
   /**
    * Firebase operations
    */
-  async firebase(operation: string, params?: any): Promise<MCPResponse> {
+  async firebase(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`firebase.${operation}`, params, { serverId: 'firebase' });
   }
 
   /**
    * Notion operations
    */
-  async notion(operation: string, params?: any): Promise<MCPResponse> {
+  async notion(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`notion.${operation}`, params, { serverId: 'notion' });
   }
 
@@ -220,14 +219,14 @@ export class MCPService {
   /**
    * Google Maps operations
    */
-  async maps(operation: string, params?: any): Promise<MCPResponse> {
+  async maps(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`maps.${operation}`, params, { serverId: 'google-maps' });
   }
 
   /**
    * Algolia search operations
    */
-  async algolia(operation: string, params?: any): Promise<MCPResponse> {
+  async algolia(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`algolia.${operation}`, params, { serverId: 'algolia' });
   }
 
@@ -243,14 +242,14 @@ export class MCPService {
   /**
    * Browser automation
    */
-  async browser(operation: string, params?: any): Promise<MCPResponse> {
+  async browser(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`browser.${operation}`, params, { serverId: 'browserbase' });
   }
 
   /**
    * Cross-browser testing
    */
-  async browserTest(operation: string, params?: any): Promise<MCPResponse> {
+  async browserTest(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`browsertest.${operation}`, params, { serverId: 'browserstack' });
   }
 
@@ -259,7 +258,7 @@ export class MCPService {
   /**
    * Workflow automation
    */
-  async automate(operation: string, params?: any): Promise<MCPResponse> {
+  async automate(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`make.${operation}`, params, { serverId: 'make' });
   }
 

@@ -5,7 +5,7 @@
 
 export type Tool = {
   name: string;
-  run: (input: any) => Promise<any>;
+  run: (input: unknown) => Promise<unknown>;
 };
 
 export type AgentConfig = {

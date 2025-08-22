@@ -1,3 +1,4 @@
+// Export helpers
 export { getProjectId };
 /**
  * Ensures a Pub/Sub topic exists (stub implementation).
@@ -14,12 +15,16 @@ export async function ensureTopic(): Promise<void> {
  */
 export function getPubSub() {
   return {
-    topic: (name: string) => ({
-      publishMessage: async (msg: any) => {
+    topic: (_name: string) => ({
+      publishMessage: async (_msg: unknown) => {
+        // Mark intentionally unused parameters to satisfy lint rules
+        void _name;
+        void _msg;
         // TODO: Implement actual publish logic using @google-cloud/pubsub
+        // Accept an unknown payload and marshal appropriately when implementing.
         return 'mock-message-id';
-      }
-    })
+      },
+    }),
   };
 }
 import { BigQuery } from '@google-cloud/bigquery';
@@ -70,7 +75,7 @@ const getProjectId = memoize((): string => {
     // Vui lòng đảm bảo nó được cung cấp trong môi trường chạy."
     throw new GcpInitializationError(
       'The GCP_PROJECT_ID environment variable is required but was not set. ' +
-        'Please ensure it is provided in the runtime environment.'
+        'Please ensure it is provided in the runtime environment.',
     );
   }
   return projectId;
@@ -99,11 +104,11 @@ export async function getGoogleCloudCredentials(): Promise<{
   } catch (error) {
     console.error(
       'Failed to get Google Cloud credentials. Check ADC setup. Lỗi lấy thông tin xác thực Google Cloud. Kiểm tra cài đặt ADC.',
-      error
+      error,
     );
-  let msg = 'An unknown error occurred while fetching GCP credentials.';
-  if (error instanceof Error) msg = error.message;
-  throw new GcpInitializationError(msg);
+    let msg = 'An unknown error occurred while fetching GCP credentials.';
+    if (error instanceof Error) msg = error.message;
+    throw new GcpInitializationError(msg);
   }
 }
 
@@ -148,6 +153,65 @@ export const getStorageClient = memoize((): Storage => {
 });
 
 /**
+ * Execute a SQL query against BigQuery and return the result rows.
+ * This is a convenience wrapper used by other libraries in the monorepo.
+ */
+export async function query(sql: string, params?: Record<string, unknown>) {
+  const bigquery = getBigQueryClient();
+  const [rows] = await bigquery.query({ query: sql, params });
+  return rows;
+}
+
+/**
+ * Insert rows into a BigQuery table. The `datasetTable` parameter expects the
+ * format `dataset.table` or `dataset/table`. This is a small helper wrapper
+ * for convenience in libraries that interact with BigQuery.
+ */
+export async function insertRows(datasetTable: string, rows: Array<Record<string, unknown>>) {
+  const bigquery = getBigQueryClient();
+  let datasetName = '';
+  let tableName = '';
+  if (datasetTable.includes('.')) {
+    const parts = datasetTable.split('.');
+    tableName = parts.pop() as string;
+    datasetName = parts.join('.');
+  } else if (datasetTable.includes('/')) {
+    const parts = datasetTable.split('/');
+    datasetName = parts[0];
+    tableName = parts[1];
+  } else {
+    throw new Error('insertRows expects dataset.table or dataset/table');
+  }
+
+  const dataset = bigquery.dataset(datasetName);
+  const table = dataset.table(tableName);
+  // BigQuery Node client table.insert will throw on failure; return the result for callers if needed
+  // table.insert has complex types from the BigQuery client; use unknown result type
+  // to avoid cascading type issues here while preserving runtime behavior.
+  // Use a safe typed cast for the BigQuery insert helper to avoid cascading type issues.
+  const res: unknown = await (
+    table as unknown as { insert: (r: unknown) => Promise<unknown> }
+  ).insert(rows);
+  return res;
+}
+
+/**
+ * Upload a string or buffer to Cloud Storage.
+ * `path` must be in the form `bucket/path/to/object`.
+ */
+export async function uploadString(path: string, contents: string | Buffer, contentType?: string) {
+  const storage = getStorageClient();
+  const firstSlash = path.indexOf('/');
+  if (firstSlash === -1)
+    throw new Error('uploadString expects path in the form "bucket/objectPath"');
+  const bucketName = path.slice(0, firstSlash);
+  const objectName = path.slice(firstSlash + 1);
+  const file = storage.bucket(bucketName).file(objectName);
+  await file.save(typeof contents === 'string' ? Buffer.from(contents) : contents, { contentType });
+  return `gs://${bucketName}/${objectName}`;
+}
+
+/**
  * Khởi tạo và trả về một client Vertex AI Prediction đã được xác thực.
  * Initializes and returns an authenticated Vertex AI Prediction client. The client
  * is memoized for reuse.
@@ -170,5 +234,5 @@ export const getVertexAIClient = memoize(
       if (error instanceof Error) msg = error.message;
       throw new GcpInitializationError(msg);
     }
-  }
+  },
 );

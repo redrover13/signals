@@ -3,7 +3,7 @@
   "description": "MCP Server Configuration for Signals Project - WIF Enabled",
   "schema": "https://schemas.signals.dev/mcp-config/v2.0.0",
   "metadata": {
-  "lastUpdated": "2025-08-22T00:00:00Z",
+    "lastUpdated": "2025-08-22T00:00:00Z",
     "configVersion": "2.0.0",
     "maintainer": "Signals DevOps Team"
   },
@@ -56,21 +56,21 @@
         }
       },
       "enabledServers": [
-  "filesystem",
-  "git",
-  "github",
-  "memory",
-  "sequentialthinking",
-  "time",
-  "fetch",
-  "databases",
-  "nx",
-  "node",
-  "google",
-  "exa",
-  "apimatic",
-  "toolbox",
-  "cloudrun"
+        "filesystem",
+        "git",
+        "github",
+        "memory",
+        "sequentialthinking",
+        "time",
+        "fetch",
+        "databases",
+        "nx",
+        "node",
+        "google",
+        "exa",
+        "apimatic",
+        "toolbox",
+        "cloudrun"
       ],
       "serverOverrides": {
         "github": {
@@ -107,6 +107,30 @@
         "exa": {
           "auth": {
             "secretName": "exa-api-key-dev"
+          }
+        },
+        "toolbox": {
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          },
+          "connection": {
+            "timeout": 30000
+          },
+          "options": {
+            "toolsConfigSecret": "toolbox-tools-config-${NODE_ENV:-development}"
+          }
+        },
+        "cloudrun": {
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          },
+          "options": {
+            "invokerServiceAccount": "${WIF_SERVICE_ACCOUNT}"
+          },
+          "connection": {
+            "timeout": 30000
           }
         }
       }
@@ -148,22 +172,22 @@
         }
       },
       "enabledServers": [
-  "filesystem",
-  "git",
-  "github",
-  "memory",
-  "sequentialthinking",
-  "time",
-  "fetch",
-  "databases",
-  "nx",
-  "node",
-  "google",
-  "exa",
-  "apimatic",
-  "builtwith",
-  "toolbox",
-  "cloudrun"
+        "filesystem",
+        "git",
+        "github",
+        "memory",
+        "sequentialthinking",
+        "time",
+        "fetch",
+        "databases",
+        "nx",
+        "node",
+        "google",
+        "exa",
+        "apimatic",
+        "builtwith",
+        "toolbox",
+        "cloudrun"
       ],
       "serverOverrides": {
         "github": {
@@ -205,6 +229,30 @@
         "exa": {
           "auth": {
             "secretName": "exa-api-key-staging"
+          }
+        },
+        "toolbox": {
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          },
+          "connection": {
+            "timeout": 45000
+          },
+          "options": {
+            "toolsConfigSecret": "toolbox-tools-config-staging"
+          }
+        },
+        "cloudrun": {
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          },
+          "options": {
+            "invokerServiceAccount": "${WIF_SERVICE_ACCOUNT}"
+          },
+          "connection": {
+            "timeout": 45000
           }
         }
       }
@@ -259,21 +307,21 @@
         }
       },
       "enabledServers": [
-  "filesystem",
-  "git",
-  "github",
-  "memory",
-  "sequentialthinking",
-  "time",
-  "fetch",
-  "databases",
-  "nx",
-  "node",
-  "google",
-  "exa",
-  "builtwith",
-  "toolbox",
-  "cloudrun"
+        "filesystem",
+        "git",
+        "github",
+        "memory",
+        "sequentialthinking",
+        "time",
+        "fetch",
+        "databases",
+        "nx",
+        "node",
+        "google",
+        "exa",
+        "builtwith",
+        "toolbox",
+        "cloudrun"
       ],
       "serverOverrides": {
         "github": {
@@ -326,6 +374,30 @@
           "connection": {
             "timeout": 30000
           }
+        },
+        "toolbox": {
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          },
+          "connection": {
+            "timeout": 60000
+          },
+          "options": {
+            "toolsConfigSecret": "toolbox-tools-config-prod"
+          }
+        },
+        "cloudrun": {
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          },
+          "options": {
+            "invokerServiceAccount": "${WIF_SERVICE_ACCOUNT}"
+          },
+          "connection": {
+            "timeout": 60000
+          }
         }
       }
     },
@@ -363,11 +435,7 @@
           "maxConcurrentFailures": 1
         }
       },
-      "enabledServers": [
-        "memory",
-        "time",
-        "filesystem"
-      ],
+      "enabledServers": ["memory", "time", "filesystem"],
       "serverOverrides": {
         "memory": {
           "connection": {
@@ -433,11 +501,7 @@
       "interval": "${HEALTH_CHECK_INTERVAL:-60000}",
       "timeout": "${HEALTH_CHECK_TIMEOUT:-10000}",
       "retries": 3,
-      "endpoints": [
-        "/health",
-        "/ready",
-        "/metrics"
-      ]
+      "endpoints": ["/health", "/ready", "/metrics"]
     },
     "metrics": {
       "enabled": true,
@@ -447,7 +511,7 @@
     },
     "alerts": {
       "enabled": true,
-      "channels": ["gcp-logging", "slack"],
+      "channels": ["gcp-logging"],
       "thresholds": {
         "errorRate": "${ALERT_ERROR_RATE:-5}",
         "responseTime": "${ALERT_RESPONSE_TIME:-30000}",
@@ -464,11 +528,11 @@
           },
           {
             "threshold": 5,
-            "channels": ["gcp-logging", "slack"]
+            "channels": ["gcp-logging"]
           },
           {
             "threshold": 10,
-            "channels": ["gcp-logging", "slack", "pagerduty"]
+            "channels": ["gcp-logging", "pagerduty"]
           }
         ]
       }
@@ -504,13 +568,7 @@
       "provider": "gcp-iam",
       "roles": {
         "mcp-user": {
-          "permissions": [
-            "filesystem.read",
-            "git.status",
-            "memory.get",
-            "time.get",
-            "fetch.get"
-          ]
+          "permissions": ["filesystem.read", "git.status", "memory.get", "time.get", "fetch.get"]
         },
         "mcp-developer": {
           "permissions": [
@@ -528,9 +586,7 @@
           ]
         },
         "mcp-admin": {
-          "permissions": [
-            "*"
-          ]
+          "permissions": ["*"]
         }
       },
       "defaultRole": "mcp-user"
@@ -647,8 +703,7 @@
       "description": "Redis key-value store integration and Redis Cloud API.",
       "recommendedAuth": "api-key or managed-provider-credentials",
       "notes": "Useful for caching and ephemeral memory layers. Ensure network ACLs."
-    }
-    ,
+    },
     {
       "id": "toolbox",
       "name": "MCP Toolbox (googleapis/genai-toolbox)",
@@ -674,11 +729,7 @@
       "strict": true
     },
     "environmentVariables": {
-      "required": [
-        "GCP_PROJECT_ID",
-        "WIF_PROVIDER",
-        "WIF_SERVICE_ACCOUNT"
-      ],
+      "required": ["GCP_PROJECT_ID", "WIF_PROVIDER", "WIF_SERVICE_ACCOUNT"],
       "optional": [
         "NODE_ENV",
         "GCP_REGION",

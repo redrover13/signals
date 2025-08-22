@@ -23,7 +23,7 @@ export interface MCPServerConfig {
   /** Health check configuration */
   healthCheck?: MCPHealthCheckConfig;
   /** Server-specific options */
-  options?: Record<string, any>;
+  options?: Record<string, unknown>;
   /** Environment-specific overrides */
   environments?: Record<string, Partial<MCPServerConfig>>;
 }
@@ -53,7 +53,7 @@ export interface MCPAuthConfig {
     envVar?: string;
   };
   /** Additional auth options */
-  options?: Record<string, any>;
+  options?: Record<string, unknown>;
 }
 
 export interface MCPHealthCheckConfig {

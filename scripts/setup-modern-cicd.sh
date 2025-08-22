@@ -394,7 +394,6 @@ display_configuration() {
     echo "CODECOV_TOKEN: <your-codecov-token>"
     echo "CODACY_PROJECT_TOKEN: <your-codacy-token>"
     echo "GITGUARDIAN_API_KEY: <your-gitguardian-key>"
-    echo "SLACK_WEBHOOK: <your-slack-webhook-url>"
     echo "NX_CLOUD_ACCESS_TOKEN: <your-nx-cloud-token>"
     echo ""
     echo "=== Manual Steps Required ==="

@@ -16,9 +16,9 @@
     "mcp:health": "pnpm exec ts-node -e \"import('@nx-monorepo/mcp').then(m => m.testMCPConnectivity().then(console.log))\""
   },
   "devDependencies": {
+    "@nx/eslint": "21.4.0",
     "@nx/jest": "21.4.0",
     "@nx/js": "21.4.0",
-    "@nx/eslint": "21.4.0",
     "@nx/next": "21.4.0",
     "@nx/node": "21.4.0",
     "@nx/workspace": "21.4.0",
@@ -33,6 +33,7 @@
     "fs-extra": "^11.3.1",
     "koa": "^2.16.2",
     "nx": "21.4.0",
+    "prettier": "^3.6.2",
     "secretlint": "^11.0.2",
     "ts-node": "10.9.2",
     "typescript": "5.9.2"

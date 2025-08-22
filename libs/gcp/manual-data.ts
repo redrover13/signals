@@ -6,6 +6,8 @@ export function parseManualCSV(filePath: string) {
   return csvParse.parse(content, { columns: true });
 }
 
-export function validateManualData(data: any[], schema: string[]): boolean {
-  return data.every(row => schema.every(field => field in row));
+export function validateManualData(data: Record<string, unknown>[], schema: string[]): boolean {
+  return data.every((row) =>
+    schema.every((field) => Object.prototype.hasOwnProperty.call(row, field)),
+  );
 }

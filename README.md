@@ -9,10 +9,11 @@
 ![Docker Pulls][docker-pulls]
 
 [📖 Documentation][docs]
+
 </div>
 
 Trivy ([pronunciation][pronunciation]) is a comprehensive and versatile security scanner.
-Trivy has *scanners* that look for security issues, and *targets* where it can find those issues.
+Trivy has _scanners_ that look for security issues, and _targets_ where it can find those issues.
 
 Targets (what Trivy can scan):
 
@@ -54,6 +55,7 @@ Trivy is integrated with many popular platforms and applications. The complete l
 - See [Ecosystem] for more
 
 ### Canary builds
+
 There are canary builds ([Docker Hub](https://hub.docker.com/r/aquasec/trivy/tags?page=1&name=canary), [GitHub](https://github.com/aquasecurity/trivy/pkgs/container/trivy/75776514?tag=canary), [ECR](https://gallery.ecr.aws/aquasecurity/trivy#canary) images and [binaries](https://github.com/aquasecurity/trivy/actions/workflows/canary.yaml)) as generated every push to main branch.
 
 Please be aware: canary builds might have critical bugs, it's not recommended for use in production.
@@ -117,7 +119,7 @@ If you'd like to contact Aqua or request a demo, please use this form: <https://
 Trivy is an [Aqua Security][aquasec] open source project.  
 Learn about our open source work and portfolio [here][oss].  
 Contact us about any matter by opening a GitHub Discussion [here][discussions]
-Join our [Slack community][slack] to stay up to date with community efforts.
+Join our community channels to stay up to date with community efforts.
 
 Please ensure to abide by our [Code of Conduct][code-of-conduct] during all interactions.
 
@@ -134,17 +136,16 @@ Please ensure to abide by our [Code of Conduct][code-of-conduct] during all inte
 [homepage]: https://trivy.dev
 [docs]: https://aquasecurity.github.io/trivy
 [pronunciation]: #how-to-pronounce-the-name-trivy
-[slack]: https://slack.aquasec.com
-[code-of-conduct]: https://github.com/aquasecurity/community/blob/main/CODE_OF_CONDUCT.md
 
-[Installation]:https://aquasecurity.github.io/trivy/latest/getting-started/installation/
+<!-- Slack link removed -->
+
+[code-of-conduct]: https://github.com/aquasecurity/community/blob/main/CODE_OF_CONDUCT.md
+[Installation]: https://aquasecurity.github.io/trivy/latest/getting-started/installation/
 [Ecosystem]: https://aquasecurity.github.io/trivy/latest/ecosystem/
 [Scanning Coverage]: https://aquasecurity.github.io/trivy/latest/getting-started/coverage/
-
 [alpine]: https://ariadne.space/2021/06/08/the-vulnerability-remediation-lifecycle-of-alpine-containers/
 [rego]: https://www.openpolicyagent.org/docs/latest/#rego
 [sigstore]: https://www.sigstore.dev/
-
 [aquasec]: https://aquasec.com
 [oss]: https://www.aquasec.com/products/open-source-projects/
 [discussions]: https://github.com/aquasecurity/trivy/discussions

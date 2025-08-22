@@ -63,7 +63,7 @@ jobs:
             ENVIRONMENT="none"
             SHOULD_DEPLOY="false"
           fi
-          
+
           # Set GCP project based on environment
           case $ENVIRONMENT in
             production)
@@ -79,12 +79,12 @@ jobs:
               REGION=""
               ;;
           esac
-          
+
           echo "environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
           echo "should-deploy=$SHOULD_DEPLOY" >> $GITHUB_OUTPUT
           echo "gcp-project=$GCP_PROJECT" >> $GITHUB_OUTPUT
           echo "region=$REGION" >> $GITHUB_OUTPUT
-          
+
           echo "Deployment Environment: $ENVIRONMENT"
           echo "Should Deploy: $SHOULD_DEPLOY"
           echo "GCP Project: $GCP_PROJECT"
@@ -120,7 +120,7 @@ jobs:
       - name: Validate environment configuration
         run: |
           echo "Validating ${{ needs.determine-environment.outputs.environment }} environment..."
-          
+
           # Check required secrets
           REQUIRED_SECRETS=("GCP_PROJECT_ID" "WIF_PROVIDER" "WIF_SERVICE_ACCOUNT")
           for secret in "${REQUIRED_SECRETS[@]}"; do
@@ -313,9 +313,9 @@ jobs:
       - name: Health check - API
         run: |
           API_URL="https://dulce-api-dot-${{ needs.determine-environment.outputs.gcp-project }}.asia-southeast1.run.app"
-          
+
           echo "Checking API health at $API_URL/health"
-          
+
           for i in {1..5}; do
             if curl -f -s "$API_URL/health" > /dev/null; then
               echo "✅ API health check passed"
@@ -333,15 +333,15 @@ jobs:
       - name: Performance validation
         run: |
           API_URL="https://dulce-api-dot-${{ needs.determine-environment.outputs.gcp-project }}.asia-southeast1.run.app"
-          
+
           echo "Running performance validation..."
-          
+
           # Simple response time check
           RESPONSE_TIME=$(curl -o /dev/null -s -w '%{time_total}' "$API_URL/health")
           RESPONSE_TIME_MS=$(echo "$RESPONSE_TIME * 1000" | bc)
-          
+
           echo "Response time: ${RESPONSE_TIME_MS}ms"
-          
+
           # Fail if response time > 5 seconds
           if (( $(echo "$RESPONSE_TIME > 5.0" | bc -l) )); then
             echo "❌ Response time too slow: ${RESPONSE_TIME_MS}ms"
@@ -354,12 +354,12 @@ jobs:
       - name: Smoke tests
         run: |
           echo "Running smoke tests against deployed environment..."
-          
+
           API_URL="https://dulce-api-dot-${{ needs.determine-environment.outputs.gcp-project }}.asia-southeast1.run.app"
-          
+
           # Test basic endpoints
           curl -f "$API_URL/health" || exit 1
-          
+
           echo "✅ Smoke tests passed"
 
   # ============================================================================
@@ -386,10 +386,10 @@ jobs:
       - name: Rollback Cloud Run services
         run: |
           echo "Rolling back Cloud Run services..."
-          
+
           # Get previous revision for each service
           SERVICES=("dulce-api" "agent-runner")
-          
+
           for service in "${SERVICES[@]}"; do
             echo "Rolling back $service..."
             
@@ -419,39 +419,7 @@ jobs:
     needs: [determine-environment, build-for-deployment, deploy-to-gcp, post-deployment]
     if: always() && needs.determine-environment.outputs.should-deploy == 'true'
     steps:
-      - name: Notify Slack - Success
-        if: success()
-        if: vars.SLACK_WEBHOOK_URL != ''
-        uses: 8398a7/action-slack@v3
-        with:
-          status: success
-          channel: '#deployments'
-          fields: repo,message,commit,author,action,eventName,ref,workflow
-          text: |
-            🚀 Deployment to ${{ needs.determine-environment.outputs.environment }} successful!
-            
-            Environment: ${{ needs.determine-environment.outputs.environment }}
-            Version: ${{ needs.build-for-deployment.outputs.build-version }}
-            Commit: ${{ github.sha }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
-
-      - name: Notify Slack - Failure
-        if: failure()
-        if: vars.SLACK_WEBHOOK_URL != ''
-        uses: 8398a7/action-slack@v3
-        with:
-          status: failure
-          channel: '#alerts'
-          fields: repo,message,commit,author,action,eventName,ref,workflow
-          text: |
-            🚨 Deployment to ${{ needs.determine-environment.outputs.environment }} failed!
-            
-            Environment: ${{ needs.determine-environment.outputs.environment }}
-            Commit: ${{ github.sha }}
-            Please check the logs and consider rollback if necessary.
-        env:
-          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
+      # Slack notifications removed - Slack is not owned by this repository
 
       # Create GitHub release for production deployments
       - name: Create GitHub Release
@@ -464,12 +432,12 @@ jobs:
           release_name: Production Release v${{ needs.build-for-deployment.outputs.build-version }}
           body: |
             ## Production Deployment
-            
+
             **Version:** ${{ needs.build-for-deployment.outputs.build-version }}
             **Commit:** ${{ github.sha }}
             **Environment:** ${{ needs.determine-environment.outputs.environment }}
             **Deployed:** ${{ github.event.head_commit.timestamp }}
-            
+
             ### Changes
             ${{ github.event.head_commit.message }}
           draft: false

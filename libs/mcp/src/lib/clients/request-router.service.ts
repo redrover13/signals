@@ -20,20 +20,20 @@ export interface RoutingRule {
 
 export interface LoadBalancingStrategy {
   type: 'round-robin' | 'least-connections' | 'priority-based' | 'random';
-  options?: Record<string, any>;
+  options?: Record<string, unknown>;
 }
 
 /**
  * Request Router Service
  */
 export class RequestRouter {
-  private mcpClient: any; // MCPClientService reference
+  private mcpClient: unknown; // MCPClientService reference
   private config = getCurrentConfig();
   private routingRules: RoutingRule[] = [];
   private serverLoadCounters = new Map<string, number>();
   private roundRobinCounters = new Map<string, number>();
 
-  constructor(mcpClient: any) {
+  constructor(mcpClient: unknown) {
     this.mcpClient = mcpClient;
     this.initializeRoutingRules();
   }
@@ -265,7 +265,7 @@ export class RequestRouter {
   /**
    * Select server based on load balancing strategy
    */
-  private selectServerByLoadBalancing(rules: RoutingRule[], request: MCPRequest): RoutingRule {
+  private selectServerByLoadBalancing(rules: RoutingRule[], /* request: MCPRequest */): RoutingRule {
     const strategy: LoadBalancingStrategy = {
       type: 'priority-based' // Default strategy
     };
@@ -446,7 +446,7 @@ export class RequestRouter {
           method 
         } as MCPRequest).serverId;
       }
-    } catch (error) {
+    } catch {
       // Ignore errors in test mode
     }
 

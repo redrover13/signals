@@ -3,7 +3,7 @@
  * Helper functions for MCP configuration and client management
  */
 
-import { MCPClientService } from '../clients/mcp-client.service';
+import { readFileSync, writeFileSync } from 'fs';
 import { MCPService } from '../mcp.service';
 import { 
   getCurrentConfig, 
@@ -226,10 +226,9 @@ export function getMCPPerformanceMetrics(mcpService: MCPService): {
  */
 export function exportMCPConfig(filePath: string): void {
   const config = getCurrentConfig();
-  const fs = require('fs');
   
   try {
-    fs.writeFileSync(filePath, JSON.stringify(config, null, 2));
+    writeFileSync(filePath, JSON.stringify(config, null, 2));
     console.log(`MCP configuration exported to: ${filePath}`);
   } catch (error) {
     console.error('Failed to export MCP configuration:', error);
@@ -241,10 +240,8 @@ export function exportMCPConfig(filePath: string): void {
  * Import MCP configuration from file
  */
 export function importMCPConfig(filePath: string): MCPEnvironmentConfig {
-  const fs = require('fs');
-  
   try {
-    const configData = fs.readFileSync(filePath, 'utf8');
+    const configData = readFileSync(filePath, 'utf8');
     const config = JSON.parse(configData) as MCPEnvironmentConfig;
     
     const validation = validateConfig(config);
@@ -306,7 +303,7 @@ export function getMCPHealthSummary(mcpService: MCPService): {
  * Create MCP client with custom configuration
  */
 export async function createCustomMCPClient(
-  customConfig: Partial<MCPEnvironmentConfig>
+  /* customConfig: Partial<MCPEnvironmentConfig> */
 ): Promise<MCPService> {
   // This would require extending the MCPService to accept custom configs
   // For now, return the standard instance

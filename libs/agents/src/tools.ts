@@ -1,30 +1,53 @@
-import { query as bqQuery, insertRows } from "@dulce/gcp";
-import { uploadString } from "@dulce/gcp";
+interface BigQueryInput {
+  sql: string;
+  params?: Record<string, unknown>;
+}
+
+interface BigQueryInsertInput {
+  table: string;
+  rows: Record<string, unknown>[];
+}
+
+interface StorageUploadInput {
+  path: string;
+  contents: string;
+  contentType?: string;
+}
+
+interface GCPModule {
+  query: (sql: string, params?: Record<string, unknown>) => Promise<unknown[]>;
+  insertRows: (table: string, rows: Record<string, unknown>[]) => Promise<void>;
+  uploadString: (path: string, contents: string, contentType?: string) => Promise<string>;
+}
 
 export const tools = {
-  "bq.query": {
-    name: "bq.query",
-    description: "Run a BigQuery SQL query. Input: { sql: string, params?: object }",
-    run: async (input: any) => {
-      const rows = await bqQuery(input.sql, input.params);
+  'bq.query': {
+    name: 'bq.query',
+    description: 'Run a BigQuery SQL query. Input: { sql: string, params?: object }',
+    run: async (input: BigQueryInput) => {
+      const gcp = (await import('@dulce/gcp')) as GCPModule;
+      const rows = await gcp.query(input.sql, input.params);
       return { rows };
-    }
+    },
   },
-  "bq.insert": {
-    name: "bq.insert",
-    description: "Insert rows into a BigQuery table. Input: { table: string, rows: any[] }",
-    run: async (input: any) => {
-      await insertRows(input.table, input.rows);
+  'bq.insert': {
+    name: 'bq.insert',
+    description: 'Insert rows into a BigQuery table. Input: { table: string, rows: any[] }',
+    run: async (input: BigQueryInsertInput) => {
+      const gcp = (await import('@dulce/gcp')) as GCPModule;
+      await gcp.insertRows(input.table, input.rows);
       return { ok: true };
-    }
+    },
   },
-  "storage.uploadString": {
-    name: "storage.uploadString",
-    description: "Upload a string to Cloud Storage. Input: { path: string, contents: string, contentType?: string }",
-    run: async (input: any) => {
-      const uri = await uploadString(input.path, input.contents, input.contentType);
+  'storage.uploadString': {
+    name: 'storage.uploadString',
+    description:
+      'Upload a string to Cloud Storage. Input: { path: string, contents: string, contentType?: string }',
+    run: async (input: StorageUploadInput) => {
+      const gcp = (await import('@dulce/gcp')) as GCPModule;
+      const uri = await gcp.uploadString(input.path, input.contents, input.contentType);
       return { uri };
-    }
-  }
+    },
+  },
 } as const;
 export type DefaultToolName = keyof typeof tools;

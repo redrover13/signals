@@ -75,7 +75,7 @@ jobs:
         run: |
           SERVICES=("dulce-api" "agent-runner")
           FAILED_SERVICES=()
-          
+
           for service in "${SERVICES[@]}"; do
             echo "Checking $service in ${{ matrix.environment }}..."
             
@@ -106,7 +106,7 @@ jobs:
               fi
             fi
           done
-          
+
           if [ ${#FAILED_SERVICES[@]} -gt 0 ]; then
             echo "failed_services=${FAILED_SERVICES[*]}" >> $GITHUB_OUTPUT
             echo "status=failed" >> $GITHUB_OUTPUT
@@ -120,7 +120,7 @@ jobs:
         run: |
           FUNCTIONS=("event-parser")
           FAILED_FUNCTIONS=()
-          
+
           for function in "${FUNCTIONS[@]}"; do
             echo "Checking function $function..."
             
@@ -135,7 +135,7 @@ jobs:
               echo "✅ $function is healthy"
             fi
           done
-          
+
           if [ ${#FAILED_FUNCTIONS[@]} -gt 0 ]; then
             echo "failed_functions=${FAILED_FUNCTIONS[*]}" >> $GITHUB_OUTPUT
             echo "status=failed" >> $GITHUB_OUTPUT
@@ -152,21 +152,21 @@ jobs:
             const title = `🚨 Health Check Failed - ${{ matrix.environment }}`;
             const body = `
             ## Health Check Failure Alert
-            
+
             **Environment:** ${{ matrix.environment }}
             **Time:** ${new Date().toISOString()}
             **Workflow:** ${context.workflow}
-            
+
             ### Failed Services
             ${steps.cloud-run.outputs.failed_services ? '**Cloud Run:** ' + steps.cloud-run.outputs.failed_services : ''}
             ${steps.cloud-functions.outputs.failed_functions ? '**Cloud Functions:** ' + steps.cloud-functions.outputs.failed_functions : ''}
-            
+
             ### Action Required
             Please investigate the failed services immediately.
-            
+
             **Runbook:** [Health Check Runbook](https://github.com/${context.repo.owner}/${context.repo.repo}/wiki/Health-Check-Runbook)
             `;
-            
+
             // Create or update issue
             const issues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
@@ -174,7 +174,7 @@ jobs:
               labels: ['alert', 'health-check', '${{ matrix.environment }}'],
               state: 'open'
             });
-            
+
             if (issues.data.length === 0) {
               await github.rest.issues.create({
                 owner: context.repo.owner,
@@ -228,14 +228,14 @@ jobs:
         id: performance
         run: |
           API_URL="https://dulce-api-dot-${{ matrix.project }}.asia-southeast1.run.app"
-          
+
           echo "Running performance tests against $API_URL"
-          
+
           # Simple load test with curl
           TOTAL_TIME=0
           FAILED_REQUESTS=0
           TOTAL_REQUESTS=10
-          
+
           for i in $(seq 1 $TOTAL_REQUESTS); do
             START_TIME=$(date +%s.%N)
             HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL/health")
@@ -250,16 +250,16 @@ jobs:
             
             echo "Request $i: ${REQUEST_TIME}s (HTTP $HTTP_CODE)"
           done
-          
+
           AVG_TIME=$(echo "scale=3; $TOTAL_TIME / $TOTAL_REQUESTS" | bc)
           SUCCESS_RATE=$(echo "scale=2; ($TOTAL_REQUESTS - $FAILED_REQUESTS) * 100 / $TOTAL_REQUESTS" | bc)
-          
+
           echo "Average response time: ${AVG_TIME}s"
           echo "Success rate: ${SUCCESS_RATE}%"
-          
+
           echo "avg_response_time=$AVG_TIME" >> $GITHUB_OUTPUT
           echo "success_rate=$SUCCESS_RATE" >> $GITHUB_OUTPUT
-          
+
           # Alert thresholds
           if (( $(echo "$AVG_TIME > 2.0" | bc -l) )); then
             echo "status=slow" >> $GITHUB_OUTPUT
@@ -273,7 +273,7 @@ jobs:
       - name: Check Resource Utilization
         run: |
           echo "Checking resource utilization for ${{ matrix.environment }}..."
-          
+
           # This would typically query monitoring APIs
           # For now, we'll simulate with basic checks
           echo "CPU, Memory, and Network metrics would be checked here"
@@ -287,23 +287,23 @@ jobs:
             const title = `⚠️ Performance Issue Detected - ${{ matrix.environment }}`;
             const body = `
             ## Performance Alert
-            
+
             **Environment:** ${{ matrix.environment }}
             **Time:** ${new Date().toISOString()}
             **Status:** ${{ steps.performance.outputs.status }}
-            
+
             ### Metrics
             - **Average Response Time:** ${{ steps.performance.outputs.avg_response_time }}s
             - **Success Rate:** ${{ steps.performance.outputs.success_rate }}%
-            
+
             ### Thresholds
             - Response Time Threshold: 2.0s
             - Success Rate Threshold: 95%
-            
+
             ### Action Required
             Please investigate performance degradation.
             `;
-            
+
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -340,9 +340,9 @@ jobs:
         id: deps
         run: |
           echo "Scanning dependencies for vulnerabilities..."
-          
+
           pnpm audit --audit-level=moderate --json > audit-results.json || true
-          
+
           if [ -f audit-results.json ]; then
             VULNERABILITIES=$(cat audit-results.json | jq '.metadata.vulnerabilities.total // 0')
             HIGH_VULNS=$(cat audit-results.json | jq '.metadata.vulnerabilities.high // 0')
@@ -368,9 +368,9 @@ jobs:
         id: secrets
         run: |
           echo "Scanning for exposed secrets..."
-          
+
           pnpm secretlint "**/*" --format json --output secretlint-results.json || true
-          
+
           if [ -f secretlint-results.json ] && [ -s secretlint-results.json ]; then
             SECRETS_COUNT=$(cat secretlint-results.json | jq '. | length')
             echo "secrets_found=$SECRETS_COUNT" >> $GITHUB_OUTPUT
@@ -389,29 +389,29 @@ jobs:
             const title = `🔒 Security Alert - Critical Issues Detected`;
             const body = `
             ## Security Alert
-            
+
             **Time:** ${new Date().toISOString()}
             **Severity:** Critical
-            
+
             ### Dependency Vulnerabilities
             - **Total:** ${{ steps.deps.outputs.vulnerabilities }}
             - **High:** ${{ steps.deps.outputs.high_vulnerabilities }}
             - **Critical:** ${{ steps.deps.outputs.critical_vulnerabilities }}
-            
+
             ### Secret Scanning
             - **Secrets Found:** ${{ steps.secrets.outputs.secrets_found }}
-            
+
             ### Action Required
             **IMMEDIATE ACTION REQUIRED** - Critical security issues detected.
-            
+
             1. Review dependency vulnerabilities
             2. Update vulnerable packages
             3. Investigate any exposed secrets
             4. Consider emergency deployment if needed
-            
+
             **Security Runbook:** [Security Incident Response](https://github.com/${context.repo.owner}/${context.repo.repo}/wiki/Security-Runbook)
             `;
-            
+
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -451,9 +451,9 @@ jobs:
       - name: Check BigQuery Health
         run: |
           echo "Checking BigQuery datasets..."
-          
+
           DATASETS=$(gcloud alpha bq datasets list --format="value(datasetId)" 2>/dev/null || echo "")
-          
+
           if [ -z "$DATASETS" ]; then
             echo "❌ No BigQuery datasets found"
           else
@@ -464,22 +464,22 @@ jobs:
       - name: Check Cloud Storage
         run: |
           echo "Checking Cloud Storage buckets..."
-          
+
           BUCKETS=$(gsutil ls 2>/dev/null | wc -l || echo "0")
-          
+
           echo "Found $BUCKETS storage buckets"
 
       # Check IAM and security
       - name: Check IAM Security
         run: |
           echo "Checking IAM security configuration..."
-          
+
           # Check for overly permissive IAM bindings
           gcloud projects get-iam-policy ${{ matrix.project }} \
             --flatten="bindings[].members" \
             --filter="bindings.role:roles/owner OR bindings.role:roles/editor" \
             --format="table(bindings.role,bindings.members)" > iam-report.txt
-          
+
           if [ -s iam-report.txt ]; then
             echo "⚠️ Found privileged IAM bindings:"
             cat iam-report.txt
@@ -506,43 +506,28 @@ jobs:
               { name: 'Security Monitoring', status: '${{ needs.security-monitoring.result }}' },
               { name: 'Infrastructure Monitoring', status: '${{ needs.infrastructure-monitoring.result }}' }
             ];
-            
+
             const successful = jobs.filter(job => job.status === 'success').length;
             const failed = jobs.filter(job => job.status === 'failure').length;
             const total = jobs.length;
-            
+
             const summary = `
             ## Daily Monitoring Report - ${new Date().toDateString()}
-            
+
             ### Overall Status: ${failed === 0 ? '✅ All Systems Operational' : '⚠️ Issues Detected'}
-            
+
             **Success Rate:** ${successful}/${total} (${Math.round(successful/total*100)}%)
-            
+
             ### Job Results
             ${jobs.map(job => `- ${job.name}: ${job.status === 'success' ? '✅' : job.status === 'failure' ? '❌' : '⏸️'} ${job.status}`).join('\n')}
-            
+
             ### Next Steps
             ${failed > 0 ? '- Review failed monitoring jobs\n- Check alert issues for details\n- Take corrective action as needed' : '- Continue monitoring\n- All systems operating normally'}
-            
+
             ---
             *Generated by automated monitoring workflow*
             `;
-            
+
             console.log(summary);
 
-      - name: Notify Slack - Daily Summary
-        if: vars.SLACK_WEBHOOK_URL != ''
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ needs.health-check.result == 'success' && needs.performance-check.result == 'success' && needs.security-monitoring.result == 'success' && needs.infrastructure-monitoring.result == 'success' && 'success' || 'warning' }}
-          channel: '#monitoring'
-          fields: repo,message,commit,author,action,eventName,ref,workflow
-          text: |
-            📊 Daily Monitoring Report
-            
-            Health: ${{ needs.health-check.result }}
-            Performance: ${{ needs.performance-check.result }}
-            Security: ${{ needs.security-monitoring.result }}
-            Infrastructure: ${{ needs.infrastructure-monitoring.result }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
+  # Slack notifications removed - not owned by this repo

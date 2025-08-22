@@ -8,29 +8,65 @@ This document explains how to configure and deploy two recommended MCP component
 Purpose: provide a minimal, secure, and reproducible pattern to expose database tools to MCP clients using WIF and Secret Manager.
 
 Prerequisites
+
 - GCP project configured and `WIF_PROVIDER` + `WIF_SERVICE_ACCOUNT` set in environment or Secret Manager.
 - `gcloud` CLI installed and configured for the target project/region.
+- `gcloud` CLI installed and authenticated locally (or WIF enabled in CI).
 - Secrets stored in Secret Manager (API keys or service account keys only when strictly required).
 
 Toolbox (genai-toolbox)
+
 - Repo: https://github.com/googleapis/genai-toolbox
 - What it does: Provides an MCP server that exposes curated database tools (BigQuery, AlloyDB, etc.) using a `tools.yaml` configuration.
 
 Quick start (high-level):
+
 1. Create a `tools.yaml` that defines the tools you want to expose (BigQuery, SQL adapters, etc.).
 2. Build / run Toolbox locally for testing using a WIF-backed service account or local ADC.
 3. Deploy Toolbox to Cloud Run for staging/production.
 
 Security notes:
+
 - Prefer Workload Identity Federation (WIF) with short-lived credentials.
+
+## Quick deploy (Cloud Run)
+
+1. Create the placeholder Secret Manager secrets used by the MCP config (example):
+
+```bash
+# from your workstation with gcloud authenticated
+PROJECT=your-project-id
+gcloud secrets create toolbox-tools-config-dev --replication-policy="automatic" || true
+echo '{"tools": []}' | gcloud secrets versions add toolbox-tools-config-dev --data-file=-
+```
+
+2. Use the provided script to build and deploy the toolbox to Cloud Run:
+
+```bash
+./scripts/deploy-toolbox.sh your-project-id us-central1 v1
+```
+
+3. Verify the service is up and healthy:
+
+```bash
+gcloud run services describe genai-toolbox --region us-central1
+gcloud run services list --region us-central1
+```
+
+## Notes
+
+- The deploy script uses WIF environment variables `WIF_PROVIDER` and `WIF_SERVICE_ACCOUNT` passed via environment or CI secrets. The service image is built via Cloud Build so WIF in CI provides the needed permissions without long-lived keys.
+- If you prefer local testing, run the toolbox container locally and point it at Secret Manager or a local config file. See upstream `genai-toolbox` README for runtime options.
 - Store any required secrets (e.g., API tokens) in Secret Manager and reference by name in `mcp-servers.config.json` via `serverOverrides.<env>.<server>.auth.secretName`.
 - Give the Toolbox service account the minimum IAM roles necessary (e.g., BigQuery Data Viewer / Job User for read-only queries).
 
 Cloud Run MCP (deployment pattern)
+
 - Repo: https://github.com/GoogleCloudPlatform/cloud-run-mcp
 - What it does: Provides a pattern to host MCP servers on Cloud Run and best practices to deploy with IAM and environment variables.
 
 Deployment summary:
+
 1. Build and containerize the MCP server you will run (Toolbox or custom server).
 2. Deploy to Cloud Run with `gcloud run deploy` and set `GOOGLE_CLOUD_PROJECT` and `GOOGLE_CLOUD_REGION` env vars.
 3. Use IAM to grant the calling service account permission to invoke the Cloud Run service.
@@ -73,12 +109,15 @@ Cloud Run (production example):
 ```
 
 Verification
+
 - Use `/health` and `/ready` endpoints configured in our monitoring to verify the deployed service responds.
 - Use a simple MCP client call to request a small tool operation (e.g., list datasets) to validate IAM and Toolbox configuration.
 
 Next steps (optional)
+
 - I can add the `serverOverrides` templates directly into `mcp-servers.config.json` for `development/staging/production` with placeholder secret names (I will not add actual secrets).
 - I can attempt to deploy a local instance of Toolbox if you provide GCP credentials or allow me to run `gcloud` here.
 
 Notes
+
 - All sensitive credentials must live in Secret Manager and be referenced by secret name only. Do not embed keys in repository files.

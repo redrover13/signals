@@ -26,8 +26,6 @@ on:
         default: false
         type: boolean
 
-env:
-
 permissions:
   contents: write
   issues: write
@@ -81,26 +79,26 @@ jobs:
             echo "Manual release triggered"
             exit 0
           fi
-          
+
           # Check for conventional commits since last release
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-          
+
           if [ -z "$LAST_TAG" ]; then
             echo "should-release=true" >> $GITHUB_OUTPUT
             echo "release-type=minor" >> $GITHUB_OUTPUT
             echo "No previous releases found, creating initial release"
             exit 0
           fi
-          
+
           # Analyze commits since last tag
           COMMITS=$(git log $LAST_TAG..HEAD --oneline --grep="^feat\|^fix\|^perf\|BREAKING CHANGE" || echo "")
-          
+
           if [ -z "$COMMITS" ]; then
             echo "should-release=false" >> $GITHUB_OUTPUT
             echo "No release-worthy commits found"
             exit 0
           fi
-          
+
           # Determine release type based on commits
           if echo "$COMMITS" | grep -q "BREAKING CHANGE"; then
             RELEASE_TYPE="major"
@@ -109,7 +107,7 @@ jobs:
           else
             RELEASE_TYPE="patch"
           fi
-          
+
           echo "should-release=true" >> $GITHUB_OUTPUT
           echo "release-type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
           echo "Release type determined: $RELEASE_TYPE"
@@ -121,10 +119,10 @@ jobs:
         run: |
           CURRENT_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "0.0.0")
           echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-          
+
           # Calculate next version based on release type
           RELEASE_TYPE="${{ steps.check.outputs.release-type }}"
-          
+
           if [ "$RELEASE_TYPE" = "auto" ]; then
             # Use semantic-release to determine version
             NEXT_VERSION=$(npx semantic-release --dry-run --no-ci | grep "next release version" | sed 's/.*version is \([0-9.]*\).*/\1/' || echo "$CURRENT_VERSION")
@@ -158,7 +156,7 @@ jobs:
               NEXT_VERSION="$MAJOR.$MINOR.$PATCH"
             fi
           fi
-          
+
           echo "next=$NEXT_VERSION" >> $GITHUB_OUTPUT
           echo "Next version: $NEXT_VERSION"
 
@@ -224,11 +222,11 @@ jobs:
       - name: Breaking change analysis
         run: |
           echo "Analyzing potential breaking changes..."
-          
+
           # This would typically use tools like api-extractor or similar
           # For now, we'll check commit messages
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-          
+
           if [ -n "$LAST_TAG" ]; then
             BREAKING_CHANGES=$(git log $LAST_TAG..HEAD --grep="BREAKING CHANGE" --oneline || echo "")
             
@@ -303,7 +301,7 @@ jobs:
         run: |
           LAST_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
           NEW_VERSION="${{ needs.prepare-release.outputs.next-version }}"
-          
+
           if [ -z "$LAST_TAG" ]; then
             CHANGELOG="## Initial Release\n\nFirst release of the Dulce de Saigon platform."
           else
@@ -334,15 +332,15 @@ jobs:
               CHANGELOG="$CHANGELOG### 🔧 Other Changes\n$OTHER\n\n"
             fi
           fi
-          
+
           # Add breaking changes if any
           if [ -f breaking-changes.txt ]; then
             CHANGELOG="$CHANGELOG### ⚠️ BREAKING CHANGES\n$(cat breaking-changes.txt)\n\n"
           fi
-          
+
           # Save changelog
           echo -e "$CHANGELOG" > RELEASE_CHANGELOG.md
-          
+
           # Set output for GitHub release
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
           echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
@@ -367,35 +365,35 @@ jobs:
           release_name: Release v${{ needs.prepare-release.outputs.next-version }}
           body: |
             # Release v${{ needs.prepare-release.outputs.next-version }}
-            
+
             **Release Type:** ${{ needs.prepare-release.outputs.release-type }}
             **Previous Version:** v${{ needs.prepare-release.outputs.current-version }}
             **Release Date:** ${{ github.event.head_commit.timestamp }}
-            
+
             ${{ steps.changelog.outputs.changelog }}
-            
+
             ## Installation
-            
+
             ```bash
             # Clone the repository
             git clone https://github.com/${{ github.repository }}.git
             cd ${{ github.event.repository.name }}
-            
+
             # Checkout this release
             git checkout v${{ needs.prepare-release.outputs.next-version }}
-            
+
             # Install dependencies
             pnpm install
             ```
-            
+
             ## Deployment
-            
+
             This release has been automatically deployed to production.
-            
+
             **API Endpoint:** https://dulce-api-dot-saigon-signals.asia-southeast1.run.app
-            
+
             ## Support
-            
+
             - 📖 [Documentation](https://github.com/${{ github.repository }}/wiki)
             - 🐛 [Report Issues](https://github.com/${{ github.repository }}/issues)
             - 💬 [Discussions](https://github.com/${{ github.repository }}/discussions)
@@ -426,7 +424,7 @@ jobs:
       - name: Update documentation
         run: |
           echo "Updating documentation for release v${{ needs.prepare-release.outputs.next-version }}"
-          
+
           # Update README with new version
           if [ -f README.md ]; then
             sed -i "s/Version: [0-9.]*/Version: ${{ needs.prepare-release.outputs.next-version }}/g" README.md || true
@@ -440,24 +438,24 @@ jobs:
             const title = `🎉 Release v${{ needs.prepare-release.outputs.next-version }} is now available!`;
             const body = `
             ## 🚀 New Release Available
-            
+
             **Version:** v${{ needs.prepare-release.outputs.next-version }}
             **Release Type:** ${{ needs.prepare-release.outputs.release-type }}
             **Release URL:** ${{ needs.create-release.outputs.release-url }}
-            
+
             ### What's New
             Check out the [full release notes](${{ needs.create-release.outputs.release-url }}) for detailed information about this release.
-            
+
             ### Deployment Status
             This release has been automatically deployed to production and is now live.
-            
+
             ### Feedback
             We'd love to hear your feedback! Please let us know if you encounter any issues or have suggestions for improvement.
-            
+
             ---
             *This announcement was automatically generated by our release workflow.*
             `;
-            
+
             // Create discussion for release announcement
             try {
               await github.rest.repos.createDiscussion({
@@ -472,23 +470,7 @@ jobs:
             }
 
       # Notify stakeholders
-      - name: Notify Slack
-        if: vars.SLACK_WEBHOOK_URL != ''
-        uses: 8398a7/action-slack@v3
-        with:
-          status: success
-          channel: '#releases'
-          fields: repo,message,commit,author,action,eventName,ref,workflow
-          text: |
-            🎉 New Release Published!
-            
-            **Version:** v${{ needs.prepare-release.outputs.next-version }}
-            **Type:** ${{ needs.prepare-release.outputs.release-type }}
-            **Release Notes:** ${{ needs.create-release.outputs.release-url }}
-            
-            The release has been deployed to production and is now live! 🚀
-        env:
-          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
+      # Slack notifications removed - not owned by this repo
 
       # Update project boards or issues
       - name: Update project management
@@ -497,7 +479,7 @@ jobs:
           script: |
             // Close issues that are fixed in this release
             const releaseTag = 'v${{ needs.prepare-release.outputs.next-version }}';
-            
+
             // Find issues with "fixed in next release" label
             const issues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
@@ -505,7 +487,7 @@ jobs:
               labels: 'fixed-in-next-release',
               state: 'open'
             });
-            
+
             for (const issue of issues.data) {
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
@@ -539,9 +521,9 @@ jobs:
       - name: Validate production deployment
         run: |
           API_URL="https://dulce-api-dot-saigon-signals.asia-southeast1.run.app"
-          
+
           echo "Validating production deployment..."
-          
+
           # Health check
           for i in {1..5}; do
             if curl -f -s "$API_URL/health" > /dev/null; then
@@ -555,7 +537,7 @@ jobs:
               sleep 30
             fi
           done
-          
+
           # Version check (if endpoint exists)
           VERSION_RESPONSE=$(curl -s "$API_URL/version" || echo "")
           if [ -n "$VERSION_RESPONSE" ]; then
@@ -566,12 +548,12 @@ jobs:
       - name: Production smoke tests
         run: |
           echo "Running smoke tests against production..."
-          
+
           API_URL="https://dulce-api-dot-saigon-signals.asia-southeast1.run.app"
-          
+
           # Basic endpoint tests
           curl -f "$API_URL/health" || exit 1
-          
+
           echo "✅ Production smoke tests passed"
 
       # Alert on validation failure
@@ -583,23 +565,23 @@ jobs:
             const title = `🚨 Release Validation Failed - v${{ needs.prepare-release.outputs.next-version }}`;
             const body = `
             ## Release Validation Failure
-            
+
             **Release:** v${{ needs.prepare-release.outputs.next-version }}
             **Time:** ${new Date().toISOString()}
             **Workflow:** ${context.workflow}
-            
+
             ### Issue
             The production deployment validation failed after release creation.
-            
+
             ### Action Required
             1. Check production deployment status
             2. Verify all services are running correctly
             3. Consider rollback if necessary
             4. Investigate root cause
-            
+
             **Release URL:** ${{ needs.create-release.outputs.release-url }}
             `;
-            
+
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,

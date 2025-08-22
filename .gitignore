@@ -85,3 +85,10 @@ servers/
 *.bin
 *.zip
 *.tar.gz
+
+
+.nx/cache
+.nx/workspace-data
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md

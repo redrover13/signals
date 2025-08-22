@@ -1,3 +1,27 @@
+export { getProjectId };
+/**
+ * Ensures a Pub/Sub topic exists (stub implementation).
+ * Replace with actual logic as needed.
+ */
+export async function ensureTopic(): Promise<void> {
+  // TODO: Implement actual topic creation logic using @google-cloud/pubsub
+  return;
+}
+
+/**
+ * Returns a Pub/Sub topic interface (stub implementation).
+ * Replace with actual logic as needed.
+ */
+export function getPubSub() {
+  return {
+    topic: (name: string) => ({
+      publishMessage: async (msg: any) => {
+        // TODO: Implement actual publish logic using @google-cloud/pubsub
+        return 'mock-message-id';
+      }
+    })
+  };
+}
 import { BigQuery } from '@google-cloud/bigquery';
 import { Storage } from '@google-cloud/storage';
 import { PredictionServiceClient, v1 } from '@google-cloud/aiplatform';
@@ -77,10 +101,9 @@ export async function getGoogleCloudCredentials(): Promise<{
       'Failed to get Google Cloud credentials. Check ADC setup. Lỗi lấy thông tin xác thực Google Cloud. Kiểm tra cài đặt ADC.',
       error
     );
-    throw new GcpInitializationError(
-      error.message ||
-        'An unknown error occurred while fetching GCP credentials.'
-    );
+  let msg = 'An unknown error occurred while fetching GCP credentials.';
+  if (error instanceof Error) msg = error.message;
+  throw new GcpInitializationError(msg);
   }
 }
 
@@ -98,9 +121,9 @@ export const getBigQueryClient = memoize((): BigQuery => {
     return new BigQuery({ projectId });
   } catch (error) {
     console.error('Failed to initialize BigQuery client. Lỗi khởi tạo BigQuery client.', error);
-    throw new GcpInitializationError(
-      error.message || 'Could not instantiate BigQuery client.'
-    );
+    let msg = 'Could not instantiate BigQuery client.';
+    if (error instanceof Error) msg = error.message;
+    throw new GcpInitializationError(msg);
   }
 });
 
@@ -118,9 +141,9 @@ export const getStorageClient = memoize((): Storage => {
     return new Storage({ projectId });
   } catch (error) {
     console.error('Failed to initialize Storage client. Lỗi khởi tạo Storage client.', error);
-    throw new GcpInitializationError(
-      error.message || 'Could not instantiate Storage client.'
-    );
+    let msg = 'Could not instantiate Storage client.';
+    if (error instanceof Error) msg = error.message;
+    throw new GcpInitializationError(msg);
   }
 });
 
@@ -143,9 +166,9 @@ export const getVertexAIClient = memoize(
       });
     } catch (error) {
       console.error('Failed to initialize Vertex AI client. Lỗi khởi tạo Vertex AI client.', error);
-      throw new GcpInitializationError(
-        error.message || 'Could not instantiate Vertex AI client.'
-      );
+      let msg = 'Could not instantiate Vertex AI client.';
+      if (error instanceof Error) msg = error.message;
+      throw new GcpInitializationError(msg);
     }
   }
 );

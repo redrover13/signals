@@ -2,7 +2,7 @@ import { PredictionServiceClient } from '@google-cloud/aiplatform';
 import {
   getVertexAIClient,
   getProjectId,
-} from '../../../../libs/gcp/src/index';
+} from '@dulce/gcp';
 
 /**
  * Configuration for the VertexAIClient.

@@ -1,0 +1,15 @@
+{
+  "name": "adk",
+  "sourceRoot": "adk",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "options": {
+        "outputPath": "dist/adk",
+        "main": "adk/index.ts",
+        "tsConfig": "adk/tsconfig.json"
+      }
+    }
+  }
+}

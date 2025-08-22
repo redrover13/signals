@@ -219,7 +219,7 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     priority: 7,
     connection: {
       type: 'http',
-      endpoint: process.env.CHROMA_URL || 'http://localhost:8000',
+  endpoint: process.env['CHROMA_URL'] || 'http://localhost:8000',
       timeout: 30000,
     },
     auth: {
@@ -458,8 +458,8 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
       failureThreshold: 3,
     },
     options: {
-      projectId: process.env.GCP_PROJECT_ID,
-      region: process.env.GCP_REGION || 'us-central1',
+  projectId: process.env['GCP_PROJECT_ID'],
+  region: process.env['GCP_REGION'] || 'us-central1',
     },
   },
 
@@ -719,8 +719,8 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
       failureThreshold: 3,
     },
     options: {
-      projectId: process.env.GCP_PROJECT_ID,
-      region: process.env.GCP_REGION || 'us-central1',
+  projectId: process.env['GCP_PROJECT_ID'],
+  region: process.env['GCP_REGION'] || 'us-central1',
       services: ['bigquery', 'storage', 'secretmanager', 'aiplatform'],
     },
   },

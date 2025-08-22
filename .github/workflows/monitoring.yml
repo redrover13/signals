@@ -30,7 +30,7 @@ on:
 
 env:
   NODE_VERSION: '20'
-  PNPM_VERSION: '9'
+  PNPM_VERSION: '10'
 
 permissions:
   contents: read
@@ -128,6 +128,12 @@ jobs:
             STATUS=$(gcloud functions describe "$function" --gen2 \
               --region=asia-southeast1 \
               --format="value(status)" 2>/dev/null || echo "NotFound")
+            
+            if [ "$STATUS" != "ACTIVE" ]; then
+              FAILED_FUNCTIONS+=("$function")
+              echo "❌ $function is not healthy: $STATUS"
+            else
+              echo "✅ $function is healthy"
             fi
           done
           

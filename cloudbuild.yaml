@@ -61,6 +61,7 @@ steps:
       - 'functions'
       - 'deploy'
       - 'event-parser'
+      - '--gen2'
       - '--project=${PROJECT_ID}'
       - '--region=${_GCP_REGION}'
       - '--trigger-topic=dulce.agents'

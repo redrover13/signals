@@ -1,98 +1,21 @@
 {
   "run": {
-    "command": "nx run-many --target=build --all",
-    "startTime": "2025-08-18T06:13:41.168Z",
-    "endTime": "2025-08-18T06:14:06.886Z",
+    "command": "nx build web --verbose",
+    "startTime": "2025-08-22T05:43:49.619Z",
+    "endTime": "2025-08-22T05:44:01.146Z",
     "inner": false
   },
   "tasks": [
     {
-      "taskId": "gcp:build",
-      "target": "build",
-      "projectName": "gcp",
-      "hash": "789339522777651076",
-      "startTime": "2025-08-18T06:13:41.252Z",
-      "endTime": "2025-08-18T06:13:41.287Z",
-      "params": "",
-      "cacheStatus": "local-cache-hit",
-      "status": 0
-    },
-    {
-      "taskId": "agents-lib:build",
-      "target": "build",
-      "projectName": "agents-lib",
-      "hash": "9766278641153596434",
-      "startTime": "2025-08-18T06:13:41.254Z",
-      "endTime": "2025-08-18T06:13:41.302Z",
-      "params": "",
-      "cacheStatus": "local-cache-hit",
-      "status": 0
-    },
-    {
-      "taskId": "event-parser:build",
-      "target": "build",
-      "projectName": "event-parser",
-      "hash": "5991840654138910761",
-      "startTime": "2025-08-18T06:13:41.336Z",
-      "endTime": "2025-08-18T06:13:41.361Z",
-      "params": "",
-      "cacheStatus": "local-cache-hit",
-      "status": 0
-    },
-    {
-      "taskId": "legacy-event-parser:build",
-      "target": "build",
-      "projectName": "legacy-event-parser",
-      "hash": "12657733771075397530",
-      "startTime": "2025-08-18T06:13:41.384Z",
-      "endTime": "2025-08-18T06:13:41.410Z",
-      "params": "",
-      "cacheStatus": "local-cache-hit",
-      "status": 0
-    },
-    {
-      "taskId": "api:build",
-      "target": "build",
-      "projectName": "api",
-      "hash": "9401825933421100422",
-      "startTime": "2025-08-18T06:13:41.255Z",
-      "endTime": "2025-08-18T06:13:50.120Z",
-      "params": "",
-      "cacheStatus": "cache-miss",
-      "status": 1
-    },
-    {
-      "taskId": "agents:build",
-      "target": "build",
-      "projectName": "agents",
-      "hash": "15679100808073141588",
-      "startTime": "2025-08-18T06:13:41.430Z",
-      "endTime": "2025-08-18T06:13:50.237Z",
-      "params": "",
-      "cacheStatus": "cache-miss",
-      "status": 1
-    },
-    {
       "taskId": "web:build:production",
       "target": "build",
       "projectName": "web",
-      "hash": "2419741385259504423",
-      "startTime": "2025-08-18T06:13:41.319Z",
-      "endTime": "2025-08-18T06:13:57.584Z",
+      "hash": "6414300357943287483",
+      "startTime": "2025-08-22T05:43:49.627Z",
+      "endTime": "2025-08-22T05:44:01.139Z",
       "params": "",
       "cacheStatus": "cache-miss",
-      "status": 1
-    },
-    {
-      "taskId": "mcp:build",
-      "target": "build",
-      "projectName": "mcp",
-      "hash": "6978209111618966658",
-      "startTime": "2025-08-18T06:13:50.121Z",
-      "endTime": "2025-08-18T06:14:06.885Z",
-      "params": "",
-      "cacheStatus": "cache-miss",
-      "status": 1
+      "status": 0
     }
   ]
 }

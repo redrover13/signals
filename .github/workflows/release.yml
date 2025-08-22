@@ -60,8 +60,6 @@ jobs:
 
       - name: Setup Node.js & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -180,8 +178,6 @@ jobs:
 
       - name: Setup Node.js & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -277,8 +273,6 @@ jobs:
 
       - name: Setup Node.js & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -479,6 +473,7 @@ jobs:
 
       # Notify stakeholders
       - name: Notify Slack
+        if: vars.SLACK_WEBHOOK_URL != ''
         uses: 8398a7/action-slack@v3
         with:
           status: success
@@ -493,7 +488,7 @@ jobs:
             
             The release has been deployed to production and is now live! 🚀
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
 
       # Update project boards or issues
       - name: Update project management

@@ -9,7 +9,6 @@ on:
 
 env:
   NODE_VERSION: '20'
-  PNPM_VERSION: '10'
   NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
   CI: true
   NX_DAEMON: false
@@ -48,8 +47,6 @@ jobs:
 
       - name: Setup Node.js & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -60,7 +57,7 @@ jobs:
       - name: Generate cache key
         id: cache-key
         run: |
-          echo "key=${{ runner.os }}-node-${{ env.NODE_VERSION }}-pnpm-${{ env.PNPM_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}" >> "$GITHUB_OUTPUT"
+          echo "key=${{ runner.os }}-node-${{ env.NODE_VERSION }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}" >> "$GITHUB_OUTPUT"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -88,7 +85,6 @@ jobs:
             .nx/cache
           key: ${{ steps.cache-key.outputs.key }}
           restore-keys: |
-            ${{ runner.os }}-node-${{ env.NODE_VERSION }}-pnpm-${{ env.PNPM_VERSION }}-
             ${{ runner.os }}-node-${{ env.NODE_VERSION }}-
 
   # ============================================================================
@@ -107,8 +103,6 @@ jobs:
 
       - name: Setup Node.js & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -169,8 +163,6 @@ jobs:
 
       - name: Setup Node.js & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -226,8 +218,6 @@ jobs:
 
       - name: Setup Node.js & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -291,8 +281,6 @@ jobs:
 
       - name: Setup Node.js & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -354,8 +342,6 @@ jobs:
 
       - name: Setup Node.js & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -471,8 +457,6 @@ jobs:
 
       - name: Setup Node.js & pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -503,23 +487,22 @@ jobs:
     if: always()
     steps:
       - name: Notify Slack on failure
-        if: failure()
+        if: failure() && vars.SLACK_WEBHOOK_URL != ''
         uses: 8398a7/action-slack@v3
         with:
           status: failure
           channel: '#ci-cd'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
 
       - name: Notify Slack on success
-        if: success() && github.ref == 'refs/heads/main'
+        if: success() && github.ref == 'refs/heads/main' && vars.SLACK_WEBHOOK_URL != ''
         uses: 8398a7/action-slack@v3
         with:
           status: success
           channel: '#deployments'
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_URL: ${{ vars.SLACK_WEBHOOK_URL }}
 
       # Update deployment status
       - name: Update deployment status

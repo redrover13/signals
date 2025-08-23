@@ -44,8 +44,10 @@ try {
   
   function testVNDFormatting() {
     const amount = 25000;
-    const formatted = amount.toLocaleString('vi-VN') + ' ₫';
-    return formatted === '25.000 ₫';
+    const formatted = new Intl.NumberFormat('vi-VN').format(amount) + ' ₫';
+    // Accept both normal and non-breaking/narrow spaces and dot grouping
+    const expected = /^25\.000\s?₫$/u;
+    return expected.test(formatted.replace(/\u00A0|\u202F/g, ' '));
   }
   
   function testPhoneNumberValidation() {

@@ -1,21 +1,9 @@
 {
   "run": {
-    "command": "nx run gcp:lint",
-    "startTime": "2025-08-22T08:15:57.555Z",
-    "endTime": "2025-08-22T08:15:57.581Z",
+    "command": "nx test mcp --skip-nx-cache",
+    "startTime": "2025-08-23T04:26:52.367Z",
+    "endTime": "2025-08-23T04:26:52.377Z",
     "inner": false
   },
-  "tasks": [
-    {
-      "taskId": "gcp:lint",
-      "target": "lint",
-      "projectName": "gcp",
-      "hash": "15155664017633900211",
-      "startTime": "2025-08-22T08:15:57.576Z",
-      "endTime": "2025-08-22T08:15:57.579Z",
-      "params": "",
-      "cacheStatus": "local-cache-hit",
-      "status": 0
-    }
-  ]
+  "tasks": []
 }

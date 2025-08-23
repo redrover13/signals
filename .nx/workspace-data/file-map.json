@@ -14,724 +14,6 @@
   },
   "nxJsonPlugins": [],
   "fileMap": {
-    "nonProjectFiles": [
-      {
-        "file": "infra/terraform/wif.tf",
-        "hash": "736777278131382268"
-      },
-      {
-        "file": "docs/legacy/saigon-signals/apps/api/Dockerfile",
-        "hash": "8103555982450745878"
-      },
-      {
-        "file": "PIPELINE_TEST.md",
-        "hash": "12730785709141680747"
-      },
-      {
-        "file": "docs/WIF_SETUP_GUIDE.md",
-        "hash": "329321195016226610"
-      },
-      {
-        "file": "scripts/setup-wif-github.sh",
-        "hash": "11207461228982266840"
-      },
-      {
-        "file": "tests/test_codacy_config.py",
-        "hash": "16489420330274966982"
-      },
-      {
-        "file": "adk/services/analytics/GA4_Implementation_Phase_2.md",
-        "hash": "6348438015846484218"
-      },
-      {
-        "file": "infra/terraform/provider.tf",
-        "hash": "9104835344810982445"
-      },
-      {
-        "file": "tests/test_github_workflows_unit.py",
-        "hash": "1234572789448493741"
-      },
-      {
-        "file": "adk/services/analytics/tracking/android-tracker.kt",
-        "hash": "16500946516256989545"
-      },
-      {
-        "file": "contrib/html.tpl",
-        "hash": "12358606086046353047"
-      },
-      {
-        "file": "infra/terraform/modules/cloud_sql/outputs.tf",
-        "hash": "7604912621006534266"
-      },
-      {
-        "file": ".codacy/cli.sh",
-        "hash": "1026308347676405730"
-      },
-      {
-        "file": ".gitignore",
-        "hash": "1995734660679085113"
-      },
-      {
-        "file": ".kilocode/rules/f&b-data-standards.md",
-        "hash": "3891336337992445458"
-      },
-      {
-        "file": "package.json",
-        "hash": "9592988121703974443"
-      },
-      {
-        "file": "docs/SECURITY_COMPLIANCE.md",
-        "hash": "3351329322596618899"
-      },
-      {
-        "file": "docs/kilocode-implementation.md",
-        "hash": "5191664729427522685"
-      },
-      {
-        "file": ".kilocode/rules/localized-instructions.md",
-        "hash": "12238683894002118509"
-      },
-      {
-        "file": "adk/services/analytics/dbt/saigon_signals_dbt/models/example/schema.yml",
-        "hash": "8417259762927288942"
-      },
-      {
-        "file": "scripts/setup-modern-cicd.sh",
-        "hash": "2006591059589864117"
-      },
-      {
-        "file": "adk/README.md",
-        "hash": "6290880135771531804"
-      },
-      {
-        "file": "scripts/deploy-toolbox.sh",
-        "hash": "18031328950188226094"
-      },
-      {
-        "file": "adk/services/analytics/dbt/saigon_signals_dbt/seeds/.gitkeep",
-        "hash": "3244421341483603138"
-      },
-      {
-        "file": "contrib/gitlab-codequality.tpl",
-        "hash": "2298900831619188693"
-      },
-      {
-        "file": ".npmrc",
-        "hash": "10609646072662821176"
-      },
-      {
-        "file": "docs/GIT_PUSH_PREPARATION_REPORT.md",
-        "hash": "1150544225153639965"
-      },
-      {
-        "file": "tests/__init__.py",
-        "hash": "3244421341483603138"
-      },
-      {
-        "file": "adk/services/analytics/dbt/saigon_signals_dbt/macros/.gitkeep",
-        "hash": "3244421341483603138"
-      },
-      {
-        "file": "LICENSE",
-        "hash": "1539253793410688689"
-      },
-      {
-        "file": "docs/MIGRATION_ENV_MAP.md",
-        "hash": "4540197300338221508"
-      },
-      {
-        "file": "adk/services/analytics/dbt/saigon_signals_dbt/snapshots/.gitkeep",
-        "hash": "3244421341483603138"
-      },
-      {
-        "file": "__tests__/github-workflows/workflowYaml.sample.yml",
-        "hash": "3271088299569529361"
-      },
-      {
-        "file": "scripts/verify-env.sh",
-        "hash": "17459139757643083494"
-      },
-      {
-        "file": ".github/workflows/ci.yml",
-        "hash": "12534096827976551309"
-      },
-      {
-        "file": "__tests__/github-workflows/docs/README.txt",
-        "hash": "1818091672050417180"
-      },
-      {
-        "file": "infra/terraform/modules/cloud_run/main.tf",
-        "hash": "11381765914686293004"
-      },
-      {
-        "file": "README.md",
-        "hash": "9868606566435187709"
-      },
-      {
-        "file": ".husky/commit-msg",
-        "hash": "11622855527704072305"
-      },
-      {
-        "file": "cloudbuild.yaml",
-        "hash": "10866780891455567014"
-      },
-      {
-        "file": "infra/terraform/iam.tf",
-        "hash": "4836758657395328825"
-      },
-      {
-        "file": "contrib/junit.tpl",
-        "hash": "2938714836648258818"
-      },
-      {
-        "file": "MCP_IMPLEMENTATION_SUMMARY.md",
-        "hash": "18007604339937967617"
-      },
-      {
-        "file": "adk/services/analytics/GA4_Implementation_Phase_4_PLAN.md",
-        "hash": "12291508972981194786"
-      },
-      {
-        "file": ".prettierrc",
-        "hash": "13875402611355503364"
-      },
-      {
-        "file": "pnpm-workspace.yaml",
-        "hash": "13790079124729980866"
-      },
-      {
-        "file": ".github/workflows/pr-validation.yml",
-        "hash": "3907360246345154593"
-      },
-      {
-        "file": "scripts/enable_apis.sh",
-        "hash": "12736209600496133585"
-      },
-      {
-        "file": "infra/terraform/README.md",
-        "hash": "8060538307044027328"
-      },
-      {
-        "file": "adk/services/analytics/dbt/.user.yml",
-        "hash": "12641057919161783200"
-      },
-      {
-        "file": "docs/MCP_INTEGRATION_GUIDE.md",
-        "hash": "17788750400013101227"
-      },
-      {
-        "file": "lint-staged.config.js",
-        "hash": "5231677182737734074"
-      },
-      {
-        "file": "estinationPath",
-        "hash": "16289582287151258234"
-      },
-      {
-        "file": "adk/services/analytics/tracking/ios-tracker.swift",
-        "hash": "1638651613120806471"
-      },
-      {
-        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/pubsub.tf",
-        "hash": "7101670553944425649"
-      },
-      {
-        "file": "adk/services/analytics/dbt/packages.yml",
-        "hash": "3806383187886795147"
-      },
-      {
-        "file": "docs/mcp-google-tooling.md",
-        "hash": "6364946120881412176"
-      },
-      {
-        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/iam.tf",
-        "hash": "7303113644520089165"
-      },
-      {
-        "file": "docs/COMPONENTS.md",
-        "hash": "1907077695446787752"
-      },
-      {
-        "file": "infra/terraform/variables.tf",
-        "hash": "12475806750889476076"
-      },
-      {
-        "file": ".github/workflows/monitoring.yml",
-        "hash": "184751298889218579"
-      },
-      {
-        "file": "create-provider.bat",
-        "hash": "11001865408313388536"
-      },
-      {
-        "file": ".husky/pre-commit",
-        "hash": "18416103059275581665"
-      },
-      {
-        "file": "__tests__/github-workflows/workflowYaml.test.js",
-        "hash": "18108184903177372135"
-      },
-      {
-        "file": "adk/services/vertex/index.ts",
-        "hash": "1259053160796083896"
-      },
-      {
-        "file": "cloudbuild-original.yaml.bak",
-        "hash": "13217223986750787705"
-      },
-      {
-        "file": "create-provider-fixed.bat",
-        "hash": "1932918030795203629"
-      },
-      {
-        "file": ".kilocode/rules/google-cloud-optimization.md",
-        "hash": "15165878371236140730"
-      },
-      {
-        "file": "nx.json",
-        "hash": "9704429451444440496"
-      },
-      {
-        "file": "docs/PIPELINE_TEST.md",
-        "hash": "2904594714207634919"
-      },
-      {
-        "file": ".github/workflows/deploy.yml",
-        "hash": "10388431908057462942"
-      },
-      {
-        "file": "adk/services/analytics/GA4_Implementation_Phase_3_PLAN.md",
-        "hash": "13721727940773210225"
-      },
-      {
-        "file": "docs/CRITICAL_IMPROVEMENTS.md",
-        "hash": "7688416494505119828"
-      },
-      {
-        "file": "infra/terraform/artifact_registry.tf",
-        "hash": "9873242368133518358"
-      },
-      {
-        "file": "mcp-servers.config.json",
-        "hash": "8480483476190517384"
-      },
-      {
-        "file": ".kilocode/rules/security-protocols.md",
-        "hash": "16723711407241759197"
-      },
-      {
-        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/README.md",
-        "hash": "8442520022156863374"
-      },
-      {
-        "file": "COPILOT_PROMPT_CI.md",
-        "hash": "12047367586848313995"
-      },
-      {
-        "file": "tests/test_cloudbuild_config.py",
-        "hash": "6888129688441616171"
-      },
-      {
-        "file": "NUL",
-        "hash": "3244421341483603138"
-      },
-      {
-        "file": "infra/terraform/COPILOT_PROMPT.md",
-        "hash": "16165539838562057959"
-      },
-      {
-        "file": "infra/terraform/bigquery.tf",
-        "hash": "16668316252780583477"
-      },
-      {
-        "file": "infra/terraform/modules/cloud_sql/variables.tf",
-        "hash": "9126733433653344333"
-      },
-      {
-        "file": "adk/services/analytics/dbt/saigon_signals_dbt/.gitignore",
-        "hash": "9328185637958179232"
-      },
-      {
-        "file": "docs/DIAGRAMS.md",
-        "hash": "9487884018824420294"
-      },
-      {
-        "file": "CI_SETUP_GUIDE.md",
-        "hash": "10557809243234003524"
-      },
-      {
-        "file": "adk/services/analytics/GA4_Implementation_Phase_3.md",
-        "hash": "9719482758710040588"
-      },
-      {
-        "file": "adk/services/vertex/1754982644143-index.ts",
-        "hash": "8784044008208896975"
-      },
-      {
-        "file": ".codacy.yml",
-        "hash": "4458823662345982620"
-      },
-      {
-        "file": "tests/test_cloudbuild.py",
-        "hash": "9500774185357552120"
-      },
-      {
-        "file": ".kilocode/rules/memory-bank/data-governance.md",
-        "hash": "18027381609126153677"
-      },
-      {
-        "file": "infra/terraform/agents_service_account.tf",
-        "hash": "5179726379366634213"
-      },
-      {
-        "file": "commitlint.config.js",
-        "hash": "14226619119765174880"
-      },
-      {
-        "file": "scripts/setup-wif-local.bat",
-        "hash": "13586198102871700449"
-      },
-      {
-        "file": "infra/terraform/modules/cloud_sql/main.tf",
-        "hash": "8033312478550386909"
-      },
-      {
-        "file": "docs/VIETNAMESE_LOCALIZATION.md",
-        "hash": "4928801499054552619"
-      },
-      {
-        "file": ".gitattributes",
-        "hash": "107764069010930236"
-      },
-      {
-        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/functions.tf",
-        "hash": "13416772756733463357"
-      },
-      {
-        "file": "adk/services/analytics/dbt/saigon_signals_dbt/README.md",
-        "hash": "11988232824804989456"
-      },
-      {
-        "file": "tsconfig.base.json",
-        "hash": "10469642633181101732"
-      },
-      {
-        "file": ".kilocode/rules/memory-bank/technical-architecture.md",
-        "hash": "15802643566693692475"
-      },
-      {
-        "file": "docs/CI_CD_WORKFLOW.md",
-        "hash": "11001078088304453109"
-      },
-      {
-        "file": "docs/SECRETS.md",
-        "hash": "17833698757531402688"
-      },
-      {
-        "file": "adk/services/analytics/dbt/saigon_signals_dbt/models/example/my_first_dbt_model.sql",
-        "hash": "4075391124059315668"
-      },
-      {
-        "file": "link-github-repo.bat",
-        "hash": "17606022364094505046"
-      },
-      {
-        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/main.tf",
-        "hash": "20481220203980109"
-      },
-      {
-        "file": "STEP_BY_STEP_CI.md",
-        "hash": "7568198845922860866"
-      },
-      {
-        "file": "infra/terraform/modules/cloud_run/outputs.tf",
-        "hash": "16919777784067928085"
-      },
-      {
-        "file": "scripts/fix-wif-windows.ps1",
-        "hash": "4556913060181844260"
-      },
-      {
-        "file": ".nvmrc",
-        "hash": "15341889625944712743"
-      },
-      {
-        "file": "setup-wif-complete.bat",
-        "hash": "16768440283436705367"
-      },
-      {
-        "file": ".kilocode/rules/memory-bank/google-cloud-integration.md",
-        "hash": "13351292395495888234"
-      },
-      {
-        "file": "docs/ARCHITECTURE.md",
-        "hash": "12659354885142461709"
-      },
-      {
-        "file": "docs/AGENTS_WORKFLOW_GUIDE.md",
-        "hash": "7792602457439524340"
-      },
-      {
-        "file": "tools/__tests__/yamlLoader.js",
-        "hash": "4437120564280064997"
-      },
-      {
-        "file": "infra/terraform/v_site_view.tf",
-        "hash": "17867687404170643353"
-      },
-      {
-        "file": ".github/copilot-instructions.md",
-        "hash": "2392655004933152538"
-      },
-      {
-        "file": "examples/mcp-demo.ts",
-        "hash": "11671193365580342313"
-      },
-      {
-        "file": "docs/DEVELOPMENT_WORKFLOW.md",
-        "hash": "17210579584206505236"
-      },
-      {
-        "file": "adk/services/analytics/dbt/saigon_signals_dbt/dbt_project.yml",
-        "hash": "1273632063089512515"
-      },
-      {
-        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/bigquery.tf",
-        "hash": "15495772703651613188"
-      },
-      {
-        "file": "infra/terraform/secrets.tf",
-        "hash": "6193777309604861849"
-      },
-      {
-        "file": ".github/workflows/codeql.yml",
-        "hash": "11342143269943371580"
-      },
-      {
-        "file": "migrations.json",
-        "hash": "15705494035716829551"
-      },
-      {
-        "file": "COPILOT_GUIDE.md",
-        "hash": "18252963461425202871"
-      },
-      {
-        "file": "docs/CI_CD_PIPELINE.md",
-        "hash": "5672618009395239755"
-      },
-      {
-        "file": "adk/services/analytics/dbt/saigon_signals_dbt/analyses/.gitkeep",
-        "hash": "3244421341483603138"
-      },
-      {
-        "file": "pnpm-lock.yaml",
-        "hash": "14613482824310872129"
-      },
-      {
-        "file": "adk/services/analytics/dbt/saigon_signals_dbt/tests/.gitkeep",
-        "hash": "3244421341483603138"
-      },
-      {
-        "file": ".kilocode/rules/data-governance.md",
-        "hash": "11245192697374843745"
-      },
-      {
-        "file": "docs/DEPLOYMENT.md",
-        "hash": "12701558703215720461"
-      },
-      {
-        "file": "infra/terraform/backend.tf",
-        "hash": "5575632995240131502"
-      },
-      {
-        "file": "tests/e2e_workflow.py",
-        "hash": "11915969753564346352"
-      },
-      {
-        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/gcs.tf",
-        "hash": "4585117466723771382"
-      },
-      {
-        "file": "adk/services/analytics/GA4_Implementation_Phase_2_PLAN.md",
-        "hash": "11979416304058536752"
-      },
-      {
-        "file": "docs/legacy/saigon-signals/libs/gcp/README.md",
-        "hash": "2893186334432708647"
-      },
-      {
-        "file": "infra/terraform/main.tf",
-        "hash": "299698814717760935"
-      },
-      {
-        "file": ".github/COPILOT_DOC_REVIEW.md",
-        "hash": "6783828047881246632"
-      },
-      {
-        "file": "infra/terraform/agents_infra.tf",
-        "hash": "9996616342578139982"
-      },
-      {
-        "file": "adk/services/analytics/dbt/dbt_project.yml",
-        "hash": "4080476380513896012"
-      },
-      {
-        "file": "docs/CI_CD_MIGRATION_GUIDE.md",
-        "hash": "1767053183741221624"
-      },
-      {
-        "file": "scripts/cleanup-ci.sh",
-        "hash": "16269623463364024472"
-      },
-      {
-        "file": ".eslintrc.json",
-        "hash": "14046805285034164182"
-      },
-      {
-        "file": "infra/terraform/modules/cloud_run/variables.tf",
-        "hash": "5444102554783533433"
-      },
-      {
-        "file": ".github/workflows/release.yml",
-        "hash": "800256498548666251"
-      },
-      {
-        "file": ".editorconfig",
-        "hash": "411347901149957151"
-      },
-      {
-        "file": "adk/services/analytics/event-taxonomy.yaml",
-        "hash": "3770914240831401697"
-      },
-      {
-        "file": "tests/test_package_json.py",
-        "hash": "14140873122369447466"
-      },
-      {
-        "file": "tests/README.md",
-        "hash": "3523786783330245268"
-      },
-      {
-        "file": ".github/workflows/README.md",
-        "hash": "152446210650675483"
-      },
-      {
-        "file": "docs/DEPLOY_CHECKLIST.md",
-        "hash": "4143531383670455382"
-      },
-      {
-        "file": "tests/test_project_json.py",
-        "hash": "4107690893735379129"
-      },
-      {
-        "file": "jfrog-install.sh",
-        "hash": "13989858741757812584"
-      },
-      {
-        "file": "scripts/data_ingestion.py",
-        "hash": "14097295115637491816"
-      },
-      {
-        "file": ".secretlintrc.json",
-        "hash": "6018282623876076270"
-      },
-      {
-        "file": "adk/services/analytics/tracking/core-events.ts",
-        "hash": "4447231945740271363"
-      },
-      {
-        "file": "__tests__/github-workflows/workflowValidator.js",
-        "hash": "10568011758073816593"
-      },
-      {
-        "file": "docs/TROUBLESHOOTING.md",
-        "hash": "17691719576568404758"
-      },
-      {
-        "file": ".kilocode/rules/memory-bank/brief.md",
-        "hash": "14186660626872060503"
-      },
-      {
-        "file": "adk/services/analytics/GA4_Implementation_Phase_4.md",
-        "hash": "9648212565216805069"
-      },
-      {
-        "file": "docs/typed_views/v_site_view.sql",
-        "hash": "10915531799210220311"
-      },
-      {
-        "file": ".kilocode/rules/vietnamese-compliance.md",
-        "hash": "14449847640871785343"
-      },
-      {
-        "file": "docs/SEMANTIC_SEARCH_API.md",
-        "hash": "6605084618938508741"
-      },
-      {
-        "file": ".codacy/codacy.yaml",
-        "hash": "12369131117871939215"
-      },
-      {
-        "file": "docs/legacy/saigon-signals/.devcontainer/Dockerfile",
-        "hash": "13475184571217704797"
-      },
-      {
-        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/outputs.tf",
-        "hash": "18110964327495333615"
-      },
-      {
-        "file": "adk/services/analytics/dbt/saigon_signals_dbt/models/example/my_second_dbt_model.sql",
-        "hash": "17703395223883931898"
-      },
-      {
-        "file": "scripts/test-mcp-servers.js",
-        "hash": "4707710568518021700"
-      },
-      {
-        "file": "adk/services/analytics/tracking/web-tracker.ts",
-        "hash": "12297003702828537956"
-      },
-      {
-        "file": "scripts/fix-wif-windows.cmd",
-        "hash": "8216105717025734381"
-      },
-      {
-        "file": "tests/test_github_workflows.py",
-        "hash": "2911837582465916524"
-      },
-      {
-        "file": ".kilocode/rules/memory-bank/vietnamese-market-context.md",
-        "hash": "12248571381637499454"
-      },
-      {
-        "file": "check-and-fix-wif.bat",
-        "hash": "7505297872489851051"
-      },
-      {
-        "file": "contrib/gitlab.tpl",
-        "hash": "7619220181411711163"
-      },
-      {
-        "file": "pmd.xml",
-        "hash": "14307645218378886744"
-      },
-      {
-        "file": "docs/AGENT_GCP_INTEGRATION.md",
-        "hash": "8665187724584917097"
-      },
-      {
-        "file": "contrib/asff.tpl",
-        "hash": "1091033208497073207"
-      },
-      {
-        "file": "scripts/update-secrets.sh",
-        "hash": "8259477186019554488"
-      },
-      {
-        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/variables.tf",
-        "hash": "2770556354555998855"
-      }
-    ],
     "projectFileMap": {
       "event-parser": [
         {
@@ -756,6 +38,166 @@
         {
           "file": "apps/event-parser/project.json",
           "hash": "5913538667647741326"
+        }
+      ],
+      "legacy-event-parser": [
+        {
+          "file": "apps/legacy_event_parser/index.js",
+          "hash": "8111006878647914647",
+          "deps": [
+            "npm:@google-cloud/pubsub",
+            "npm:@google-cloud/bigquery"
+          ]
+        },
+        {
+          "file": "apps/legacy_event_parser/package.json",
+          "hash": "4475964162858051640",
+          "deps": [
+            "npm:@google-cloud/functions-framework",
+            "npm:@google-cloud/pubsub",
+            "npm:@google-cloud/bigquery"
+          ]
+        },
+        {
+          "file": "apps/legacy_event_parser/project.json",
+          "hash": "12204104461009431540"
+        }
+      ],
+      "mcp": [
+        {
+          "file": "libs/mcp/README.md",
+          "hash": "4496346652772077061"
+        },
+        {
+          "file": "libs/mcp/project.json",
+          "hash": "5568977903714663353"
+        },
+        {
+          "file": "libs/mcp/src/index.ts",
+          "hash": "361260212127963270"
+        },
+        {
+          "file": "libs/mcp/src/lib/clients/mcp-client.service.ts",
+          "hash": "15245971964113929811"
+        },
+        {
+          "file": "libs/mcp/src/lib/clients/request-router.service.ts",
+          "hash": "17581107217021995129"
+        },
+        {
+          "file": "libs/mcp/src/lib/clients/server-health.service.ts",
+          "hash": "12682037362803371225"
+        },
+        {
+          "file": "libs/mcp/src/lib/config/environment-config.ts",
+          "hash": "8865878833108213536"
+        },
+        {
+          "file": "libs/mcp/src/lib/config/mcp-config.schema.ts",
+          "hash": "11762348952682604943"
+        },
+        {
+          "file": "libs/mcp/src/lib/config/server-registry.ts",
+          "hash": "13977203452203219380"
+        },
+        {
+          "file": "libs/mcp/src/lib/mcp.service.ts",
+          "hash": "1474040779072228292"
+        },
+        {
+          "file": "libs/mcp/src/lib/utils/mcp-utils.ts",
+          "hash": "17191469979326991522"
+        },
+        {
+          "file": "libs/mcp/tsconfig.json",
+          "hash": "4834719271918839137"
+        },
+        {
+          "file": "libs/mcp/tsconfig.lib.json",
+          "hash": "4312518675533582045"
+        }
+      ],
+      "gcp": [
+        {
+          "file": "libs/gcp/README.md",
+          "hash": "17090715588258430041"
+        },
+        {
+          "file": "libs/gcp/ga4-client.ts",
+          "hash": "439894361220441425",
+          "deps": [
+            "npm:@google-analytics/data"
+          ]
+        },
+        {
+          "file": "libs/gcp/manual-data.ts",
+          "hash": "4614906744381935418"
+        },
+        {
+          "file": "libs/gcp/project.json",
+          "hash": "8723406835173922789"
+        },
+        {
+          "file": "libs/gcp/src/index.d.ts",
+          "hash": "12876032997637870925"
+        },
+        {
+          "file": "libs/gcp/src/index.js",
+          "hash": "12611208744080212336"
+        },
+        {
+          "file": "libs/gcp/src/index.js.map",
+          "hash": "4367282471376217120"
+        },
+        {
+          "file": "libs/gcp/src/index.ts",
+          "hash": "10336146786281506629",
+          "deps": [
+            "npm:@google-cloud/bigquery",
+            "npm:@google-cloud/storage",
+            "npm:@google-cloud/aiplatform",
+            "npm:google-auth-library",
+            "npm:lodash"
+          ]
+        },
+        {
+          "file": "libs/gcp/tsconfig.json",
+          "hash": "10430309696173710587"
+        },
+        {
+          "file": "libs/gcp/tsconfig.lib.json",
+          "hash": "13291289617200625598"
+        }
+      ],
+      "agents": [
+        {
+          "file": "apps/agents/COPILOT_PROMPT.md",
+          "hash": "8284939958649031614"
+        },
+        {
+          "file": "apps/agents/Dockerfile",
+          "hash": "13481554108116628881"
+        },
+        {
+          "file": "apps/agents/README.md",
+          "hash": "16560707230609139321"
+        },
+        {
+          "file": "apps/agents/project.json",
+          "hash": "5764686364660039331"
+        },
+        {
+          "file": "apps/agents/src/main.ts",
+          "hash": "12334308586246898349",
+          "deps": [
+            "npm:fastify",
+            "agents-lib",
+            "api"
+          ]
+        },
+        {
+          "file": "apps/agents/tsconfig.json",
+          "hash": "1733962632352765753"
         }
       ],
       "web": [
@@ -824,140 +266,6 @@
           "hash": "15337167957341348420"
         }
       ],
-      "agents": [
-        {
-          "file": "apps/agents/COPILOT_PROMPT.md",
-          "hash": "8284939958649031614"
-        },
-        {
-          "file": "apps/agents/Dockerfile",
-          "hash": "13481554108116628881"
-        },
-        {
-          "file": "apps/agents/README.md",
-          "hash": "16560707230609139321"
-        },
-        {
-          "file": "apps/agents/project.json",
-          "hash": "5764686364660039331"
-        },
-        {
-          "file": "apps/agents/src/main.ts",
-          "hash": "12334308586246898349",
-          "deps": [
-            "npm:fastify",
-            "agents-lib",
-            "api"
-          ]
-        },
-        {
-          "file": "apps/agents/tsconfig.json",
-          "hash": "1733962632352765753"
-        }
-      ],
-      "agents-lib": [
-        {
-          "file": "libs/agents/README.md",
-          "hash": "3757155501495552222"
-        },
-        {
-          "file": "libs/agents/project.json",
-          "hash": "12929525747964891097"
-        },
-        {
-          "file": "libs/agents/src/index.ts",
-          "hash": "13677317759222400303"
-        },
-        {
-          "file": "libs/agents/src/tools.ts",
-          "hash": "9078202335274891687"
-        },
-        {
-          "file": "libs/agents/tsconfig.json",
-          "hash": "16905144177106485730"
-        },
-        {
-          "file": "libs/agents/tsconfig.lib.json",
-          "hash": "15834690189997340113"
-        }
-      ],
-      "mcp": [
-        {
-          "file": "libs/mcp/README.md",
-          "hash": "4496346652772077061"
-        },
-        {
-          "file": "libs/mcp/project.json",
-          "hash": "5568977903714663353"
-        },
-        {
-          "file": "libs/mcp/src/index.ts",
-          "hash": "361260212127963270"
-        },
-        {
-          "file": "libs/mcp/src/lib/clients/mcp-client.service.ts",
-          "hash": "15245971964113929811"
-        },
-        {
-          "file": "libs/mcp/src/lib/clients/request-router.service.ts",
-          "hash": "17581107217021995129"
-        },
-        {
-          "file": "libs/mcp/src/lib/clients/server-health.service.ts",
-          "hash": "12682037362803371225"
-        },
-        {
-          "file": "libs/mcp/src/lib/config/environment-config.ts",
-          "hash": "8865878833108213536"
-        },
-        {
-          "file": "libs/mcp/src/lib/config/mcp-config.schema.ts",
-          "hash": "11762348952682604943"
-        },
-        {
-          "file": "libs/mcp/src/lib/config/server-registry.ts",
-          "hash": "13977203452203219380"
-        },
-        {
-          "file": "libs/mcp/src/lib/mcp.service.ts",
-          "hash": "1474040779072228292"
-        },
-        {
-          "file": "libs/mcp/src/lib/utils/mcp-utils.ts",
-          "hash": "17191469979326991522"
-        },
-        {
-          "file": "libs/mcp/tsconfig.json",
-          "hash": "4834719271918839137"
-        },
-        {
-          "file": "libs/mcp/tsconfig.lib.json",
-          "hash": "4312518675533582045"
-        }
-      ],
-      "legacy-event-parser": [
-        {
-          "file": "apps/legacy_event_parser/index.js",
-          "hash": "8111006878647914647",
-          "deps": [
-            "npm:@google-cloud/pubsub",
-            "npm:@google-cloud/bigquery"
-          ]
-        },
-        {
-          "file": "apps/legacy_event_parser/package.json",
-          "hash": "4475964162858051640",
-          "deps": [
-            "npm:@google-cloud/functions-framework",
-            "npm:@google-cloud/pubsub",
-            "npm:@google-cloud/bigquery"
-          ]
-        },
-        {
-          "file": "apps/legacy_event_parser/project.json",
-          "hash": "12204104461009431540"
-        }
-      ],
       "api": [
         {
           "file": "apps/api/COPILOT_PROMPT.md",
@@ -1006,58 +314,750 @@
           "hash": "14641593147291263924"
         }
       ],
-      "gcp": [
+      "agents-lib": [
         {
-          "file": "libs/gcp/README.md",
-          "hash": "17090715588258430041"
+          "file": "libs/agents/README.md",
+          "hash": "3757155501495552222"
         },
         {
-          "file": "libs/gcp/ga4-client.ts",
-          "hash": "439894361220441425",
-          "deps": [
-            "npm:@google-analytics/data"
-          ]
+          "file": "libs/agents/project.json",
+          "hash": "12929525747964891097"
         },
         {
-          "file": "libs/gcp/manual-data.ts",
-          "hash": "4614906744381935418"
+          "file": "libs/agents/src/index.ts",
+          "hash": "13677317759222400303"
         },
         {
-          "file": "libs/gcp/project.json",
-          "hash": "8723406835173922789"
+          "file": "libs/agents/src/tools.ts",
+          "hash": "9078202335274891687"
         },
         {
-          "file": "libs/gcp/src/index.d.ts",
-          "hash": "12876032997637870925"
+          "file": "libs/agents/tsconfig.json",
+          "hash": "16905144177106485730"
         },
         {
-          "file": "libs/gcp/src/index.js",
-          "hash": "12611208744080212336"
-        },
-        {
-          "file": "libs/gcp/src/index.js.map",
-          "hash": "4367282471376217120"
-        },
-        {
-          "file": "libs/gcp/src/index.ts",
-          "hash": "10336146786281506629",
-          "deps": [
-            "npm:@google-cloud/bigquery",
-            "npm:@google-cloud/storage",
-            "npm:@google-cloud/aiplatform",
-            "npm:google-auth-library",
-            "npm:lodash"
-          ]
-        },
-        {
-          "file": "libs/gcp/tsconfig.json",
-          "hash": "10430309696173710587"
-        },
-        {
-          "file": "libs/gcp/tsconfig.lib.json",
-          "hash": "13291289617200625598"
+          "file": "libs/agents/tsconfig.lib.json",
+          "hash": "15834690189997340113"
         }
       ]
-    }
+    },
+    "nonProjectFiles": [
+      {
+        "file": ".codacy.yml",
+        "hash": "4458823662345982620"
+      },
+      {
+        "file": ".codacy/cli.sh",
+        "hash": "1026308347676405730"
+      },
+      {
+        "file": ".codacy/codacy.yaml",
+        "hash": "12369131117871939215"
+      },
+      {
+        "file": ".editorconfig",
+        "hash": "411347901149957151"
+      },
+      {
+        "file": ".eslintrc.json",
+        "hash": "14046805285034164182"
+      },
+      {
+        "file": ".gitattributes",
+        "hash": "107764069010930236"
+      },
+      {
+        "file": ".github/COPILOT_DOC_REVIEW.md",
+        "hash": "6783828047881246632"
+      },
+      {
+        "file": ".github/copilot-instructions.md",
+        "hash": "2392655004933152538"
+      },
+      {
+        "file": ".github/workflows/README.md",
+        "hash": "152446210650675483"
+      },
+      {
+        "file": ".github/workflows/ci.yml",
+        "hash": "12534096827976551309"
+      },
+      {
+        "file": ".github/workflows/codeql.yml",
+        "hash": "11342143269943371580"
+      },
+      {
+        "file": ".github/workflows/deploy.yml",
+        "hash": "10388431908057462942"
+      },
+      {
+        "file": ".github/workflows/monitoring.yml",
+        "hash": "184751298889218579"
+      },
+      {
+        "file": ".github/workflows/pr-validation.yml",
+        "hash": "3907360246345154593"
+      },
+      {
+        "file": ".github/workflows/release.yml",
+        "hash": "800256498548666251"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "1995734660679085113"
+      },
+      {
+        "file": ".husky/commit-msg",
+        "hash": "11622855527704072305"
+      },
+      {
+        "file": ".husky/pre-commit",
+        "hash": "18416103059275581665"
+      },
+      {
+        "file": ".kilocode/rules/data-governance.md",
+        "hash": "11245192697374843745"
+      },
+      {
+        "file": ".kilocode/rules/f&b-data-standards.md",
+        "hash": "3891336337992445458"
+      },
+      {
+        "file": ".kilocode/rules/google-cloud-optimization.md",
+        "hash": "15165878371236140730"
+      },
+      {
+        "file": ".kilocode/rules/localized-instructions.md",
+        "hash": "12238683894002118509"
+      },
+      {
+        "file": ".kilocode/rules/memory-bank/brief.md",
+        "hash": "14186660626872060503"
+      },
+      {
+        "file": ".kilocode/rules/memory-bank/data-governance.md",
+        "hash": "18027381609126153677"
+      },
+      {
+        "file": ".kilocode/rules/memory-bank/google-cloud-integration.md",
+        "hash": "13351292395495888234"
+      },
+      {
+        "file": ".kilocode/rules/memory-bank/technical-architecture.md",
+        "hash": "15802643566693692475"
+      },
+      {
+        "file": ".kilocode/rules/memory-bank/vietnamese-market-context.md",
+        "hash": "12248571381637499454"
+      },
+      {
+        "file": ".kilocode/rules/security-protocols.md",
+        "hash": "16723711407241759197"
+      },
+      {
+        "file": ".kilocode/rules/vietnamese-compliance.md",
+        "hash": "14449847640871785343"
+      },
+      {
+        "file": ".npmrc",
+        "hash": "10609646072662821176"
+      },
+      {
+        "file": ".nvmrc",
+        "hash": "15341889625944712743"
+      },
+      {
+        "file": ".prettierrc",
+        "hash": "13875402611355503364"
+      },
+      {
+        "file": ".secretlintrc.json",
+        "hash": "6018282623876076270"
+      },
+      {
+        "file": "CI_SETUP_GUIDE.md",
+        "hash": "10557809243234003524"
+      },
+      {
+        "file": "COPILOT_GUIDE.md",
+        "hash": "18252963461425202871"
+      },
+      {
+        "file": "COPILOT_PROMPT_CI.md",
+        "hash": "12047367586848313995"
+      },
+      {
+        "file": "LICENSE",
+        "hash": "1539253793410688689"
+      },
+      {
+        "file": "MCP_IMPLEMENTATION_SUMMARY.md",
+        "hash": "18007604339937967617"
+      },
+      {
+        "file": "NUL",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "PIPELINE_TEST.md",
+        "hash": "12730785709141680747"
+      },
+      {
+        "file": "README.md",
+        "hash": "9868606566435187709"
+      },
+      {
+        "file": "STEP_BY_STEP_CI.md",
+        "hash": "7568198845922860866"
+      },
+      {
+        "file": "__tests__/github-workflows/docs/README.txt",
+        "hash": "1818091672050417180"
+      },
+      {
+        "file": "__tests__/github-workflows/workflowValidator.js",
+        "hash": "10568011758073816593"
+      },
+      {
+        "file": "__tests__/github-workflows/workflowYaml.sample.yml",
+        "hash": "3271088299569529361"
+      },
+      {
+        "file": "__tests__/github-workflows/workflowYaml.test.js",
+        "hash": "18108184903177372135"
+      },
+      {
+        "file": "adk/README.md",
+        "hash": "6290880135771531804"
+      },
+      {
+        "file": "adk/services/analytics/GA4_Implementation_Phase_2.md",
+        "hash": "6348438015846484218"
+      },
+      {
+        "file": "adk/services/analytics/GA4_Implementation_Phase_2_PLAN.md",
+        "hash": "11979416304058536752"
+      },
+      {
+        "file": "adk/services/analytics/GA4_Implementation_Phase_3.md",
+        "hash": "9719482758710040588"
+      },
+      {
+        "file": "adk/services/analytics/GA4_Implementation_Phase_3_PLAN.md",
+        "hash": "13721727940773210225"
+      },
+      {
+        "file": "adk/services/analytics/GA4_Implementation_Phase_4.md",
+        "hash": "9648212565216805069"
+      },
+      {
+        "file": "adk/services/analytics/GA4_Implementation_Phase_4_PLAN.md",
+        "hash": "12291508972981194786"
+      },
+      {
+        "file": "adk/services/analytics/dbt/.user.yml",
+        "hash": "12641057919161783200"
+      },
+      {
+        "file": "adk/services/analytics/dbt/dbt_project.yml",
+        "hash": "4080476380513896012"
+      },
+      {
+        "file": "adk/services/analytics/dbt/packages.yml",
+        "hash": "3806383187886795147"
+      },
+      {
+        "file": "adk/services/analytics/dbt/saigon_signals_dbt/.gitignore",
+        "hash": "9328185637958179232"
+      },
+      {
+        "file": "adk/services/analytics/dbt/saigon_signals_dbt/README.md",
+        "hash": "11988232824804989456"
+      },
+      {
+        "file": "adk/services/analytics/dbt/saigon_signals_dbt/analyses/.gitkeep",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "adk/services/analytics/dbt/saigon_signals_dbt/dbt_project.yml",
+        "hash": "1273632063089512515"
+      },
+      {
+        "file": "adk/services/analytics/dbt/saigon_signals_dbt/macros/.gitkeep",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "adk/services/analytics/dbt/saigon_signals_dbt/models/example/my_first_dbt_model.sql",
+        "hash": "4075391124059315668"
+      },
+      {
+        "file": "adk/services/analytics/dbt/saigon_signals_dbt/models/example/my_second_dbt_model.sql",
+        "hash": "17703395223883931898"
+      },
+      {
+        "file": "adk/services/analytics/dbt/saigon_signals_dbt/models/example/schema.yml",
+        "hash": "8417259762927288942"
+      },
+      {
+        "file": "adk/services/analytics/dbt/saigon_signals_dbt/seeds/.gitkeep",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "adk/services/analytics/dbt/saigon_signals_dbt/snapshots/.gitkeep",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "adk/services/analytics/dbt/saigon_signals_dbt/tests/.gitkeep",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "adk/services/analytics/event-taxonomy.yaml",
+        "hash": "3770914240831401697"
+      },
+      {
+        "file": "adk/services/analytics/tracking/android-tracker.kt",
+        "hash": "16500946516256989545"
+      },
+      {
+        "file": "adk/services/analytics/tracking/core-events.ts",
+        "hash": "4447231945740271363"
+      },
+      {
+        "file": "adk/services/analytics/tracking/ios-tracker.swift",
+        "hash": "1638651613120806471"
+      },
+      {
+        "file": "adk/services/analytics/tracking/web-tracker.ts",
+        "hash": "12297003702828537956"
+      },
+      {
+        "file": "adk/services/vertex/1754982644143-index.ts",
+        "hash": "8784044008208896975"
+      },
+      {
+        "file": "adk/services/vertex/index.ts",
+        "hash": "1259053160796083896"
+      },
+      {
+        "file": "check-and-fix-wif.bat",
+        "hash": "7505297872489851051"
+      },
+      {
+        "file": "cloudbuild-original.yaml.bak",
+        "hash": "13217223986750787705"
+      },
+      {
+        "file": "cloudbuild.yaml",
+        "hash": "10866780891455567014"
+      },
+      {
+        "file": "commitlint.config.js",
+        "hash": "14226619119765174880"
+      },
+      {
+        "file": "contrib/asff.tpl",
+        "hash": "1091033208497073207"
+      },
+      {
+        "file": "contrib/gitlab-codequality.tpl",
+        "hash": "2298900831619188693"
+      },
+      {
+        "file": "contrib/gitlab.tpl",
+        "hash": "7619220181411711163"
+      },
+      {
+        "file": "contrib/html.tpl",
+        "hash": "12358606086046353047"
+      },
+      {
+        "file": "contrib/junit.tpl",
+        "hash": "2938714836648258818"
+      },
+      {
+        "file": "create-provider-fixed.bat",
+        "hash": "1932918030795203629"
+      },
+      {
+        "file": "create-provider.bat",
+        "hash": "11001865408313388536"
+      },
+      {
+        "file": "docs/AGENTS_WORKFLOW_GUIDE.md",
+        "hash": "7792602457439524340"
+      },
+      {
+        "file": "docs/AGENT_GCP_INTEGRATION.md",
+        "hash": "8665187724584917097"
+      },
+      {
+        "file": "docs/ARCHITECTURE.md",
+        "hash": "12659354885142461709"
+      },
+      {
+        "file": "docs/CI_CD_MIGRATION_GUIDE.md",
+        "hash": "1767053183741221624"
+      },
+      {
+        "file": "docs/CI_CD_PIPELINE.md",
+        "hash": "5672618009395239755"
+      },
+      {
+        "file": "docs/CI_CD_WORKFLOW.md",
+        "hash": "11001078088304453109"
+      },
+      {
+        "file": "docs/COMPONENTS.md",
+        "hash": "1907077695446787752"
+      },
+      {
+        "file": "docs/CRITICAL_IMPROVEMENTS.md",
+        "hash": "7688416494505119828"
+      },
+      {
+        "file": "docs/DEPLOYMENT.md",
+        "hash": "12701558703215720461"
+      },
+      {
+        "file": "docs/DEPLOY_CHECKLIST.md",
+        "hash": "4143531383670455382"
+      },
+      {
+        "file": "docs/DEVELOPMENT_WORKFLOW.md",
+        "hash": "17210579584206505236"
+      },
+      {
+        "file": "docs/DIAGRAMS.md",
+        "hash": "9487884018824420294"
+      },
+      {
+        "file": "docs/GIT_PUSH_PREPARATION_REPORT.md",
+        "hash": "1150544225153639965"
+      },
+      {
+        "file": "docs/MCP_INTEGRATION_GUIDE.md",
+        "hash": "17788750400013101227"
+      },
+      {
+        "file": "docs/MIGRATION_ENV_MAP.md",
+        "hash": "4540197300338221508"
+      },
+      {
+        "file": "docs/PIPELINE_TEST.md",
+        "hash": "2904594714207634919"
+      },
+      {
+        "file": "docs/SECRETS.md",
+        "hash": "17833698757531402688"
+      },
+      {
+        "file": "docs/SECURITY_COMPLIANCE.md",
+        "hash": "3351329322596618899"
+      },
+      {
+        "file": "docs/SEMANTIC_SEARCH_API.md",
+        "hash": "6605084618938508741"
+      },
+      {
+        "file": "docs/TROUBLESHOOTING.md",
+        "hash": "17691719576568404758"
+      },
+      {
+        "file": "docs/VIETNAMESE_LOCALIZATION.md",
+        "hash": "4928801499054552619"
+      },
+      {
+        "file": "docs/WIF_SETUP_GUIDE.md",
+        "hash": "329321195016226610"
+      },
+      {
+        "file": "docs/kilocode-implementation.md",
+        "hash": "5191664729427522685"
+      },
+      {
+        "file": "docs/legacy/saigon-signals/.devcontainer/Dockerfile",
+        "hash": "13475184571217704797"
+      },
+      {
+        "file": "docs/legacy/saigon-signals/apps/api/Dockerfile",
+        "hash": "8103555982450745878"
+      },
+      {
+        "file": "docs/legacy/saigon-signals/libs/gcp/README.md",
+        "hash": "2893186334432708647"
+      },
+      {
+        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/README.md",
+        "hash": "8442520022156863374"
+      },
+      {
+        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/bigquery.tf",
+        "hash": "15495772703651613188"
+      },
+      {
+        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/functions.tf",
+        "hash": "13416772756733463357"
+      },
+      {
+        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/gcs.tf",
+        "hash": "4585117466723771382"
+      },
+      {
+        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/iam.tf",
+        "hash": "7303113644520089165"
+      },
+      {
+        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/main.tf",
+        "hash": "20481220203980109"
+      },
+      {
+        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/outputs.tf",
+        "hash": "18110964327495333615"
+      },
+      {
+        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/pubsub.tf",
+        "hash": "7101670553944425649"
+      },
+      {
+        "file": "docs/legacy/saigon-signals/libs/gcp/terraform/variables.tf",
+        "hash": "2770556354555998855"
+      },
+      {
+        "file": "docs/mcp-google-tooling.md",
+        "hash": "6364946120881412176"
+      },
+      {
+        "file": "docs/typed_views/v_site_view.sql",
+        "hash": "10915531799210220311"
+      },
+      {
+        "file": "estinationPath",
+        "hash": "16289582287151258234"
+      },
+      {
+        "file": "examples/mcp-demo.ts",
+        "hash": "11671193365580342313"
+      },
+      {
+        "file": "infra/terraform/COPILOT_PROMPT.md",
+        "hash": "16165539838562057959"
+      },
+      {
+        "file": "infra/terraform/README.md",
+        "hash": "8060538307044027328"
+      },
+      {
+        "file": "infra/terraform/agents_infra.tf",
+        "hash": "9996616342578139982"
+      },
+      {
+        "file": "infra/terraform/agents_service_account.tf",
+        "hash": "5179726379366634213"
+      },
+      {
+        "file": "infra/terraform/artifact_registry.tf",
+        "hash": "9873242368133518358"
+      },
+      {
+        "file": "infra/terraform/backend.tf",
+        "hash": "5575632995240131502"
+      },
+      {
+        "file": "infra/terraform/bigquery.tf",
+        "hash": "16668316252780583477"
+      },
+      {
+        "file": "infra/terraform/iam.tf",
+        "hash": "4836758657395328825"
+      },
+      {
+        "file": "infra/terraform/main.tf",
+        "hash": "299698814717760935"
+      },
+      {
+        "file": "infra/terraform/modules/cloud_run/main.tf",
+        "hash": "11381765914686293004"
+      },
+      {
+        "file": "infra/terraform/modules/cloud_run/outputs.tf",
+        "hash": "16919777784067928085"
+      },
+      {
+        "file": "infra/terraform/modules/cloud_run/variables.tf",
+        "hash": "5444102554783533433"
+      },
+      {
+        "file": "infra/terraform/modules/cloud_sql/main.tf",
+        "hash": "8033312478550386909"
+      },
+      {
+        "file": "infra/terraform/modules/cloud_sql/outputs.tf",
+        "hash": "7604912621006534266"
+      },
+      {
+        "file": "infra/terraform/modules/cloud_sql/variables.tf",
+        "hash": "9126733433653344333"
+      },
+      {
+        "file": "infra/terraform/provider.tf",
+        "hash": "9104835344810982445"
+      },
+      {
+        "file": "infra/terraform/secrets.tf",
+        "hash": "6193777309604861849"
+      },
+      {
+        "file": "infra/terraform/v_site_view.tf",
+        "hash": "17867687404170643353"
+      },
+      {
+        "file": "infra/terraform/variables.tf",
+        "hash": "12475806750889476076"
+      },
+      {
+        "file": "infra/terraform/wif.tf",
+        "hash": "736777278131382268"
+      },
+      {
+        "file": "jfrog-install.sh",
+        "hash": "13989858741757812584"
+      },
+      {
+        "file": "link-github-repo.bat",
+        "hash": "17606022364094505046"
+      },
+      {
+        "file": "lint-staged.config.js",
+        "hash": "5231677182737734074"
+      },
+      {
+        "file": "mcp-servers.config.json",
+        "hash": "8480483476190517384"
+      },
+      {
+        "file": "migrations.json",
+        "hash": "15705494035716829551"
+      },
+      {
+        "file": "nx.json",
+        "hash": "9704429451444440496"
+      },
+      {
+        "file": "package.json",
+        "hash": "9592988121703974443"
+      },
+      {
+        "file": "pmd.xml",
+        "hash": "14307645218378886744"
+      },
+      {
+        "file": "pnpm-lock.yaml",
+        "hash": "14613482824310872129"
+      },
+      {
+        "file": "pnpm-workspace.yaml",
+        "hash": "13790079124729980866"
+      },
+      {
+        "file": "scripts/cleanup-ci.sh",
+        "hash": "16269623463364024472"
+      },
+      {
+        "file": "scripts/data_ingestion.py",
+        "hash": "14097295115637491816"
+      },
+      {
+        "file": "scripts/deploy-toolbox.sh",
+        "hash": "18031328950188226094"
+      },
+      {
+        "file": "scripts/enable_apis.sh",
+        "hash": "12736209600496133585"
+      },
+      {
+        "file": "scripts/fix-wif-windows.cmd",
+        "hash": "8216105717025734381"
+      },
+      {
+        "file": "scripts/fix-wif-windows.ps1",
+        "hash": "4556913060181844260"
+      },
+      {
+        "file": "scripts/setup-modern-cicd.sh",
+        "hash": "2006591059589864117"
+      },
+      {
+        "file": "scripts/setup-wif-github.sh",
+        "hash": "11207461228982266840"
+      },
+      {
+        "file": "scripts/setup-wif-local.bat",
+        "hash": "13586198102871700449"
+      },
+      {
+        "file": "scripts/test-mcp-servers.js",
+        "hash": "4707710568518021700"
+      },
+      {
+        "file": "scripts/update-secrets.sh",
+        "hash": "8259477186019554488"
+      },
+      {
+        "file": "scripts/verify-env.sh",
+        "hash": "17459139757643083494"
+      },
+      {
+        "file": "setup-wif-complete.bat",
+        "hash": "16768440283436705367"
+      },
+      {
+        "file": "tests/README.md",
+        "hash": "3523786783330245268"
+      },
+      {
+        "file": "tests/__init__.py",
+        "hash": "3244421341483603138"
+      },
+      {
+        "file": "tests/e2e_workflow.py",
+        "hash": "11915969753564346352"
+      },
+      {
+        "file": "tests/test_cloudbuild.py",
+        "hash": "9500774185357552120"
+      },
+      {
+        "file": "tests/test_cloudbuild_config.py",
+        "hash": "6888129688441616171"
+      },
+      {
+        "file": "tests/test_codacy_config.py",
+        "hash": "16489420330274966982"
+      },
+      {
+        "file": "tests/test_github_workflows.py",
+        "hash": "2911837582465916524"
+      },
+      {
+        "file": "tests/test_github_workflows_unit.py",
+        "hash": "1234572789448493741"
+      },
+      {
+        "file": "tests/test_package_json.py",
+        "hash": "14140873122369447466"
+      },
+      {
+        "file": "tests/test_project_json.py",
+        "hash": "4107690893735379129"
+      },
+      {
+        "file": "tools/__tests__/yamlLoader.js",
+        "hash": "4437120564280064997"
+      },
+      {
+        "file": "tsconfig.base.json",
+        "hash": "10469642633181101732"
+      }
+    ]
   }
 }

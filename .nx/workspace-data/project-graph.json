@@ -16355,6 +16355,11 @@
     "security": [
       {
         "source": "security",
+        "target": "npm:@jest/globals",
+        "type": "static"
+      },
+      {
+        "source": "security",
         "target": "npm:fastify",
         "type": "static"
       },
@@ -16366,11 +16371,6 @@
       {
         "source": "security",
         "target": "npm:@google-cloud/secret-manager",
-        "type": "static"
-      },
-      {
-        "source": "security",
-        "target": "npm:@jest/globals",
         "type": "static"
       }
     ],
@@ -38055,5 +38055,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1755923294470
+  "computedAt": 1755923395267
 }

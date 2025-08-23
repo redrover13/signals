@@ -329,15 +329,18 @@ function formatVietnameseName(name: string): string {
 }
 
 function isValidVietnamesePhoneNumber(phone: string): boolean {
+  if (typeof phone !== 'string' || phone.length === 0) {
+    return false;
+  }
   // Remove common separators
   const cleaned = phone.replace(/[\s\-\.\(\)]/g, '');
   
   // Check Vietnamese mobile patterns
   const patterns = [
-    /^\+849\d{8}$/,  // +84 9xx xxx xxx
-    /^09\d{8}$/,     // 09x xxx xxxx
-    /^\+848[1-9]\d{7}$/, // +84 8x xxx xxxx (landline)
-    /^08[1-9]\d{7}$/     // 08x xxx xxxx (landline)
+    /^\+849\d{8}$/,          // +84 9xx xxx xxx
+    /^09\d{8}$/,             // 09x xxx xxxx
+    /^\+848[1-9]\d{7}$/,     // +84 8x xxx xxxx (landline)
+    /^08[1-9]\d{7}$/         // 08x xxx xxxx (landline)
   ];
 
   return patterns.some(pattern => pattern.test(cleaned));

@@ -1,7 +1,7 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import * as fs from "fs";
-import * as path from "path";
-import * as _ from "lodash";
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as _ from 'lodash';
 
 interface SearchRequest {
   tool: string;
@@ -23,53 +23,67 @@ interface SearchResponse {
 
 export async function searchRoutes(fastify: FastifyInstance) {
   fastify.post(
-    "/semantic-code-search",
+    '/semantic-code-search',
     async function (request: FastifyRequest, reply: FastifyReply) {
       try {
         const body = request.body as SearchRequest;
 
-        if (!body.tool || body.tool !== "semantic-code-search") {
-          return reply.status(400).send({ 
-            error: "Invalid tool. Expected 'semantic-code-search'" 
+        if (!body.tool || body.tool !== 'semantic-code-search') {
+          return reply.status(400).send({
+            error: "Invalid tool. Expected 'semantic-code-search'",
           });
         }
 
         if (!body.query) {
-          return reply.status(400).send({ 
-            error: "Query parameter is required" 
+          return reply.status(400).send({
+            error: 'Query parameter is required',
           });
         }
 
         const results = await performSemanticSearch(body.query);
-        
+
         const response: SearchResponse = {
           query: body.query,
           results,
-          totalMatches: results.length
+          totalMatches: results.length,
         };
 
         return reply.send(response);
       } catch (error: any) {
         fastify.log.error('Search error:', error);
-        return reply.status(500).send({ 
-          error: "Internal server error during search" 
+        return reply.status(500).send({
+          error: 'Internal server error during search',
         });
       }
-    }
+    },
   );
 }
 
 async function performSemanticSearch(query: string): Promise<SearchResult[]> {
   const results: SearchResult[] = [];
   const repoRoot = process.cwd();
-  
+
   const ciTerms = [
-    'ci', 'continuous integration', 'continuous deployment', 'pipeline', 
-    'workflow', 'github actions', 'build', 'deploy', 'test', 'lint',
-    'cloud build', 'docker', 'container', 'terraform', 'infrastructure',
-    'deployment', 'automation', 'devops'
+    'ci',
+    'continuous integration',
+    'continuous deployment',
+    'pipeline',
+    'workflow',
+    'github actions',
+    'build',
+    'deploy',
+    'test',
+    'lint',
+    'cloud build',
+    'docker',
+    'container',
+    'terraform',
+    'infrastructure',
+    'deployment',
+    'automation',
+    'devops',
   ];
-  
+
   if (query.toLowerCase().includes('ci') || query.toLowerCase().includes('common')) {
     const workflowsDir = path.join(repoRoot, '.github/workflows');
     if (fs.existsSync(workflowsDir)) {
@@ -87,18 +101,22 @@ async function performSemanticSearch(query: string): Promise<SearchResult[]> {
   }
 
   results.sort((a, b) => b.relevance - a.relevance);
-  
+
   return results.slice(0, 10);
 }
 
-async function searchInFile(filePath: string, query: string, ciTerms: string[]): Promise<SearchResult | null> {
+async function searchInFile(
+  filePath: string,
+  query: string,
+  ciTerms: string[],
+): Promise<SearchResult | null> {
   try {
     const content = fs.readFileSync(filePath, 'utf-8');
     const lines = content.split('\n');
-    
+
     const matches: string[] = [];
     let relevance = 0;
-    
+
     const safeQuery = _.escapeRegExp(query);
     const queryRegex = new RegExp(safeQuery, 'gi');
     const queryMatches = content.match(queryRegex);
@@ -106,7 +124,7 @@ async function searchInFile(filePath: string, query: string, ciTerms: string[]):
       relevance += queryMatches.length * 10;
       matches.push(...queryMatches);
     }
-    
+
     for (const term of ciTerms) {
       const termRegex = new RegExp(term, 'gi');
       const termMatches = content.match(termRegex);
@@ -114,14 +132,14 @@ async function searchInFile(filePath: string, query: string, ciTerms: string[]):
         relevance += termMatches.length * 2;
       }
     }
-    
+
     const relevantLines: string[] = [];
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      if (queryRegex.test(line) || ciTerms.some(term => new RegExp(term, 'i').test(line))) {
+      if (queryRegex.test(line) || ciTerms.some((term) => new RegExp(term, 'i').test(line))) {
         const contextStart = Math.max(0, i - 1);
         const contextEnd = Math.min(lines.length - 1, i + 1);
-        
+
         for (let j = contextStart; j <= contextEnd; j++) {
           if (!relevantLines.includes(lines[j].trim()) && lines[j].trim()) {
             relevantLines.push(lines[j].trim());
@@ -129,18 +147,18 @@ async function searchInFile(filePath: string, query: string, ciTerms: string[]):
         }
       }
     }
-    
+
     if (relevance > 0) {
       const uniqueMatches = matches.filter((match, index) => matches.indexOf(match) === index);
-      
+
       return {
         file: path.relative(process.cwd(), filePath),
         content: relevantLines.slice(0, 5).join('\n'),
         relevance,
-        matches: uniqueMatches
+        matches: uniqueMatches,
       };
     }
-    
+
     return null;
   } catch (error) {
     return null;

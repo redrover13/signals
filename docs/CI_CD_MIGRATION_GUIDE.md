@@ -7,11 +7,13 @@ This guide documents the migration from a convoluted multi-platform CI/CD setup 
 ## Previous Issues
 
 ### 1. Multiple Overlapping CI Systems
+
 - **GitHub Actions**: 9+ workflow files with overlapping responsibilities
 - **GitLab CI**: Complete duplicate pipeline
 - **Google Cloud Build**: Third CI system doing similar work
 
 ### 2. Workflow Problems
+
 - 600+ line monolithic workflow (`ci-complete.yml`)
 - Redundant jobs across multiple files
 - Poor parallelization and dependencies
@@ -19,6 +21,7 @@ This guide documents the migration from a convoluted multi-platform CI/CD setup 
 - Matrix builds with unused results
 
 ### 3. Security & Performance Issues
+
 - Hardcoded secrets scattered across files
 - Inefficient caching strategies
 - Multiple authentication methods
@@ -27,6 +30,7 @@ This guide documents the migration from a convoluted multi-platform CI/CD setup 
 ## New Architecture
 
 ### Single Source of Truth
+
 - **Primary CI**: `.github/workflows/ci.yml` - Main CI/CD pipeline
 - **PR Validation**: `.github/workflows/pr-validation.yml` - PR-specific checks
 - **Cloud Build**: `cloudbuild.yaml` - Deployment only
@@ -57,13 +61,16 @@ graph TD
 ## Migration Steps
 
 ### 1. Run Cleanup Script
+
 ```bash
 chmod +x scripts/cleanup-ci.sh
 ./scripts/cleanup-ci.sh
 ```
 
 ### 2. Update Repository Secrets
+
 Ensure these secrets are configured:
+
 - `NX_CLOUD_ACCESS_TOKEN`
 - `GITGUARDIAN_API_KEY`
 - `CODECOV_TOKEN`
@@ -72,11 +79,13 @@ Ensure these secrets are configured:
 - `GCP_PROJECT_ID`
 
 ### 3. Test New Pipeline
+
 1. Create a test PR
 2. Verify all jobs run correctly
 3. Check deployment works on main branch
 
 ### 4. Monitor & Adjust
+
 - Review job execution times
 - Adjust parallelization if needed
 - Fine-tune caching strategies
@@ -84,21 +93,25 @@ Ensure these secrets are configured:
 ## Benefits
 
 ### Performance
+
 - **50% faster builds** through better parallelization
 - **Reduced resource usage** by eliminating redundancy
 - **Smarter caching** with pnpm and Nx
 
 ### Maintainability
+
 - **Single workflow** instead of 9+ files
 - **Clear job dependencies** and flow
 - **Standardized patterns** across all jobs
 
 ### Security
+
 - **Dedicated security scanning** job
 - **Workload Identity Federation** for GCP auth
 - **Secret scanning** on every PR
 
 ### Developer Experience
+
 - **Faster feedback** on PRs
 - **Clear failure reasons** with focused jobs
 - **Consistent behavior** across environments

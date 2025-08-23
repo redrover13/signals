@@ -18,12 +18,12 @@ A comprehensive MCP integration system for the Signals project, providing seamle
 The MCP library is already included in your Nx workspace. To use it in your applications:
 
 ```typescript
-import { 
-  mcpService, 
-  createMCPClient, 
-  withErrorHandler, 
+import {
+  mcpService,
+  createMCPClient,
+  withErrorHandler,
   ErrorCategory,
-  createServiceErrorHandler 
+  createServiceErrorHandler,
 } from '@nx-monorepo/mcp';
 ```
 
@@ -42,7 +42,7 @@ const result = await withErrorHandler(
   {
     function: 'fetchData',
     file: 'data-service.ts',
-    params: { query: 'SELECT * FROM table' }
+    params: { query: 'SELECT * FROM table' },
   },
   {
     maxRetries: 3,
@@ -50,8 +50,8 @@ const result = await withErrorHandler(
     exponentialBackoff: true,
     fallbackAction: async () => {
       return await mcpService.memory('retrieve', { key: 'cached-data' });
-    }
-  }
+    },
+  },
 );
 ```
 
@@ -70,7 +70,7 @@ export class DataService {
       },
       'getData',
       {},
-      { maxRetries: 2 }
+      { maxRetries: 2 },
     );
   }
 }

@@ -56,8 +56,8 @@ export class ServerHealthService extends EventEmitter {
     this.config = getCurrentConfig();
 
     // Start monitoring for each enabled server
-    const enabledServers = this.config.servers.filter(server => 
-      server.enabled && server.healthCheck
+    const enabledServers = this.config.servers.filter(
+      (server) => server.enabled && server.healthCheck,
     );
 
     for (const server of enabledServers) {
@@ -98,7 +98,7 @@ export class ServerHealthService extends EventEmitter {
     }
 
     const { interval } = serverConfig.healthCheck;
-    
+
     // Initialize stats
     this.healthStats.set(serverConfig.id, {
       serverId: serverConfig.id,
@@ -107,7 +107,7 @@ export class ServerHealthService extends EventEmitter {
       failedChecks: 0,
       averageResponseTime: 0,
       consecutiveFailures: 0,
-      uptime: 100
+      uptime: 100,
     });
 
     // Set up periodic health check
@@ -130,7 +130,7 @@ export class ServerHealthService extends EventEmitter {
     try {
       // Get server connection status
       const connection = this.mcpClient.getServerStatus(serverConfig.id);
-      
+
       if (!connection || connection.status !== 'connected') {
         throw new Error(`Server ${serverConfig.id} is not connected`);
       }
@@ -156,11 +156,11 @@ export class ServerHealthService extends EventEmitter {
         serverId: serverConfig.id,
         healthy,
         responseTime,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       this.updateHealthStats(serverConfig.id, result);
-      
+
       if (healthy) {
         this.emit('serverHealthy', serverConfig.id, result);
       } else {
@@ -168,17 +168,16 @@ export class ServerHealthService extends EventEmitter {
       }
 
       return result;
-
     } catch {
       const result: HealthCheckResult = {
         serverId: serverConfig.id,
         healthy: false,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       this.updateHealthStats(serverConfig.id, result);
       this.emit('serverUnhealthy', serverConfig.id, result);
-      
+
       // Handle consecutive failures
       await this.handleHealthCheckFailure(serverConfig);
 
@@ -189,7 +188,10 @@ export class ServerHealthService extends EventEmitter {
   /**
    * Check stdio server health
    */
-  private async checkStdioHealth(_connection: MCPServerConnection, config: MCPServerConfig): Promise<{ healthy: boolean; responseTime: number }> {
+  private async checkStdioHealth(
+    _connection: MCPServerConnection,
+    config: MCPServerConfig,
+  ): Promise<{ healthy: boolean; responseTime: number }> {
     const startTime = Date.now();
 
     try {
@@ -198,14 +200,13 @@ export class ServerHealthService extends EventEmitter {
         id: `health-check-${Date.now()}`,
         method: 'ping',
         timeout: config.healthCheck?.timeout || 5000,
-        serverId: config.id
+        serverId: config.id,
       });
       // …
       const responseTime = Date.now() - startTime;
       const healthy = !response.error;
 
       return { healthy, responseTime };
-
     } catch {
       return { healthy: false, responseTime: Date.now() - startTime };
     }
@@ -223,7 +224,6 @@ export class ServerHealthService extends EventEmitter {
       // For now, just return healthy if connection exists
       const responseTime = Date.now() - startTime;
       return { healthy: true, responseTime };
-
     } catch {
       return { healthy: false, responseTime: Date.now() - startTime };
     }
@@ -239,15 +239,16 @@ export class ServerHealthService extends EventEmitter {
     }
 
     stats.totalChecks++;
-    
+
     if (result.healthy) {
       stats.successfulChecks++;
       stats.consecutiveFailures = 0;
       stats.lastHealthy = result.timestamp;
-      
+
       if (result.responseTime) {
         // Update average response time
-        const totalResponseTime = stats.averageResponseTime * (stats.successfulChecks - 1) + result.responseTime;
+        const totalResponseTime =
+          stats.averageResponseTime * (stats.successfulChecks - 1) + result.responseTime;
         stats.averageResponseTime = totalResponseTime / stats.successfulChecks;
       }
     } else {
@@ -272,13 +273,15 @@ export class ServerHealthService extends EventEmitter {
     }
 
     const failureThreshold = serverConfig.healthCheck?.failureThreshold || 3;
-    
+
     if (stats.consecutiveFailures >= failureThreshold) {
-      console.warn(`Server ${serverConfig.id} has failed ${stats.consecutiveFailures} consecutive health checks`);
-      
+      console.warn(
+        `Server ${serverConfig.id} has failed ${stats.consecutiveFailures} consecutive health checks`,
+      );
+
       // Emit critical health event
       this.emit('serverCritical', serverConfig.id, stats);
-      
+
       // Attempt reconnection if configured
       if (this.shouldAttemptReconnection(serverConfig)) {
         await this.attemptReconnection(serverConfig);
@@ -299,18 +302,17 @@ export class ServerHealthService extends EventEmitter {
    */
   private async attemptReconnection(serverConfig: MCPServerConfig): Promise<void> {
     console.log(`Attempting to reconnect to server: ${serverConfig.id}`);
-    
+
     try {
       // This would call the MCP client's reconnection logic
       // For now, just emit an event
       this.emit('reconnectionAttempt', serverConfig.id);
-      
+
       // Reset consecutive failures on successful reconnection
       const stats = this.healthStats.get(serverConfig.id);
       if (stats) {
         stats.consecutiveFailures = 0;
       }
-      
     } catch (error) {
       console.error(`Failed to reconnect to server ${serverConfig.id}:`, error);
       this.emit('reconnectionFailed', serverConfig.id, error);
@@ -343,14 +345,14 @@ export class ServerHealthService extends EventEmitter {
   } {
     const stats = Array.from(this.healthStats.values());
     const totalServers = stats.length;
-    const healthyServers = stats.filter(s => s.consecutiveFailures === 0).length;
+    const healthyServers = stats.filter((s) => s.consecutiveFailures === 0).length;
     const getThreshold = (id: string) =>
-      this.config.servers.find(s => s.id === id)?.healthCheck?.failureThreshold ?? 3;
-    const unhealthyServers = stats.filter(s =>
-      s.consecutiveFailures > 0 && s.consecutiveFailures < getThreshold(s.serverId)
+      this.config.servers.find((s) => s.id === id)?.healthCheck?.failureThreshold ?? 3;
+    const unhealthyServers = stats.filter(
+      (s) => s.consecutiveFailures > 0 && s.consecutiveFailures < getThreshold(s.serverId),
     ).length;
-    const criticalServers = stats.filter(s =>
-      s.consecutiveFailures >= getThreshold(s.serverId)
+    const criticalServers = stats.filter(
+      (s) => s.consecutiveFailures >= getThreshold(s.serverId),
     ).length;
     const averageUptime = stats.reduce((sum, s) => sum + s.uptime, 0) / totalServers || 0;
     return {
@@ -358,7 +360,7 @@ export class ServerHealthService extends EventEmitter {
       healthyServers,
       unhealthyServers,
       criticalServers,
-      averageUptime
+      averageUptime,
     };
   }
 
@@ -366,7 +368,7 @@ export class ServerHealthService extends EventEmitter {
    * Force health check for a specific server
    */
   async forceHealthCheck(serverId: string): Promise<HealthCheckResult | null> {
-    const serverConfig = this.config.servers.find(s => s.id === serverId);
+    const serverConfig = this.config.servers.find((s) => s.id === serverId);
     if (!serverConfig || !serverConfig.healthCheck) {
       return null;
     }
@@ -379,7 +381,7 @@ export class ServerHealthService extends EventEmitter {
    */
   async forceHealthCheckAll(): Promise<HealthCheckResult[]> {
     const results: HealthCheckResult[] = [];
-    
+
     for (const server of this.config.servers) {
       if (server.enabled && server.healthCheck) {
         const result = await this.performHealthCheck(server);

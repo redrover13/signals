@@ -4,7 +4,11 @@
  */
 
 import { MCPClientService, MCPRequest, MCPResponse } from './clients/mcp-client.service';
-import { ServerHealthService, HealthCheckResult, ServerHealthStats } from './clients/server-health.service';
+import {
+  ServerHealthService,
+  HealthCheckResult,
+  ServerHealthStats,
+} from './clients/server-health.service';
 import { RequestRouter } from './clients/request-router.service';
 import { getCurrentConfig, getCurrentEnvironment } from './config/environment-config';
 import { createServiceErrorHandler, ErrorCategory, ErrorSeverity } from './utils/error-handler';
@@ -45,7 +49,7 @@ export class MCPService {
     }
 
     console.log(`Initializing MCP Service for environment: ${getCurrentEnvironment()}`);
-    
+
     return this.errorHandler.withRetry(
       async () => {
         await this.clientService.initialize();
@@ -57,19 +61,23 @@ export class MCPService {
       {
         maxRetries: 2,
         retryDelay: 1000,
-        exponentialBackoff: true
-      }
+        exponentialBackoff: true,
+      },
     );
   }
 
   /**
    * Send request to MCP servers
    */
-  async request(method: string, params?: Record<string, unknown>, options?: {
-    serverId?: string;
-    timeout?: number;
-    retries?: number;
-  }): Promise<MCPResponse> {
+  async request(
+    method: string,
+    params?: Record<string, unknown>,
+    options?: {
+      serverId?: string;
+      timeout?: number;
+      retries?: number;
+    },
+  ): Promise<MCPResponse> {
     if (!this.isInitialized) {
       await this.initialize();
     }
@@ -80,7 +88,7 @@ export class MCPService {
       params,
       serverId: options?.serverId,
       timeout: options?.timeout,
-      retries: options?.retries
+      retries: options?.retries,
     };
 
     return this.errorHandler.withRetry(
@@ -95,8 +103,8 @@ export class MCPService {
         exponentialBackoff: true,
         onRetry: (attempt, error) => {
           console.warn(`Retrying MCP request ${request.id}, attempt ${attempt}:`, error.message);
-        }
-      }
+        },
+      },
     );
   }
 
@@ -127,7 +135,11 @@ export class MCPService {
    * Sequential thinking
    */
   async think(prompt: string, options?: { maxThoughts?: number }): Promise<MCPResponse> {
-    return this.request('think.analyze', { prompt, ...options }, { serverId: 'sequentialthinking' });
+    return this.request(
+      'think.analyze',
+      { prompt, ...options },
+      { serverId: 'sequentialthinking' },
+    );
   }
 
   /**
@@ -211,7 +223,11 @@ export class MCPService {
   /**
    * Google Cloud Platform operations
    */
-  async gcp(service: string, operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async gcp(
+    service: string,
+    operation: string,
+    params?: Record<string, unknown>,
+  ): Promise<MCPResponse> {
     return this.request(`gcp.${service}.${operation}`, params, { serverId: 'google' });
   }
 
@@ -289,7 +305,9 @@ export class MCPService {
   /**
    * Get server health status
    */
-  getServerHealth(serverId?: string): ServerHealthStats | Map<string, ServerHealthStats> | undefined {
+  getServerHealth(
+    serverId?: string,
+  ): ServerHealthStats | Map<string, ServerHealthStats> | undefined {
     if (serverId) {
       return this.healthService.getServerHealthStats(serverId);
     }
@@ -343,10 +361,10 @@ export class MCPService {
    * Get enabled servers
    */
   getEnabledServers(): string[] {
-    return this.getConfig().servers
-      .filter(server => server.enabled)
+    return this.getConfig()
+      .servers.filter((server) => server.enabled)
       .sort((a, b) => b.priority - a.priority)
-      .map(server => server.id);
+      .map((server) => server.id);
   }
 
   /**
@@ -362,7 +380,7 @@ export class MCPService {
   getRoutingStats() {
     return {
       rules: this.requestRouter.getRoutingRules(),
-      loadStats: this.requestRouter.getLoadStatistics()
+      loadStats: this.requestRouter.getLoadStatistics(),
     };
   }
 
@@ -373,7 +391,7 @@ export class MCPService {
    */
   async shutdown(): Promise<void> {
     console.log('Shutting down MCP Service...');
-    
+
     return this.errorHandler.withRetry(
       async () => {
         await this.clientService.disconnect();
@@ -384,8 +402,8 @@ export class MCPService {
       {},
       {
         maxRetries: 1,
-        retryDelay: 500
-      }
+        retryDelay: 500,
+      },
     );
   }
 

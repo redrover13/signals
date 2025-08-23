@@ -7,6 +7,7 @@ This document outlines the compliance requirements and rules for the Dulce de Sa
 ## Vietnamese Data Protection Law (Personal Data Protection Law)
 
 ### Legal Framework
+
 - **Law No. 23/2023/QH15**: Personal Data Protection Law of Vietnam, effective from July 1, 2024
 - **Scope**: Applies to all organizations processing personal data of Vietnamese citizens
 - **Territorial Scope**: Applies to data processing activities conducted in Vietnam or targeting Vietnamese data subjects
@@ -67,7 +68,7 @@ This document outlines the compliance requirements and rules for the Dulce de Sa
    - Regular review and deletion of unnecessary data
    - Pseudonymization where appropriate
 
-3. **Data Quality
+3. \*\*Data Quality
    - Ensure accuracy and completeness of personal data
    - Update data when necessary
    - Delete or rectify inaccurate data promptly
@@ -75,12 +76,14 @@ This document outlines the compliance requirements and rules for the Dulce de Sa
 ## Data Localization Requirements
 
 ### Data Residency
+
 - **Vietnamese Citizen Data**: Must be stored within Vietnam
 - **Cloud Services**: Use GCP asia-southeast1 region for all Vietnamese citizen data
 - **Cross-border Transfers**: Require explicit consent and legal justification
 - **Data Processing**: Conducted in Vietnam or with approved international partners
 
 ### Cross-border Data Transfer Restrictions
+
 - Explicit consent required from data subjects
 - Adequate level of data protection in receiving country
 - Binding corporate rules or standard contractual clauses
@@ -89,6 +92,7 @@ This document outlines the compliance requirements and rules for the Dulce de Sa
 ## Data Retention and Deletion
 
 ### Retention Periods
+
 - **Customer Data**: 5 years after last interaction or as required by law
 - **Financial Data**: 10 years for tax compliance
 - **Employee Data**: 5 years after employment termination
@@ -96,6 +100,7 @@ This document outlines the compliance requirements and rules for the Dulce de Sa
 - **Marketing Data**: Until consent is withdrawn
 
 ### Secure Deletion
+
 - **Technical Measures**: Cryptographic erasure for encrypted data
 - **Physical Destruction**: For end-of-life storage media
 - **Verification**: Certificate of destruction for sensitive data
@@ -104,12 +109,14 @@ This document outlines the compliance requirements and rules for the Dulce de Sa
 ## Data Breach Notification
 
 ### Notification Requirements
+
 - **Timeframe**: Within 72 hours of becoming aware of breach
 - **Authority**: Notify the Ministry of Public Security
 - **Data Subjects**: Notify affected individuals without undue delay
 - **Content**: Nature of breach, categories and numbers of data subjects, consequences, measures taken
 
 ### Incident Response
+
 - **24/7 Monitoring**: Continuous monitoring of security events
 - **Escalation Procedures**: Defined escalation paths for security incidents
 - **Investigation**: Prompt investigation of suspected breaches
@@ -118,9 +125,10 @@ This document outlines the compliance requirements and rules for the Dulce de Sa
 ## Data Protection Officer (DPO)
 
 ### Appointment Requirements
+
 - **Mandatory**: For organizations processing large-scale personal data
 - **Qualifications**: Knowledge of data protection laws and practices
-- **Responsibilities**: 
+- **Responsibilities**:
   - Monitor compliance with data protection laws
   - Provide advice on DPIA
   - Cooperate with supervisory authorities
@@ -128,6 +136,7 @@ This document outlines the compliance requirements and rules for the Dulce de Sa
   - Handle data subject requests
 
 ### DPO Functions
+
 - **Compliance Monitoring**: Regular assessment of compliance measures
 - **Policy Development**: Development and maintenance of data protection policies
 - **Training**: Conduct regular training sessions for employees
@@ -136,12 +145,14 @@ This document outlines the compliance requirements and rules for the Dulce de Sa
 ## Privacy by Design and Default
 
 ### Technical Measures
+
 - **Encryption**: End-to-end encryption for data in transit and at rest
 - **Access Controls**: Role-based access controls with least privilege principle
 - **Audit Trails**: Comprehensive logging of data access and modifications
 - **Data Minimization**: Collect only necessary data for specific purposes
 
 ### Organizational Measures
+
 - **Data Protection Policies**: Clear policies for data handling
 - **Staff Training**: Regular training on data protection requirements
 - **Vendor Management**: Due diligence for third-party data processors
@@ -150,18 +161,21 @@ This document outlines the compliance requirements and rules for the Dulce de Sa
 ## Vietnamese Market Specific Requirements
 
 ### Language Requirements
+
 - **User Interface**: All customer-facing interfaces in Vietnamese
 - **Privacy Notices**: Privacy policies and notices in Vietnamese
 - **Consent Forms**: Consent forms in Vietnamese with clear explanations
 - **Documentation**: All compliance documentation in Vietnamese
 
 ### Cultural Considerations
+
 - **Family-Centric Approach**: Special consideration for family group data
 - **Regional Variations**: Adaptation to regional cultural preferences
 - **Festival Integration**: Special handling during Vietnamese festivals and holidays
 - **Hierarchy Respect**: Data access controls reflecting organizational hierarchy
 
 ### Tax and Financial Compliance
+
 - **Tax Reporting**: Adherence to Vietnamese tax reporting requirements
 - **Financial Audits**: Support for financial audits as required by law
 - **Currency Handling**: Proper handling of Vietnamese Dong (VND) in financial data
@@ -170,6 +184,7 @@ This document outlines the compliance requirements and rules for the Dulce de Sa
 ## Implementation Guidelines
 
 ### Compliance Monitoring
+
 - **Regular Audits**: Quarterly internal compliance audits
 - **Third-Party Assessments**: Annual third-party compliance assessments
 - **Regulatory Updates**: Monthly review of regulatory changes

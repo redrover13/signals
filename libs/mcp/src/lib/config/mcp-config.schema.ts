@@ -67,15 +67,15 @@ export interface MCPHealthCheckConfig {
   endpoint?: string;
 }
 
-export type MCPServerCategory = 
-  | 'core'           // Essential servers (git, filesystem, etc.)
-  | 'development'    // Development tools (nx, github, etc.)
-  | 'data'          // Data and databases (bigquery, chroma, etc.)
-  | 'web'           // Web and API services (exa, netlify, etc.)
-  | 'platforms'     // Platform integrations (notion, firebase, etc.)
-  | 'specialized'   // Specialized tools (google-maps, algolia, etc.)
-  | 'testing'       // Testing and debugging (browserstack, etc.)
-  | 'automation';   // Workflow automation (make, etc.)
+export type MCPServerCategory =
+  | 'core' // Essential servers (git, filesystem, etc.)
+  | 'development' // Development tools (nx, github, etc.)
+  | 'data' // Data and databases (bigquery, chroma, etc.)
+  | 'web' // Web and API services (exa, netlify, etc.)
+  | 'platforms' // Platform integrations (notion, firebase, etc.)
+  | 'specialized' // Specialized tools (google-maps, algolia, etc.)
+  | 'testing' // Testing and debugging (browserstack, etc.)
+  | 'automation'; // Workflow automation (make, etc.)
 
 export interface MCPGlobalConfig {
   /** Global MCP settings */
@@ -132,23 +132,23 @@ export const DEFAULT_MCP_CONFIG: Partial<MCPGlobalConfig> = {
   defaultRetry: {
     attempts: 3,
     delay: 1000,
-    backoff: 'exponential'
+    backoff: 'exponential',
   },
   healthMonitoring: {
     enabled: true,
     interval: 60000,
-    alertThreshold: 3
+    alertThreshold: 3,
   },
   logging: {
     level: 'info',
     destination: 'console',
-    includeRequestResponse: false
+    includeRequestResponse: false,
   },
   security: {
     enableTLS: true,
     validateCertificates: true,
-    maxRequestSize: 10485760 // 10MB
-  }
+    maxRequestSize: 10485760, // 10MB
+  },
 };
 
 /**
@@ -162,5 +162,5 @@ export const CATEGORY_PRIORITIES: Record<MCPServerCategory, number> = {
   platforms: 6,
   specialized: 5,
   testing: 4,
-  automation: 3
+  automation: 3,
 };

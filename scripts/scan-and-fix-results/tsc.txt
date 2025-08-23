@@ -1,0 +1,77 @@
+libs/mcp/src/lib/clients/request-router.service.ts(223,5): error TS1068: Unexpected token. A constructor, method, accessor, or property was expected.
+libs/mcp/src/lib/clients/request-router.service.ts(230,3): error TS1128: Declaration or statement expected.
+libs/mcp/src/lib/clients/request-router.service.ts(235,3): error TS1128: Declaration or statement expected.
+libs/mcp/src/lib/clients/request-router.service.ts(235,35): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(235,62): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(235,80): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(235,82): error TS1434: Unexpected keyword or identifier.
+libs/mcp/src/lib/clients/request-router.service.ts(260,3): error TS1128: Declaration or statement expected.
+libs/mcp/src/lib/clients/request-router.service.ts(260,44): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(260,58): error TS1011: An element access expression should take an argument.
+libs/mcp/src/lib/clients/request-router.service.ts(260,87): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(260,89): error TS1434: Unexpected keyword or identifier.
+libs/mcp/src/lib/clients/request-router.service.ts(286,3): error TS1128: Declaration or statement expected.
+libs/mcp/src/lib/clients/request-router.service.ts(286,33): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(286,47): error TS1011: An element access expression should take an argument.
+libs/mcp/src/lib/clients/request-router.service.ts(286,49): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(286,51): error TS1434: Unexpected keyword or identifier.
+libs/mcp/src/lib/clients/request-router.service.ts(302,3): error TS1128: Declaration or statement expected.
+libs/mcp/src/lib/clients/request-router.service.ts(302,35): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(302,49): error TS1011: An element access expression should take an argument.
+libs/mcp/src/lib/clients/request-router.service.ts(302,51): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(302,53): error TS1434: Unexpected keyword or identifier.
+libs/mcp/src/lib/clients/request-router.service.ts(314,3): error TS1128: Declaration or statement expected.
+libs/mcp/src/lib/clients/request-router.service.ts(314,41): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(314,55): error TS1011: An element access expression should take an argument.
+libs/mcp/src/lib/clients/request-router.service.ts(314,57): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(314,59): error TS1434: Unexpected keyword or identifier.
+libs/mcp/src/lib/clients/request-router.service.ts(325,3): error TS1128: Declaration or statement expected.
+libs/mcp/src/lib/clients/request-router.service.ts(325,31): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(325,45): error TS1011: An element access expression should take an argument.
+libs/mcp/src/lib/clients/request-router.service.ts(325,47): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(325,49): error TS1434: Unexpected keyword or identifier.
+libs/mcp/src/lib/clients/request-router.service.ts(333,3): error TS1128: Declaration or statement expected.
+libs/mcp/src/lib/clients/request-router.service.ts(333,38): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(333,47): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(334,11): error TS1005: ':' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(334,67): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(335,9): error TS1005: ':' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(335,59): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(338,21): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(338,27): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(343,3): error TS1128: Declaration or statement expected.
+libs/mcp/src/lib/clients/request-router.service.ts(348,3): error TS1128: Declaration or statement expected.
+libs/mcp/src/lib/clients/request-router.service.ts(348,37): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(348,46): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(348,48): error TS1434: Unexpected keyword or identifier.
+libs/mcp/src/lib/clients/request-router.service.ts(356,3): error TS1128: Declaration or statement expected.
+libs/mcp/src/lib/clients/request-router.service.ts(356,35): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(356,44): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(356,74): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(363,22): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(363,36): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(364,9): error TS1005: ':' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(364,36): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(365,9): error TS1005: ':' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(365,62): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(371,28): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(371,46): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(372,9): error TS1005: ':' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(378,7): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(384,20): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(384,34): error TS1011: An element access expression should take an argument.
+libs/mcp/src/lib/clients/request-router.service.ts(384,36): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(391,22): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(392,12): error TS1005: ':' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(392,44): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(398,22): error TS1005: ';' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(399,9): error TS1005: ':' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(399,36): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(400,9): error TS1005: ':' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(400,36): error TS1005: ',' expected.
+libs/mcp/src/lib/clients/request-router.service.ts(414,3): error TS1128: Declaration or statement expected.
+libs/mcp/src/lib/clients/request-router.service.ts(418,32): error TS1011: An element access expression should take an argument.
+libs/mcp/src/lib/clients/request-router.service.ts(419,30): error TS1011: An element access expression should take an argument.
+libs/mcp/src/lib/clients/request-router.service.ts(420,20): error TS1109: Expression expected.
+libs/mcp/src/lib/clients/request-router.service.ts(421,3): error TS1128: Declaration or statement expected.
+libs/mcp/src/lib/clients/request-router.service.ts(441,1): error TS1128: Declaration or statement expected.

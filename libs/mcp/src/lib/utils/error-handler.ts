@@ -8,13 +8,13 @@
  */
 export enum ErrorCategory {
   NETWORK = 'network',
-  AUTHENTICATION = 'authentication', 
+  AUTHENTICATION = 'authentication',
   VALIDATION = 'validation',
   CONFIGURATION = 'configuration',
   TIMEOUT = 'timeout',
   RATE_LIMIT = 'rate_limit',
   SERVER_ERROR = 'server_error',
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
 }
 
 /**
@@ -22,9 +22,9 @@ export enum ErrorCategory {
  */
 export enum ErrorSeverity {
   LOW = 'low',
-  MEDIUM = 'medium', 
+  MEDIUM = 'medium',
   HIGH = 'high',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
 }
 
 /**
@@ -72,20 +72,20 @@ export function createError(
     serverId?: string;
   },
   originalError?: Error,
-  userMessage?: string
+  userMessage?: string,
 ): StandardizedError {
   const error = new Error(message) as StandardizedError;
-  
+
   error.category = category;
   error.severity = severity;
   error.context = {
     ...context,
-    timestamp: new Date()
+    timestamp: new Date(),
   };
   error.originalError = originalError;
   error.retryable = isRetryableError(category);
   error.userMessage = userMessage;
-  
+
   return error;
 }
 
@@ -97,7 +97,7 @@ export function isRetryableError(category: ErrorCategory): boolean {
     ErrorCategory.NETWORK,
     ErrorCategory.TIMEOUT,
     ErrorCategory.RATE_LIMIT,
-    ErrorCategory.SERVER_ERROR
+    ErrorCategory.SERVER_ERROR,
   ].includes(category);
 }
 
@@ -106,35 +106,47 @@ export function isRetryableError(category: ErrorCategory): boolean {
  */
 export function categorizeError(error: Error): ErrorCategory {
   const message = error.message.toLowerCase();
-  
-  if (message.includes('network') || message.includes('connection') || message.includes('econnrefused')) {
+
+  if (
+    message.includes('network') ||
+    message.includes('connection') ||
+    message.includes('econnrefused')
+  ) {
     return ErrorCategory.NETWORK;
   }
-  
-  if (message.includes('auth') || message.includes('unauthorized') || message.includes('forbidden')) {
+
+  if (
+    message.includes('auth') ||
+    message.includes('unauthorized') ||
+    message.includes('forbidden')
+  ) {
     return ErrorCategory.AUTHENTICATION;
   }
-  
-  if (message.includes('validation') || message.includes('invalid') || message.includes('required')) {
+
+  if (
+    message.includes('validation') ||
+    message.includes('invalid') ||
+    message.includes('required')
+  ) {
     return ErrorCategory.VALIDATION;
   }
-  
+
   if (message.includes('timeout') || message.includes('timed out')) {
     return ErrorCategory.TIMEOUT;
   }
-  
+
   if (message.includes('rate limit') || message.includes('too many requests')) {
     return ErrorCategory.RATE_LIMIT;
   }
-  
+
   if (message.includes('config') || message.includes('environment')) {
     return ErrorCategory.CONFIGURATION;
   }
-  
+
   if (message.includes('server error') || message.includes('internal error')) {
     return ErrorCategory.SERVER_ERROR;
   }
-  
+
   return ErrorCategory.UNKNOWN;
 }
 
@@ -150,9 +162,9 @@ export function getVietnameseMessage(category: ErrorCategory): string {
     [ErrorCategory.TIMEOUT]: 'Yêu cầu bị hết thời gian chờ. Vui lòng thử lại.',
     [ErrorCategory.RATE_LIMIT]: 'Quá nhiều yêu cầu. Vui lòng chờ và thử lại sau.',
     [ErrorCategory.SERVER_ERROR]: 'Lỗi máy chủ. Vui lòng thử lại sau.',
-    [ErrorCategory.UNKNOWN]: 'Đã xảy ra lỗi không xác định. Vui lòng thử lại.'
+    [ErrorCategory.UNKNOWN]: 'Đã xảy ra lỗi không xác định. Vui lòng thử lại.',
   };
-  
+
   return messages[category];
 }
 
@@ -168,65 +180,63 @@ export async function withErrorHandler<T>(
     requestId?: string;
     serverId?: string;
   },
-  options: ErrorRecoveryOptions = {}
+  options: ErrorRecoveryOptions = {},
 ): Promise<T> {
   const { maxRetries = 0, retryDelay = 1000, exponentialBackoff = false } = options;
-  
+
   let lastError: Error;
   let attempt = 0;
-  
+
   while (attempt <= maxRetries) {
     try {
       return await fn();
     } catch (error) {
       const originalError = error as Error;
       lastError = originalError;
-      
+
       const category = categorizeError(originalError);
       const severity = getSeverityFromCategory(category);
-      
+
       const standardizedError = createError(
         originalError.message,
         category,
         severity,
         context,
         originalError,
-        getVietnameseMessage(category)
+        getVietnameseMessage(category),
       );
-      
+
       // Log the error with context
       logError(standardizedError);
-      
+
       // Check if we should retry
       if (attempt < maxRetries && standardizedError.retryable) {
         attempt++;
-        
+
         if (options.onRetry) {
           options.onRetry(attempt, standardizedError);
         }
-        
+
         // Calculate delay with optional exponential backoff
-        const delay = exponentialBackoff 
-          ? retryDelay * Math.pow(2, attempt - 1)
-          : retryDelay;
-        
+        const delay = exponentialBackoff ? retryDelay * Math.pow(2, attempt - 1) : retryDelay;
+
         await sleep(delay);
         continue;
       }
-      
+
       // If we have a fallback action and no more retries
       if (options.fallbackAction && attempt === maxRetries) {
         try {
-          return await options.fallbackAction() as T;
+          return (await options.fallbackAction()) as T;
         } catch (fallbackError) {
           console.warn('Fallback action failed:', fallbackError);
         }
       }
-      
+
       throw standardizedError;
     }
   }
-  
+
   throw lastError!;
 }
 
@@ -257,7 +267,7 @@ function getSeverityFromCategory(category: ErrorCategory): ErrorSeverity {
 export function logError(error: StandardizedError): void {
   const logLevel = getLogLevel(error.severity);
   const logMessage = formatErrorLog(error);
-  
+
   switch (logLevel) {
     case 'error':
       console.error(logMessage);
@@ -294,22 +304,26 @@ function getLogLevel(severity: ErrorSeverity): 'error' | 'warn' | 'info' | 'debu
  * Format error for logging
  */
 function formatErrorLog(error: StandardizedError): string {
-  return JSON.stringify({
-    message: error.message,
-    category: error.category,
-    severity: error.severity,
-    context: error.context,
-    stack: error.stack,
-    originalError: error.originalError?.message,
-    userMessage: error.userMessage
-  }, null, 2);
+  return JSON.stringify(
+    {
+      message: error.message,
+      category: error.category,
+      severity: error.severity,
+      context: error.context,
+      stack: error.stack,
+      originalError: error.originalError?.message,
+      userMessage: error.userMessage,
+    },
+    null,
+    2,
+  );
 }
 
 /**
  * Sleep utility for retry delays
  */
 function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -321,15 +335,19 @@ export function createServiceErrorHandler(serviceName: string, fileName: string)
       fn: () => Promise<T>,
       functionName: string,
       params?: Record<string, unknown>,
-      options?: ErrorRecoveryOptions
+      options?: ErrorRecoveryOptions,
     ): Promise<T> {
-      return withErrorHandler(fn, {
-        function: `${serviceName}.${functionName}`,
-        file: fileName,
-        params
-      }, options);
+      return withErrorHandler(
+        fn,
+        {
+          function: `${serviceName}.${functionName}`,
+          file: fileName,
+          params,
+        },
+        options,
+      );
     },
-    
+
     createError: (
       message: string,
       category: ErrorCategory,
@@ -337,18 +355,19 @@ export function createServiceErrorHandler(serviceName: string, fileName: string)
       functionName: string,
       params?: Record<string, unknown>,
       originalError?: Error,
-      userMessage?: string
-    ) => createError(
-      message,
-      category,
-      severity,
-      {
-        function: `${serviceName}.${functionName}`,
-        file: fileName,
-        params
-      },
-      originalError,
-      userMessage
-    )
+      userMessage?: string,
+    ) =>
+      createError(
+        message,
+        category,
+        severity,
+        {
+          function: `${serviceName}.${functionName}`,
+          file: fileName,
+          params,
+        },
+        originalError,
+        userMessage,
+      ),
   };
 }

@@ -10,47 +10,91 @@ import { readFileSync, readdirSync, statSync } from 'fs';
 import { join, extname } from 'path';
 
 const SUPPORTED_EXTENSIONS = ['.ts', '.js', '.json', '.md', '.txt', '.yml', '.yaml'];
-const IGNORE_PATTERNS = [
-  'node_modules',
-  '.git',
-  '.nx',
-  'dist',
-  'coverage',
-  '.pnpm-store',
-  'tmp'
-];
+const IGNORE_PATTERNS = ['node_modules', '.git', '.nx', 'dist', 'coverage', '.pnpm-store', 'tmp'];
 
 /**
  * Test Vietnamese characters for proper UTF-8 encoding
  */
 const VIETNAMESE_TEST_CHARS = [
-  'á', 'à', 'ả', 'ã', 'ạ',  // a with tones
-  'ă', 'ắ', 'ằ', 'ẳ', 'ẵ', 'ặ',  // a with breve
-  'â', 'ấ', 'ầ', 'ẩ', 'ẫ', 'ậ',  // a with circumflex
-  'đ',  // d with stroke
-  'é', 'è', 'ẻ', 'ẽ', 'ẹ',  // e with tones
-  'ê', 'ế', 'ề', 'ể', 'ễ', 'ệ',  // e with circumflex
-  'í', 'ì', 'ỉ', 'ĩ', 'ị',  // i with tones
-  'ó', 'ò', 'ỏ', 'õ', 'ọ',  // o with tones
-  'ô', 'ố', 'ồ', 'ổ', 'ỗ', 'ộ',  // o with circumflex
-  'ơ', 'ớ', 'ờ', 'ở', 'ỡ', 'ợ',  // o with horn
-  'ú', 'ù', 'ủ', 'ũ', 'ụ',  // u with tones
-  'ư', 'ứ', 'ừ', 'ử', 'ữ', 'ự',  // u with horn
-  'ý', 'ỳ', 'ỷ', 'ỹ', 'ỵ'   // y with tones
+  'á',
+  'à',
+  'ả',
+  'ã',
+  'ạ', // a with tones
+  'ă',
+  'ắ',
+  'ằ',
+  'ẳ',
+  'ẵ',
+  'ặ', // a with breve
+  'â',
+  'ấ',
+  'ầ',
+  'ẩ',
+  'ẫ',
+  'ậ', // a with circumflex
+  'đ', // d with stroke
+  'é',
+  'è',
+  'ẻ',
+  'ẽ',
+  'ẹ', // e with tones
+  'ê',
+  'ế',
+  'ề',
+  'ể',
+  'ễ',
+  'ệ', // e with circumflex
+  'í',
+  'ì',
+  'ỉ',
+  'ĩ',
+  'ị', // i with tones
+  'ó',
+  'ò',
+  'ỏ',
+  'õ',
+  'ọ', // o with tones
+  'ô',
+  'ố',
+  'ồ',
+  'ổ',
+  'ỗ',
+  'ộ', // o with circumflex
+  'ơ',
+  'ớ',
+  'ờ',
+  'ở',
+  'ỡ',
+  'ợ', // o with horn
+  'ú',
+  'ù',
+  'ủ',
+  'ũ',
+  'ụ', // u with tones
+  'ư',
+  'ứ',
+  'ừ',
+  'ử',
+  'ữ',
+  'ự', // u with horn
+  'ý',
+  'ỳ',
+  'ỷ',
+  'ỹ',
+  'ỵ', // y with tones
 ];
 
 /**
  * Test emojis for proper UTF-8 encoding
  */
-const EMOJI_TEST_CHARS = [
-  '✅', '❌', '⚠️', '🚀', '🎉', '📊', '🏥', '💭', '🔀', '🔄'
-];
+const EMOJI_TEST_CHARS = ['✅', '❌', '⚠️', '🚀', '🎉', '📊', '🏥', '💭', '🔀', '🔄'];
 
 /**
  * Check if a file path should be ignored
  */
 function shouldIgnoreFile(filePath) {
-  return IGNORE_PATTERNS.some(pattern => filePath.includes(pattern));
+  return IGNORE_PATTERNS.some((pattern) => filePath.includes(pattern));
 }
 
 /**
@@ -66,13 +110,13 @@ function hasSupportedExtension(filePath) {
 function validateFileEncoding(filePath) {
   try {
     const content = readFileSync(filePath, 'utf8');
-    
+
     // Check for UTF-8 replacement characters (\uFFFD)
     const replacementChar = '\uFFFD';
     if (content.includes(replacementChar)) {
       return {
         valid: false,
-        error: 'Contains UTF-8 replacement characters (\uFFFD) - possible encoding corruption'
+        error: 'Contains UTF-8 replacement characters (\uFFFD) - possible encoding corruption',
       };
     }
 
@@ -86,13 +130,13 @@ function validateFileEncoding(filePath) {
           if (decoded !== char) {
             return {
               valid: false,
-              error: `Vietnamese character '${char}' encoding validation failed`
+              error: `Vietnamese character '${char}' encoding validation failed`,
             };
           }
         } catch (e) {
           return {
             valid: false,
-            error: `Vietnamese character '${char}' encoding error: ${e.message}`
+            error: `Vietnamese character '${char}' encoding error: ${e.message}`,
           };
         }
       }
@@ -107,13 +151,13 @@ function validateFileEncoding(filePath) {
           if (decoded !== emoji) {
             return {
               valid: false,
-              error: `Emoji '${emoji}' encoding validation failed`
+              error: `Emoji '${emoji}' encoding validation failed`,
             };
           }
         } catch (e) {
           return {
             valid: false,
-            error: `Emoji '${emoji}' encoding error: ${e.message}`
+            error: `Emoji '${emoji}' encoding error: ${e.message}`,
           };
         }
       }
@@ -126,7 +170,7 @@ function validateFileEncoding(filePath) {
     }
     return {
       valid: false,
-      error: `Failed to read file: ${error.message}`
+      error: `Failed to read file: ${error.message}`,
     };
   }
 }
@@ -137,27 +181,27 @@ function validateFileEncoding(filePath) {
 function walkDirectory(dirPath, results = { valid: [], invalid: [] }) {
   try {
     const items = readdirSync(dirPath);
-    
+
     for (const item of items) {
       const fullPath = join(dirPath, item);
-      
+
       if (shouldIgnoreFile(fullPath)) {
         continue;
       }
-      
+
       const stat = statSync(fullPath);
-      
+
       if (stat.isDirectory()) {
         walkDirectory(fullPath, results);
       } else if (hasSupportedExtension(fullPath)) {
         const validation = validateFileEncoding(fullPath);
-        
+
         if (validation.valid) {
           results.valid.push(fullPath);
         } else {
           results.invalid.push({
             path: fullPath,
-            error: validation.error
+            error: validation.error,
           });
         }
       }
@@ -165,7 +209,7 @@ function walkDirectory(dirPath, results = { valid: [], invalid: [] }) {
   } catch (error) {
     console.error(`Error walking directory ${dirPath}:`, error.message);
   }
-  
+
   return results;
 }
 
@@ -174,10 +218,11 @@ function walkDirectory(dirPath, results = { valid: [], invalid: [] }) {
  */
 function validateEncoding(rootPath = '.') {
   console.log('🔍 Starting UTF-8 encoding validation...\n');
-  
+
   // Test Vietnamese character support
   console.log('Testing Vietnamese character support:');
-  for (const char of VIETNAMESE_TEST_CHARS.slice(0, 5)) { // Test first 5 characters
+  for (const char of VIETNAMESE_TEST_CHARS.slice(0, 5)) {
+    // Test first 5 characters
     try {
       const buffer = Buffer.from(char, 'utf8');
       const decoded = buffer.toString('utf8');
@@ -186,9 +231,10 @@ function validateEncoding(rootPath = '.') {
       console.log(`  ${char} → ❌ (${e.message})`);
     }
   }
-  
+
   console.log('\nTesting emoji support:');
-  for (const emoji of EMOJI_TEST_CHARS.slice(0, 5)) { // Test first 5 emojis
+  for (const emoji of EMOJI_TEST_CHARS.slice(0, 5)) {
+    // Test first 5 emojis
     try {
       const buffer = Buffer.from(emoji, 'utf8');
       const decoded = buffer.toString('utf8');
@@ -197,25 +243,25 @@ function validateEncoding(rootPath = '.') {
       console.log(`  ${emoji} → ❌ (${e.message})`);
     }
   }
-  
+
   console.log('\n📁 Validating files...');
   const results = walkDirectory(rootPath);
-  
+
   console.log(`\n📊 Validation Results:`);
   console.log(`  ✅ Valid files: ${results.valid.length}`);
   console.log(`  ❌ Invalid files: ${results.invalid.length}`);
-  
+
   if (results.invalid.length > 0) {
     console.log('\n❌ Files with encoding issues:');
     for (const invalid of results.invalid) {
       console.log(`  - ${invalid.path}: ${invalid.error}`);
     }
-    
+
     console.log('\n💡 To fix encoding issues:');
     console.log('  1. Open files in a UTF-8 capable editor');
     console.log('  2. Save with UTF-8 encoding');
     console.log('  3. Ensure .editorconfig specifies charset = utf-8');
-    
+
     process.exit(1);
   } else {
     console.log('\n🎉 All files pass UTF-8 validation!');

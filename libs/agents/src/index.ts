@@ -12,7 +12,7 @@ export type AgentConfig = {
   tools: Record<string, Tool>;
   complete: (
     prompt: string,
-    history: Array<{ role: 'user' | 'assistant'; content: string }>
+    history: Array<{ role: 'user' | 'assistant'; content: string }>,
   ) => Promise<string>;
   maxSteps?: number;
 };
@@ -21,7 +21,9 @@ export type AgentConfig = {
  * Minimal runner loop — safe placeholder until you integrate ADK/Vertex.
  */
 export async function runAgent(task: string, cfg: AgentConfig) {
-  const history: Array<{ role: 'user' | 'assistant'; content: string }> = [{ role: 'user', content: task }];
+  const history: Array<{ role: 'user' | 'assistant'; content: string }> = [
+    { role: 'user', content: task },
+  ];
   const response = await cfg.complete(task, history);
   return [...history, { role: 'assistant', content: response }];
 }

@@ -345,8 +345,8 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
       },
     },
     options: {
-  projectId: process.env['GCP_PROJECT_ID'],
-  region: process.env['GCP_REGION'] || 'us-central1',
+      projectId: process.env['GCP_PROJECT_ID'],
+      region: process.env['GCP_REGION'] || 'us-central1',
     },
   },
 
@@ -556,8 +556,8 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
       },
     },
     options: {
-  projectId: process.env['GCP_PROJECT_ID'],
-  region: process.env['GCP_REGION'] || 'us-central1',
+      projectId: process.env['GCP_PROJECT_ID'],
+      region: process.env['GCP_REGION'] || 'us-central1',
       services: ['bigquery', 'storage', 'secretmanager', 'aiplatform'],
     },
   },

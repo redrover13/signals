@@ -13,7 +13,7 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-  "command": "tsc -p apps/api/tsconfig.json && node -e 'require(\"fs\").cpSync(\"apps/api/src/routes\", \"dist/apps/api/routes\", { recursive: true })'"
+        "command": "tsc -p apps/api/tsconfig.json && node -e 'require(\"fs\").cpSync(\"apps/api/src/routes\", \"dist/apps/api/routes\", { recursive: true })'"
       }
     },
     "lint": {

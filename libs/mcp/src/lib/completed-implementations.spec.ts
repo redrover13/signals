@@ -2,8 +2,8 @@
  * Test file to verify completed implementations
  */
 
-import { createMCPClient, withErrorHandler, ErrorCategory, ErrorSeverity } from '../src/index';
-import { ensureTopic, getPubSub } from '../../gcp/src/index';
+import { createMCPClient, withErrorHandler, ErrorCategory, ErrorSeverity } from '../index';
+import { ensureTopic, getPubSub } from '../../../gcp/src/index';
 
 describe('Completed Implementations', () => {
   describe('Error Handling', () => {
@@ -14,23 +14,23 @@ describe('Completed Implementations', () => {
         },
         {
           function: 'test',
-          file: 'test.spec.ts'
+          file: 'test.spec.ts',
         },
         {
           maxRetries: 1,
           retryDelay: 100,
           fallbackAction: async () => {
             return { fallback: true };
-          }
-        }
+          },
+        },
       );
 
       expect(result).toEqual({ fallback: true });
     });
 
     it('should categorize errors correctly', async () => {
-      const { categorizeError } = await import('../src/lib/utils/error-handler');
-      
+      const { categorizeError } = await import('./utils/error-handler');
+
       expect(categorizeError(new Error('network timeout'))).toBe(ErrorCategory.NETWORK);
       expect(categorizeError(new Error('unauthorized access'))).toBe(ErrorCategory.AUTHENTICATION);
       expect(categorizeError(new Error('validation failed'))).toBe(ErrorCategory.VALIDATION);
@@ -52,7 +52,7 @@ describe('Completed Implementations', () => {
       expect(pubsub).toBeDefined();
       expect(pubsub.topic).toBeDefined();
       expect(typeof pubsub.topic).toBe('function');
-      
+
       const topic = pubsub.topic('test-topic');
       expect(topic.publishMessage).toBeDefined();
       expect(typeof topic.publishMessage).toBe('function');

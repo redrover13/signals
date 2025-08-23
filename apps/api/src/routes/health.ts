@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 /**
  * @swagger
@@ -17,10 +17,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
  *                   type: string
  */
 export async function healthRoutes(fastify: FastifyInstance) {
-  fastify.get(
-    "/",
-    async function (_request: FastifyRequest, reply: FastifyReply) {
-      return reply.send({ status: "ok" });
-    }
-  );
+  fastify.get('/', async function (_request: FastifyRequest, reply: FastifyReply) {
+    return reply.send({ status: 'ok' });
+  });
 }

@@ -57,6 +57,7 @@
     "@google-analytics/data": "^5.2.0",
     "@google-cloud/aiplatform": "^5.5.0",
     "@google-cloud/bigquery": "8.1.1",
+    "@google-cloud/pubsub": "^4.1.0",
     "@google-cloud/secret-manager": "^6.1.0",
     "@google-cloud/storage": "7.16.0",
     "@modelcontextprotocol/sdk": "^1.17.3",

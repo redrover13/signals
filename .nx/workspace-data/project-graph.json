@@ -16343,6 +16343,11 @@
         "source": "gcp",
         "target": "npm:lodash",
         "type": "static"
+      },
+      {
+        "source": "gcp",
+        "target": "npm:@google-cloud/pubsub",
+        "type": "dynamic"
       }
     ],
     "mcp": [],
@@ -37954,5 +37959,5 @@
   },
   "version": "6.0",
   "errors": [],
-  "computedAt": 1755850437574
+  "computedAt": 1755923199502
 }

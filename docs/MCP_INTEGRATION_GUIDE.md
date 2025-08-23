@@ -277,41 +277,98 @@ export class MCPHealthController {
 ### 3. Error Handling and Fallbacks
 
 ```typescript
+import { withErrorHandler, ErrorCategory, ErrorSeverity } from '@nx-monorepo/mcp';
+
 export class ResilientDataService {
   async getData(query: string) {
-    try {
-      // Primary: Try BigQuery
-      return await mcpService.bigquery(query);
-    } catch (error) {
-      console.warn('BigQuery failed, trying fallback:', error);
-      
-      try {
-        // Fallback 1: Try cached data from memory
-        const cached = await mcpService.memory('retrieve', { 
-          key: `cache-${this.hashQuery(query)}` 
-        });
-        
-        if (cached.result) {
-          return cached;
-        }
-      } catch (memoryError) {
-        console.warn('Memory fallback failed:', memoryError);
-      }
+    return withErrorHandler(
+      async () => {
+        // Primary: Try BigQuery
+        return await mcpService.bigquery(query);
+      },
+      {
+        function: 'ResilientDataService.getData',
+        file: 'data.service.ts',
+        params: { query }
+      },
+      {
+        maxRetries: 2,
+        retryDelay: 1000,
+        exponentialBackoff: true,
+        fallbackAction: async () => {
+          // Fallback 1: Try cached data from memory
+          try {
+            const cached = await mcpService.memory('retrieve', { 
+              key: `cache-${this.hashQuery(query)}` 
+            });
+            
+            if (cached.result) {
+              return cached;
+            }
+          } catch (memoryError) {
+            console.warn('Memory fallback failed:', memoryError);
+          }
 
-      try {
-        // Fallback 2: Try external search
-        const searchResult = await mcpService.search(query);
-        return { result: searchResult.result, source: 'search' };
-      } catch (searchError) {
-        console.error('All data sources failed:', searchError);
-        throw new Error('Data unavailable from all sources');
+          // Fallback 2: Try external search
+          const searchResult = await mcpService.search(query);
+          return { result: searchResult.result, source: 'search' };
+        },
+        onRetry: (attempt, error) => {
+          console.warn(`Retrying getData, attempt ${attempt}:`, error.message);
+        }
       }
-    }
+    );
   }
 
   private hashQuery(query: string): string {
     // Simple hash function for caching
     return Buffer.from(query).toString('base64').slice(0, 16);
+  }
+}
+```
+
+### 4. Standardized Error Handling
+
+The MCP library now includes standardized error handling with Vietnamese language support:
+
+```typescript
+import { 
+  createServiceErrorHandler, 
+  ErrorCategory, 
+  ErrorSeverity,
+  withErrorHandler 
+} from '@nx-monorepo/mcp';
+
+export class MyService {
+  private errorHandler = createServiceErrorHandler('MyService', 'my-service.ts');
+
+  async processData(data: unknown) {
+    return this.errorHandler.withRetry(
+      async () => {
+        // Your business logic here
+        const result = await mcpService.bigquery('SELECT * FROM my_table');
+        return result;
+      },
+      'processData',
+      { data },
+      {
+        maxRetries: 3,
+        retryDelay: 1000,
+        exponentialBackoff: true
+      }
+    );
+  }
+
+  async validateInput(input: string) {
+    if (!input) {
+      throw this.errorHandler.createError(
+        'Input is required',
+        ErrorCategory.VALIDATION,
+        ErrorSeverity.MEDIUM,
+        'validateInput',
+        { input }
+      );
+    }
   }
 }
 ```

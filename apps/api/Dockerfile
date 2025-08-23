@@ -1,5 +1,11 @@
 # Use the official Node.js 20 image as a parent image
 FROM node:20-slim
+\nARG USER_ID=1000
+ARG GROUP_ID=1000
+
+RUN groupadd -g ${GROUP_ID} appuser \
+    && useradd -u ${USER_ID} -g appuser -s /bin/bash -m appuser
+
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
@@ -20,4 +26,5 @@ RUN pnpm nx build api
 EXPOSE 3000
 
 # Start the agents application
+USER appuser
 CMD ["node", "dist/apps/api/main.js"]

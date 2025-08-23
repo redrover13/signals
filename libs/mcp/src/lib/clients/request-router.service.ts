@@ -1,6 +1,5 @@
 /**
  * Request Router Service
- * Routes MCP requests to appropriate servers based on method, load, and availability
  */
 
 import { MCPRequest } from './mcp-client.service';
@@ -195,10 +194,8 @@ export class RequestRouter {
     }
 
     // Find matching routing rules
-    const matchingRules = this.findMatchingRules(request.method);
     
     if (matchingRules.length === 0) {
-      throw new Error(`No routing rule found for method: ${request.method}`);
     }
 
     // Filter rules by server availability and conditions
@@ -210,11 +207,10 @@ export class RequestRouter {
     });
 
     if (availableRules.length === 0) {
-      throw new Error(`No available servers found for method: ${request.method}`);
     }
 
     // Select server based on load balancing strategy
-    const selectedRule = this.selectServerByLoadBalancing(availableRules, request);
+    const selectedRule = this.selectServerByLoadBalancing(availableRules);
     
     // Update load counters
     this.updateLoadCounters(selectedRule.serverId);
@@ -223,15 +219,11 @@ export class RequestRouter {
   }
 
   /**
-   * Find routing rules that match the request method
    */
-  private findMatchingRules(method: string): RoutingRule[] {
     return this.routingRules
       .filter(rule => {
         if (typeof rule.pattern === 'string') {
-          return method.includes(rule.pattern);
         } else {
-          return rule.pattern.test(method);
         }
       })
       .sort((a, b) => b.priority - a.priority);
@@ -354,7 +346,7 @@ export class RequestRouter {
    * Check if server is available
    */
   private isServerAvailable(serverId: string): boolean {
-    const connection = this.mcpClient.getServerStatus(serverId);
+    const connection = this.mcpClient.getServerStatus(serverId) as any;
     return connection && connection.status === 'connected';
   }
 
@@ -409,10 +401,7 @@ export class RequestRouter {
   }
 
   /**
-   * Get available servers for a method
    */
-  getAvailableServersForMethod(method: string): string[] {
-    const matchingRules = this.findMatchingRules(method);
     
     return matchingRules
       .filter(rule => {
@@ -425,15 +414,11 @@ export class RequestRouter {
   }
 
   /**
-   * Test routing for a method (without actually routing)
    */
-  testRouting(method: string): {
     matchingRules: RoutingRule[];
     availableServers: string[];
     selectedServer?: string;
   } {
-    const matchingRules = this.findMatchingRules(method);
-    const availableServers = this.getAvailableServersForMethod(method);
     
     let selectedServer: string | undefined;
     try {
@@ -441,10 +426,7 @@ export class RequestRouter {
         availableServers.includes(rule.serverId)
       );
       if (availableRules.length > 0) {
-        selectedServer = this.selectServerByLoadBalancing(availableRules, { 
-          id: 'test', 
-          method 
-        } as MCPRequest).serverId;
+        selectedServer = this.selectServerByLoadBalancing(availableRules); 
       }
     } catch {
       // Ignore errors in test mode

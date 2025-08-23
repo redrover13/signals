@@ -127,10 +127,10 @@ export class MCPClientService extends EventEmitter {
           await this.connectHttp(connection);
           break;
         case 'websocket':
-          await this.connectWebSocket(connection);
+          await this.connectWebSocket();
           break;
         case 'tcp':
-          await this.connectTcp(connection);
+          await this.connectTcp();
           break;
         default:
           throw new Error(`Unsupported connection type: ${config.connection.type}`);
@@ -180,10 +180,10 @@ export class MCPClientService extends EventEmitter {
     });
 
     // Set up JSON-RPC communication
-    connection.process = spawnedProcess;
+    connection.process = spawnedProcess as any;
 
     // Wait for initial connection
-    await this.waitForConnection(connection);
+    await this.waitForConnection();
   }
 
   /**
@@ -203,7 +203,7 @@ export class MCPClientService extends EventEmitter {
     connection.client = client;
 
     // Test connection
-    await this.testHttpConnection(connection);
+    await this.testHttpConnection();
   }
 
   /**
@@ -406,7 +406,7 @@ export class MCPClientService extends EventEmitter {
    */
   private async disconnectFromServer(connection: MCPServerConnection): Promise<void> {
     if (connection.process) {
-      connection.process.kill();
+      connection.process.kill(process.pid);
     }
     if (connection.client) {
       // Close HTTP/WebSocket client

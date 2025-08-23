@@ -124,6 +124,7 @@ export interface MCPEnvironmentConfig {
 
 /**
  * Default MCP configuration values
+ * NOTE: For server-specific configurations, please refer to `server-config.defaults.ts`.
  */
 export const DEFAULT_MCP_CONFIG: Partial<MCPGlobalConfig> = {
   version: '1.0.0',

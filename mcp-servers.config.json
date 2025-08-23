@@ -56,21 +56,29 @@
         }
       },
       "enabledServers": [
-        "filesystem",
-        "git",
-        "github",
-        "memory",
-        "sequentialthinking",
-        "time",
-        "fetch",
-        "databases",
-        "nx",
-        "node",
-        "google",
-        "exa",
-        "apimatic",
-        "toolbox",
-        "cloudrun"
+  "semgrep",
+  "nx-mcp",
+  "google-filesystem",
+  "google-postgres",
+  "google-maps",
+  "google-search",
+  "qdrant",
+  "filesystem",
+  "git",
+  "github",
+  "memory",
+  "sequentialthinking",
+  "time",
+  "fetch",
+  "databases",
+  "nx",
+  "node",
+  "google",
+  "exa",
+  "apimatic",
+  "toolbox",
+  "cloudrun",
+  "codacy"
       ],
       "serverOverrides": {
         "github": {
@@ -83,6 +91,19 @@
           },
           "auth": {
             "secretName": "github-token-dev"
+          }
+        },
+        "codacy": {
+          "connection": {
+            "timeout": 20000
+          },
+          "healthCheck": {
+            "interval": 60000,
+            "failureThreshold": 2
+          },
+          "auth": {
+            "type": "token",
+            "secretName": "codacy-token-dev"
           }
         },
         "databases": {
@@ -133,6 +154,65 @@
             "timeout": 30000
           }
         }
+        ,
+        "semgrep": {
+          "connection": {
+            "url": "${SEMGREP_URL:-https://mcp.semgrep.ai/sse}",
+            "timeout": 10000
+          }
+        },
+        "nx-mcp": {
+          "connection": {
+            "url": "${NX_MCP_URL:-https://mcp.nx.app/sse}",
+            "timeout": 10000
+          }
+        },
+        "google-filesystem": {
+          "connection": {
+            "url": "${GOOGLE_FILESYSTEM_URL:-https://mcp.googleapis.com/filesystem/sse}",
+            "timeout": 15000
+          },
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          }
+        },
+        "google-postgres": {
+          "connection": {
+            "url": "${GOOGLE_POSTGRES_URL:-https://mcp.googleapis.com/postgres/sse}",
+            "timeout": 15000
+          },
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          }
+        },
+        "google-maps": {
+          "connection": {
+            "url": "${GOOGLE_MAPS_URL:-https://mcp.googleapis.com/maps/sse}",
+            "timeout": 15000
+          },
+          "auth": {
+            "type": "env",
+            "envName": "GOOGLE_MAPS_API_KEY"
+          }
+        },
+        "google-search": {
+          "connection": {
+            "url": "${GOOGLE_SEARCH_URL:-https://mcp.googleapis.com/search/sse}",
+            "timeout": 15000
+          }
+        },
+        "qdrant": {
+          "connection": {
+            "url": "${QDRANT_URL:-https://mcp.qdrant.tech/sse}",
+            "timeout": 15000
+          },
+          "auth": {
+            "type": "env",
+            "envName": "QDRANT_API_KEY"
+          }
+        }
       }
     },
     "staging": {
@@ -172,6 +252,13 @@
         }
       },
       "enabledServers": [
+        "semgrep",
+        "nx-mcp",
+        "google-filesystem",
+        "google-postgres",
+        "google-maps",
+        "google-search",
+        "qdrant",
         "filesystem",
         "git",
         "github",
@@ -255,6 +342,65 @@
             "timeout": 45000
           }
         }
+        ,
+        "semgrep": {
+          "connection": {
+            "url": "${SEMGREP_URL:-https://mcp.semgrep.ai/sse}",
+            "timeout": 15000
+          }
+        },
+        "nx-mcp": {
+          "connection": {
+            "url": "${NX_MCP_URL:-https://mcp.nx.app/sse}",
+            "timeout": 15000
+          }
+        },
+        "google-filesystem": {
+          "connection": {
+            "url": "${GOOGLE_FILESYSTEM_URL:-https://mcp.googleapis.com/filesystem/sse}",
+            "timeout": 15000
+          },
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          }
+        },
+        "google-postgres": {
+          "connection": {
+            "url": "${GOOGLE_POSTGRES_URL:-https://mcp.googleapis.com/postgres/sse}",
+            "timeout": 15000
+          },
+          "auth": {
+            "type": "wif",
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+          }
+        },
+        "google-maps": {
+          "connection": {
+            "url": "${GOOGLE_MAPS_URL:-https://mcp.googleapis.com/maps/sse}",
+            "timeout": 15000
+          },
+          "auth": {
+            "type": "env",
+            "envName": "GOOGLE_MAPS_API_KEY"
+          }
+        },
+        "google-search": {
+          "connection": {
+            "url": "${GOOGLE_SEARCH_URL:-https://mcp.googleapis.com/search/sse}",
+            "timeout": 15000
+          }
+        },
+        "qdrant": {
+          "connection": {
+            "url": "${QDRANT_URL:-https://mcp.qdrant.tech/sse}",
+            "timeout": 15000
+          },
+          "auth": {
+            "type": "env",
+            "envName": "QDRANT_API_KEY"
+          }
+        }
       }
     },
     "production": {
@@ -307,6 +453,13 @@
         }
       },
       "enabledServers": [
+        "semgrep",
+        "nx-mcp",
+        "google-filesystem",
+        "google-postgres",
+        "google-maps",
+        "google-search",
+        "qdrant",
         "filesystem",
         "git",
         "github",
@@ -582,7 +735,9 @@
             "fetch.get",
             "fetch.post",
             "nx.run",
-            "node.execute"
+            "node.execute",
+            "search.files",
+            "fs.list"
           ]
         },
         "mcp-admin": {
@@ -721,6 +876,136 @@
       "description": "Reference MCP server and deployment pattern for hosting MCP servers on Cloud Run.",
       "recommendedAuth": "gcp-iap or wif",
       "notes": "Use Cloud Run and IAM to host MCP implementations."
+    },
+    {
+      "id": "google-cloud",
+      "name": "Google Cloud",
+      "repo": "https://github.com/googleapis/google-cloud-node",
+      "category": "google",
+      "description": "General Google Cloud services.",
+      "recommendedAuth": "wif / service-account"
+    },
+    {
+      "id": "bq",
+      "name": "BigQuery",
+      "repo": "https://github.com/googleapis/google-cloud-node/tree/main/packages/google-cloud-bigquery",
+      "category": "google",
+      "description": "BigQuery for data warehousing and analytics.",
+      "recommendedAuth": "wif / service-account"
+    },
+    {
+      "id": "nx-mcp",
+      "name": "Nx MCP",
+      "repo": "npm:nx-mcp",
+      "category": "third-party",
+      "description": "Nx monorepo context (project graph, generators, docs)",
+      "recommendedAuth": "none"
+    },
+    {
+      "id": "google-filesystem",
+      "name": "Google Filesystem",
+      "repo": "https://github.com/modelcontextprotocol/server-filesystem",
+      "category": "google",
+      "description": "Gemini CLI MCP for filesystem access",
+      "recommendedAuth": "service-account or secret-manager"
+    },
+    {
+      "id": "google-postgres",
+      "name": "Google PostgreSQL",
+      "repo": "https://github.com/modelcontextprotocol/server-postgres",
+      "category": "google",
+      "description": "Gemini CLI MCP for PostgreSQL access",
+      "recommendedAuth": "service-account or wif"
+    },
+    {
+      "id": "google-maps",
+      "name": "Google Maps",
+      "repo": "docker:mcp/google-maps",
+      "category": "google",
+      "description": "Google Maps services (geocode, directions, places)",
+      "recommendedAuth": "api-key",
+      "notes": "Requires GOOGLE_MAPS_API_KEY environment variable."
+    },
+    {
+      "id": "google-search",
+      "name": "Google Search",
+      "repo": "https://github.com/mcp-server/google-search-mcp",
+      "category": "google",
+      "description": "Structured Google Search via browser automation",
+      "recommendedAuth": "none"
+    },
+    {
+      "id": "qdrant",
+      "name": "Qdrant",
+      "repo": "https://github.com/modelcontextprotocol/server-qdrant",
+      "category": "third-party",
+      "description": "Semantic memory store (Qdrant vector DB)",
+      "recommendedAuth": "api-key"
+    },
+    {
+      "id": "csharp-sdk",
+      "name": "C# SDK",
+      "repo": "nuget:MCP.Sdk",
+      "category": "sdk",
+      "description": "C# SDK for MCP. Stable and well-supported.",
+      "recommendedAuth": "api-key"
+    },
+    {
+      "id": "java-sdk",
+      "name": "Java SDK",
+      "repo": "https://github.com/spring-projects/spring-ai",
+      "category": "sdk",
+      "description": "Java SDK for MCP, maintained by Spring AI. Supports sync & async, multiple transports.",
+      "recommendedAuth": "api-key"
+    },
+    {
+      "id": "python-sdk",
+      "name": "Python SDK",
+      "repo": "pypi:mcp-sdk",
+      "category": "sdk",
+      "description": "Python SDK for MCP. Async-first, asyncio-based.",
+      "recommendedAuth": "api-key"
+    },
+    {
+      "id": "typescript-sdk",
+      "name": "TypeScript SDK",
+      "repo": "npm:@mcp/sdk",
+      "category": "sdk",
+      "description": "TypeScript SDK for MCP. Promise-based, Express-like API for browser & Node.js.",
+      "recommendedAuth": "api-key"
+    },
+    {
+      "id": "kotlin-sdk",
+      "name": "Kotlin SDK",
+      "repo": "maven:com.mcp.sdk:kotlin-sdk",
+      "category": "sdk",
+      "description": "Kotlin SDK for MCP. Coroutine-based, JDK 8 compatible.",
+      "recommendedAuth": "api-key"
+    }
+    ,
+    {
+      "id": "go-sdk",
+      "name": "Go SDK",
+      "repo": "go-mcp",
+      "category": "sdk",
+      "description": "Go Community SDK for MCP",
+      "recommendedAuth": "api-key"
+    },
+    {
+      "id": "rust-sdk",
+      "name": "Rust SDK",
+      "repo": "crate:MCPR",
+      "category": "sdk",
+      "description": "Rust Community SDK for MCP",
+      "recommendedAuth": "api-key"
+    },
+    {
+      "id": "semgrep",
+      "name": "Semgrep",
+      "repo": "https://github.com/returntocorp/semgrep",
+      "category": "third-party",
+      "description": "Semgrep code analysis and security scanning",
+      "recommendedAuth": "api-key"
     }
   ],
   "validation": {
@@ -737,7 +1022,16 @@
         "GITHUB_REPO",
         "MCP_DEFAULT_TIMEOUT",
         "HEALTH_CHECK_INTERVAL",
-        "METRICS_INTERVAL"
+        "METRICS_INTERVAL",
+        "SEMGREP_URL",
+        "NX_MCP_URL",
+        "GOOGLE_FILESYSTEM_URL",
+        "GOOGLE_POSTGRES_URL",
+        "GOOGLE_MAPS_URL",
+        "GOOGLE_SEARCH_URL",
+        "QDRANT_URL",
+        "GOOGLE_MAPS_API_KEY",
+        "QDRANT_API_KEY"
       ]
     }
   }

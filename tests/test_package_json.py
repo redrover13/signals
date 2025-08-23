@@ -199,7 +199,7 @@ def test_dev_dependencies_expected_versions_and_consistency(package_data: dict) 
     assert dev.get("@secretlint/secretlint-rule-preset-recommend") == "^8.5.0"
 
 
-def test_pnpm_overrides_and_only_built_dependencies(package_data: dict) -> None:
+def test_pnpm_overrides_and_only_built_deps(package_data: dict) -> None:
     """
     Validate the package.json's pnpm configuration.
     

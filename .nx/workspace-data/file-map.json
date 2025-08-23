@@ -5,6 +5,9 @@
     "@dulce-de-saigon/agents-lib": [
       "dist/libs/agents/src/index.d.ts"
     ],
+    "@dulce-de-saigon/security": [
+      "dist/libs/security/src/index.d.ts"
+    ],
     "@dulce/gcp": [
       "dist/libs/gcp/src/index.d.ts"
     ],
@@ -67,6 +70,186 @@
         {
           "file": "libs/mcp/tsconfig.lib.json",
           "hash": "4312518675533582045"
+        }
+      ],
+      "agents": [
+        {
+          "file": "apps/agents/COPILOT_PROMPT.md",
+          "hash": "8284939958649031614"
+        },
+        {
+          "file": "apps/agents/Dockerfile",
+          "hash": "13481554108116628881"
+        },
+        {
+          "file": "apps/agents/README.md",
+          "hash": "16560707230609139321"
+        },
+        {
+          "file": "apps/agents/project.json",
+          "hash": "5764686364660039331"
+        },
+        {
+          "file": "apps/agents/src/main.ts",
+          "hash": "8501753343527422492",
+          "deps": [
+            "npm:fastify",
+            "api",
+            "security"
+          ]
+        },
+        {
+          "file": "apps/agents/tsconfig.json",
+          "hash": "1733962632352765753"
+        }
+      ],
+      "legacy-event-parser": [
+        {
+          "file": "apps/legacy_event_parser/index.js",
+          "hash": "8111006878647914647",
+          "deps": [
+            "npm:@google-cloud/pubsub",
+            "npm:@google-cloud/bigquery"
+          ]
+        },
+        {
+          "file": "apps/legacy_event_parser/package.json",
+          "hash": "4475964162858051640",
+          "deps": [
+            "npm:@google-cloud/functions-framework",
+            "npm:@google-cloud/pubsub",
+            "npm:@google-cloud/bigquery"
+          ]
+        },
+        {
+          "file": "apps/legacy_event_parser/project.json",
+          "hash": "12204104461009431540"
+        }
+      ],
+      "agents-lib": [
+        {
+          "file": "libs/agents/README.md",
+          "hash": "3757155501495552222"
+        },
+        {
+          "file": "libs/agents/project.json",
+          "hash": "12929525747964891097"
+        },
+        {
+          "file": "libs/agents/src/index.ts",
+          "hash": "13677317759222400303"
+        },
+        {
+          "file": "libs/agents/src/tools.ts",
+          "hash": "9078202335274891687"
+        },
+        {
+          "file": "libs/agents/tsconfig.json",
+          "hash": "16905144177106485730"
+        },
+        {
+          "file": "libs/agents/tsconfig.lib.json",
+          "hash": "15834690189997340113"
+        }
+      ],
+      "security": [
+        {
+          "file": "libs/security/jest.config.ts",
+          "hash": "5817002437193672059"
+        },
+        {
+          "file": "libs/security/package.json",
+          "hash": "2614494282265344954"
+        },
+        {
+          "file": "libs/security/project.json",
+          "hash": "11400147387069657512"
+        },
+        {
+          "file": "libs/security/src/index.ts",
+          "hash": "5166007322281349340",
+          "deps": [
+            "npm:fastify",
+            "npm:zod"
+          ]
+        },
+        {
+          "file": "libs/security/src/secret-manager.ts",
+          "hash": "1525046794167916491",
+          "deps": [
+            "npm:@google-cloud/secret-manager"
+          ]
+        },
+        {
+          "file": "libs/security/src/security.test.ts",
+          "hash": "17884032440794925327",
+          "deps": [
+            "npm:@jest/globals"
+          ]
+        },
+        {
+          "file": "libs/security/tsconfig.json",
+          "hash": "14910574388472849694"
+        },
+        {
+          "file": "libs/security/tsconfig.lib.json",
+          "hash": "2627835759103904469"
+        },
+        {
+          "file": "libs/security/tsconfig.spec.json",
+          "hash": "10796733258993533913"
+        }
+      ],
+      "api": [
+        {
+          "file": "apps/api/COPILOT_PROMPT.md",
+          "hash": "5987477266114574981"
+        },
+        {
+          "file": "apps/api/Dockerfile",
+          "hash": "17739130275617513335"
+        },
+        {
+          "file": "apps/api/project.json",
+          "hash": "2467180983720415709"
+        },
+        {
+          "file": "apps/api/src/main.ts",
+          "hash": "3922156361867618845",
+          "deps": [
+            "npm:fastify",
+            "security"
+          ]
+        },
+        {
+          "file": "apps/api/src/routes/agents.ts",
+          "hash": "1583654123197766881",
+          "deps": [
+            "npm:fastify",
+            "security",
+            "npm:zod"
+          ]
+        },
+        {
+          "file": "apps/api/src/routes/health.ts",
+          "hash": "9146242794792612734",
+          "deps": [
+            "npm:fastify"
+          ]
+        },
+        {
+          "file": "apps/api/src/routes/search.ts",
+          "hash": "12389056565296477347",
+          "deps": [
+            "npm:fastify",
+            "security",
+            "npm:zod",
+            "npm:lodash"
+          ]
+        },
+        {
+          "file": "apps/api/tsconfig.json",
+          "hash": "14641593147291263924"
         }
       ],
       "web": [
@@ -135,29 +318,6 @@
           "hash": "15337167957341348420"
         }
       ],
-      "legacy-event-parser": [
-        {
-          "file": "apps/legacy_event_parser/index.js",
-          "hash": "8111006878647914647",
-          "deps": [
-            "npm:@google-cloud/pubsub",
-            "npm:@google-cloud/bigquery"
-          ]
-        },
-        {
-          "file": "apps/legacy_event_parser/package.json",
-          "hash": "4475964162858051640",
-          "deps": [
-            "npm:@google-cloud/functions-framework",
-            "npm:@google-cloud/pubsub",
-            "npm:@google-cloud/bigquery"
-          ]
-        },
-        {
-          "file": "apps/legacy_event_parser/project.json",
-          "hash": "12204104461009431540"
-        }
-      ],
       "gcp": [
         {
           "file": "libs/gcp/README.md",
@@ -208,111 +368,6 @@
         {
           "file": "libs/gcp/tsconfig.lib.json",
           "hash": "13291289617200625598"
-        }
-      ],
-      "api": [
-        {
-          "file": "apps/api/COPILOT_PROMPT.md",
-          "hash": "5987477266114574981"
-        },
-        {
-          "file": "apps/api/Dockerfile",
-          "hash": "17739130275617513335"
-        },
-        {
-          "file": "apps/api/project.json",
-          "hash": "2467180983720415709"
-        },
-        {
-          "file": "apps/api/src/main.ts",
-          "hash": "7605520943027391612",
-          "deps": [
-            "npm:fastify"
-          ]
-        },
-        {
-          "file": "apps/api/src/routes/agents.ts",
-          "hash": "13377605370302211977",
-          "deps": [
-            "npm:fastify",
-            "gcp"
-          ]
-        },
-        {
-          "file": "apps/api/src/routes/health.ts",
-          "hash": "9146242794792612734",
-          "deps": [
-            "npm:fastify"
-          ]
-        },
-        {
-          "file": "apps/api/src/routes/search.ts",
-          "hash": "16761429410381765836",
-          "deps": [
-            "npm:fastify",
-            "npm:lodash"
-          ]
-        },
-        {
-          "file": "apps/api/tsconfig.json",
-          "hash": "14641593147291263924"
-        }
-      ],
-      "agents-lib": [
-        {
-          "file": "libs/agents/README.md",
-          "hash": "3757155501495552222"
-        },
-        {
-          "file": "libs/agents/project.json",
-          "hash": "12929525747964891097"
-        },
-        {
-          "file": "libs/agents/src/index.ts",
-          "hash": "13677317759222400303"
-        },
-        {
-          "file": "libs/agents/src/tools.ts",
-          "hash": "9078202335274891687"
-        },
-        {
-          "file": "libs/agents/tsconfig.json",
-          "hash": "16905144177106485730"
-        },
-        {
-          "file": "libs/agents/tsconfig.lib.json",
-          "hash": "15834690189997340113"
-        }
-      ],
-      "agents": [
-        {
-          "file": "apps/agents/COPILOT_PROMPT.md",
-          "hash": "8284939958649031614"
-        },
-        {
-          "file": "apps/agents/Dockerfile",
-          "hash": "13481554108116628881"
-        },
-        {
-          "file": "apps/agents/README.md",
-          "hash": "16560707230609139321"
-        },
-        {
-          "file": "apps/agents/project.json",
-          "hash": "5764686364660039331"
-        },
-        {
-          "file": "apps/agents/src/main.ts",
-          "hash": "12334308586246898349",
-          "deps": [
-            "npm:fastify",
-            "agents-lib",
-            "api"
-          ]
-        },
-        {
-          "file": "apps/agents/tsconfig.json",
-          "hash": "1733962632352765753"
         }
       ],
       "event-parser": [
@@ -472,7 +527,7 @@
       },
       {
         "file": ".secretlintrc.json",
-        "hash": "6018282623876076270"
+        "hash": "6452765260735052177"
       },
       {
         "file": "CI_SETUP_GUIDE.md",
@@ -944,7 +999,7 @@
       },
       {
         "file": "package.json",
-        "hash": "9592988121703974443"
+        "hash": "16175112355534109824"
       },
       {
         "file": "pmd.xml",
@@ -981,6 +1036,10 @@
       {
         "file": "scripts/fix-wif-windows.ps1",
         "hash": "4556913060181844260"
+      },
+      {
+        "file": "scripts/security-check.sh",
+        "hash": "8509703039451234108"
       },
       {
         "file": "scripts/setup-modern-cicd.sh",
@@ -1044,7 +1103,7 @@
       },
       {
         "file": "tests/test_package_json.py",
-        "hash": "14140873122369447466"
+        "hash": "17491632316453668613"
       },
       {
         "file": "tests/test_project_json.py",
@@ -1056,7 +1115,7 @@
       },
       {
         "file": "tsconfig.base.json",
-        "hash": "10469642633181101732"
+        "hash": "13920943175457339913"
       }
     ]
   }

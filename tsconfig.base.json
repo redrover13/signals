@@ -5,6 +5,7 @@
     "baseUrl": ".",
     "paths": {
       "@dulce-de-saigon/agents-lib": ["dist/libs/agents/src/index.d.ts"],
+      "@dulce-de-saigon/security": ["dist/libs/security/src/index.d.ts"],
       "@dulce/gcp": ["dist/libs/gcp/src/index.d.ts"],
       "@nx-monorepo/mcp": ["dist/libs/mcp/src/index.d.ts"]
     },

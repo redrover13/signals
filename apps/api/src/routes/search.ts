@@ -1,13 +1,26 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { validateInput } from "@dulce-de-saigon/security";
+import { z } from "zod";
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 
+// Input validation schema for search requests
+const searchRequestSchema = z.object({
+  tool: z.literal("semantic-code-search"),
+  query: z.string()
+    .min(1, "Query is required")
+    .max(200, "Query too long")
+    .regex(/^[a-zA-Z0-9\s\-_.]+$/, "Query contains invalid characters"),
+  repoOwner: z.string().optional(),
+  repoName: z.string().optional(),
+});
+
 interface SearchRequest {
   tool: string;
   query: string;
-  repoOwner: string;
-  repoName: string;
+  repoOwner?: string;
+  repoName?: string;
 }
 
 interface SearchResult {
@@ -42,28 +55,17 @@ export async function searchRoutes(fastify: FastifyInstance) {
    */
   fastify.post(
     "/semantic-code-search",
+    {
+      preHandler: validateInput(searchRequestSchema),
+    },
     async function (request: FastifyRequest, reply: FastifyReply) {
       try {
-        const body = request.body as SearchRequest;
+        const { query } = request.body as SearchRequest;
         
-        // Validate required tool parameter
-        if (!body.tool || body.tool !== "semantic-code-search") {
-          return reply.status(400).send({ 
-            error: "Invalid tool. Expected 'semantic-code-search'" 
-          });
-        }
-
-        // Validate required query parameter
-        if (!body.query) {
-          return reply.status(400).send({ 
-            error: "Query parameter is required" 
-          });
-        }
-
-        const results = await performSemanticSearch(body.query);
+        const results = await performSemanticSearch(query);
         
         const response: SearchResponse = {
-          query: body.query,
+          query,
           results,
           totalMatches: results.length
         };

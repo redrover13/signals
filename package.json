@@ -10,6 +10,8 @@
     "test": "nx test",
     "lint": "nx lint",
     "affected": "nx affected --target=build",
+    "security:check": "./scripts/security-check.sh",
+    "security:test": "nx test security",
     "mcp:demo": "pnpm exec ts-node examples/mcp-demo.ts",
     "mcp:build": "pnpm nx build mcp",
     "mcp:test": "pnpm nx test mcp",

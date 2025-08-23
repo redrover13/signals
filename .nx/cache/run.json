@@ -1,8 +1,8 @@
 {
   "run": {
-    "command": "nx test mcp --testPathPattern=completed-implementations --verbose",
-    "startTime": "2025-08-23T04:24:47.804Z",
-    "endTime": "2025-08-23T04:24:47.816Z",
+    "command": "nx lint mcp",
+    "startTime": "2025-08-23T04:26:39.618Z",
+    "endTime": "2025-08-23T04:26:39.627Z",
     "inner": false
   },
   "tasks": []

@@ -1,4 +1,3 @@
-
 {
   "version": "2.0.0",
   "description": "MCP Server Configuration for Signals Project - WIF Enabled",
@@ -91,6 +90,7 @@
             "failureThreshold": 2
           },
           "auth": {
+            "type": "secret-manager",
             "secretName": "github-token-dev"
           }
         },
@@ -128,6 +128,7 @@
         },
         "exa": {
           "auth": {
+            "type": "secret-manager",
             "secretName": "exa-api-key-dev"
           }
         },
@@ -157,19 +158,19 @@
         },
         "semgrep": {
           "connection": {
-            "url": "${SEMGREP_URL:-https://mcp.semgrep.ai/sse}",
+            "endpoint": "${SEMGREP_URL:-https://mcp.semgrep.ai/sse}",
             "timeout": 10000
           }
         },
         "nx-mcp": {
           "connection": {
-            "url": "${NX_MCP_URL:-https://mcp.nx.app/sse}",
+            "endpoint": "${NX_MCP_URL:-https://mcp.nx.app/sse}",
             "timeout": 10000
           }
         },
         "google-filesystem": {
           "connection": {
-            "url": "${GOOGLE_FILESYSTEM_URL:-https://mcp.googleapis.com/filesystem/sse}",
+            "endpoint": "${GOOGLE_FILESYSTEM_URL:-https://mcp.googleapis.com/filesystem/sse}",
             "timeout": 15000
           },
           "auth": {
@@ -179,7 +180,7 @@
         },
         "google-postgres": {
           "connection": {
-            "url": "${GOOGLE_POSTGRES_URL:-https://mcp.googleapis.com/postgres/sse}",
+            "endpoint": "${GOOGLE_POSTGRES_URL:-https://mcp.googleapis.com/postgres/sse}",
             "timeout": 15000
           },
           "auth": {
@@ -189,7 +190,7 @@
         },
         "google-maps": {
           "connection": {
-            "url": "${GOOGLE_MAPS_URL:-https://mcp.googleapis.com/maps/sse}",
+            "endpoint": "${GOOGLE_MAPS_URL:-https://mcp.googleapis.com/maps/sse}",
             "timeout": 15000
           },
           "auth": {
@@ -199,13 +200,13 @@
         },
         "google-search": {
           "connection": {
-            "url": "${GOOGLE_SEARCH_URL:-https://mcp.googleapis.com/search/sse}",
+            "endpoint": "${GOOGLE_SEARCH_URL:-https://mcp.googleapis.com/search/sse}",
             "timeout": 15000
           }
         },
         "qdrant": {
           "connection": {
-            "url": "${QDRANT_URL:-https://mcp.qdrant.tech/sse}",
+            "endpoint": "${QDRANT_URL:-https://mcp.qdrant.tech/sse}",
             "timeout": 15000
           },
           "auth": {
@@ -291,6 +292,7 @@
             "failureThreshold": 3
           },
           "auth": {
+            "type": "secret-manager",
             "secretName": "github-token-staging"
           }
         },
@@ -315,6 +317,7 @@
         },
         "exa": {
           "auth": {
+            "type": "secret-manager",
             "secretName": "exa-api-key-staging"
           }
         },
@@ -344,19 +347,19 @@
         },
         "semgrep": {
           "connection": {
-            "url": "${SEMGREP_URL:-https://mcp.semgrep.ai/sse}",
+            "endpoint": "${SEMGREP_URL:-https://mcp.semgrep.ai/sse}",
             "timeout": 15000
           }
         },
         "nx-mcp": {
           "connection": {
-            "url": "${NX_MCP_URL:-https://mcp.nx.app/sse}",
+            "endpoint": "${NX_MCP_URL:-https://mcp.nx.app/sse}",
             "timeout": 15000
           }
         },
         "google-filesystem": {
           "connection": {
-            "url": "${GOOGLE_FILESYSTEM_URL:-https://mcp.googleapis.com/filesystem/sse}",
+            "endpoint": "${GOOGLE_FILESYSTEM_URL:-https://mcp.googleapis.com/filesystem/sse}",
             "timeout": 15000
           },
           "auth": {
@@ -366,7 +369,7 @@
         },
         "google-postgres": {
           "connection": {
-            "url": "${GOOGLE_POSTGRES_URL:-https://mcp.googleapis.com/postgres/sse}",
+            "endpoint": "${GOOGLE_POSTGRES_URL:-https://mcp.googleapis.com/postgres/sse}",
             "timeout": 15000
           },
           "auth": {
@@ -376,7 +379,7 @@
         },
         "google-maps": {
           "connection": {
-            "url": "${GOOGLE_MAPS_URL:-https://mcp.googleapis.com/maps/sse}",
+            "endpoint": "${GOOGLE_MAPS_URL:-https://mcp.googleapis.com/maps/sse}",
             "timeout": 15000
           },
           "auth": {
@@ -386,13 +389,13 @@
         },
         "google-search": {
           "connection": {
-            "url": "${GOOGLE_SEARCH_URL:-https://mcp.googleapis.com/search/sse}",
+            "endpoint": "${GOOGLE_SEARCH_URL:-https://mcp.googleapis.com/search/sse}",
             "timeout": 15000
           }
         },
         "qdrant": {
           "connection": {
-            "url": "${QDRANT_URL:-https://mcp.qdrant.tech/sse}",
+            "endpoint": "${QDRANT_URL:-https://mcp.qdrant.tech/sse}",
             "timeout": 15000
           },
           "auth": {
@@ -469,7 +472,7 @@
         "databases",
         "nx",
         "node",
-        "google",
+        "google-cloud",
         "exa",
         "builtwith",
         "toolbox",
@@ -736,7 +739,7 @@
             "nx.run",
             "node.execute",
             "search.files",
-            "fs.list"
+            "filesystem.list"
           ]
         },
         "mcp-admin": {
@@ -1029,7 +1032,8 @@
         "GOOGLE_SEARCH_URL",
         "QDRANT_URL",
         "GOOGLE_MAPS_API_KEY",
-        "QDRANT_API_KEY"
+        "QDRANT_API_KEY",
+        "TRACE_SAMPLING_RATE"
       ]
     }
   }

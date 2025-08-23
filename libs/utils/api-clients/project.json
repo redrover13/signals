@@ -1,0 +1,26 @@
+{
+  "name": "api-clients",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/utils/api-clients/src",
+  "projectType": "library",
+  "tags": ["scope:backend-lib", "type:util"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/utils/api-clients",
+        "main": "libs/utils/api-clients/src/index.ts",
+        "tsConfig": "libs/utils/api-clients/tsconfig.lib.json",
+        "assets": ["libs/utils/api-clients/*.md"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/utils/api-clients/jest.config.ts"
+      }
+    }
+  }
+}

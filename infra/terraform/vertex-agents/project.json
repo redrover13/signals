@@ -1,0 +1,26 @@
+{
+  "name": "vertex-agents",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "infra/terraform/vertex-agents/src",
+  "projectType": "library",
+  "tags": ["scope:infra", "type:iac"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/infra/terraform/vertex-agents",
+        "main": "infra/terraform/vertex-agents/src/index.ts",
+        "tsConfig": "infra/terraform/vertex-agents/tsconfig.lib.json",
+        "assets": ["infra/terraform/vertex-agents/*.md"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "infra/terraform/vertex-agents/jest.config.ts"
+      }
+    }
+  }
+}

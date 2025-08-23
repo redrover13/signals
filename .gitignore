@@ -92,3 +92,7 @@ servers/
 
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
+
+# Next.js
+.next
+out

@@ -13,7 +13,8 @@
     "mcp:demo": "pnpm exec ts-node examples/mcp-demo.ts",
     "mcp:build": "pnpm nx build mcp",
     "mcp:test": "pnpm nx test mcp",
-    "mcp:health": "pnpm exec ts-node -e \"import('@nx-monorepo/mcp').then(m => m.testMCPConnectivity().then(console.log))\""
+    "mcp:health": "pnpm exec ts-node -e \"import('@nx-monorepo/mcp').then(m => m.testMCPConnectivity().then(console.log))\"",
+    "validate:encoding": "node scripts/validate-encoding.js"
   },
   "devDependencies": {
     "@nx/eslint": "21.4.0",
@@ -59,6 +60,7 @@
     "@google-analytics/data": "^5.2.0",
     "@google-cloud/aiplatform": "^5.5.0",
     "@google-cloud/bigquery": "8.1.1",
+    "@google-cloud/pubsub": "^4.1.0",
     "@google-cloud/secret-manager": "^6.1.0",
     "@google-cloud/storage": "7.16.0",
     "@modelcontextprotocol/sdk": "^1.17.3",

@@ -303,11 +303,20 @@ export function getMCPHealthSummary(mcpService: MCPService): {
  * Create MCP client with custom configuration
  */
 export async function createCustomMCPClient(
-  /* customConfig: Partial<MCPEnvironmentConfig> */
+  customConfig: Partial<MCPEnvironmentConfig>
 ): Promise<MCPService> {
-  // This would require extending the MCPService to accept custom configs
-  // For now, return the standard instance
-  return createMCPClient();
+  // For now, this creates a standard client since MCPService doesn't support custom configs
+  // In the future, this could be enhanced to accept custom configurations
+  const mcpService = MCPService.getInstance();
+  
+  // Log the configuration difference for debugging
+  if (customConfig) {
+    console.log('Custom MCP configuration provided:', JSON.stringify(customConfig, null, 2));
+    console.warn('Note: Custom configuration not yet implemented. Using default configuration.');
+  }
+  
+  await mcpService.initialize();
+  return mcpService;
 }
 
 /**

@@ -65,7 +65,7 @@ async function runMCPDemo() {
     try {
       const gitStatus = await mcpService.git('status');
       if (!gitStatus.error) {
-        console.log('��� Git status retrieved successfully');
+        console.log('✅ Git status retrieved successfully');
       }
     } catch (error) {
       console.log('⚠️  Git test skipped:', error.message);

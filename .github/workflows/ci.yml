@@ -227,6 +227,10 @@ jobs:
       - name: Format check
         run: pnpm nx format:check
 
+      # UTF-8 encoding validation
+      - name: UTF-8 encoding validation
+        run: pnpm run validate:encoding
+
       # Lint affected projects
       - name: Lint affected projects
         run: pnpm nx affected -t lint --parallel=3

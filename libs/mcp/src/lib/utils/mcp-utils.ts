@@ -5,11 +5,11 @@
 
 import { readFileSync, writeFileSync } from 'fs';
 import { MCPService } from '../mcp.service';
-import { 
-  getCurrentConfig, 
-  getCurrentEnvironment, 
+import {
+  getCurrentConfig,
+  getCurrentEnvironment,
   validateConfig,
-  Environment 
+  Environment,
 } from '../config/environment-config';
 import { MCPEnvironmentConfig } from '../config/mcp-config.schema';
 
@@ -40,37 +40,41 @@ export function validateMCPEnvironment(environment?: Environment): {
   const env = environment || getCurrentEnvironment();
   const config = getCurrentConfig();
   const validation = validateConfig(config);
-  
+
   const warnings: string[] = [];
-  
+
   // Check for common configuration issues
-  const enabledServers = config.servers.filter(s => s.enabled);
-  
+  const enabledServers = config.servers.filter((s) => s.enabled);
+
   if (enabledServers.length === 0) {
     warnings.push('No servers are enabled');
   }
-  
+
   // Check for missing authentication
-  const serversNeedingAuth = enabledServers.filter(s => 
-    s.auth?.type !== 'none' && !process.env[s.auth?.credentials?.envVar || '']
+  const serversNeedingAuth = enabledServers.filter(
+    (s) => s.auth?.type !== 'none' && !process.env[s.auth?.credentials?.envVar || ''],
   );
-  
+
   if (serversNeedingAuth.length > 0) {
-    warnings.push(`Missing authentication for servers: ${serversNeedingAuth.map(s => s.id).join(', ')}`);
+    warnings.push(
+      `Missing authentication for servers: ${serversNeedingAuth.map((s) => s.id).join(', ')}`,
+    );
   }
-  
+
   // Check for development-only servers in production
   if (env === 'production') {
-    const devServers = enabledServers.filter(s => s.category === 'testing');
+    const devServers = enabledServers.filter((s) => s.category === 'testing');
     if (devServers.length > 0) {
-      warnings.push(`Testing servers enabled in production: ${devServers.map(s => s.id).join(', ')}`);
+      warnings.push(
+        `Testing servers enabled in production: ${devServers.map((s) => s.id).join(', ')}`,
+      );
     }
   }
-  
+
   return {
     valid: validation.valid,
     errors: validation.errors,
-    warnings
+    warnings,
   };
 }
 
@@ -82,44 +86,49 @@ export function getMCPServerRecommendations(useCase: string): {
   recommended: string[];
   optional: string[];
 } {
-  const useCaseMap: Record<string, { essential: string[]; recommended: string[]; optional: string[] }> = {
+  const useCaseMap: Record<
+    string,
+    { essential: string[]; recommended: string[]; optional: string[] }
+  > = {
     'web-development': {
       essential: ['filesystem', 'git', 'github', 'node'],
       recommended: ['nx', 'fetch', 'apimatic', 'memory'],
-      optional: ['browserbase', 'netlify', 'cloudflare']
+      optional: ['browserbase', 'netlify', 'cloudflare'],
     },
     'data-analysis': {
       essential: ['databases', 'filesystem', 'memory'],
       recommended: ['chroma', 'fetch', 'sequentialthinking'],
-      optional: ['exa', 'google']
+      optional: ['exa', 'google'],
     },
     'ai-development': {
       essential: ['memory', 'chroma', 'sequentialthinking', 'fetch'],
       recommended: ['databases', 'exa', 'google'],
-      optional: ['notion', 'firebase']
+      optional: ['notion', 'firebase'],
     },
-    'devops': {
+    devops: {
       essential: ['git', 'github', 'google-cloud-run', 'google'],
       recommended: ['nx', 'node', 'databases'],
-      optional: ['netlify', 'cloudflare', 'make']
+      optional: ['netlify', 'cloudflare', 'make'],
     },
-    'testing': {
+    testing: {
       essential: ['filesystem', 'git', 'everything'],
       recommended: ['browserbase', 'browserstack', 'apimatic'],
-      optional: ['fetch', 'memory']
+      optional: ['fetch', 'memory'],
     },
     'content-management': {
       essential: ['filesystem', 'memory', 'notion'],
       recommended: ['fetch', 'devhub', 'firebase'],
-      optional: ['algolia', 'make']
-    }
+      optional: ['algolia', 'make'],
+    },
   };
 
-  return useCaseMap[useCase] || {
-    essential: ['filesystem', 'git', 'memory'],
-    recommended: ['fetch', 'sequentialthinking'],
-    optional: ['everything']
-  };
+  return (
+    useCaseMap[useCase] || {
+      essential: ['filesystem', 'git', 'memory'],
+      recommended: ['fetch', 'sequentialthinking'],
+      optional: ['everything'],
+    }
+  );
 }
 
 /**
@@ -128,17 +137,14 @@ export function getMCPServerRecommendations(useCase: string): {
 export function generateMCPConfig(
   useCase: string,
   environment: Environment = 'development',
-  options: { exclusive?: boolean } = {}
+  options: { exclusive?: boolean } = {},
 ): Partial<MCPEnvironmentConfig> {
   const recommendations = getMCPServerRecommendations(useCase);
   const baseConfig = getCurrentConfig();
 
-  const enabledServerIds = [
-    ...recommendations.essential,
-    ...recommendations.recommended
-  ];
+  const enabledServerIds = [...recommendations.essential, ...recommendations.recommended];
 
-  const servers = baseConfig.servers.map(server => {
+  const servers = baseConfig.servers.map((server) => {
     if (enabledServerIds.includes(server.id)) {
       return { ...server, enabled: true };
     }
@@ -148,7 +154,7 @@ export function generateMCPConfig(
   return {
     environment,
     servers,
-    global: baseConfig.global
+    global: baseConfig.global,
   };
 }
 
@@ -163,16 +169,16 @@ export function checkMCPDependencies(): {
   const available: string[] = [];
   const missing: string[] = [];
   const errors: Record<string, string> = {};
-  
+
   const config = getCurrentConfig();
-  const enabledServers = config.servers.filter(s => s.enabled);
-  
+  const enabledServers = config.servers.filter((s) => s.enabled);
+
   for (const server of enabledServers) {
     try {
       // Check if server command/endpoint is available
       if (server.connection.type === 'stdio') {
         const [command] = server.connection.endpoint.split(' ');
-        
+
         // For npm packages, check if they can be resolved
         if (command === 'npx' || command === 'node') {
           available.push(server.id);
@@ -189,7 +195,7 @@ export function checkMCPDependencies(): {
       errors[server.id] = error instanceof Error ? error.message : 'Unknown error';
     }
   }
-  
+
   return { available, missing, errors };
 }
 
@@ -205,19 +211,22 @@ export function getMCPPerformanceMetrics(mcpService: MCPService): {
 } {
   const systemHealth = mcpService.getSystemHealth();
   const routingStats = mcpService.getRoutingStats();
-  
+
   // Calculate metrics from available data
-  const totalRequests = Array.from(routingStats.loadStats.values())
-    .reduce((sum, count) => sum + count, 0);
-  
+  const totalRequests = Array.from(routingStats.loadStats.values()).reduce(
+    (sum, count) => sum + count,
+    0,
+  );
+
   return {
     serverCount: systemHealth.totalServers,
     healthyServers: systemHealth.healthyServers,
     averageResponseTime: 0, // Would need to track this
     totalRequests,
-    errorRate: systemHealth.totalServers === 0
-      ? 0
-      : (systemHealth.criticalServers / systemHealth.totalServers) * 100
+    errorRate:
+      systemHealth.totalServers === 0
+        ? 0
+        : (systemHealth.criticalServers / systemHealth.totalServers) * 100,
   };
 }
 
@@ -226,7 +235,7 @@ export function getMCPPerformanceMetrics(mcpService: MCPService): {
  */
 export function exportMCPConfig(filePath: string): void {
   const config = getCurrentConfig();
-  
+
   try {
     writeFileSync(filePath, JSON.stringify(config, null, 2));
     console.log(`MCP configuration exported to: ${filePath}`);
@@ -243,12 +252,12 @@ export function importMCPConfig(filePath: string): MCPEnvironmentConfig {
   try {
     const configData = readFileSync(filePath, 'utf8');
     const config = JSON.parse(configData) as MCPEnvironmentConfig;
-    
+
     const validation = validateConfig(config);
     if (!validation.valid) {
       throw new Error(`Invalid configuration: ${validation.errors.join(', ')}`);
     }
-    
+
     return config;
   } catch (error) {
     console.error('Failed to import MCP configuration:', error);
@@ -271,10 +280,10 @@ export function getMCPHealthSummary(mcpService: MCPService): {
   };
 } {
   const health = mcpService.getSystemHealth();
-  
+
   let status: 'healthy' | 'degraded' | 'critical';
   let summary: string;
-  
+
   if (health.criticalServers > 0) {
     status = 'critical';
     summary = `${health.criticalServers} critical server(s) detected`;
@@ -285,7 +294,7 @@ export function getMCPHealthSummary(mcpService: MCPService): {
     status = 'healthy';
     summary = 'All servers operating normally';
   }
-  
+
   return {
     status,
     summary,
@@ -294,8 +303,8 @@ export function getMCPHealthSummary(mcpService: MCPService): {
       healthyServers: health.healthyServers,
       unhealthyServers: health.unhealthyServers,
       criticalServers: health.criticalServers,
-      uptime: health.averageUptime
-    }
+      uptime: health.averageUptime,
+    },
   };
 }
 
@@ -303,18 +312,18 @@ export function getMCPHealthSummary(mcpService: MCPService): {
  * Create MCP client with custom configuration
  */
 export async function createCustomMCPClient(
-  customConfig: Partial<MCPEnvironmentConfig>
+  customConfig: Partial<MCPEnvironmentConfig>,
 ): Promise<MCPService> {
   // For now, this creates a standard client since MCPService doesn't support custom configs
   // In the future, this could be enhanced to accept custom configurations
   const mcpService = MCPService.getInstance();
-  
+
   // Log the configuration difference for debugging
   if (customConfig) {
     console.log('Custom MCP configuration provided:', JSON.stringify(customConfig, null, 2));
     console.warn('Note: Custom configuration not yet implemented. Using default configuration.');
   }
-  
+
   await mcpService.initialize();
   return mcpService;
 }
@@ -322,49 +331,51 @@ export async function createCustomMCPClient(
 /**
  * Test MCP server connectivity
  */
-export async function testMCPConnectivity(serverId?: string): Promise<{
-  serverId: string;
-  connected: boolean;
-  responseTime?: number;
-  error?: string;
-}[]> {
+export async function testMCPConnectivity(serverId?: string): Promise<
+  {
+    serverId: string;
+    connected: boolean;
+    responseTime?: number;
+    error?: string;
+  }[]
+> {
   const mcpService = MCPService.getInstance();
-  
+
   if (!mcpService.isReady()) {
     await mcpService.initialize();
   }
-  
+
   const results: {
     serverId: string;
     connected: boolean;
     responseTime?: number;
     error?: string;
   }[] = [];
-  
+
   const serversToTest = serverId ? [serverId] : mcpService.getEnabledServers();
-  
+
   for (const id of serversToTest) {
     const startTime = Date.now();
-    
+
     try {
       const healthResult = await mcpService.checkHealth(id);
       const responseTime = Date.now() - startTime;
-      
+
       results.push({
         serverId: id,
-        connected: Array.isArray(healthResult) ? 
-          healthResult.some(r => r.healthy) : 
-          (healthResult?.healthy ?? false),
-        responseTime
+        connected: Array.isArray(healthResult)
+          ? healthResult.some((r) => r.healthy)
+          : (healthResult?.healthy ?? false),
+        responseTime,
       });
     } catch (error) {
       results.push({
         serverId: id,
         connected: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
-  
+
   return results;
 }

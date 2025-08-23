@@ -3,10 +3,6 @@
   "compilerOptions": {
     "outDir": "../../dist/libs/agents"
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
 }

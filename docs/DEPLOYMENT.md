@@ -5,6 +5,7 @@
 Production deployments require approval from designated reviewers. These reviewers must be assigned in the GitHub Environment settings for `production`.
 
 **Recommended roles:**
+
 - Lead Engineer
 - DevOps Engineer
 - CTO or delegated release manager
@@ -20,19 +21,28 @@ Production deployments require approval from designated reviewers. These reviewe
 ## SOP for Deployment Failure & Rollback
 
 1. **Monitor the deployment:**
-  - The workflow will run health checks after deployment.
-  - If a health check fails, the workflow will attempt an automatic rollback to the previous stable version.
+
+- The workflow will run health checks after deployment.
+- If a health check fails, the workflow will attempt an automatic rollback to the previous stable version.
+
 2. **Manual rollback:**
-  - If the automatic rollback fails or further issues are detected, trigger a manual rollback using the GCP Console or CLI:
-    - `gcloud run services update-traffic <service> --region <region> --to-latest`
+
+- If the automatic rollback fails or further issues are detected, trigger a manual rollback using the GCP Console or CLI:
+  - `gcloud run services update-traffic <service> --region <region> --to-latest`
+
 3. **Notify stakeholders:**
-  - Inform the team and stakeholders of the rollback and incident.
+
+- Inform the team and stakeholders of the rollback and incident.
+
 4. **Post-mortem:**
-  - Document the failure, root cause, and remediation steps in the incident log.
+
+- Document the failure, root cause, and remediation steps in the incident log.
 
 **See also:**
+
 - [SECURITY_COMPLIANCE.md](SECURITY_COMPLIANCE.md)
 - [WIF_SETUP_GUIDE.md](WIF_SETUP_GUIDE.md)
+
 # Dulce de Saigon Deployment Guide
 
 ## Overview
@@ -98,6 +108,7 @@ terraform apply
 ```
 
 This will create:
+
 - Pub/Sub topics for events and agents
 - BigQuery dataset and tables
 - Cloud Storage bucket
@@ -174,16 +185,19 @@ gcloud run deploy dulce-web \
 Each service requires specific environment variables:
 
 ### API Service
+
 - `GCP_PROJECT_ID` - Your Google Cloud Project ID
 - `BQ_DATASET` - BigQuery dataset name (default: dulce)
 - `PUBSUB_TOPIC` - Pub/Sub topic name for events (default: dulce.events)
 - `AGENTS_TOPIC` - Pub/Sub topic name for agents (default: dulce.agents)
 
 ### Agents Service
+
 - `GCP_PROJECT_ID` - Your Google Cloud Project ID
 - `BQ_DATASET` - BigQuery dataset name (default: dulce)
 
 ### Web Application
+
 - `NEXT_PUBLIC_API_BASE` - URL of the deployed API service
 
 ## Workload Identity Federation Setup
@@ -191,6 +205,7 @@ Each service requires specific environment variables:
 For secure CI/CD without service account keys:
 
 1. Run the setup script in Cloud Shell:
+
    ```bash
    curl -O https://raw.githubusercontent.com/YOUR_REPO/main/scripts/setup-wif-github.sh
    chmod +x setup-wif-github.sh
@@ -225,6 +240,7 @@ The platform uses Google Cloud's built-in monitoring:
 - **Alerts**: Configure for critical issues
 
 Set up alerts for:
+
 - API service downtime
 - Agents processing failures
 - BigQuery errors
@@ -239,6 +255,7 @@ The platform includes automated backups:
 - **Secrets**: Stored in Secret Manager with versioning
 
 For disaster recovery:
+
 1. Recreate infrastructure using Terraform
 2. Restore data from BigQuery snapshots if needed
 3. Redeploy applications
@@ -262,5 +279,6 @@ The platform automatically scales:
 - **BigQuery**: Provides serverless analytics at scale
 
 For manual scaling:
+
 - Adjust Cloud Run memory and CPU allocation
 - Increase BigQuery slot capacity for heavy workloads

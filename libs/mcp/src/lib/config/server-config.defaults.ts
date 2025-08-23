@@ -1,4 +1,3 @@
-
 /**
  * Default Server Configurations
  * Provides standardized configurations for MCP servers to ensure consistency and maintainability.
@@ -34,7 +33,6 @@ export const SHORT_TIMEOUT = 10000;
  * Long connection timeout for potentially slow operations: 60 seconds
  */
 export const LONG_TIMEOUT = 60000;
-
 
 // ================== HEALTH CHECK DEFAULTS ==================
 

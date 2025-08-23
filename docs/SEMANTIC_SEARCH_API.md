@@ -78,9 +78,9 @@ The endpoint is specially optimized for CI-related queries. When searching for t
 curl -X POST http://localhost:3000/search/semantic-code-search \
   -H "Content-Type: application/json" \
   -d '{
-    "tool": "semantic-code-search", 
-    "query": "ci-common", 
-    "repoOwner": "myorg", 
+    "tool": "semantic-code-search",
+    "query": "ci-common",
+    "repoOwner": "myorg",
     "repoName": "my-repo"
   }'
 ```
@@ -95,8 +95,8 @@ const response = await fetch('/search/semantic-code-search', {
     tool: 'semantic-code-search',
     query: 'ci-common',
     repoOwner: 'myorg',
-    repoName: 'my-repo'
-  })
+    repoName: 'my-repo',
+  }),
 });
 const results = await response.json();
 ```
@@ -104,6 +104,7 @@ const results = await response.json();
 ## Error Responses
 
 ### Invalid Tool
+
 ```json
 {
   "error": "Invalid tool. Expected 'semantic-code-search'"
@@ -111,6 +112,7 @@ const results = await response.json();
 ```
 
 ### Missing Query
+
 ```json
 {
   "error": "Query parameter is required"
@@ -118,6 +120,7 @@ const results = await response.json();
 ```
 
 ### Internal Server Error
+
 ```json
 {
   "error": "Internal server error during search"

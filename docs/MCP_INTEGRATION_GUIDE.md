@@ -34,9 +34,9 @@ import { mcpService } from '@nx-monorepo/mcp';
 async function initializeApp() {
   // Initialize MCP service
   await mcpService.initialize();
-  
+
   console.log('MCP Service initialized with servers:', mcpService.getEnabledServers());
-  
+
   // Your app initialization code...
 }
 
@@ -66,9 +66,9 @@ export class DataService {
   }
 
   async storeUserPreference(userId: string, preferences: any) {
-    await mcpService.memory('store', { 
-      key: `user-${userId}-prefs`, 
-      value: preferences 
+    await mcpService.memory('store', {
+      key: `user-${userId}-prefs`,
+      value: preferences,
     });
   }
 }
@@ -87,11 +87,11 @@ import { Injectable } from '@nestjs/common';
 export class BigQueryService {
   async executeQuery(query: string, parameters?: any[]) {
     const response = await mcpService.bigquery(query, { parameters });
-    
+
     if (response.error) {
       throw new Error(`BigQuery error: ${response.error.message}`);
     }
-    
+
     return response.result;
   }
 
@@ -117,18 +117,18 @@ export class EventProcessor {
     await mcpService.memory('store', {
       key: `event-${event.id}`,
       value: event,
-      ttl: 3600 // 1 hour
+      ttl: 3600, // 1 hour
     });
 
     // Analyze event with sequential thinking
     const analysis = await mcpService.think(
-      `Analyze this event for anomalies: ${JSON.stringify(event)}`
+      `Analyze this event for anomalies: ${JSON.stringify(event)}`,
     );
 
     // Store in BigQuery for long-term analytics
     await mcpService.bigquery(
       'INSERT INTO events.raw_events (id, data, timestamp, analysis) VALUES (?, ?, ?, ?)',
-      [event.id, JSON.stringify(event), new Date(), analysis.result]
+      [event.id, JSON.stringify(event), new Date(), analysis.result],
     );
 
     return analysis.result;
@@ -147,30 +147,30 @@ export class ContentService {
     // Use Exa for intelligent search
     const searchResults = await mcpService.search(query, {
       type: 'documentation',
-      limit: 5
+      limit: 5,
     });
 
     // Enhance with vector similarity search
     const vectorResults = await mcpService.vector('search', {
       query,
       collection: 'documentation',
-      limit: 3
+      limit: 3,
     });
 
     return {
       webResults: searchResults.result,
-      similarContent: vectorResults.result
+      similarContent: vectorResults.result,
     };
   }
 
   async generateContent(prompt: string) {
     // Use sequential thinking for content planning
     const plan = await mcpService.think(`Create a content plan for: ${prompt}`);
-    
+
     // Store the plan for future reference
     await mcpService.memory('store', {
       key: `content-plan-${Date.now()}`,
-      value: plan.result
+      value: plan.result,
     });
 
     return plan.result;
@@ -196,7 +196,7 @@ export class DeploymentService {
       // 2. Build with Nx
       const buildResult = await mcpService.nx('run-target', {
         project: appName,
-        target: 'build'
+        target: 'build',
       });
 
       if (buildResult.error) {
@@ -207,13 +207,13 @@ export class DeploymentService {
       const deployResult = await mcpService.cloudRun('deploy', {
         service: appName,
         image: `gcr.io/${process.env.GCP_PROJECT_ID}/${appName}:latest`,
-        region: process.env.GCP_REGION
+        region: process.env.GCP_REGION,
       });
 
       // 4. Update deployment record
       await mcpService.bigquery(
         'INSERT INTO deployments.history (app_name, version, timestamp, status) VALUES (?, ?, ?, ?)',
-        [appName, gitStatus.result.commit, new Date(), 'success']
+        [appName, gitStatus.result.commit, new Date(), 'success'],
       );
 
       // 5. Store deployment info in memory
@@ -222,19 +222,18 @@ export class DeploymentService {
         value: {
           timestamp: new Date(),
           version: gitStatus.result.commit,
-          url: deployResult.result.url
-        }
+          url: deployResult.result.url,
+        },
       });
 
       return deployResult.result;
-
     } catch (error) {
       // Log deployment failure
       await mcpService.bigquery(
         'INSERT INTO deployments.history (app_name, timestamp, status, error) VALUES (?, ?, ?, ?)',
-        [appName, new Date(), 'failed', error.message]
+        [appName, new Date(), 'failed', error.message],
       );
-      
+
       throw error;
     }
   }
@@ -289,7 +288,7 @@ export class ResilientDataService {
       {
         function: 'ResilientDataService.getData',
         file: 'data.service.ts',
-        params: { query }
+        params: { query },
       },
       {
         maxRetries: 2,
@@ -298,10 +297,10 @@ export class ResilientDataService {
         fallbackAction: async () => {
           // Fallback 1: Try cached data from memory
           try {
-            const cached = await mcpService.memory('retrieve', { 
-              key: `cache-${this.hashQuery(query)}` 
+            const cached = await mcpService.memory('retrieve', {
+              key: `cache-${this.hashQuery(query)}`,
             });
-            
+
             if (cached.result) {
               return cached;
             }
@@ -315,8 +314,8 @@ export class ResilientDataService {
         },
         onRetry: (attempt, error) => {
           console.warn(`Retrying getData, attempt ${attempt}:`, error.message);
-        }
-      }
+        },
+      },
     );
   }
 
@@ -332,11 +331,11 @@ export class ResilientDataService {
 The MCP library now includes standardized error handling with Vietnamese language support:
 
 ```typescript
-import { 
-  createServiceErrorHandler, 
-  ErrorCategory, 
+import {
+  createServiceErrorHandler,
+  ErrorCategory,
   ErrorSeverity,
-  withErrorHandler 
+  withErrorHandler,
 } from '@nx-monorepo/mcp';
 
 export class MyService {
@@ -354,8 +353,8 @@ export class MyService {
       {
         maxRetries: 3,
         retryDelay: 1000,
-        exponentialBackoff: true
-      }
+        exponentialBackoff: true,
+      },
     );
   }
 
@@ -366,7 +365,7 @@ export class MyService {
         ErrorCategory.VALIDATION,
         ErrorSeverity.MEDIUM,
         'validateInput',
-        { input }
+        { input },
       );
     }
   }
@@ -382,7 +381,7 @@ export class MyService {
 const secrets = {
   github: 'projects/PROJECT_ID/secrets/github-token/versions/latest',
   openai: 'projects/PROJECT_ID/secrets/openai-api-key/versions/latest',
-  database: 'projects/PROJECT_ID/secrets/db-connection/versions/latest'
+  database: 'projects/PROJECT_ID/secrets/db-connection/versions/latest',
 };
 
 // Secrets are automatically retrieved by MCP servers
@@ -400,7 +399,7 @@ export class SecureMCPService {
     if (!this.canAccessDatabase()) {
       throw new Error('Insufficient permissions for database access');
     }
-    
+
     return mcpService.bigquery(query);
   }
 
@@ -408,7 +407,7 @@ export class SecureMCPService {
     if (!this.canAccessGitHub()) {
       throw new Error('Insufficient permissions for GitHub access');
     }
-    
+
     return mcpService.github(operation);
   }
 
@@ -434,7 +433,7 @@ export class PrivacyCompliantService {
 
     // Anonymize sensitive data before processing
     const anonymizedData = this.anonymizeData(userData);
-    
+
     // Store with privacy metadata
     await mcpService.memory('store', {
       key: `user-data-${userData.id}`,
@@ -443,8 +442,8 @@ export class PrivacyCompliantService {
         consent: true,
         consentDate: new Date(),
         dataRetentionDays: 365,
-        region: 'vietnam'
-      }
+        region: 'vietnam',
+      },
     });
 
     return anonymizedData;
@@ -456,7 +455,7 @@ export class PrivacyCompliantService {
       ...data,
       email: this.hashEmail(data.email),
       phone: this.maskPhone(data.phone),
-      ip: this.anonymizeIP(data.ip)
+      ip: this.anonymizeIP(data.ip),
     };
   }
 }
@@ -473,26 +472,26 @@ import { mcpService, getMCPPerformanceMetrics } from '@nx-monorepo/mcp';
 export class MCPMetricsService {
   async collectMetrics() {
     const metrics = getMCPPerformanceMetrics(mcpService);
-    
+
     // Send to Google Cloud Monitoring
     await mcpService.gcp('monitoring', 'write-metrics', {
       metrics: [
         {
           name: 'mcp/server_count',
           value: metrics.serverCount,
-          timestamp: new Date()
+          timestamp: new Date(),
         },
         {
           name: 'mcp/healthy_servers',
           value: metrics.healthyServers,
-          timestamp: new Date()
+          timestamp: new Date(),
         },
         {
           name: 'mcp/error_rate',
           value: metrics.errorRate,
-          timestamp: new Date()
-        }
-      ]
+          timestamp: new Date(),
+        },
+      ],
     });
 
     return metrics;
@@ -502,14 +501,16 @@ export class MCPMetricsService {
     // Create alerting policies
     await mcpService.gcp('monitoring', 'create-alert-policy', {
       displayName: 'MCP Server Health Alert',
-      conditions: [{
-        displayName: 'Server health below threshold',
-        conditionThreshold: {
-          filter: 'metric.type="custom.googleapis.com/mcp/healthy_servers"',
-          comparison: 'COMPARISON_LESS_THAN',
-          thresholdValue: 0.8
-        }
-      }]
+      conditions: [
+        {
+          displayName: 'Server health below threshold',
+          conditionThreshold: {
+            filter: 'metric.type="custom.googleapis.com/mcp/healthy_servers"',
+            comparison: 'COMPARISON_LESS_THAN',
+            thresholdValue: 0.8,
+          },
+        },
+      ],
     });
   }
 }
@@ -529,13 +530,13 @@ export class MCPLogger {
       success: !result.error,
       duration,
       serverId: result.serverId,
-      environment: process.env.NODE_ENV
+      environment: process.env.NODE_ENV,
     };
 
     // Store in BigQuery for analysis
     await mcpService.bigquery(
       'INSERT INTO logs.mcp_requests (timestamp, service, method, params, success, duration, server_id, environment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      Object.values(logEntry)
+      Object.values(logEntry),
     );
 
     // Also log to console in development
@@ -598,12 +599,12 @@ describe('MCP Integration', () => {
 
   it('should connect to all enabled servers', async () => {
     const connectivity = await testMCPConnectivity();
-    const failedConnections = connectivity.filter(c => !c.connected);
-    
+    const failedConnections = connectivity.filter((c) => !c.connected);
+
     if (failedConnections.length > 0) {
       console.warn('Failed connections:', failedConnections);
     }
-    
+
     // Allow some failures in test environment
     expect(failedConnections.length).toBeLessThan(connectivity.length * 0.5);
   });
@@ -618,15 +619,15 @@ describe('MCP Workflow E2E', () => {
   it('should complete full data processing workflow', async () => {
     // 1. Store test data
     await mcpService.memory('store', { key: 'test-data', value: { test: true } });
-    
+
     // 2. Query data
     const stored = await mcpService.memory('retrieve', { key: 'test-data' });
     expect(stored.result.test).toBe(true);
-    
+
     // 3. Process with BigQuery
     const queryResult = await mcpService.bigquery('SELECT 1 as test_value');
     expect(queryResult.result).toBeDefined();
-    
+
     // 4. Search for related content
     const searchResult = await mcpService.search('test query');
     expect(searchResult.result).toBeDefined();
@@ -661,19 +662,19 @@ spec:
   template:
     spec:
       containers:
-      - name: api
-        livenessProbe:
-          httpGet:
-            path: /health/mcp
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /health/mcp/connectivity
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: api
+          livenessProbe:
+            httpGet:
+              path: /health/mcp
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health/mcp/connectivity
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
 ```
 
 ### 3. Monitoring Dashboards
@@ -686,25 +687,31 @@ const dashboardConfig = {
     {
       title: 'Server Health',
       type: 'stat',
-      targets: [{
-        expr: 'mcp_healthy_servers / mcp_total_servers * 100'
-      }]
+      targets: [
+        {
+          expr: 'mcp_healthy_servers / mcp_total_servers * 100',
+        },
+      ],
     },
     {
       title: 'Request Rate',
       type: 'graph',
-      targets: [{
-        expr: 'rate(mcp_requests_total[5m])'
-      }]
+      targets: [
+        {
+          expr: 'rate(mcp_requests_total[5m])',
+        },
+      ],
     },
     {
       title: 'Error Rate',
       type: 'graph',
-      targets: [{
-        expr: 'rate(mcp_errors_total[5m])'
-      }]
-    }
-  ]
+      targets: [
+        {
+          expr: 'rate(mcp_errors_total[5m])',
+        },
+      ],
+    },
+  ],
 };
 ```
 
@@ -713,23 +720,26 @@ const dashboardConfig = {
 ### Common Issues and Solutions
 
 1. **Server Connection Timeouts**
+
    ```typescript
    // Increase timeout for slow servers
    const result = await mcpService.request('slow.operation', params, {
-     timeout: 60000 // 60 seconds
+     timeout: 60000, // 60 seconds
    });
    ```
 
 2. **Authentication Failures**
+
    ```bash
    # Check secret access
    gcloud secrets versions access latest --secret="github-token"
-   
+
    # Verify service account permissions
    gcloud projects get-iam-policy PROJECT_ID
    ```
 
 3. **Memory Issues**
+
    ```typescript
    // Clear memory cache periodically
    await mcpService.memory('clear', { pattern: 'cache-*' });
@@ -740,7 +750,7 @@ const dashboardConfig = {
    // Implement exponential backoff
    const result = await mcpService.request('api.call', params, {
      retries: 5,
-     timeout: 30000
+     timeout: 30000,
    });
    ```
 
@@ -755,7 +765,7 @@ export class CachedMCPService {
   async cachedRequest(method: string, params: any, ttl = 300000) {
     const key = `${method}-${JSON.stringify(params)}`;
     const cached = this.cache.get(key);
-    
+
     if (cached && cached.expires > Date.now()) {
       return cached.data;
     }
@@ -763,7 +773,7 @@ export class CachedMCPService {
     const result = await mcpService.request(method, params);
     this.cache.set(key, {
       data: result,
-      expires: Date.now() + ttl
+      expires: Date.now() + ttl,
     });
 
     return result;
@@ -779,8 +789,8 @@ const mcpConfig = {
   connectionPool: {
     maxConnections: 10,
     idleTimeout: 30000,
-    acquireTimeout: 10000
-  }
+    acquireTimeout: 10000,
+  },
 };
 ```
 
@@ -792,9 +802,9 @@ const loadBalancedService = {
   async distributedRequest(method: string, params: any) {
     const availableServers = mcpService.testRouting(method).availableServers;
     const selectedServer = this.selectLeastLoadedServer(availableServers);
-    
+
     return mcpService.request(method, params, { serverId: selectedServer });
-  }
+  },
 };
 ```
 

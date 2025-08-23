@@ -119,3 +119,24 @@ export const getVertexAIClient = memoize(
 );
 
 export { getProjectId };
+
+/**
+ * Minimal Pub/Sub helpers for tests and local usage.
+ * These are lightweight wrappers that can be replaced by full implementations.
+ */
+export function getPubSub() {
+  // Minimal stub that resembles the @google-cloud/pubsub client enough for tests
+  return {
+    topic: (name: string) => ({
+      publishMessage: async (msg: unknown) => {
+        // no-op publish for tests
+        return Promise.resolve({ messageId: 'test-message-id', name });
+      },
+    }),
+  };
+}
+
+export async function ensureTopic(name: string) {
+  // Minimal no-op implementation for tests
+  return Promise.resolve(true);
+}

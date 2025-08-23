@@ -1,16 +1,7 @@
-/**
- * MCP Server Registry
- * Defines all available MCP servers and their configurations
- */
-
 import { MCPServerConfig } from './mcp-config.schema';
+import { DEFAULT_TIMEOUT } from './server-config.defaults';
 
-/**
- * Registry of all available MCP servers
- */
 export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
-  // ===== CORE & DEVELOPMENT SERVERS =====
-
   github: {
     id: 'github',
     name: 'GitHub',
@@ -21,8 +12,7 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @modelcontextprotocol/server-github',
-      timeout: 30000,
-      retry: { attempts: 3, delay: 1000, backoff: 'exponential' },
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'api-key',
@@ -31,14 +21,9 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         envVar: 'GITHUB_TOKEN',
       },
     },
-    healthCheck: {
-      interval: 300000, // 5 minutes
-      timeout: 10000,
-      failureThreshold: 3,
-    },
     options: {
-      owner: process.env['GITHUB_OWNER'] || 'your-org',
-      repo: process.env['GITHUB_REPO'] || 'signals',
+      owner: process.env['GITHUB_OWNER'],
+      repo: process.env['GITHUB_REPO'],
     },
   },
 
@@ -48,16 +33,11 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'core',
     type: 'git',
     enabled: true,
-    priority: 10,
+    priority: 1,
     connection: {
       type: 'stdio',
       endpoint: 'node servers/src/git/dist/index.js',
-      timeout: 15000,
-    },
-    healthCheck: {
-      interval: 120000, // 2 minutes
-      timeout: 5000,
-      failureThreshold: 2,
+      timeout: DEFAULT_TIMEOUT,
     },
   },
 
@@ -67,16 +47,11 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'core',
     type: 'filesystem',
     enabled: true,
-    priority: 10,
+    priority: 1,
     connection: {
       type: 'stdio',
       endpoint: 'node servers/src/filesystem/dist/index.js',
-      timeout: 10000,
-    },
-    healthCheck: {
-      interval: 60000, // 1 minute
-      timeout: 3000,
-      failureThreshold: 2,
+      timeout: DEFAULT_TIMEOUT,
     },
     options: {
       allowedDirectories: [process.cwd(), '/tmp'],
@@ -89,16 +64,11 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'core',
     type: 'sequentialthinking',
     enabled: true,
-    priority: 9,
+    priority: 1,
     connection: {
       type: 'stdio',
       endpoint: 'node servers/src/sequentialthinking/dist/index.js',
-      timeout: 60000,
-    },
-    healthCheck: {
-      interval: 300000, // 5 minutes
-      timeout: 10000,
-      failureThreshold: 3,
+      timeout: DEFAULT_TIMEOUT,
     },
   },
 
@@ -108,16 +78,11 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'web',
     type: 'fetch',
     enabled: true,
-    priority: 8,
+    priority: 5,
     connection: {
       type: 'stdio',
       endpoint: 'node servers/src/fetch/dist/index.js',
-      timeout: 30000,
-    },
-    healthCheck: {
-      interval: 180000, // 3 minutes
-      timeout: 10000,
-      failureThreshold: 3,
+      timeout: DEFAULT_TIMEOUT,
     },
   },
 
@@ -127,16 +92,11 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'core',
     type: 'memory',
     enabled: true,
-    priority: 8,
+    priority: 1,
     connection: {
       type: 'stdio',
       endpoint: 'node servers/src/memory/dist/index.js',
-      timeout: 15000,
-    },
-    healthCheck: {
-      interval: 120000, // 2 minutes
-      timeout: 5000,
-      failureThreshold: 2,
+      timeout: DEFAULT_TIMEOUT,
     },
   },
 
@@ -146,16 +106,11 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'core',
     type: 'time',
     enabled: true,
-    priority: 7,
+    priority: 1,
     connection: {
       type: 'stdio',
       endpoint: 'node servers/src/time/dist/index.js',
-      timeout: 5000,
-    },
-    healthCheck: {
-      interval: 300000, // 5 minutes
-      timeout: 3000,
-      failureThreshold: 3,
+      timeout: DEFAULT_TIMEOUT,
     },
   },
 
@@ -165,20 +120,13 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'testing',
     type: 'everything',
     enabled: true,
-    priority: 3,
+    priority: 100,
     connection: {
       type: 'stdio',
       endpoint: 'node servers/src/everything/dist/index.js',
-      timeout: 10000,
-    },
-    healthCheck: {
-      interval: 600000, // 10 minutes
-      timeout: 5000,
-      failureThreshold: 5,
+      timeout: DEFAULT_TIMEOUT,
     },
   },
-
-  // ===== DATA & DATABASES =====
 
   databases: {
     id: 'databases',
@@ -186,11 +134,11 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'data',
     type: 'databases',
     enabled: true,
-    priority: 9,
+    priority: 10,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @google/mcp-toolbox-databases',
-      timeout: 30000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'gcp-service-account',
@@ -198,11 +146,6 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         secretName: 'gcp-service-account-key',
         envVar: 'GOOGLE_APPLICATION_CREDENTIALS',
       },
-    },
-    healthCheck: {
-      interval: 300000, // 5 minutes
-      timeout: 15000,
-      failureThreshold: 3,
     },
     options: {
       bigqueryProjectId: process.env['GCP_PROJECT_ID'],
@@ -216,11 +159,11 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'data',
     type: 'chroma',
     enabled: true,
-    priority: 7,
+    priority: 10,
     connection: {
       type: 'http',
-  endpoint: process.env['CHROMA_URL'] || 'http://localhost:8000',
-      timeout: 30000,
+      endpoint: process.env['CHROMA_URL'] || 'http://localhost:8000',
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'api-key',
@@ -229,14 +172,7 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         envVar: 'CHROMA_API_KEY',
       },
     },
-    healthCheck: {
-      interval: 180000, // 3 minutes
-      timeout: 10000,
-      failureThreshold: 3,
-    },
   },
-
-  // ===== WEB & API =====
 
   exa: {
     id: 'exa',
@@ -244,11 +180,11 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'web',
     type: 'exa',
     enabled: true,
-    priority: 8,
+    priority: 5,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @modelcontextprotocol/server-exa',
-      timeout: 30000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'api-key',
@@ -257,11 +193,6 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         envVar: 'EXA_API_KEY',
       },
     },
-    healthCheck: {
-      interval: 300000, // 5 minutes
-      timeout: 15000,
-      failureThreshold: 3,
-    },
   },
 
   netlify: {
@@ -269,12 +200,12 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     name: 'Netlify',
     category: 'platforms',
     type: 'netlify',
-    enabled: false, // Enable when needed
-    priority: 6,
+    enabled: false,
+    priority: 20,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @modelcontextprotocol/server-netlify',
-      timeout: 30000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'api-key',
@@ -283,11 +214,6 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         envVar: 'NETLIFY_TOKEN',
       },
     },
-    healthCheck: {
-      interval: 600000, // 10 minutes
-      timeout: 15000,
-      failureThreshold: 3,
-    },
   },
 
   cloudflare: {
@@ -295,12 +221,12 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     name: 'Cloudflare',
     category: 'platforms',
     type: 'cloudflare',
-    enabled: false, // Enable when needed
-    priority: 6,
+    enabled: false,
+    priority: 20,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @modelcontextprotocol/server-cloudflare',
-      timeout: 30000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'api-key',
@@ -308,11 +234,6 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         secretName: 'cloudflare-token',
         envVar: 'CLOUDFLARE_TOKEN',
       },
-    },
-    healthCheck: {
-      interval: 600000, // 10 minutes
-      timeout: 15000,
-      failureThreshold: 3,
     },
   },
 
@@ -322,32 +243,25 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'development',
     type: 'apimatic',
     enabled: true,
-    priority: 6,
+    priority: 10,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @modelcontextprotocol/server-apimatic',
-      timeout: 30000,
-    },
-    healthCheck: {
-      interval: 600000, // 10 minutes
-      timeout: 15000,
-      failureThreshold: 3,
+      timeout: DEFAULT_TIMEOUT,
     },
   },
-
-  // ===== PLATFORMS & DOCS =====
 
   notion: {
     id: 'notion',
     name: 'Notion',
     category: 'platforms',
     type: 'notion',
-    enabled: false, // Enable when needed
-    priority: 6,
+    enabled: false,
+    priority: 20,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @modelcontextprotocol/server-notion',
-      timeout: 30000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'api-key',
@@ -355,11 +269,6 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         secretName: 'notion-token',
         envVar: 'NOTION_TOKEN',
       },
-    },
-    healthCheck: {
-      interval: 600000, // 10 minutes
-      timeout: 15000,
-      failureThreshold: 3,
     },
   },
 
@@ -369,16 +278,11 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'platforms',
     type: 'mslearn',
     enabled: true,
-    priority: 5,
+    priority: 20,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @modelcontextprotocol/server-mslearn',
-      timeout: 30000,
-    },
-    healthCheck: {
-      interval: 600000, // 10 minutes
-      timeout: 15000,
-      failureThreshold: 3,
+      timeout: DEFAULT_TIMEOUT,
     },
   },
 
@@ -387,28 +291,21 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     name: 'Firebase',
     category: 'platforms',
     type: 'firebase',
-    enabled: false, // Enable when needed
-    priority: 6,
+    enabled: false,
+    priority: 20,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @modelcontextprotocol/server-firebase',
-      timeout: 30000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'gcp-service-account',
       credentials: {
-        secretName: 'firebase-service-account',
+        secretName: 'gcp-service-account-key',
         envVar: 'FIREBASE_SERVICE_ACCOUNT',
       },
     },
-    healthCheck: {
-      interval: 600000, // 10 minutes
-      timeout: 15000,
-      failureThreshold: 3,
-    },
   },
-
-  // ===== NX, NODE.JS, GOOGLE & WEBSITE BUILDING =====
 
   nx: {
     id: 'nx',
@@ -416,16 +313,11 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'development',
     type: 'nx',
     enabled: true,
-    priority: 9,
+    priority: 10,
     connection: {
       type: 'stdio',
       endpoint: 'node libs/mcp/src/lib/servers/specialized/nx-server.js',
-      timeout: 30000,
-    },
-    healthCheck: {
-      interval: 300000, // 5 minutes
-      timeout: 10000,
-      failureThreshold: 3,
+      timeout: DEFAULT_TIMEOUT,
     },
     options: {
       workspaceRoot: process.cwd(),
@@ -439,11 +331,11 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'platforms',
     type: 'google-cloud-run',
     enabled: true,
-    priority: 7,
+    priority: 20,
     connection: {
       type: 'stdio',
       endpoint: 'node libs/mcp/src/lib/servers/specialized/gcp-cloud-run-server.js',
-      timeout: 45000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'gcp-service-account',
@@ -451,11 +343,6 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         secretName: 'gcp-service-account-key',
         envVar: 'GOOGLE_APPLICATION_CREDENTIALS',
       },
-    },
-    healthCheck: {
-      interval: 300000, // 5 minutes
-      timeout: 15000,
-      failureThreshold: 3,
     },
     options: {
   projectId: process.env['GCP_PROJECT_ID'],
@@ -468,12 +355,12 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     name: 'Google Maps',
     category: 'specialized',
     type: 'google-maps',
-    enabled: false, // Enable when needed
-    priority: 5,
+    enabled: false,
+    priority: 30,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @modelcontextprotocol/server-google-maps',
-      timeout: 30000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'api-key',
@@ -482,11 +369,6 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         envVar: 'GOOGLE_MAPS_API_KEY',
       },
     },
-    healthCheck: {
-      interval: 600000, // 10 minutes
-      timeout: 15000,
-      failureThreshold: 3,
-    },
   },
 
   algolia: {
@@ -494,12 +376,12 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     name: 'Algolia Search',
     category: 'specialized',
     type: 'algolia',
-    enabled: false, // Enable when needed
-    priority: 5,
+    enabled: false,
+    priority: 30,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @modelcontextprotocol/server-algolia',
-      timeout: 30000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'api-key',
@@ -508,11 +390,6 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         envVar: 'ALGOLIA_API_KEY',
       },
     },
-    healthCheck: {
-      interval: 600000, // 10 minutes
-      timeout: 15000,
-      failureThreshold: 3,
-    },
   },
 
   browserbase: {
@@ -520,12 +397,12 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     name: 'Browserbase',
     category: 'testing',
     type: 'browserbase',
-    enabled: false, // Enable when needed
-    priority: 4,
+    enabled: false,
+    priority: 100,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @modelcontextprotocol/server-browserbase',
-      timeout: 60000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'api-key',
@@ -534,11 +411,6 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         envVar: 'BROWSERBASE_API_KEY',
       },
     },
-    healthCheck: {
-      interval: 600000, // 10 minutes
-      timeout: 30000,
-      failureThreshold: 3,
-    },
   },
 
   browserstack: {
@@ -546,12 +418,12 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     name: 'BrowserStack',
     category: 'testing',
     type: 'browserstack',
-    enabled: false, // Enable when needed
-    priority: 4,
+    enabled: false,
+    priority: 100,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @modelcontextprotocol/server-browserstack',
-      timeout: 60000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'api-key',
@@ -559,11 +431,6 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         secretName: 'browserstack-credentials',
         envVar: 'BROWSERSTACK_USERNAME',
       },
-    },
-    healthCheck: {
-      interval: 600000, // 10 minutes
-      timeout: 30000,
-      failureThreshold: 3,
     },
   },
 
@@ -573,11 +440,11 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'specialized',
     type: 'builtwith',
     enabled: true,
-    priority: 4,
+    priority: 30,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @modelcontextprotocol/server-builtwith',
-      timeout: 30000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'api-key',
@@ -586,11 +453,6 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         envVar: 'BUILTWITH_API_KEY',
       },
     },
-    healthCheck: {
-      interval: 600000, // 10 minutes
-      timeout: 15000,
-      failureThreshold: 3,
-    },
   },
 
   magic: {
@@ -598,12 +460,12 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     name: 'Magic UI Generator (21st.dev)',
     category: 'development',
     type: 'magic',
-    enabled: false, // Enable when needed
-    priority: 5,
+    enabled: false,
+    priority: 10,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @21st-dev/mcp-server-magic',
-      timeout: 45000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'api-key',
@@ -612,11 +474,6 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         envVar: 'MAGIC_API_KEY',
       },
     },
-    healthCheck: {
-      interval: 600000, // 10 minutes
-      timeout: 20000,
-      failureThreshold: 3,
-    },
   },
 
   make: {
@@ -624,12 +481,12 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     name: 'Make.com Automation',
     category: 'automation',
     type: 'make',
-    enabled: false, // Enable when needed
-    priority: 3,
+    enabled: false,
+    priority: 40,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @modelcontextprotocol/server-make',
-      timeout: 30000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'api-key',
@@ -638,11 +495,6 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         envVar: 'MAKE_API_KEY',
       },
     },
-    healthCheck: {
-      interval: 600000, // 10 minutes
-      timeout: 15000,
-      failureThreshold: 3,
-    },
   },
 
   devhub: {
@@ -650,12 +502,12 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     name: 'DevHub Content Management',
     category: 'platforms',
     type: 'devhub',
-    enabled: false, // Enable when needed
-    priority: 4,
+    enabled: false,
+    priority: 20,
     connection: {
       type: 'stdio',
       endpoint: 'npx -y @modelcontextprotocol/server-devhub',
-      timeout: 30000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'api-key',
@@ -663,11 +515,6 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         secretName: 'devhub-api-key',
         envVar: 'DEVHUB_API_KEY',
       },
-    },
-    healthCheck: {
-      interval: 600000, // 10 minutes
-      timeout: 15000,
-      failureThreshold: 3,
     },
   },
 
@@ -677,16 +524,11 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'development',
     type: 'node',
     enabled: true,
-    priority: 8,
+    priority: 10,
     connection: {
       type: 'stdio',
       endpoint: 'node libs/mcp/src/lib/servers/specialized/node-server.js',
-      timeout: 30000,
-    },
-    healthCheck: {
-      interval: 300000, // 5 minutes
-      timeout: 10000,
-      failureThreshold: 3,
+      timeout: DEFAULT_TIMEOUT,
     },
     options: {
       nodeVersion: process.version,
@@ -700,11 +542,11 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     category: 'platforms',
     type: 'google',
     enabled: true,
-    priority: 8,
+    priority: 20,
     connection: {
       type: 'stdio',
       endpoint: 'node libs/mcp/src/lib/servers/specialized/gcp-server.js',
-      timeout: 45000,
+      timeout: DEFAULT_TIMEOUT,
     },
     auth: {
       type: 'gcp-service-account',
@@ -713,11 +555,6 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
         envVar: 'GOOGLE_APPLICATION_CREDENTIALS',
       },
     },
-    healthCheck: {
-      interval: 300000, // 5 minutes
-      timeout: 15000,
-      failureThreshold: 3,
-    },
     options: {
   projectId: process.env['GCP_PROJECT_ID'],
   region: process.env['GCP_REGION'] || 'us-central1',
@@ -725,26 +562,3 @@ export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
     },
   },
 };
-
-/**
- * Get servers by category
- */
-export function getServersByCategory(category: string): MCPServerConfig[] {
-  return Object.values(MCP_SERVER_REGISTRY).filter((server) => server.category === category);
-}
-
-/**
- * Get enabled servers sorted by priority
- */
-export function getEnabledServers(): MCPServerConfig[] {
-  return Object.values(MCP_SERVER_REGISTRY)
-    .filter((server) => server.enabled)
-    .sort((a, b) => b.priority - a.priority);
-}
-
-/**
- * Get server configuration by ID
- */
-export function getServerConfig(serverId: string): MCPServerConfig | undefined {
-  return MCP_SERVER_REGISTRY[serverId];
-}

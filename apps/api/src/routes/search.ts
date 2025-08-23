@@ -1,13 +1,11 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-const fs = require('fs');
-const path = require('path');
-const _ = require('lodash');
+import * as fs from "fs";
+import * as path from "path";
+import * as _ from "lodash";
 
 interface SearchRequest {
   tool: string;
   query: string;
-  repoOwner: string;
-  repoName: string;
 }
 
 interface SearchResult {
@@ -23,37 +21,19 @@ interface SearchResponse {
   totalMatches: number;
 }
 
-/**
- * Search routes for semantic code search functionality
- * 
- * Provides an endpoint to search through repository files and documentation
- * with semantic understanding of CI/CD related content.
- */
 export async function searchRoutes(fastify: FastifyInstance) {
-  /**
-   * POST /search/semantic-code-search
-   * 
-   * Performs semantic code search across repository files.
-   * Specially optimized for CI-related queries like "ci-common".
-   * 
-   * @param request - Fastify request containing search parameters
-   * @param reply - Fastify reply object
-   * @returns Search results with relevance scoring
-   */
   fastify.post(
     "/semantic-code-search",
     async function (request: FastifyRequest, reply: FastifyReply) {
       try {
         const body = request.body as SearchRequest;
-        
-        // Validate required tool parameter
+
         if (!body.tool || body.tool !== "semantic-code-search") {
           return reply.status(400).send({ 
             error: "Invalid tool. Expected 'semantic-code-search'" 
           });
         }
 
-        // Validate required query parameter
         if (!body.query) {
           return reply.status(400).send({ 
             error: "Query parameter is required" 
@@ -70,7 +50,7 @@ export async function searchRoutes(fastify: FastifyInstance) {
 
         return reply.send(response);
       } catch (error: any) {
-        console.error('Search error:', error);
+        fastify.log.error('Search error:', error);
         return reply.status(500).send({ 
           error: "Internal server error during search" 
         });
@@ -79,17 +59,10 @@ export async function searchRoutes(fastify: FastifyInstance) {
   );
 }
 
-/**
- * Performs semantic search across repository files
- * 
- * @param query - Search query string
- * @returns Array of search results sorted by relevance
- */
 async function performSemanticSearch(query: string): Promise<SearchResult[]> {
   const results: SearchResult[] = [];
   const repoRoot = process.cwd();
   
-  // CI/CD related terms for semantic matching
   const ciTerms = [
     'ci', 'continuous integration', 'continuous deployment', 'pipeline', 
     'workflow', 'github actions', 'build', 'deploy', 'test', 'lint',
@@ -97,50 +70,27 @@ async function performSemanticSearch(query: string): Promise<SearchResult[]> {
     'deployment', 'automation', 'devops'
   ];
   
-  // For CI-related queries, search through CI documentation and configuration files
   if (query.toLowerCase().includes('ci') || query.toLowerCase().includes('common')) {
-    const ciFiles = [
-      'CI_SETUP_GUIDE.md',
-      'COPILOT_PROMPT_CI.md',
-      'STEP_BY_STEP_CI.md',
-      'docs/CI_CD_WORKFLOW.md',
-      'docs/GIT_PUSH_PREPARATION_REPORT.md',
-      'cloudbuild.yaml',
-      '.gitlab-ci.yml'
-    ];
-
-    for (const filePattern of ciFiles) {
-      try {
-        const filePath = path.join(repoRoot, filePattern);
-        
-        if (fs.existsSync(filePath)) {
+    const workflowsDir = path.join(repoRoot, '.github/workflows');
+    if (fs.existsSync(workflowsDir)) {
+      const files = fs.readdirSync(workflowsDir);
+      for (const file of files) {
+        if (file.endsWith('.yml') || file.endsWith('.yaml')) {
+          const filePath = path.join(workflowsDir, file);
           const result = await searchInFile(filePath, query, ciTerms);
           if (result) {
             results.push(result);
           }
         }
-      } catch (error) {
-        // Continue searching other files if one fails
-        console.warn(`Failed to search in ${filePattern}:`, error);
       }
     }
   }
 
-  // Sort results by relevance (descending)
   results.sort((a, b) => b.relevance - a.relevance);
   
-  // Return top 10 most relevant results
   return results.slice(0, 10);
 }
 
-/**
- * Searches for matches within a specific file
- * 
- * @param filePath - Path to the file to search
- * @param query - Search query string
- * @param ciTerms - Array of CI-related terms for semantic matching
- * @returns SearchResult object or null if no relevant matches found
- */
 async function searchInFile(filePath: string, query: string, ciTerms: string[]): Promise<SearchResult | null> {
   try {
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -149,7 +99,6 @@ async function searchInFile(filePath: string, query: string, ciTerms: string[]):
     const matches: string[] = [];
     let relevance = 0;
     
-    // Search for exact query matches (highest weight)
     const safeQuery = _.escapeRegExp(query);
     const queryRegex = new RegExp(safeQuery, 'gi');
     const queryMatches = content.match(queryRegex);
@@ -158,7 +107,6 @@ async function searchInFile(filePath: string, query: string, ciTerms: string[]):
       matches.push(...queryMatches);
     }
     
-    // Search for CI-related terms for semantic relevance
     for (const term of ciTerms) {
       const termRegex = new RegExp(term, 'gi');
       const termMatches = content.match(termRegex);
@@ -167,12 +115,10 @@ async function searchInFile(filePath: string, query: string, ciTerms: string[]):
       }
     }
     
-    // Extract relevant lines with context
     const relevantLines: string[] = [];
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       if (queryRegex.test(line) || ciTerms.some(term => new RegExp(term, 'i').test(line))) {
-        // Include context (line before and after)
         const contextStart = Math.max(0, i - 1);
         const contextEnd = Math.min(lines.length - 1, i + 1);
         
@@ -184,14 +130,12 @@ async function searchInFile(filePath: string, query: string, ciTerms: string[]):
       }
     }
     
-    // Return result if relevant content found
     if (relevance > 0) {
-      // Remove duplicates from matches array
       const uniqueMatches = matches.filter((match, index) => matches.indexOf(match) === index);
       
       return {
         file: path.relative(process.cwd(), filePath),
-        content: relevantLines.slice(0, 5).join('\n'), // Limit to 5 most relevant lines
+        content: relevantLines.slice(0, 5).join('\n'),
         relevance,
         matches: uniqueMatches
       };

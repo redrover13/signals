@@ -184,13 +184,10 @@ describe('MCP Utils', () => {
       const results = await testMCPConnectivity();
 
       expect(results).toHaveLength(3);
-      expect(results[0]).toEqual(
-        expect.objectContaining({
-          serverId: 'git',
-          connected: true,
-          responseTime: expect.any(Number)
-        })
-      );
+      const byId = Object.fromEntries(results.map(r => [r.serverId, r]));
+      expect(byId['git']).toEqual(expect.objectContaining({ serverId: 'git', connected: true, responseTime: expect.any(Number) }));
+      expect(byId['memory']).toEqual(expect.objectContaining({ serverId: 'memory', connected: true, responseTime: expect.any(Number) }));
+      expect(byId['filesystem']).toEqual(expect.objectContaining({ serverId: 'filesystem', connected: true, responseTime: expect.any(Number) }));
       expect(mockMCPService.checkHealth).toHaveBeenCalledTimes(3);
     });
 

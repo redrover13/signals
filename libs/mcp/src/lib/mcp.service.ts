@@ -7,6 +7,7 @@ import { MCPClientService, MCPRequest, MCPResponse } from './clients/mcp-client.
 import { ServerHealthService, HealthCheckResult, ServerHealthStats } from './clients/server-health.service';
 import { RequestRouter } from './clients/request-router.service';
 import { getCurrentConfig, getCurrentEnvironment } from './config/environment-config';
+import { createServiceErrorHandler, ErrorCategory, ErrorSeverity } from './utils/error-handler';
 
 /**
  * Main MCP Service - Simplified interface for all MCP operations
@@ -17,6 +18,7 @@ export class MCPService {
   private healthService: ServerHealthService;
   private requestRouter: RequestRouter;
   private isInitialized = false;
+  private errorHandler = createServiceErrorHandler('MCPService', 'mcp.service.ts');
 
   private constructor() {
     this.clientService = new MCPClientService();
@@ -44,14 +46,20 @@ export class MCPService {
 
     console.log(`Initializing MCP Service for environment: ${getCurrentEnvironment()}`);
     
-    try {
-      await this.clientService.initialize();
-      this.isInitialized = true;
-      console.log('MCP Service initialized successfully');
-    } catch (error) {
-      console.error('Failed to initialize MCP Service:', error);
-      throw error;
-    }
+    return this.errorHandler.withRetry(
+      async () => {
+        await this.clientService.initialize();
+        this.isInitialized = true;
+        console.log('MCP Service initialized successfully');
+      },
+      'initialize',
+      { environment: getCurrentEnvironment() },
+      {
+        maxRetries: 2,
+        retryDelay: 1000,
+        exponentialBackoff: true
+      }
+    );
   }
 
   /**
@@ -75,7 +83,21 @@ export class MCPService {
       retries: options?.retries
     };
 
-    return await this.clientService.sendRequest(request);
+    return this.errorHandler.withRetry(
+      async () => {
+        return await this.clientService.sendRequest(request);
+      },
+      'request',
+      { method, params, options },
+      {
+        maxRetries: options?.retries || 2,
+        retryDelay: 1000,
+        exponentialBackoff: true,
+        onRetry: (attempt, error) => {
+          console.warn(`Retrying MCP request ${request.id}, attempt ${attempt}:`, error.message);
+        }
+      }
+    );
   }
 
   // ===== CORE SERVER METHODS =====
@@ -352,14 +374,19 @@ export class MCPService {
   async shutdown(): Promise<void> {
     console.log('Shutting down MCP Service...');
     
-    try {
-      await this.clientService.disconnect();
-      this.isInitialized = false;
-      console.log('MCP Service shut down successfully');
-    } catch (error) {
-      console.error('Error during MCP Service shutdown:', error);
-      throw error;
-    }
+    return this.errorHandler.withRetry(
+      async () => {
+        await this.clientService.disconnect();
+        this.isInitialized = false;
+        console.log('MCP Service shut down successfully');
+      },
+      'shutdown',
+      {},
+      {
+        maxRetries: 1,
+        retryDelay: 500
+      }
+    );
   }
 
   /**

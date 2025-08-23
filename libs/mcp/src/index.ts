@@ -18,3 +18,4 @@ export { MCPService } from './lib/mcp.service';
 
 // Utility functions
 export { createMCPClient, getMCPConfig, validateMCPEnvironment } from './lib/utils/mcp-utils';
+export * from './lib/utils/error-handler';

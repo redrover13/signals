@@ -41,31 +41,6 @@
           "hash": "15834690189997340113"
         }
       ],
-      "event-parser": [
-        {
-          "file": "apps/event-parser/index.js",
-          "hash": "1551799424560765925",
-          "deps": [
-            "npm:@google-cloud/bigquery",
-            "npm:@google-cloud/storage",
-            "npm:uuid@9.0.1"
-          ]
-        },
-        {
-          "file": "apps/event-parser/package.json",
-          "hash": "12992567968388828974",
-          "deps": [
-            "npm:@google-cloud/functions-framework",
-            "npm:@google-cloud/bigquery",
-            "npm:@google-cloud/storage",
-            "npm:uuid@9.0.1"
-          ]
-        },
-        {
-          "file": "apps/event-parser/project.json",
-          "hash": "5913538667647741326"
-        }
-      ],
       "api": [
         {
           "file": "apps/api/COPILOT_PROMPT.md",
@@ -112,6 +87,31 @@
         {
           "file": "apps/api/tsconfig.json",
           "hash": "14641593147291263924"
+        }
+      ],
+      "event-parser": [
+        {
+          "file": "apps/event-parser/index.js",
+          "hash": "1551799424560765925",
+          "deps": [
+            "npm:@google-cloud/bigquery",
+            "npm:@google-cloud/storage",
+            "npm:uuid@9.0.1"
+          ]
+        },
+        {
+          "file": "apps/event-parser/package.json",
+          "hash": "12992567968388828974",
+          "deps": [
+            "npm:@google-cloud/functions-framework",
+            "npm:@google-cloud/bigquery",
+            "npm:@google-cloud/storage",
+            "npm:uuid@9.0.1"
+          ]
+        },
+        {
+          "file": "apps/event-parser/project.json",
+          "hash": "5913538667647741326"
         }
       ],
       "web": [
@@ -180,58 +180,27 @@
           "hash": "15337167957341348420"
         }
       ],
-      "mcp": [
+      "legacy-event-parser": [
         {
-          "file": "libs/mcp/README.md",
-          "hash": "4496346652772077061"
+          "file": "apps/legacy_event_parser/index.js",
+          "hash": "8111006878647914647",
+          "deps": [
+            "npm:@google-cloud/pubsub",
+            "npm:@google-cloud/bigquery"
+          ]
         },
         {
-          "file": "libs/mcp/project.json",
-          "hash": "5568977903714663353"
+          "file": "apps/legacy_event_parser/package.json",
+          "hash": "4475964162858051640",
+          "deps": [
+            "npm:@google-cloud/functions-framework",
+            "npm:@google-cloud/pubsub",
+            "npm:@google-cloud/bigquery"
+          ]
         },
         {
-          "file": "libs/mcp/src/index.ts",
-          "hash": "361260212127963270"
-        },
-        {
-          "file": "libs/mcp/src/lib/clients/mcp-client.service.ts",
-          "hash": "15245971964113929811"
-        },
-        {
-          "file": "libs/mcp/src/lib/clients/request-router.service.ts",
-          "hash": "17581107217021995129"
-        },
-        {
-          "file": "libs/mcp/src/lib/clients/server-health.service.ts",
-          "hash": "12682037362803371225"
-        },
-        {
-          "file": "libs/mcp/src/lib/config/environment-config.ts",
-          "hash": "8865878833108213536"
-        },
-        {
-          "file": "libs/mcp/src/lib/config/mcp-config.schema.ts",
-          "hash": "11762348952682604943"
-        },
-        {
-          "file": "libs/mcp/src/lib/config/server-registry.ts",
-          "hash": "13977203452203219380"
-        },
-        {
-          "file": "libs/mcp/src/lib/mcp.service.ts",
-          "hash": "1474040779072228292"
-        },
-        {
-          "file": "libs/mcp/src/lib/utils/mcp-utils.ts",
-          "hash": "17191469979326991522"
-        },
-        {
-          "file": "libs/mcp/tsconfig.json",
-          "hash": "4834719271918839137"
-        },
-        {
-          "file": "libs/mcp/tsconfig.lib.json",
-          "hash": "4312518675533582045"
+          "file": "apps/legacy_event_parser/project.json",
+          "hash": "12204104461009431540"
         }
       ],
       "gcp": [
@@ -268,13 +237,17 @@
         },
         {
           "file": "libs/gcp/src/index.ts",
-          "hash": "10336146786281506629",
+          "hash": "6694118158899966649",
           "deps": [
             "npm:@google-cloud/bigquery",
             "npm:@google-cloud/storage",
             "npm:@google-cloud/aiplatform",
             "npm:google-auth-library",
-            "npm:lodash"
+            "npm:lodash",
+            [
+              "npm:@google-cloud/pubsub",
+              "dynamic"
+            ]
           ]
         },
         {
@@ -317,27 +290,66 @@
           "hash": "1733962632352765753"
         }
       ],
-      "legacy-event-parser": [
+      "mcp": [
         {
-          "file": "apps/legacy_event_parser/index.js",
-          "hash": "8111006878647914647",
-          "deps": [
-            "npm:@google-cloud/pubsub",
-            "npm:@google-cloud/bigquery"
-          ]
+          "file": "libs/mcp/README.md",
+          "hash": "11810793336253725378"
         },
         {
-          "file": "apps/legacy_event_parser/package.json",
-          "hash": "4475964162858051640",
-          "deps": [
-            "npm:@google-cloud/functions-framework",
-            "npm:@google-cloud/pubsub",
-            "npm:@google-cloud/bigquery"
-          ]
+          "file": "libs/mcp/project.json",
+          "hash": "5568977903714663353"
         },
         {
-          "file": "apps/legacy_event_parser/project.json",
-          "hash": "12204104461009431540"
+          "file": "libs/mcp/src/index.ts",
+          "hash": "4422972705228089311"
+        },
+        {
+          "file": "libs/mcp/src/lib/clients/mcp-client.service.ts",
+          "hash": "15245971964113929811"
+        },
+        {
+          "file": "libs/mcp/src/lib/clients/request-router.service.ts",
+          "hash": "17581107217021995129"
+        },
+        {
+          "file": "libs/mcp/src/lib/clients/server-health.service.ts",
+          "hash": "12682037362803371225"
+        },
+        {
+          "file": "libs/mcp/src/lib/completed-implementations.spec.ts",
+          "hash": "11230248385614486401"
+        },
+        {
+          "file": "libs/mcp/src/lib/config/environment-config.ts",
+          "hash": "8865878833108213536"
+        },
+        {
+          "file": "libs/mcp/src/lib/config/mcp-config.schema.ts",
+          "hash": "11762348952682604943"
+        },
+        {
+          "file": "libs/mcp/src/lib/config/server-registry.ts",
+          "hash": "13977203452203219380"
+        },
+        {
+          "file": "libs/mcp/src/lib/mcp.service.ts",
+          "hash": "13627191671346496806"
+        },
+        {
+          "file": "libs/mcp/src/lib/utils/error-handler.ts",
+          "hash": "1085795159422946707"
+        },
+        {
+          "file": "libs/mcp/src/lib/utils/mcp-utils.ts",
+          "hash": "1845929344909992752"
+        },
+        {
+          "file": "libs/mcp/tsconfig.json",
+          "hash": "4834719271918839137"
+        },
+        {
+          "file": "libs/mcp/tsconfig.lib.json",
+          "hash": "4312518675533582045"
         }
       ]
     },
@@ -736,7 +748,7 @@
       },
       {
         "file": "docs/MCP_INTEGRATION_GUIDE.md",
-        "hash": "17788750400013101227"
+        "hash": "3237811419977496265"
       },
       {
         "file": "docs/MIGRATION_ENV_MAP.md",
@@ -944,7 +956,7 @@
       },
       {
         "file": "package.json",
-        "hash": "9592988121703974443"
+        "hash": "8538708691519721366"
       },
       {
         "file": "pmd.xml",
@@ -952,7 +964,7 @@
       },
       {
         "file": "pnpm-lock.yaml",
-        "hash": "14613482824310872129"
+        "hash": "7422320342518914555"
       },
       {
         "file": "pnpm-workspace.yaml",

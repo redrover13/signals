@@ -1,28 +1,73 @@
 // Export helpers
 export { getProjectId };
 /**
- * Ensures a Pub/Sub topic exists (stub implementation).
- * Replace with actual logic as needed.
+ * Ensures a Pub/Sub topic exists.
+ * Creates the topic if it doesn't exist, following GCP best practices.
  */
-export async function ensureTopic(): Promise<void> {
-  // TODO: Implement actual topic creation logic using @google-cloud/pubsub
-  return;
+export async function ensureTopic(topicName: string): Promise<void> {
+  try {
+    const { PubSub } = await import('@google-cloud/pubsub');
+    const projectId = getProjectId();
+    const pubsub = new PubSub({ projectId });
+    const topic = pubsub.topic(topicName);
+    
+    const [exists] = await topic.exists();
+    if (!exists) {
+      await topic.create();
+      console.log(`Topic ${topicName} created successfully`);
+    } else {
+      console.log(`Topic ${topicName} already exists`);
+    }
+  } catch (error) {
+    console.error(`Failed to ensure topic ${topicName}:`, error);
+    throw new GcpInitializationError(
+      `Could not ensure Pub/Sub topic ${topicName}: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 }
 
 /**
- * Returns a Pub/Sub topic interface (stub implementation).
- * Replace with actual logic as needed.
+ * Returns a Pub/Sub topic interface with proper implementation.
+ * Provides methods for publishing messages to topics.
  */
 export function getPubSub() {
+  const projectId = getProjectId();
+  
   return {
-    topic: (_name: string) => ({
-      publishMessage: async (_msg: unknown) => {
-        // Mark intentionally unused parameters to satisfy lint rules
-        void _name;
-        void _msg;
-        // TODO: Implement actual publish logic using @google-cloud/pubsub
-        // Accept an unknown payload and marshal appropriately when implementing.
-        return 'mock-message-id';
+    topic: (topicName: string) => ({
+      publishMessage: async (message: {
+        data?: Buffer | string;
+        attributes?: Record<string, string>;
+        orderingKey?: string;
+      }) => {
+        try {
+          const { PubSub } = await import('@google-cloud/pubsub');
+          const pubsub = new PubSub({ projectId });
+          const topic = pubsub.topic(topicName);
+          
+          // Ensure the topic exists
+          await ensureTopic(topicName);
+          
+          // Prepare message data
+          const messageData = typeof message.data === 'string' 
+            ? Buffer.from(message.data) 
+            : message.data || Buffer.alloc(0);
+          
+          // Publish the message
+          const messageId = await topic.publishMessage({
+            data: messageData,
+            attributes: message.attributes,
+            orderingKey: message.orderingKey
+          });
+          
+          console.log(`Message ${messageId} published to topic ${topicName}`);
+          return messageId;
+        } catch (error) {
+          console.error(`Failed to publish message to topic ${topicName}:`, error);
+          throw new GcpInitializationError(
+            `Could not publish message to topic ${topicName}: ${error instanceof Error ? error.message : 'Unknown error'}`
+          );
+        }
       },
     }),
   };

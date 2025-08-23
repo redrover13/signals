@@ -3,26 +3,45 @@ import { runAgent } from "@dulce-de-saigon/agents-lib";
 import { agentsRoutes } from "../../api/src/routes/agents";
 import { healthRoutes } from "../../api/src/routes/health";
 import { VertexAIClient, VertexAIClientConfig } from "adk/services/vertex";
+import { registerSecurity, loadAppConfig } from "@dulce-de-saigon/security";
 
 const fastify = Fastify({
   logger: true,
 });
 
-// --- Vertex AI Integration ---
-// Configuration should come from environment variables, not be hardcoded.
-// Cấu hình nên được lấy từ biến môi trường.
-const vertexAIConfig: VertexAIClientConfig = {
-  project: process.env.GCP_PROJECT_ID || "324928471234",
-  location: process.env.GCP_LOCATION || "us-central1",
-  endpointId: process.env.VERTEX_AI_ENDPOINT_ID || "839281723491823912",
-};
+// Load configuration asynchronously
+let appConfig: Awaited<ReturnType<typeof loadAppConfig>>;
 
-const vertexClient = new VertexAIClient(vertexAIConfig);
+// --- Vertex AI Integration ---
+// Configuration loaded securely from environment and Secret Manager
+async function initializeVertexAI() {
+  appConfig = await loadAppConfig();
+  
+  const vertexAIConfig: VertexAIClientConfig = {
+    project: appConfig.gcpProjectId,
+    location: appConfig.gcpLocation,
+    endpointId: appConfig.vertexAiEndpointId,
+  };
+
+  return new VertexAIClient(vertexAIConfig);
+}
+
+// Initialize security middleware
+async function initializeSecurity() {
+  await registerSecurity(fastify, {
+    authentication: process.env.NODE_ENV === 'production',
+    rateLimit: {
+      max: parseInt(process.env.RATE_LIMIT_MAX || '100'),
+      windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'),
+    },
+  });
+}
 
 // Example route demonstrating an inference call
 // Ví dụ về một route thực hiện lệnh gọi suy luận
 fastify.post("/api/v1/agent-predict", async (request, reply) => {
   try {
+    const vertexClient = await initializeVertexAI();
     const instancePayload = request.body; // Assume body contains the instance
     const predictions = await vertexClient.predict(instancePayload);
 
@@ -30,7 +49,7 @@ fastify.post("/api/v1/agent-predict", async (request, reply) => {
     // Ghi nhật ký để tuân thủ và phân tích, tôn trọng quyền riêng tư dữ liệu.
     fastify.log.info({
       message: "Prediction successful",
-      endpointId: vertexAIConfig.endpointId,
+      endpointId: appConfig.vertexAiEndpointId,
     });
 
     return { success: true, predictions };
@@ -39,7 +58,7 @@ fastify.post("/api/v1/agent-predict", async (request, reply) => {
     reply.status(500).send({
       success: false,
       message: "An error occurred during prediction.",
-  error: error instanceof Error ? error.name : 'UnknownError', // e.g., 'PredictionAPIError'
+      error: error instanceof Error ? error.name : 'UnknownError', // e.g., 'PredictionAPIError'
     });
   }
 });
@@ -54,10 +73,16 @@ fastify.register(agentsRoutes);
  */
 const start = async () => {
   try {
-    await fastify.listen({ port: 3000 }); // Because you have "bind: '0.0.0.0'" in your ecosystem.config, Fastify will bind to all available network interfaces for your service. Note that in production, localhost (127.0.0.1) does not refer to the local machine for external network services like load balancers or Kubernetes services. They won't route to it.
+    // Initialize security first
+    await initializeSecurity();
+    
+    // Start the server
+    await fastify.listen({ port: 3000, host: '0.0.0.0' });
+    fastify.log.info('Server started successfully with security middleware enabled');
   } catch (err) {
     fastify.log.error(err);
     process.exit(1); // Kết thúc tiến trình Node.js. 
   }
 };
+
 start();

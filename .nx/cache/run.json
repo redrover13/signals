@@ -1,8 +1,8 @@
 {
   "run": {
-    "command": "nx run-many --target=test --all",
-    "startTime": "2025-08-23T04:19:05.602Z",
-    "endTime": "2025-08-23T04:19:05.612Z",
+    "command": "nx run-many --target=build --all",
+    "startTime": "2025-08-23T04:28:14.592Z",
+    "endTime": "2025-08-23T04:28:14.603Z",
     "inner": false
   },
   "tasks": []

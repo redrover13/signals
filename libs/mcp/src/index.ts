@@ -13,6 +13,11 @@ export * from './lib/clients/mcp-client.service';
 export * from './lib/clients/server-health.service';
 export * from './lib/clients/request-router.service';
 
+// Performance optimization services
+export * from './lib/services/cache.service';
+export * from './lib/services/connection-pool.service';
+export * from './lib/services/performance-metrics.service';
+
 // Main MCP service facade
 export { MCPService } from './lib/mcp.service';
 

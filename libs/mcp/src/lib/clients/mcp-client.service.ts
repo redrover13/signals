@@ -8,6 +8,7 @@ import { MCPServerConfig } from '../config/mcp-config.schema';
 import { getCurrentConfig, getCurrentEnvironment } from '../config/environment-config';
 import { ServerHealthService } from './server-health.service';
 import { RequestRouter } from './request-router.service';
+import { ConnectionPoolService, connectionPoolService } from '../services/connection-pool.service';
 
 export interface MCPRequest {
   id: string;
@@ -47,6 +48,7 @@ export class MCPClientService extends EventEmitter {
   private connections = new Map<string, MCPServerConnection>();
   private healthService: ServerHealthService;
   private requestRouter: RequestRouter;
+  private connectionPool: ConnectionPoolService;
   private config = getCurrentConfig();
   private isInitialized = false;
 
@@ -54,6 +56,7 @@ export class MCPClientService extends EventEmitter {
     super();
     this.healthService = new ServerHealthService(this);
     this.requestRouter = new RequestRouter(this);
+    this.connectionPool = connectionPoolService;
 
     // Set up event handlers
     this.setupEventHandlers();
@@ -379,39 +382,94 @@ export class MCPClientService extends EventEmitter {
   }
 
   /**
-   * Disconnect from all servers
+   * Disconnect from all servers with improved resource cleanup
    */
   async disconnect(): Promise<void> {
     console.log('Disconnecting from all MCP servers...');
 
-    // Stop health monitoring
-    await this.healthService.stop();
+    try {
+      // Stop health monitoring
+      await this.healthService.stop();
 
-    // Disconnect from all servers
-    for (const [serverId, connection] of this.connections) {
-      try {
-        await this.disconnectFromServer(connection);
-      } catch (error) {
-        console.error(`Error disconnecting from ${serverId}:`, error);
-      }
+      // Disconnect from all servers with timeout
+      const disconnectPromises = Array.from(this.connections.entries()).map(
+        async ([serverId, connection]) => {
+          try {
+            await Promise.race([
+              this.disconnectFromServer(connection),
+              new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Disconnect timeout')), 5000)
+              )
+            ]);
+          } catch (error) {
+            console.error(`Error disconnecting from ${serverId}:`, error);
+          }
+        }
+      );
+
+      await Promise.all(disconnectPromises);
+
+      // Shutdown connection pool
+      await this.connectionPool.shutdown();
+
+      this.connections.clear();
+      this.isInitialized = false;
+      this.emit('disconnected');
+      
+      console.log('MCP Client Service disconnected successfully');
+    } catch (error) {
+      console.error('Error during MCP Client Service disconnect:', error);
+      throw error;
     }
-
-    this.connections.clear();
-    this.isInitialized = false;
-    this.emit('disconnected');
   }
 
   /**
-   * Disconnect from specific server
+   * Disconnect from specific server with proper resource cleanup
    */
   private async disconnectFromServer(connection: MCPServerConnection): Promise<void> {
-    if (connection.process) {
-      connection.process.kill();
+    console.log(`Disconnecting from server: ${connection.id}`);
+    
+    try {
+      // Set status to prevent new requests
+      connection.status = 'disconnected';
+
+      // Close process connections with timeout
+      if (connection.process) {
+        // Try graceful shutdown first
+        connection.process.kill('SIGTERM');
+        
+        // Wait for graceful shutdown or force kill
+        await new Promise<void>((resolve) => {
+          const timeout = setTimeout(() => {
+            if (connection.process && !connection.process.killed) {
+              connection.process.kill('SIGKILL');
+            }
+            resolve();
+          }, 3000); // 3 second grace period
+
+          connection.process!.on('exit', () => {
+            clearTimeout(timeout);
+            resolve();
+          });
+        });
+      }
+
+      // Close HTTP/WebSocket clients
+      if (connection.client) {
+        // Close client connections (implementation depends on client type)
+        if (typeof (connection.client as any).close === 'function') {
+          await (connection.client as any).close();
+        }
+      }
+
+      // Drain connection pool for this server
+      await this.connectionPool.drainPool(connection.id);
+
+      console.log(`Successfully disconnected from server: ${connection.id}`);
+    } catch (error) {
+      console.error(`Error disconnecting from server ${connection.id}:`, error);
+      throw error;
     }
-    if (connection.client) {
-      // Close HTTP/WebSocket client
-    }
-    connection.status = 'disconnected';
   }
 
   /**

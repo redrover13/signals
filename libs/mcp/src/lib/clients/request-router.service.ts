@@ -263,12 +263,11 @@ export class RequestRouter {
   }
 
   /**
-   * Select server based on load balancing strategy
+   * Select server based on load balancing strategy with Vietnamese market optimization
    */
-  private selectServerByLoadBalancing(rules: RoutingRule[], /* request: MCPRequest */): RoutingRule {
-    const strategy: LoadBalancingStrategy = {
-      type: 'priority-based' // Default strategy
-    };
+  private selectServerByLoadBalancing(rules: RoutingRule[], request: MCPRequest): RoutingRule {
+    // Determine strategy based on request characteristics and Vietnamese market needs
+    const strategy = this.determineOptimalStrategy(rules, request);
 
     switch (strategy.type) {
       case 'priority-based':
@@ -278,6 +277,38 @@ export class RequestRouter {
         return this.selectByRoundRobin(rules);
       
       case 'least-connections':
+        return this.selectByLeastConnections(rules);
+      
+      case 'random':
+        return this.selectByRandom(rules);
+      
+      default:
+        return this.selectByPriority(rules);
+    }
+  }
+
+  /**
+   * Determine optimal load balancing strategy for Vietnamese market
+   */
+  private determineOptimalStrategy(rules: RoutingRule[], request: MCPRequest): LoadBalancingStrategy {
+    // For BigQuery and data-heavy operations, use least-connections to avoid overloading
+    if (request.method.includes('bigquery') || request.method.includes('database')) {
+      return { type: 'least-connections' };
+    }
+    
+    // For real-time operations, use priority-based for consistent performance
+    if (request.method.includes('memory') || request.method.includes('cache')) {
+      return { type: 'priority-based' };
+    }
+    
+    // For search and fetch operations, distribute load evenly
+    if (request.method.includes('search') || request.method.includes('fetch')) {
+      return { type: 'round-robin' };
+    }
+    
+    // Default to priority-based for Vietnamese market stability
+    return { type: 'priority-based' };
+  }
         return this.selectByLeastConnections(rules);
       
       case 'random':

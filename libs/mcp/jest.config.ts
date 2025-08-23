@@ -16,6 +16,7 @@ const config: Config.InitialOptions = {
       },
     ],
   },
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   // Help Jest resolve monorepo local libs and node modules
   moduleDirectories: ['node_modules', '<rootDir>/../../node_modules', '<rootDir>/../../'],
   moduleNameMapper: {

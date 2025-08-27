@@ -29,9 +29,24 @@ try {
   });
 
   console.log('\nTest setup validation:');
-  console.log('  ✓ Jest configuration exists');
-  console.log('  ✓ TypeScript configuration exists');
-  console.log('  ✓ Test setup file exists');
+  const fs = require('fs');
+  const checks = [
+    { label: 'Jest configuration', path: path.join(__dirname, 'jest.config.js') },
+    { label: 'TypeScript configuration', path: path.join(__dirname, 'tsconfig.spec.json') },
+    { label: 'Test setup file', path: path.join(__dirname, 'src', 'test-setup.ts') },
+  ];
+  let setupOk = true;
+  checks.forEach(({ label, path: p }) => {
+    if (fs.existsSync(p)) {
+      console.log(`  ✓ ${label} exists`);
+    } else {
+      console.log(`  ✗ ${label} missing at ${p}`);
+      setupOk = false;
+    }
+  });
+  if (!setupOk) {
+    throw new Error('Required test setup files are missing');
+  }
   
   console.log('\nBasic functionality tests:');
   

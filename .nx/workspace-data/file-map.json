@@ -862,12 +862,10 @@
         "file": "docs/typed_views/v_site_view.sql",
         "hash": "10915531799210220311"
       },
-      /* Remove the invalid entry entirely, or replace with the correct file path entry, e.g.:
       {
-        "file": "destinationPath/expected-file.ext",
-        "hash": "..."
-      }
-      */
+        "file": "examples/mcp-demo.ts",
+        "hash": "11671193365580342313"
+      },
       {
         "file": "examples/mcp-demo.ts",
         "hash": "11671193365580342313"

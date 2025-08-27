@@ -129,11 +129,18 @@ describe('MCP Utils', () => {
     });
 
     it('should detect missing authentication', () => {
-      delete process.env.MEMORY_TOKEN;
-      
-      const result = validateMCPEnvironment('test');
-
-      expect(result.warnings).toContain('Missing authentication for servers: memory');
+      const originalToken = process.env.MEMORY_TOKEN;
+      try {
+        delete process.env.MEMORY_TOKEN;
+        const result = validateMCPEnvironment('test');
+        expect(result.warnings).toContain('Missing authentication for servers: memory');
+      } finally {
+        if (originalToken !== undefined) {
+          process.env.MEMORY_TOKEN = originalToken;
+        } else {
+          delete process.env.MEMORY_TOKEN;
+        }
+      }
     });
 
     it('should warn about testing servers in production', () => {

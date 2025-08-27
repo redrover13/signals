@@ -3,7 +3,7 @@ import * as fs from 'fs';
 
 // Mock service class for testing
 class MCPService {
-  private isInitialized = false;
+  public isInitialized = false;
 
   async initialize(): Promise<void> {
     this.isInitialized = true;
@@ -31,7 +31,7 @@ describe('MCP Integration', () => {
     try {
       if (mcpService.getStatus()) {
         // Make sure we clean up after each test
-        (mcpService as any).isInitialized = false;
+        mcpService.isInitialized = false;
         await mcpService.shutdown();
       }
     } catch {

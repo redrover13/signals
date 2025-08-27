@@ -58,7 +58,7 @@
       "enabledServers": [
         "semgrep",
         "nx-mcp",
-        "google-filesystem",
+        "filesystem",
         "google-postgres",
         "google-maps",
         "google-search",
@@ -168,7 +168,7 @@
             "timeout": 10000
           }
         },
-        "google-filesystem": {
+        "filesystem": {
           "connection": {
             "endpoint": "${GOOGLE_FILESYSTEM_URL:-https://mcp.googleapis.com/filesystem/sse}",
             "timeout": 15000
@@ -255,7 +255,7 @@
       "enabledServers": [
         "semgrep",
         "nx-mcp",
-        "google-filesystem",
+        "filesystem",
         "google-postgres",
         "google-maps",
         "google-search",
@@ -357,7 +357,7 @@
             "timeout": 15000
           }
         },
-        "google-filesystem": {
+        "filesystem": {
           "connection": {
             "endpoint": "${GOOGLE_FILESYSTEM_URL:-https://mcp.googleapis.com/filesystem/sse}",
             "timeout": 15000
@@ -457,7 +457,7 @@
       "enabledServers": [
         "semgrep",
         "nx-mcp",
-        "google-filesystem",
+        "filesystem",
         "google-postgres",
         "google-maps",
         "google-search",
@@ -472,11 +472,12 @@
         "databases",
         "nx",
         "node",
-        "google-cloud",
+        "google",
         "exa",
         "builtwith",
         "toolbox",
-        "cloudrun"
+        "cloudrun",
+        "codacy"
       ],
       "serverOverrides": {
         "github": {
@@ -493,6 +494,7 @@
             "failureThreshold": 5
           },
           "auth": {
+            "type": "secret-manager",
             "secretName": "github-token-prod"
           }
         },
@@ -904,16 +906,16 @@
       "recommendedAuth": "none"
     },
     {
-      "id": "google-filesystem",
-      "name": "Google Filesystem",
+      "id": "filesystem",
+      "name": "Filesystem",
       "repo": "https://github.com/modelcontextprotocol/server-filesystem",
       "category": "google",
       "description": "Gemini CLI MCP for filesystem access",
       "recommendedAuth": "service-account or secret-manager"
     },
     {
-      "id": "google-postgres",
-      "name": "Google PostgreSQL",
+      "id": "postgres",
+      "name": "PostgreSQL",
       "repo": "https://github.com/modelcontextprotocol/server-postgres",
       "category": "google",
       "description": "Gemini CLI MCP for PostgreSQL access",

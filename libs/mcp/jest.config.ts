@@ -23,6 +23,17 @@ const config: Config.InitialOptions = {
     '^@nx-monorepo/gcp$': '<rootDir>/../../gcp/src/index.ts',
     '^..\/..\/gcp\/src\/index$': '<rootDir>/../../gcp/src/index.ts',
   },
+  collectCoverage: true,
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'lcov'],
+  coverageThreshold: {
+    global: {
+      branches: 70,
+      functions: 70,
+      lines: 70,
+      statements: 70
+    }
+  },
 };
 
 export default config;

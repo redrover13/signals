@@ -315,7 +315,7 @@ describe('MCP Error Handling Tests', () => {
         new Error('EAGAIN: Resource temporarily unavailable')
       );
 
-      await expect(mcpService.node('spawn', { command: 'heavy-process' }))
+      await expect(mcpService.fs('spawn', { command: 'heavy-process' }))
         .rejects.toThrow('Resource temporarily unavailable');
     });
 

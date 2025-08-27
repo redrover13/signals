@@ -52,9 +52,10 @@ try {
   
   // Test basic JavaScript functionality
   function testVietnameseCharacterHandling() {
-    const vietnameseText = 'Bánh mì, phở, bún bò Huế, cà phê';
-    const normalized = vietnameseText.normalize('NFC');
-    return normalized === vietnameseText;
+    const cleaned = phone.replace(/[\s\-\.\(\)]/g, '');
+    // Basic VN E.164 check: +84 followed by 8–10 digits (covers landline and mobile ranges)
+    const pattern = /^\+84\d{8,10}$/;
+    return pattern.test(cleaned);
   }
   
   function testVNDFormatting() {

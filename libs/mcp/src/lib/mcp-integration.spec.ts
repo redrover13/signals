@@ -19,17 +19,17 @@ describe('MCP Integration Tests', () => {
 
   afterAll(async () => {
     try {
-      // Restore any spies and mocked internals before shutdown
       jest.restoreAllMocks();
       if (mcpService) {
-        // Clear any overrides applied during tests
         if ((mcpService as any).clientService?.mock) (mcpService as any).clientService = undefined;
         if ((mcpService as any).healthService?.mock) (mcpService as any).healthService = undefined;
         (mcpService as any).isInitialized = false;
         await mcpService.shutdown();
       }
-    } catch {
-      // Swallow shutdown errors to avoid leaking failures from cleanup
+    } catch (err) {
+      // Surface cleanup errors for visibility
+      console.error('MCP integration test cleanup failed:', err);
+      throw err;
     }
   });
 

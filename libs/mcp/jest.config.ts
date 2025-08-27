@@ -26,6 +26,13 @@ const config: Config.InitialOptions = {
   collectCoverage: true,
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov'],
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/**/*.spec.ts',
+    '!src/**/*.test.ts',
+    '!src/test-setup.ts',
+    '!src/jest.setup.ts'
+  ],
   coverageThreshold: {
     global: {
       branches: 70,

@@ -1,7 +1,12 @@
 {
   "root": true,
   "ignorePatterns": [
-    "**/*"
+    "node_modules/",
+    "dist/",
+    ".nx/",
+    ".next/",
+    "coverage/",
+    "*.generated.*"
   ],
   "plugins": [
     "@nx"
@@ -80,7 +85,39 @@
         "apps/event-parser/**/*.js"
       ],
       "env": {
-        "node": true
+        "node": true,
+        "commonjs": true
+      },
+      "globals": {
+        "require": "readonly",
+        "module": "readonly",
+        "exports": "readonly",
+        "__dirname": "readonly",
+        "__filename": "readonly",
+        "Buffer": "readonly",
+        "process": "readonly",
+        "console": "readonly"
+      }
+    },
+    {
+      "files": [
+        "scripts/**/*.js",
+        "**/*.cjs"
+      ],
+      "env": {
+        "node": true,
+        "commonjs": true
+      },
+      "globals": {
+        "require": "readonly",
+        "module": "readonly",
+        "exports": "readonly",
+        "__dirname": "readonly",
+        "__filename": "readonly",
+        "Buffer": "readonly",
+        "process": "readonly",
+        "console": "readonly",
+        "execSync": "readonly"
       }
     }
   ]

@@ -67,14 +67,14 @@ exports.parseAgentEvent = async (pubSubMessage, context) => {
       .table(BIGQUERY_TABLE)
       .insert([row]);
 
-  } catch (error) {
+  } catch (_error) {
     const deadLetterFileName = `${new Date().toISOString()}_${eventId}.json`;
     try {
       await storage
         .bucket(DEADLETTER_BUCKET.replace('gs://', ''))
         .file(deadLetterFileName)
         .save(rawMessageBuffer);
-    } catch (dlqError) {
+    } catch (_dlqError) {
       // In a production scenario, this might trigger a high-priority alert (e.g., via PagerDuty).
     }
   }

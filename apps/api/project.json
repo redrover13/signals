@@ -1,5 +1,6 @@
 {
   "name": "api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/api/src",
   "projectType": "application",
   "targets": {
@@ -17,15 +18,21 @@
       }
     },
     "lint": {
-      "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["apps/api/**/*.{ts,tsx,js,jsx}"]
+        "args": ["**/*.{ts,tsx,js,jsx}"]
       }
     },
     "test": {
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'test placeholder'"
+      }
+    },
+    "build-all": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "command": "echo 'Building all dependencies' && nx build mcp && nx build gcp"
       }
     }
   }

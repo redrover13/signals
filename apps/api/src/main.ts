@@ -13,7 +13,7 @@ import Fastify from 'fastify';
 import { healthRoutes } from './routes/health';
 import { agentsRoutes } from './routes/agents';
 import { searchRoutes } from './routes/search';
-import { mcpService } from '@nx-monorepo/mcp';
+import { mcpService } from '../../../libs/mcp/src/index';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const fastify = Fastify({ logger: true });

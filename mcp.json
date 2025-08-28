@@ -1,1047 +1,881 @@
 {
-  "version": "2.0.0",
-  "description": "MCP Server Configuration for Signals Project - WIF Enabled",
-  "schema": "https://schemas.signals.dev/mcp-config/v2.0.0",
+  "version": "3.1.0",
+  "description": "Enterprise-Grade MCP Server Configuration for Signals Project with Enhanced AI Tool Integration",
+  "schema": "https://schemas.signals.dev/mcp-config/v3.1.0",
   "metadata": {
-    "lastUpdated": "2025-08-22T00:00:00Z",
-    "configVersion": "2.0.0",
-    "maintainer": "Signals DevOps Team"
+    "lastUpdated": "2025-08-28T00:00:00Z",
+    "configVersion": "3.1.0",
+    "maintainer": "Signals DevOps Team",
+    "optimization": "Enhanced with enterprise features, AI tool integrations, comprehensive error handling, and advanced monitoring",
+    "integrations": ["codacy", "coderabbit", "gemini", "copilot", "github", "nx-cloud"]
   },
-  "wif": {
-    "enabled": true,
-    "provider": "${WIF_PROVIDER}",
-    "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
-    "projectId": "${GCP_PROJECT_ID}",
-    "region": "${GCP_REGION:-us-central1}",
-    "secretManager": {
+
+  "global": {
+    "timeouts": {
+      "default": "${MCP_DEFAULT_TIMEOUT:-15000}",
+      "long": "${MCP_LONG_TIMEOUT:-30000}",
+      "short": "${MCP_SHORT_TIMEOUT:-5000}"
+    },
+    "retry": {
+      "default": {
+        "attempts": 3,
+        "delay": 1000,
+        "backoff": "exponential",
+        "maxDelay": 10000
+      }
+    },
+    "security": {
+      "tlsVersion": "1.3",
+      "validateCertificates": true,
+      "allowInsecure": false
+    },
+    "monitoring": {
       "enabled": true,
-      "projectId": "${GCP_PROJECT_ID}",
-      "keyRing": "mcp-secrets",
-      "location": "${GCP_REGION:-us-central1}"
+      "metricsInterval": "${METRICS_INTERVAL:-60000}",
+      "healthCheckInterval": "${HEALTH_CHECK_INTERVAL:-30000}",
+      "tracing": {
+        "enabled": true,
+        "samplingRate": "${TRACE_SAMPLING_RATE:-0.1}"
+      }
     }
   },
-  "environments": {
-    "development": {
-      "global": {
-        "version": "2.0.0",
-        "defaultTimeout": "${MCP_DEFAULT_TIMEOUT:-15000}",
-        "defaultRetry": {
-          "attempts": 2,
-          "delay": 500,
-          "backoff": "linear"
-        },
-        "healthMonitoring": {
-          "enabled": true,
-          "interval": 30000,
-          "alertThreshold": 2
-        },
-        "logging": {
-          "level": "debug",
-          "destination": "console",
-          "includeRequestResponse": true,
-          "structured": true
-        },
-        "security": {
-          "enableTLS": false,
-          "validateCertificates": false,
-          "maxRequestSize": 52428800,
-          "rateLimiting": {
-            "enabled": false
-          }
-        },
-        "errorHandling": {
-          "gracefulDegradation": true,
-          "fallbackServers": ["memory", "time"],
-          "maxConcurrentFailures": 2
+
+  "defaults": {
+    "env": {
+      "GCP_PROJECT_ID": "${GCP_PROJECT_ID:-signals-1}",
+      "GCP_REGION": "${GCP_REGION:-us-central1}",
+      "WIF_PROVIDER": "${WIF_PROVIDER}",
+      "WIF_SERVICE_ACCOUNT": "${WIF_SERVICE_ACCOUNT}",
+      "NODE_ENV": "${NODE_ENV:-development}",
+      "LOG_LEVEL": "${LOG_LEVEL:-info}",
+      "MCP_DEFAULT_TIMEOUT": "${MCP_DEFAULT_TIMEOUT:-15000}"
+    },
+    "connection": {
+      "timeout": "${MCP_DEFAULT_TIMEOUT}",
+      "keepAlive": true,
+      "compression": "gzip",
+      "retry": {
+        "attempts": 2,
+        "delay": 500,
+        "backoff": "linear"
+      }
+    },
+    "healthCheck": {
+      "enabled": true,
+      "interval": "${HEALTH_CHECK_INTERVAL:-30000}",
+      "failureThreshold": 3
+    }
+  },
+
+  "serverTemplates": {
+    "base-service": {
+      "connection": {
+        "keepAlive": true,
+        "compression": "gzip",
+        "timeout": "${MCP_DEFAULT_TIMEOUT}"
+      },
+      "healthCheck": {
+        "enabled": true,
+        "interval": "${HEALTH_CHECK_INTERVAL:-30000}",
+        "failureThreshold": 3
+      },
+      "retry": {
+        "attempts": 3,
+        "delay": 1000,
+        "backoff": "exponential"
+      },
+      "monitoring": {
+        "metrics": true,
+        "tracing": true
+      }
+    },
+    "gcp-service": {
+      "extends": "base-service",
+      "auth": {
+        "type": "wif",
+        "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
+        "scopes": ["https://www.googleapis.com/auth/cloud-platform"]
+      },
+      "connection": {
+        "endpoint": "https://mcp.googleapis.com/{service}/sse"
+      },
+      "options": {
+        "projectId": "${GCP_PROJECT_ID}",
+        "region": "${GCP_REGION}"
+      }
+    },
+    "external-api": {
+      "extends": "base-service",
+      "auth": {
+        "type": "secret-manager",
+        "secretName": "{service}-api-key-${NODE_ENV}"
+      },
+      "rateLimiting": {
+        "enabled": true,
+        "requestsPerSecond": 50,
+        "burstSize": 100
+      }
+    },
+    "reference-server": {
+      "extends": "base-service",
+      "connection": {
+        "protocol": "http"
+      },
+      "development": {
+        "hotReload": true,
+        "debugMode": true
+      }
+    }
+  },
+
+  "servers": {
+    "github": {
+      "extends": "external-api",
+      "connection": {
+        "endpoint": "https://api.github.com/graphql",
+        "timeout": "${GITHUB_TIMEOUT:-15000}"
+      },
+      "options": {
+        "owner": "${GITHUB_OWNER}",
+        "repo": "${GITHUB_REPO}",
+        "rateLimiting": {
+          "requestsPerHour": 5000
         }
       },
-      "enabledServers": [
-        "semgrep",
-        "nx-mcp",
-        "filesystem",
-        "google-postgres",
-        "google-maps",
-        "google-search",
-        "qdrant",
-        "filesystem",
-        "git",
-        "github",
-        "memory",
-        "sequentialthinking",
-        "time",
-        "fetch",
-        "databases",
-        "nx",
-        "node",
-        "google",
-        "exa",
-        "apimatic",
-        "toolbox",
-        "cloudrun",
-        "codacy"
-      ],
-      "serverOverrides": {
-        "github": {
-          "connection": {
-            "timeout": 10000
+      "auth": {
+        "type": "secret-manager",
+        "secretName": "github-token-${NODE_ENV}",
+        "scopes": ["repo", "read:org", "read:user"]
+      }
+    },
+    "codacy": {
+      "extends": "external-api",
+      "connection": {
+        "endpoint": "https://app.codacy.com/api/v3",
+        "timeout": "${CODACY_TIMEOUT:-20000}"
+      },
+      "auth": {
+        "type": "secret-manager",
+        "secretName": "codacy-token-${NODE_ENV}"
+      },
+      "options": {
+        "organizationProvider": "gh",
+        "rateLimiting": {
+          "requestsPerMinute": 100
+        },
+        "analysis": {
+          "autoTrigger": true,
+          "supportedTools": ["eslint", "semgrep", "trivy", "sonarqube"],
+          "qualityGates": {
+            "coverage": 80,
+            "duplication": 5,
+            "complexity": "B"
+          }
+        }
+      }
+    },
+    "coderabbit": {
+      "extends": "external-api",
+      "connection": {
+        "endpoint": "https://api.coderabbit.ai/v1",
+        "timeout": "${CODERABBIT_TIMEOUT:-15000}"
+      },
+      "auth": {
+        "type": "secret-manager",
+        "secretName": "coderabbit-token-${NODE_ENV}"
+      },
+      "options": {
+        "review": {
+          "autoReview": true,
+          "reviewStyle": "comprehensive",
+          "focusAreas": ["security", "performance", "maintainability", "best-practices"]
+        },
+        "integrations": {
+          "github": true,
+          "slack": true,
+          "jira": false
+        },
+        "rateLimiting": {
+          "requestsPerHour": 1000
+        }
+      }
+    },
+    "gemini": {
+      "extends": "gcp-service",
+      "connection": {
+        "endpoint": "${GEMINI_URL:-https://generativelanguage.googleapis.com/v1beta}",
+        "timeout": "${GEMINI_TIMEOUT:-30000}"
+      },
+      "auth": {
+        "type": "secret-manager",
+        "secretName": "gemini-api-key-${NODE_ENV}"
+      },
+      "options": {
+        "model": "${GEMINI_MODEL:-gemini-1.5-pro}",
+        "temperature": 0.7,
+        "maxTokens": 8192,
+        "safetySettings": {
+          "enabled": true,
+          "blockUnsafe": true
+        },
+        "rateLimiting": {
+          "requestsPerMinute": 60,
+          "requestsPerDay": 1440
+        }
+      }
+    },
+    "copilot": {
+      "extends": "external-api",
+      "connection": {
+        "endpoint": "https://api.github.com/copilot",
+        "timeout": "${COPILOT_TIMEOUT:-15000}"
+      },
+      "auth": {
+        "type": "secret-manager",
+        "secretName": "copilot-token-${NODE_ENV}",
+        "scopes": ["read:user", "read:org", "copilot:read"]
+      },
+      "options": {
+        "model": "gpt-4",
+        "contextWindow": 128000,
+        "features": {
+          "codeCompletion": true,
+          "codeReview": true,
+          "codeExplanation": true,
+          "testGeneration": true
+        },
+        "integrations": {
+          "vscode": true,
+          "github": true,
+          "jetbrains": false
+        },
+        "rateLimiting": {
+          "requestsPerHour": 500
+        }
+      }
+    },
+    "databases": {
+      "extends": "gcp-service",
+      "connection": {
+        "timeout": "${DATABASE_TIMEOUT:-30000}"
+      },
+      "options": {
+        "bigqueryProjectId": "${GCP_PROJECT_ID}",
+        "datasets": [
+          "analytics_${NODE_ENV}", 
+          "signals_${NODE_ENV}", 
+          "events_${NODE_ENV}"
+        ],
+        "connectionPool": {
+          "maxConnections": 50,
+          "minConnections": 10,
+          "idleTimeout": 300000
+        }
+      }
+    },
+    "google-maps": {
+      "extends": "external-api",
+      "connection": {
+        "endpoint": "${GOOGLE_MAPS_URL:-https://mcp.googleapis.com/maps/sse}"
+      },
+      "auth": {
+        "type": "secret-manager",
+        "secretName": "google-maps-api-key-${NODE_ENV}"
+      },
+      "options": {
+        "rateLimiting": {
+          "requestsPerSecond": 50,
+          "requestsPerDay": 100000
+        }
+      }
+    },
+    "google-search": {
+      "extends": "gcp-service",
+      "connection": {
+        "endpoint": "${GOOGLE_SEARCH_URL:-https://mcp.googleapis.com/search/sse}"
+      },
+      "options": {
+        "customSearchEngineId": "${GOOGLE_CSE_ID}",
+        "rateLimiting": {
+          "requestsPerSecond": 10,
+          "requestsPerDay": 10000
+        }
+      }
+    },
+    "google-postgres": {
+      "extends": "gcp-service",
+      "connection": {
+        "endpoint": "${GOOGLE_POSTGRES_URL:-https://mcp.googleapis.com/postgres/sse}",
+        "timeout": "${POSTGRES_TIMEOUT:-30000}"
+      },
+      "options": {
+        "connectionPool": {
+          "maxConnections": 20,
+          "minConnections": 5,
+          "idleTimeout": 300000
+        },
+        "ssl": {
+          "enabled": true,
+          "rejectUnauthorized": true
+        }
+      }
+    },
+    "google-analytics": {
+      "extends": "gcp-service",
+      "connection": {
+        "endpoint": "${GOOGLE_ANALYTICS_URL:-https://mcp.googleapis.com/analytics/sse}"
+      },
+      "options": {
+        "propertyId": "${GA_PROPERTY_ID}",
+        "viewId": "${GA_VIEW_ID}"
+      }
+    },
+    "google-storage": {
+      "extends": "gcp-service", 
+      "connection": {
+        "endpoint": "${GOOGLE_STORAGE_URL:-https://mcp.googleapis.com/storage/sse}"
+      },
+      "options": {
+        "defaultBucket": "${GCS_DEFAULT_BUCKET}",
+        "region": "${GCP_REGION}"
+      }
+    },
+    "qdrant": {
+      "extends": "external-api",
+      "connection": {
+        "endpoint": "${QDRANT_URL:-https://mcp.qdrant.tech/sse}"
+      },
+      "auth": {
+        "type": "secret-manager",
+        "secretName": "qdrant-api-key-${NODE_ENV}"
+      },
+      "options": {
+        "collection": "${QDRANT_COLLECTION:-signals}",
+        "vectorSize": 1536
+      }
+    },
+    "exa": {
+      "extends": "external-api",
+      "connection": {
+        "endpoint": "${EXA_URL:-https://api.exa.ai/search}"
+      },
+      "auth": {
+        "type": "secret-manager",
+        "secretName": "exa-api-key-${NODE_ENV}"
+      }
+    },
+    "toolbox": {
+      "extends": "gcp-service",
+      "connection": {
+        "timeout": "${TOOLBOX_TIMEOUT:-30000}"
+      },
+      "options": {
+        "toolsConfigSecret": "toolbox-tools-config-${NODE_ENV}",
+        "enabledTools": ["calculator", "weather", "translator"]
+      }
+    },
+    "cloudrun": {
+      "extends": "gcp-service",
+      "connection": {
+        "timeout": "${CLOUDRUN_TIMEOUT:-30000}"
+      },
+      "options": {
+        "invokerServiceAccount": "${WIF_SERVICE_ACCOUNT}",
+        "region": "${GCP_REGION}"
+      }
+    },
+    "semgrep": {
+      "extends": "reference-server",
+      "connection": {
+        "endpoint": "${SEMGREP_URL:-https://mcp.semgrep.ai/sse}",
+        "timeout": "${SEMGREP_TIMEOUT:-10000}"
+      },
+      "options": {
+        "rulesets": ["auto", "security", "performance"],
+        "severity": ["ERROR", "WARNING"]
+      }
+    },
+    "nx-mcp": {
+      "extends": "reference-server",
+      "connection": {
+        "endpoint": "${NX_MCP_URL:-https://mcp.nx.app/sse}",
+        "timeout": "${NX_TIMEOUT:-10000}"
+      },
+      "options": {
+        "workspaceRoot": "${NX_WORKSPACE_ROOT:-./}",
+        "cacheDirectory": "${NX_CACHE_DIR:-.nx/cache}"
+      }
+    },
+    "filesystem": {
+      "extends": "gcp-service",
+      "connection": {
+        "endpoint": "${GOOGLE_FILESYSTEM_URL:-https://mcp.googleapis.com/filesystem/sse}"
+      },
+      "options": {
+        "allowedPaths": ["./src", "./libs", "./apps"],
+        "maxFileSize": "10MB"
+      }
+    },
+    "typescript": {
+      "extends": "reference-server",
+      "connection": {
+        "endpoint": "${TSSERVER_URL:-http://localhost:3000}",
+        "timeout": "${TYPESCRIPT_TIMEOUT:-10000}"
+      },
+      "options": {
+        "preferences": {
+          "includeCompletionsForModuleExports": true,
+          "includeCompletionsForImportStatements": true,
+          "allowIncompleteCompletions": true
+        },
+        "compilerOptions": {
+          "strict": true,
+          "noImplicitAny": true
+        }
+      }
+    },
+    "eslint": {
+      "extends": "reference-server",
+      "connection": {
+        "endpoint": "${ESLINT_URL:-http://localhost:3001}",
+        "timeout": "${ESLINT_TIMEOUT:-15000}"
+      },
+      "options": {
+        "validateOnType": true,
+        "validateOnSave": true,
+        "configFile": ".eslintrc.json",
+        "rules": {
+          "@typescript-eslint/no-unused-vars": "error",
+          "@typescript-eslint/explicit-function-return-type": "warn"
+        }
+      }
+    },
+    "json": {
+      "extends": "reference-server",
+      "connection": {
+        "endpoint": "${JSON_SERVER_URL:-http://localhost:3002}",
+        "timeout": "${JSON_TIMEOUT:-5000}"
+      },
+      "options": {
+        "schemas": {
+          "package.json": "https://json.schemastore.org/package.json",
+          "tsconfig.json": "https://json.schemastore.org/tsconfig.json",
+          "mcp.json": "https://schemas.signals.dev/mcp-config/v3.0.0"
+        },
+        "validateOnSave": true
+      }
+    }
+  },
+
+  "environments": {
+    "base-environment": {
+      "global": {
+        "monitoring": {
+          "enabled": true,
+          "healthCheckInterval": 30000
+        },
+        "security": {
+          "tlsVersion": "1.3",
+          "validateCertificates": true
+        }
+      }
+    },
+    "development": {
+      "extends": "base-environment",
+      "enabledServerGroups": ["core-services", "development-tools", "gcp-services", "external-apis", "analysis-tools", "ai-tools"],
+      "features": {
+        "debugMode": true,
+        "hotReload": true,
+        "mockExternalAPIs": false,
+        "verboseLogging": true
+      },
+      "overrides": {
+        "global": {
+          "logging": {
+            "level": "debug",
+            "includeRequestResponse": true
           },
-          "healthCheck": {
-            "interval": 60000,
-            "failureThreshold": 2
+          "security": {
+            "allowInsecure": true,
+            "validateCertificates": false
           },
-          "auth": {
-            "type": "secret-manager",
-            "secretName": "github-token-dev"
+          "monitoring": {
+            "metricsInterval": 10000
           }
         },
-        "codacy": {
-          "connection": {
-            "timeout": 20000
+        "servers": {
+          "github": {
+            "connection": {
+              "timeout": 10000
+            }
           },
-          "healthCheck": {
-            "interval": 60000,
-            "failureThreshold": 2
-          },
-          "auth": {
-            "type": "token",
-            "secretName": "codacy-token-dev"
-          }
-        },
-        "databases": {
-          "options": {
-            "bigqueryProjectId": "${GCP_PROJECT_ID}",
-            "datasets": ["analytics_dev", "signals_dev", "events_dev"]
-          },
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          }
-        },
-        "google": {
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          },
-          "options": {
-            "services": ["bigquery", "storage", "secretmanager"]
-          }
-        },
-        "exa": {
-          "auth": {
-            "type": "secret-manager",
-            "secretName": "exa-api-key-dev"
-          }
-        },
-        "toolbox": {
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          },
-          "connection": {
-            "timeout": 30000
-          },
-          "options": {
-            "toolsConfigSecret": "toolbox-tools-config-${NODE_ENV:-development}"
-          }
-        },
-        "cloudrun": {
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          },
-          "options": {
-            "invokerServiceAccount": "${WIF_SERVICE_ACCOUNT}"
-          },
-          "connection": {
-            "timeout": 30000
-          }
-        },
-        "semgrep": {
-          "connection": {
-            "endpoint": "${SEMGREP_URL:-https://mcp.semgrep.ai/sse}",
-            "timeout": 10000
-          }
-        },
-        "nx-mcp": {
-          "connection": {
-            "endpoint": "${NX_MCP_URL:-https://mcp.nx.app/sse}",
-            "timeout": 10000
-          }
-        },
-        "filesystem": {
-          "connection": {
-            "endpoint": "${GOOGLE_FILESYSTEM_URL:-https://mcp.googleapis.com/filesystem/sse}",
-            "timeout": 15000
-          },
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          }
-        },
-        "google-postgres": {
-          "connection": {
-            "endpoint": "${GOOGLE_POSTGRES_URL:-https://mcp.googleapis.com/postgres/sse}",
-            "timeout": 15000
-          },
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          }
-        },
-        "google-maps": {
-          "connection": {
-            "endpoint": "${GOOGLE_MAPS_URL:-https://mcp.googleapis.com/maps/sse}",
-            "timeout": 15000
-          },
-          "auth": {
-            "type": "env",
-            "envName": "GOOGLE_MAPS_API_KEY"
-          }
-        },
-        "google-search": {
-          "connection": {
-            "endpoint": "${GOOGLE_SEARCH_URL:-https://mcp.googleapis.com/search/sse}",
-            "timeout": 15000
-          }
-        },
-        "qdrant": {
-          "connection": {
-            "endpoint": "${QDRANT_URL:-https://mcp.qdrant.tech/sse}",
-            "timeout": 15000
-          },
-          "auth": {
-            "type": "env",
-            "envName": "QDRANT_API_KEY"
+          "codacy": {
+            "connection": {
+              "timeout": 20000
+            }
           }
         }
       }
     },
     "staging": {
-      "global": {
-        "version": "2.0.0",
-        "defaultTimeout": "${MCP_DEFAULT_TIMEOUT:-30000}",
-        "defaultRetry": {
-          "attempts": 3,
-          "delay": 1000,
-          "backoff": "exponential"
-        },
-        "healthMonitoring": {
-          "enabled": true,
-          "interval": 60000,
-          "alertThreshold": 3
-        },
-        "logging": {
-          "level": "info",
-          "destination": "gcp-logging",
-          "includeRequestResponse": false,
-          "structured": true
-        },
-        "security": {
-          "enableTLS": true,
-          "validateCertificates": true,
-          "maxRequestSize": 20971520,
-          "rateLimiting": {
-            "enabled": true,
-            "requestsPerMinute": 1000,
-            "burstLimit": 100
-          }
-        },
-        "errorHandling": {
-          "gracefulDegradation": true,
-          "fallbackServers": ["memory", "time", "filesystem"],
-          "maxConcurrentFailures": 3
-        }
+      "extends": "base-environment",
+      "enabledServerGroups": ["core-services", "gcp-services", "external-apis", "analysis-tools", "ai-tools"],
+      "features": {
+        "debugMode": false,
+        "hotReload": false,
+        "mockExternalAPIs": false,
+        "verboseLogging": false
       },
-      "enabledServers": [
-        "semgrep",
-        "nx-mcp",
-        "filesystem",
-        "google-postgres",
-        "google-maps",
-        "google-search",
-        "qdrant",
-        "filesystem",
-        "git",
-        "github",
-        "memory",
-        "sequentialthinking",
-        "time",
-        "fetch",
-        "databases",
-        "nx",
-        "node",
-        "google",
-        "exa",
-        "apimatic",
-        "builtwith",
-        "toolbox",
-        "cloudrun"
-      ],
-      "serverOverrides": {
-        "github": {
-          "connection": {
-            "timeout": 20000,
-            "retry": {
-              "attempts": 3,
-              "delay": 1000,
-              "backoff": "exponential"
+      "overrides": {
+        "global": {
+          "logging": {
+            "level": "info",
+            "includeRequestResponse": false
+          },
+          "security": {
+            "enableTLS": true,
+            "validateCertificates": true
+          }
+        },
+        "servers": {
+          "github": {
+            "connection": {
+              "timeout": 15000
             }
-          },
-          "healthCheck": {
-            "interval": 120000,
-            "failureThreshold": 3
-          },
-          "auth": {
-            "type": "secret-manager",
-            "secretName": "github-token-staging"
-          }
-        },
-        "databases": {
-          "options": {
-            "bigqueryProjectId": "${GCP_PROJECT_ID}",
-            "datasets": ["analytics_staging", "signals_staging", "events_staging"]
-          },
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          }
-        },
-        "google": {
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          },
-          "options": {
-            "services": ["bigquery", "storage", "secretmanager", "aiplatform"]
-          }
-        },
-        "exa": {
-          "auth": {
-            "type": "secret-manager",
-            "secretName": "exa-api-key-staging"
-          }
-        },
-        "toolbox": {
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          },
-          "connection": {
-            "timeout": 45000
-          },
-          "options": {
-            "toolsConfigSecret": "toolbox-tools-config-staging"
-          }
-        },
-        "cloudrun": {
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          },
-          "options": {
-            "invokerServiceAccount": "${WIF_SERVICE_ACCOUNT}"
-          },
-          "connection": {
-            "timeout": 45000
-          }
-        },
-        "semgrep": {
-          "connection": {
-            "endpoint": "${SEMGREP_URL:-https://mcp.semgrep.ai/sse}",
-            "timeout": 15000
-          }
-        },
-        "nx-mcp": {
-          "connection": {
-            "endpoint": "${NX_MCP_URL:-https://mcp.nx.app/sse}",
-            "timeout": 15000
-          }
-        },
-        "filesystem": {
-          "connection": {
-            "endpoint": "${GOOGLE_FILESYSTEM_URL:-https://mcp.googleapis.com/filesystem/sse}",
-            "timeout": 15000
-          },
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          }
-        },
-        "google-postgres": {
-          "connection": {
-            "endpoint": "${GOOGLE_POSTGRES_URL:-https://mcp.googleapis.com/postgres/sse}",
-            "timeout": 15000
-          },
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          }
-        },
-        "google-maps": {
-          "connection": {
-            "endpoint": "${GOOGLE_MAPS_URL:-https://mcp.googleapis.com/maps/sse}",
-            "timeout": 15000
-          },
-          "auth": {
-            "type": "env",
-            "envName": "GOOGLE_MAPS_API_KEY"
-          }
-        },
-        "google-search": {
-          "connection": {
-            "endpoint": "${GOOGLE_SEARCH_URL:-https://mcp.googleapis.com/search/sse}",
-            "timeout": 15000
-          }
-        },
-        "qdrant": {
-          "connection": {
-            "endpoint": "${QDRANT_URL:-https://mcp.qdrant.tech/sse}",
-            "timeout": 15000
-          },
-          "auth": {
-            "type": "env",
-            "envName": "QDRANT_API_KEY"
           }
         }
       }
     },
     "production": {
-      "global": {
-        "version": "2.0.0",
-        "defaultTimeout": "${MCP_DEFAULT_TIMEOUT:-45000}",
-        "defaultRetry": {
-          "attempts": 5,
-          "delay": 2000,
-          "backoff": "exponential"
-        },
-        "healthMonitoring": {
-          "enabled": true,
-          "interval": 300000,
-          "alertThreshold": 5
-        },
-        "logging": {
-          "level": "warn",
-          "destination": "gcp-logging",
-          "includeRequestResponse": false,
-          "structured": true,
-          "sampling": {
-            "enabled": true,
-            "rate": 0.1
-          }
-        },
-        "security": {
-          "enableTLS": true,
-          "validateCertificates": true,
-          "maxRequestSize": 10485760,
-          "rateLimiting": {
-            "enabled": true,
-            "requestsPerMinute": 500,
-            "burstLimit": 50
-          },
-          "ipWhitelist": {
-            "enabled": true,
-            "allowedRanges": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
-          }
-        },
-        "errorHandling": {
-          "gracefulDegradation": true,
-          "fallbackServers": ["memory", "time"],
-          "maxConcurrentFailures": 5,
-          "circuitBreaker": {
-            "enabled": true,
-            "failureThreshold": 10,
-            "recoveryTimeout": 60000
-          }
-        }
+      "extends": "base-environment",
+      "enabledServerGroups": ["core-services", "gcp-services", "external-apis"],
+      "features": {
+        "debugMode": false,
+        "hotReload": false,
+        "mockExternalAPIs": false,
+        "verboseLogging": false
       },
-      "enabledServers": [
-        "semgrep",
-        "nx-mcp",
-        "filesystem",
-        "google-postgres",
-        "google-maps",
-        "google-search",
-        "qdrant",
-        "filesystem",
-        "git",
-        "github",
-        "memory",
-        "sequentialthinking",
-        "time",
-        "fetch",
-        "databases",
-        "nx",
-        "node",
-        "google",
-        "exa",
-        "builtwith",
-        "toolbox",
-        "cloudrun",
-        "codacy"
-      ],
-      "serverOverrides": {
-        "github": {
-          "connection": {
-            "timeout": 45000,
-            "retry": {
-              "attempts": 5,
-              "delay": 2000,
-              "backoff": "exponential"
+      "overrides": {
+        "global": {
+          "logging": {
+            "level": "warn",
+            "includeRequestResponse": false
+          },
+          "security": {
+            "enableTLS": true,
+            "validateCertificates": true
+          },
+          "metrics": {
+            "enabled": true,
+            "samplingRate": 0.1
+          },
+          "monitoring": {
+            "alerting": true,
+            "metricsInterval": 60000
+          }
+        },
+        "servers": {
+          "github": {
+            "connection": {
+              "timeout": 20000
             }
-          },
-          "healthCheck": {
-            "interval": 300000,
-            "failureThreshold": 5
-          },
-          "auth": {
-            "type": "secret-manager",
-            "secretName": "github-token-prod"
-          }
-        },
-        "databases": {
-          "options": {
-            "bigqueryProjectId": "${GCP_PROJECT_ID}",
-            "datasets": ["analytics", "signals", "events"]
-          },
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          },
-          "connection": {
-            "timeout": 60000,
-            "poolSize": 10
-          }
-        },
-        "google": {
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          },
-          "options": {
-            "services": ["bigquery", "storage", "secretmanager", "aiplatform", "cloudrun"]
-          },
-          "connection": {
-            "timeout": 60000
-          }
-        },
-        "exa": {
-          "auth": {
-            "secretName": "exa-api-key-prod"
-          },
-          "connection": {
-            "timeout": 30000
-          }
-        },
-        "toolbox": {
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          },
-          "connection": {
-            "timeout": 60000
-          },
-          "options": {
-            "toolsConfigSecret": "toolbox-tools-config-prod"
-          }
-        },
-        "cloudrun": {
-          "auth": {
-            "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          },
-          "options": {
-            "invokerServiceAccount": "${WIF_SERVICE_ACCOUNT}"
-          },
-          "connection": {
-            "timeout": 60000
-          }
-        }
-      }
-    },
-    "test": {
-      "global": {
-        "version": "2.0.0",
-        "defaultTimeout": 5000,
-        "defaultRetry": {
-          "attempts": 1,
-          "delay": 100,
-          "backoff": "linear"
-        },
-        "healthMonitoring": {
-          "enabled": false,
-          "interval": 0,
-          "alertThreshold": 0
-        },
-        "logging": {
-          "level": "error",
-          "destination": "console",
-          "includeRequestResponse": false,
-          "structured": false
-        },
-        "security": {
-          "enableTLS": false,
-          "validateCertificates": false,
-          "maxRequestSize": 1048576,
-          "rateLimiting": {
-            "enabled": false
-          }
-        },
-        "errorHandling": {
-          "gracefulDegradation": false,
-          "fallbackServers": [],
-          "maxConcurrentFailures": 1
-        }
-      },
-      "enabledServers": ["memory", "time", "filesystem"],
-      "serverOverrides": {
-        "memory": {
-          "connection": {
-            "timeout": 1000
-          }
-        },
-        "time": {
-          "connection": {
-            "timeout": 1000
-          }
-        },
-        "filesystem": {
-          "connection": {
-            "timeout": 2000
-          },
-          "options": {
-            "allowedDirectories": ["/tmp", "./test-fixtures"]
           }
         }
       }
     }
   },
-  "integrations": {
-    "gcp": {
-      "enabled": true,
-      "projectId": "${GCP_PROJECT_ID}",
-      "region": "${GCP_REGION:-us-central1}",
-      "services": ["bigquery", "storage", "secretmanager", "aiplatform", "cloudrun"],
-      "auth": {
-        "type": "wif",
-        "provider": "${WIF_PROVIDER}",
-        "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-      },
-      "secretManager": {
+
+  "serverGroups": {
+    "core-services": {
+      "description": "Essential services for basic functionality",
+      "servers": ["github", "codacy", "coderabbit", "gemini", "copilot", "semgrep", "nx-mcp"],
+      "healthCheck": {
         "enabled": true,
-        "prefix": "mcp-${NODE_ENV:-development}",
-        "caching": {
-          "enabled": true,
-          "ttl": 3600
-        }
+        "criticalServices": ["github", "codacy", "gemini"]
       }
     },
-    "nx": {
-      "enabled": true,
-      "workspaceRoot": ".",
-      "configPath": "nx.json",
-      "cacheDirectory": ".nx/cache"
-    },
-    "github": {
-      "enabled": true,
-      "owner": "${GITHUB_OWNER}",
-      "repo": "${GITHUB_REPO}",
-      "defaultBranch": "main",
-      "auth": {
-        "type": "secret-manager",
-        "secretName": "github-token-${NODE_ENV:-development}"
+    "development-tools": {
+      "description": "Tools used during development and debugging",
+      "servers": ["exa", "toolbox", "typescript", "eslint", "json"],
+      "loadBalancing": {
+        "strategy": "round-robin"
       }
     },
-    "codacy": {
-      "enabled": true,
-      "apiUrl": "https://api.codacy.com",
-      "token": "secret-manager:CODACY_API_TOKEN"
+    "gcp-services": {
+      "description": "Google Cloud Platform services",
+      "servers": ["databases", "cloudrun", "filesystem", "google-postgres", "google-analytics", "google-storage"],
+      "circuitBreaker": {
+        "enabled": true,
+        "failureThreshold": 5,
+        "recoveryTimeout": 30000
+      }
+    },
+    "external-apis": {
+      "description": "Third-party API integrations",
+      "servers": ["google-maps", "google-search", "qdrant", "exa"],
+      "rateLimiting": {
+        "enabled": true,
+        "globalLimit": 1000
+      }
+    },
+    "analysis-tools": {
+      "description": "Code analysis and security tools",
+      "servers": ["semgrep"],
+      "caching": {
+        "enabled": true,
+        "ttl": 3600000
+      }
+    },
+    "ai-tools": {
+      "description": "AI-powered development and review tools",
+      "servers": ["coderabbit", "gemini", "copilot"],
+      "circuitBreaker": {
+        "enabled": true,
+        "failureThreshold": 3,
+        "recoveryTimeout": 60000
+      },
+      "rateLimiting": {
+        "enabled": true,
+        "globalLimit": 100
+      }
     }
   },
+
+  "circuitBreaker": {
+    "enabled": true,
+    "failureThreshold": 5,
+    "recoveryTimeout": 30000,
+    "halfOpenMaxCalls": 3,
+    "servers": {
+      "github": {
+        "failureThreshold": 3
+      },
+      "external-apis": {
+        "failureThreshold": 5
+      }
+    }
+  },
+
+  "caching": {
+    "enabled": true,
+    "defaultTTL": 300000,
+    "strategies": {
+      "github": {
+        "type": "redis",
+        "ttl": 600000,
+        "keyPattern": "github:{endpoint}:{hash}"
+      },
+      "google-search": {
+        "type": "memory", 
+        "ttl": 1800000,
+        "maxSize": 1000
+      },
+      "semgrep": {
+        "type": "file",
+        "ttl": 3600000,
+        "directory": ".cache/semgrep"
+      }
+    }
+  },
+
   "monitoring": {
-    "logging": {
-      "enabled": true,
-      "level": "${LOGGING_LEVEL:-info}",
-      "destination": "${LOGGING_DESTINATION:-stdout}",
-      "includeRequestResponse": true,
-      "structured": true
-    },
     "metrics": {
       "enabled": true,
-      "collectInterval": "${METRICS_INTERVAL:-30000}",
-      "retentionDays": "${METRICS_RETENTION:-7}",
-      "exporters": ["prometheus", "gcp-monitoring"]
-    },
-    "alerts": {
-      "enabled": true,
-      "channels": ["gcp-logging"],
-      "thresholds": {
-        "errorRate": "${ALERT_ERROR_RATE:-5}",
-        "responseTime": "${ALERT_RESPONSE_TIME:-30000}",
-        "consecutiveFailures": "${ALERT_CONSECUTIVE_FAILURES:-3}",
-        "memoryUsage": 85,
-        "cpuUsage": 80
-      },
-      "escalation": {
-        "enabled": true,
-        "levels": [
-          {
-            "threshold": 3,
-            "channels": ["gcp-logging"]
-          },
-          {
-            "threshold": 5,
-            "channels": ["gcp-logging"]
-          },
-          {
-            "threshold": 10,
-            "channels": ["gcp-logging", "pagerduty"]
-          }
-        ]
+      "exporters": ["prometheus", "datadog", "cloud-monitoring"],
+      "customMetrics": {
+        "request_duration": {
+          "type": "histogram",
+          "buckets": [0.1, 0.5, 1.0, 2.5, 5.0, 10.0]
+        },
+        "request_count": {
+          "type": "counter",
+          "labels": ["server", "method", "status", "ai_tool"]
+        },
+        "active_connections": {
+          "type": "gauge"
+        },
+        "ai_tool_usage": {
+          "type": "counter",
+          "labels": ["tool", "operation", "success"]
+        },
+        "code_quality_score": {
+          "type": "gauge",
+          "labels": ["tool", "metric"]
+        }
       }
     },
     "tracing": {
       "enabled": true,
-      "provider": "gcp-trace",
-      "samplingRate": "${TRACE_SAMPLING_RATE:-0.1}"
-    }
-  },
-  "security": {
-    "authentication": {
-      "required": true,
-      "methods": ["wif", "gcp-service-account"],
-      "wif": {
-        "enabled": true,
-        "provider": "${WIF_PROVIDER}",
-        "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
-        "tokenLifetime": 3600
+      "sampler": {
+        "type": "probabilistic",
+        "param": "${TRACE_SAMPLING_RATE:-0.1}"
       },
-      "secretManager": {
+      "exporters": ["jaeger", "zipkin", "cloud-trace"]
+    },
+    "healthChecks": {
+      "startup": {
         "enabled": true,
-        "prefix": "mcp-${NODE_ENV:-development}",
-        "projectId": "${GCP_PROJECT_ID}",
-        "caching": {
-          "enabled": true,
-          "ttl": 1800
-        }
+        "timeout": 30000
+      },
+      "readiness": {
+        "enabled": true,
+        "interval": 10000
+      },
+      "liveness": {
+        "enabled": true,
+        "interval": 30000
       }
     },
-    "authorization": {
+    "alerting": {
       "enabled": true,
-      "provider": "gcp-iam",
-      "roles": {
-        "mcp-user": {
-          "permissions": ["filesystem.read", "git.status", "memory.get", "time.get", "fetch.get"]
+      "channels": ["slack", "email", "pagerduty"],
+      "rules": {
+        "high_error_rate": {
+          "condition": "error_rate > 0.05",
+          "duration": "5m",
+          "severity": "critical"
         },
-        "mcp-developer": {
-          "permissions": [
-            "filesystem.read",
-            "filesystem.write",
-            "git.status",
-            "git.commit",
-            "memory.get",
-            "memory.set",
-            "time.get",
-            "fetch.get",
-            "fetch.post",
-            "nx.run",
-            "node.execute",
-            "search.files",
-            "filesystem.list"
-          ]
+        "high_latency": {
+          "condition": "p95_latency > 5000",
+          "duration": "2m",
+          "severity": "warning"
         },
-        "mcp-admin": {
-          "permissions": ["*"]
+        "ai_tool_failure": {
+          "condition": "ai_tool_error_rate > 0.1",
+          "duration": "10m",
+          "severity": "warning"
+        },
+        "code_quality_degradation": {
+          "condition": "code_quality_score < 7.0",
+          "duration": "1h",
+          "severity": "info"
         }
-      },
-      "defaultRole": "mcp-user"
-    },
-    "encryption": {
-      "enabled": true,
-      "provider": "gcp-kms",
-      "keyRing": "mcp-encryption",
-      "location": "${GCP_REGION:-us-central1}"
-    },
-    "audit": {
-      "enabled": true,
-      "destination": "gcp-audit-logs",
-      "events": ["auth", "config-change", "server-start", "server-stop", "error"]
+      }
     }
   },
 
-  "serverCatalog": [
-    {
-      "id": "everything",
-      "name": "Everything (reference)",
-      "repo": "https://github.com/modelcontextprotocol/servers/tree/main/src/everything",
-      "category": "reference",
-      "description": "Reference/test server with prompts, resources, and tools. Good for functional testing and examples.",
-      "recommendedAuth": "none",
-      "notes": "Useful for local development and example tooling."
-    },
-    {
-      "id": "fetch",
-      "name": "Fetch",
-      "repo": "https://github.com/modelcontextprotocol/servers/tree/main/src/fetch",
-      "category": "reference",
-      "description": "Web content fetching and conversion for LLM use.",
-      "recommendedAuth": "none",
-      "notes": "Consider URL allowlists and response size limits for security."
-    },
-    {
-      "id": "filesystem",
-      "name": "Filesystem",
-      "repo": "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem",
-      "category": "reference",
-      "description": "Secure file operations with configurable access controls.",
-      "recommendedAuth": "service-account or secret-manager",
-      "notes": "Use strict allowedDirectories and careful ACLs when enabling."
-    },
-    {
-      "id": "git",
-      "name": "Git",
-      "repo": "https://github.com/modelcontextprotocol/servers/tree/main/src/git",
-      "category": "reference",
-      "description": "Tools to read, search, and manipulate Git repositories.",
-      "recommendedAuth": "ssh-key or token",
-      "notes": "Limit write operations in production."
-    },
-    {
-      "id": "memory",
-      "name": "Memory",
-      "repo": "https://github.com/modelcontextprotocol/servers/tree/main/src/memory",
-      "category": "reference",
-      "description": "Knowledge graph-based persistent memory system.",
-      "recommendedAuth": "api-key or secret-manager",
-      "notes": "Ensure encryption at rest for persisted stores."
-    },
-    {
-      "id": "sequentialthinking",
-      "name": "Sequential Thinking",
-      "repo": "https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking",
-      "category": "reference",
-      "description": "Dynamic and reflective problem-solving through thought sequences.",
-      "recommendedAuth": "none",
-      "notes": "Used for advanced agent reasoning workflows."
-    },
-    {
-      "id": "time",
-      "name": "Time",
-      "repo": "https://github.com/modelcontextprotocol/servers/tree/main/src/time",
-      "category": "reference",
-      "description": "Time and timezone conversion capabilities.",
-      "recommendedAuth": "none",
-      "notes": "Low-risk utility server."
-    },
-    {
-      "id": "apify",
-      "name": "Apify",
-      "repo": "https://github.com/apify/actors-mcp-server",
-      "category": "third-party",
-      "description": "Actors MCP Server for large-scale web scraping and extraction.",
-      "recommendedAuth": "api-key",
-      "notes": "Useful for crawling external menus and pricing data. Consider rate limits and robots.txt."
-    },
-    {
-      "id": "vectorstores",
-      "name": "Vector Stores (pinecone/qdrant/chroma)",
-      "repo": "https://github.com/modelcontextprotocol/servers (various community repos)",
-      "category": "third-party",
-      "description": "Vector DB adapters for semantic search (Pinecone, Qdrant, Chroma, etc.).",
-      "recommendedAuth": "api-key",
-      "notes": "Add specific server only after picking a provider; ensure index access controls."
-    },
-    {
-      "id": "meilisearch",
-      "name": "Meilisearch",
-      "repo": "https://github.com/meilisearch/meilisearch-mcp",
-      "category": "third-party",
-      "description": "Full-text & semantic search integration.",
-      "recommendedAuth": "api-key",
-      "notes": "Good for fast site search and product/menu search."
-    },
-    {
-      "id": "redis",
-      "name": "Redis",
-      "repo": "https://github.com/redis/mcp-redis/",
-      "category": "third-party",
-      "description": "Redis key-value store integration and Redis Cloud API.",
-      "recommendedAuth": "api-key or managed-provider-credentials",
-      "notes": "Useful for caching and ephemeral memory layers. Ensure network ACLs."
-    },
-    {
-      "id": "toolbox",
-      "name": "MCP Toolbox (googleapis/genai-toolbox)",
-      "repo": "https://github.com/googleapis/genai-toolbox",
-      "category": "google",
-      "description": "Open-source MCP server to safely expose database tools on GCP (BigQuery, AlloyDB, etc.).",
-      "recommendedAuth": "wif / service-account",
-      "notes": "Configure tools.yaml and prefer IAM/WIF for DB access."
-    },
-    {
-      "id": "cloudrun",
-      "name": "Cloud Run MCP (GoogleCloudPlatform/cloud-run-mcp)",
-      "repo": "https://github.com/GoogleCloudPlatform/cloud-run-mcp",
-      "category": "google",
-      "description": "Reference MCP server and deployment pattern for hosting MCP servers on Cloud Run.",
-      "recommendedAuth": "gcp-iap or wif",
-      "notes": "Use Cloud Run and IAM to host MCP implementations."
-    },
-    {
-      "id": "google-cloud",
-      "name": "Google Cloud",
-      "repo": "https://github.com/googleapis/google-cloud-node",
-      "category": "google",
-      "description": "General Google Cloud services.",
-      "recommendedAuth": "wif / service-account"
-    },
-    {
-      "id": "bq",
-      "name": "BigQuery",
-      "repo": "https://github.com/googleapis/google-cloud-node/tree/main/packages/google-cloud-bigquery",
-      "category": "google",
-      "description": "BigQuery for data warehousing and analytics.",
-      "recommendedAuth": "wif / service-account"
-    },
-    {
-      "id": "nx-mcp",
-      "name": "Nx MCP",
-      "repo": "npm:nx-mcp",
-      "category": "third-party",
-      "description": "Nx monorepo context (project graph, generators, docs)",
-      "recommendedAuth": "none"
-    },
-    {
-      "id": "filesystem",
-      "name": "Filesystem",
-      "repo": "https://github.com/modelcontextprotocol/server-filesystem",
-      "category": "google",
-      "description": "Gemini CLI MCP for filesystem access",
-      "recommendedAuth": "service-account or secret-manager"
-    },
-    {
-      "id": "postgres",
-      "name": "PostgreSQL",
-      "repo": "https://github.com/modelcontextprotocol/server-postgres",
-      "category": "google",
-      "description": "Gemini CLI MCP for PostgreSQL access",
-      "recommendedAuth": "service-account or wif"
-    },
-    {
-      "id": "google-maps",
-      "name": "Google Maps",
-      "repo": "docker:mcp/google-maps",
-      "category": "google",
-      "description": "Google Maps services (geocode, directions, places)",
-      "recommendedAuth": "api-key",
-      "notes": "Requires GOOGLE_MAPS_API_KEY environment variable."
-    },
-    {
-      "id": "google-search",
-      "name": "Google Search",
-      "repo": "https://github.com/mcp-server/google-search-mcp",
-      "category": "google",
-      "description": "Structured Google Search via browser automation",
-      "recommendedAuth": "none"
-    },
-    {
-      "id": "qdrant",
-      "name": "Qdrant",
-      "repo": "https://github.com/modelcontextprotocol/server-qdrant",
-      "category": "third-party",
-      "description": "Semantic memory store (Qdrant vector DB)",
-      "recommendedAuth": "api-key"
-    },
-    {
-      "id": "csharp-sdk",
-      "name": "C# SDK",
-      "repo": "nuget:MCP.Sdk",
-      "category": "sdk",
-      "description": "C# SDK for MCP. Stable and well-supported.",
-      "recommendedAuth": "api-key"
-    },
-    {
-      "id": "java-sdk",
-      "name": "Java SDK",
-      "repo": "https://github.com/spring-projects/spring-ai",
-      "category": "sdk",
-      "description": "Java SDK for MCP, maintained by Spring AI. Supports sync & async, multiple transports.",
-      "recommendedAuth": "api-key"
-    },
-    {
-      "id": "python-sdk",
-      "name": "Python SDK",
-      "repo": "pypi:mcp-sdk",
-      "category": "sdk",
-      "description": "Python SDK for MCP. Async-first, asyncio-based.",
-      "recommendedAuth": "api-key"
-    },
-    {
-      "id": "typescript-sdk",
-      "name": "TypeScript SDK",
-      "repo": "npm:@mcp/sdk",
-      "category": "sdk",
-      "description": "TypeScript SDK for MCP. Promise-based, Express-like API for browser & Node.js.",
-      "recommendedAuth": "api-key"
-    },
-    {
-      "id": "kotlin-sdk",
-      "name": "Kotlin SDK",
-      "repo": "maven:com.mcp.sdk:kotlin-sdk",
-      "category": "sdk",
-      "description": "Kotlin SDK for MCP. Coroutine-based, JDK 8 compatible.",
-      "recommendedAuth": "api-key"
-    },
-    {
-      "id": "go-sdk",
-      "name": "Go SDK",
-      "repo": "go-mcp",
-      "category": "sdk",
-      "description": "Go Community SDK for MCP",
-      "recommendedAuth": "api-key"
-    },
-    {
-      "id": "rust-sdk",
-      "name": "Rust SDK",
-      "repo": "crate:MCPR",
-      "category": "sdk",
-      "description": "Rust Community SDK for MCP",
-      "recommendedAuth": "api-key"
-    },
-    {
-      "id": "semgrep",
-      "name": "Semgrep",
-      "repo": "https://github.com/returntocorp/semgrep",
-      "category": "third-party",
-      "description": "Semgrep code analysis and security scanning",
-      "recommendedAuth": "api-key"
-    }
-  ],
   "validation": {
     "schema": {
       "enabled": true,
-      "strict": true
+      "strict": true,
+      "validateOnLoad": true
     },
     "environmentVariables": {
-      "required": ["GCP_PROJECT_ID", "WIF_PROVIDER", "WIF_SERVICE_ACCOUNT"],
+      "required": [
+        "GCP_PROJECT_ID", 
+        "WIF_PROVIDER", 
+        "WIF_SERVICE_ACCOUNT"
+      ],
       "optional": [
         "NODE_ENV",
         "GCP_REGION",
         "GITHUB_OWNER",
         "GITHUB_REPO",
         "MCP_DEFAULT_TIMEOUT",
+        "MCP_LONG_TIMEOUT",
+        "MCP_SHORT_TIMEOUT",
         "HEALTH_CHECK_INTERVAL",
         "METRICS_INTERVAL",
+        "TRACE_SAMPLING_RATE",
+        "GITHUB_TIMEOUT",
+        "CODACY_TIMEOUT",
+        "CODERABBIT_TIMEOUT",
+        "GEMINI_TIMEOUT",
+        "COPILOT_TIMEOUT",
+        "DATABASE_TIMEOUT",
+        "POSTGRES_TIMEOUT",
+        "TOOLBOX_TIMEOUT",
+        "CLOUDRUN_TIMEOUT",
+        "SEMGREP_TIMEOUT",
+        "NX_TIMEOUT",
+        "TYPESCRIPT_TIMEOUT",
+        "ESLINT_TIMEOUT",
+        "JSON_TIMEOUT",
         "SEMGREP_URL",
         "NX_MCP_URL",
         "GOOGLE_FILESYSTEM_URL",
         "GOOGLE_POSTGRES_URL",
+        "GOOGLE_ANALYTICS_URL",
+        "GOOGLE_STORAGE_URL",
         "GOOGLE_MAPS_URL",
         "GOOGLE_SEARCH_URL",
         "QDRANT_URL",
-        "GOOGLE_MAPS_API_KEY",
-        "QDRANT_API_KEY",
-        "TRACE_SAMPLING_RATE"
+        "EXA_URL",
+        "TSSERVER_URL",
+        "ESLINT_URL",
+        "JSON_SERVER_URL",
+        "GA_PROPERTY_ID",
+        "GA_VIEW_ID",
+        "GCS_DEFAULT_BUCKET",
+        "GOOGLE_CSE_ID",
+        "QDRANT_COLLECTION",
+        "NX_WORKSPACE_ROOT",
+        "NX_CACHE_DIR",
+        "GEMINI_URL",
+        "GEMINI_MODEL"
       ]
+    },
+    "servers": {
+      "validateConnections": true,
+      "validateAuth": true,
+      "validateTemplates": true
+    }
+  },
+
+  "performance": {
+    "connectionPooling": {
+      "enabled": true,
+      "defaultMaxConnections": 50,
+      "defaultMinConnections": 5
+    },
+    "batching": {
+      "enabled": true,
+      "maxBatchSize": 100,
+      "batchTimeout": 1000
+    },
+    "compression": {
+      "enabled": true,
+      "algorithm": "gzip",
+      "level": 6
+    }
+  },
+
+  "security": {
+    "secretRotation": {
+      "enabled": true,
+      "interval": "24h",
+      "services": ["github", "codacy", "coderabbit", "gemini", "copilot", "google-maps", "qdrant", "exa"]
+    },
+    "networkSecurity": {
+      "allowedOrigins": ["*.signals.dev", "localhost"],
+      "rateLimiting": {
+        "enabled": true,
+        "windowSize": "1m",
+        "maxRequests": 1000
+      }
+    },
+    "audit": {
+      "enabled": true,
+      "logLevel": "info",
+      "includeRequestBodies": false
+    },
+    "aiToolSecurity": {
+      "enabled": true,
+      "contentFiltering": {
+        "enabled": true,
+        "blockSensitiveData": true,
+        "allowedDomains": ["github.com", "codacy.com", "coderabbit.ai", "googleapis.com"]
+      },
+      "usageMonitoring": {
+        "enabled": true,
+        "alertThreshold": 1000,
+        "dailyLimit": 50000
+      },
+      "dataPrivacy": {
+        "gdprCompliant": true,
+        "dataRetention": "90d",
+        "anonymizeLogs": true
+      }
     }
   }
 }

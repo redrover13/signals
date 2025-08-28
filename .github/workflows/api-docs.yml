@@ -13,24 +13,26 @@ jobs:
   generate-api-docs:
     name: Generate API Documentation
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
           node-version: '20'
           cache: 'pnpm'
           
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@8095b2b9580c96f4e9a8177bec82d79210851024 # v4.0.0
         with:
           version: 8
           run_install: false
           
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --frozen-lockfile
 
       - name: Generate API documentation
         run: |
@@ -39,9 +41,18 @@ jobs:
           pnpm nx run api:generate-docs
           
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@bae45bd7c0cd6f338596808adca97f47cf91dfac # v3.9.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup pnpm cache
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
           publish_dir: ./docs/api
           destination_dir: api
           keep_files: true

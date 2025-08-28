@@ -8,28 +8,30 @@ jobs:
   auto-label:
     name: Auto-label PR
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     permissions:
       pull-requests: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
           node-version: '20'
           cache: 'pnpm'
           
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@8095b2b9580c96f4e9a8177bec82d79210851024 # v4.0.0
         with:
           version: 8
           run_install: false
           
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --frozen-lockfile
 
       - name: Get affected projects
         id: affected
@@ -38,9 +40,18 @@ jobs:
           echo "affected_projects=$AFFECTED_PROJECTS" >> $GITHUB_OUTPUT
 
       - name: Label based on affected projects
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup pnpm cache
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
           script: |
             const affectedProjects = '${{ steps.affected.outputs.affected_projects }}'.split(' ');
             console.log('Affected projects:', affectedProjects);

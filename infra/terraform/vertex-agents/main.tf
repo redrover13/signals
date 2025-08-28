@@ -46,13 +46,13 @@ data "google_service_account" "vertex_agents_sa" {
 resource "google_project_iam_member" "vertex_sa_storage" {
   project = var.project_id
   role    = "roles/storage.objectViewer"
-  member  = "serviceAccount:${data.data.google_service_account.vertex_agents_sa.email}"
+  member  = "serviceAccount:${data.google_service_account.vertex_agents_sa.email}"
 }
 
 resource "google_project_iam_member" "vertex_sa_secretmanager" {
   project = var.project_id
   role    = "roles/secretmanager.secretAccessor"
-  member  = "serviceAccount:${data.data.google_service_account.vertex_agents_sa.email}"
+  member  = "serviceAccount:${data.google_service_account.vertex_agents_sa.email}"
 }
 
 # Cloud Storage bucket for agent artifacts
@@ -79,6 +79,22 @@ resource "google_storage_bucket" "agent_artifacts" {
     environment = var.environment
     managed_by  = "terraform"
   }
+}
+
+# New: Dedicated Vertex AI Endpoint for Gemini Orchestration
+resource "google_vertex_ai_endpoint" "gemini_endpoint" {
+  name         = "gemini-orchestrator-endpoint"
+  location     = var.region
+  display_name = "Gemini Orchestrator Endpoint"
+
+  network = "projects/${var.project_id}/global/networks/default"  # Optional: Attach to VPC if needed
+
+  labels = {
+    environment = var.environment
+    managed_by  = "terraform"
+  }
+
+  depends_on = [google_storage_bucket.agent_artifacts]
 }
 
 # Vertex AI Model Registry for custom models (if needed)
@@ -138,9 +154,10 @@ resource "google_cloudfunctions2_function" "gemini_orchestrator" {
       NODE_ENV = var.environment
       GCP_PROJECT_ID = var.project_id
       VERTEX_AI_LOCATION = var.region
+      GEMINI_ENDPOINT_ID = google_vertex_ai_endpoint.gemini_endpoint.name  # New: Reference the Gemini endpoint
     }
     
-    service_account_email = data.data.google_service_account.vertex_agents_sa.email
+    service_account_email = data.google_service_account.vertex_agents_sa.email
   }
 
   labels = {
@@ -177,7 +194,7 @@ resource "google_cloudfunctions2_function" "bq_agent" {
       GCP_PROJECT_ID = var.project_id
     }
     
-    service_account_email = data.data.google_service_account.vertex_agents_sa.email
+    service_account_email = data.google_service_account.vertex_agents_sa.email
   }
 
   labels = {

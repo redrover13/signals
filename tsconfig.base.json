@@ -6,8 +6,8 @@
     "paths": {
       "@dulce-de-saigon/agents-lib": ["dist/libs/agents/src/index.d.ts"],
       "@dulce/adk": ["dist/adk/index.d.ts"],
-      "@dulce/gcp": ["dist/libs/gcp/src/index.d.ts"],
-      "@nx-monorepo/mcp": ["dist/libs/mcp/src/index.d.ts"],
+      "@dulce/gcp": ["dist/libs/gcp/src/index.ts"],
+      "@nx-monorepo/mcp": ["dist/libs/mcp/src/index.ts"],
       "dbt-models": ["libs/data-models/dbt-models/src/index.ts"],
       "gcp-auth": ["libs/utils/gcp-auth/src/index.ts"],
       "gemini-orchestrator": ["libs/agents/gemini-orchestrator/src/index.ts"],

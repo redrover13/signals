@@ -38,6 +38,8 @@ jobs:
   determine-environment:
     name: Determine Environment
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     outputs:
       environment: ${{ steps.env.outputs.environment }}
       should-deploy: ${{ steps.env.outputs.should-deploy }}
@@ -95,26 +97,37 @@ jobs:
   pre-deployment:
     name: Pre-deployment Validation
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     needs: determine-environment
     if: needs.determine-environment.outputs.should-deploy == 'true'
     environment: ${{ needs.determine-environment.outputs.environment }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           fetch-depth: 0
 
       - name: Setup Node.js & pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@8095b2b9580c96f4e9a8177bec82d79210851024 # v4.0.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
           node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm cache
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --frozen-lockfile
 
       # Validate environment configuration
       - name: Validate environment configuration
@@ -152,27 +165,38 @@ jobs:
   build-for-deployment:
     name: Build for Deployment
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     needs: [determine-environment, pre-deployment]
     if: needs.determine-environment.outputs.should-deploy == 'true'
     outputs:
       build-version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           fetch-depth: 0
 
       - name: Setup Node.js & pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@8095b2b9580c96f4e9a8177bec82d79210851024 # v4.0.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
           node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm cache
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --frozen-lockfile
 
       # Generate build version
       - name: Generate build version
@@ -192,7 +216,7 @@ jobs:
 
       # Upload build artifacts
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
         with:
           name: deployment-build-${{ steps.version.outputs.version }}
           path: |
@@ -209,12 +233,14 @@ jobs:
   deploy-to-gcp:
     name: Deploy to Google Cloud
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     needs: [determine-environment, build-for-deployment]
     if: needs.determine-environment.outputs.should-deploy == 'true'
     environment: ${{ needs.determine-environment.outputs.environment }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -224,13 +250,13 @@ jobs:
 
       # Authenticate to Google Cloud
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@e2ab1afc8b16a89a5bc7eac718364352c9ebb8d6 # v2.1.0
         with:
           project_id: ${{ needs.determine-environment.outputs.gcp-project }}
 
@@ -241,7 +267,7 @@ jobs:
 
       # Create deployment record
       - name: Create deployment record
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
         id: deployment
         with:
           script: |
@@ -269,7 +295,7 @@ jobs:
       # Update deployment status to success
       - name: Update deployment status - Success
         if: success()
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
         with:
           script: |
             await github.rest.repos.createDeploymentStatus({
@@ -285,7 +311,7 @@ jobs:
       # Update deployment status to failure
       - name: Update deployment status - Failure
         if: failure()
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
         with:
           script: |
             await github.rest.repos.createDeploymentStatus({
@@ -303,6 +329,8 @@ jobs:
   post-deployment:
     name: Post-deployment Validation
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     needs: [determine-environment, deploy-to-gcp]
     if: needs.determine-environment.outputs.should-deploy == 'true'
     steps:
@@ -368,18 +396,20 @@ jobs:
   rollback:
     name: Rollback Deployment
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     if: failure() && needs.determine-environment.outputs.should-deploy == 'true'
     needs: [determine-environment, deploy-to-gcp, post-deployment]
     environment: ${{ needs.determine-environment.outputs.environment }}
     steps:
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@e2ab1afc8b16a89a5bc7eac718364352c9ebb8d6 # v2.1.0
         with:
           project_id: ${{ needs.determine-environment.outputs.gcp-project }}
 
@@ -416,6 +446,8 @@ jobs:
   notify:
     name: Deployment Notification
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     needs: [determine-environment, build-for-deployment, deploy-to-gcp, post-deployment]
     if: always() && needs.determine-environment.outputs.should-deploy == 'true'
     steps:

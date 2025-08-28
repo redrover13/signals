@@ -70,7 +70,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm cache
-        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
         with:
           path: |
             ${{ env.STORE_PATH }}
@@ -199,7 +199,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm cache
-        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
         with:
           path: |
             ${{ env.STORE_PATH }}
@@ -305,7 +305,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm cache
-        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
         with:
           path: |
             ${{ env.STORE_PATH }}
@@ -384,7 +384,7 @@ jobs:
 
       # Download breaking changes artifact
       - name: Download breaking changes
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@694a571876d6598ad8b4a2365a1d88cd1a5c6473 # v4.0.0
         with:
           name: breaking-changes
           path: .
@@ -393,7 +393,7 @@ jobs:
       # Create GitHub release
       - name: Create GitHub Release
         id: release
-        uses: actions/create-release@v1
+        uses: actions/create-release@5b78d9bfd51970a06a83574aaea8d585d1fe8fd1 # v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

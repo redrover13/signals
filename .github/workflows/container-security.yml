@@ -41,7 +41,7 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@2b51285786e4a1181b7a0b3a6f50d8390f18b788 # v3.2.0
 
       - name: Authenticate to GCP
         uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
@@ -135,7 +135,7 @@ jobs:
     if: always()
     steps:
       - name: Download all scan results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@694a571876d6598ad8b4a2365a1d88cd1a5c6473 # v4.0.0
         with:
           path: scan-results
 

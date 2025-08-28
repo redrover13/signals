@@ -84,15 +84,15 @@ jobs:
       with:
         languages: ${{ matrix.language }}
 
-      - name: Setup pnpm cache
-        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
-        with:
-          path: |
-            ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-        config-file: .github/codeql/typescript-config.yml
+          - name: Setup pnpm cache
+            uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
+            with:
+                path: |
+                    ${{ env.STORE_PATH }}
+                key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+                restore-keys: |
+                    ${{ runner.os }}-pnpm-store-
+            config-file: .github/codeql/typescript-config.yml
         # By default, queries listed here will override any specified in a config file.
         # Prefix the list here with "+" to use these queries and those in the config file.
 

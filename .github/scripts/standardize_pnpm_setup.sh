@@ -17,7 +17,7 @@ standardize_pnpm_setup() {
           if ($0 ~ /}/) {
             print ""
             print "      - name: Setup pnpm cache"
-            print "        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2"
+            print "        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0"
             print "        with:"
             print "          path: |"
             print "            ${{ env.STORE_PATH }}"

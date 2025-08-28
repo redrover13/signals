@@ -1,5 +1,5 @@
 # GitHub Workflow Update Report
-Generated on: Thu Aug 28 08:00:49 +07 2025
+Generated on: Thu Aug 28 08:05:46 +07 2025
 
 ## Workflows Updated
 
@@ -37,14 +37,13 @@ Generated on: Thu Aug 28 08:00:49 +07 2025
 - Workflows with standardized pnpm setup: 18
 - Workflows needing action pinning: 0
 - Workflows needing pnpm standardization: 6
-
 ## Scripts Used
 
 For future reference, the following scripts were created to help maintain GitHub workflow consistency:
 
-1. [Update GitHub Actions with Pinned SHAs](./.github/scripts/update_additional_actions.sh) - Pins GitHub Actions to specific commit SHAs for security and stability.
-2. [Standardize PNPM Setup](./.github/scripts/standardize_pnpm_setup.sh) - Ensures consistent PNPM caching and installation across workflows.
-3. [Track Workflow Updates](./.github/scripts/track_workflow_updates.sh) - Generates this report to track which workflows need updates.
+1. [Update GitHub Actions with Pinned SHAs](../../.github/scripts/update_additional_actions.sh) - Pins GitHub Actions to specific commit SHAs for security and stability.
+2. [Standardize PNPM Setup](../../.github/scripts/standardize_pnpm_setup.sh) - Ensures consistent PNPM caching and installation across workflows.
+3. [Track Workflow Updates](../../.github/scripts/track_workflow_updates.sh) - Generates this report to track which workflows need updates.
 
 ## Best Practices
 

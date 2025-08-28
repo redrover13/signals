@@ -13,6 +13,15 @@ This script updates GitHub Actions to use pinned commit SHAs instead of version 
 ./update_additional_actions.sh
 ```
 
+### `update_cache_action.sh`
+
+This script updates the deprecated `actions/cache` references to use the latest v4 version with a pinned commit SHA.
+
+**Usage:**
+```bash
+./update_cache_action.sh
+```
+
 ### `standardize_pnpm_setup.sh`
 
 This script standardizes the PNPM setup across all workflows, ensuring consistent caching and installation practices.

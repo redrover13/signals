@@ -426,6 +426,23 @@ pnpm nx affected --target=test
 pnpm nx affected --target=build
 ```
 
+### Linting Configuration
+The project uses ESLint with NX integration to enforce code quality and consistency:
+
+- **Base Configuration**: Configured in `.eslintrc.json` with TypeScript and JavaScript rules
+- **Project-Specific Rules**: Each project can add custom rules in their own ESLint config
+- **Enforcement**:
+  - Pre-commit hooks via lint-staged
+  - CI pipeline validation
+  - NX commands: `pnpm nx lint <project-name>` or `pnpm nx affected --target=lint`
+
+Key rules enforced include:
+- TypeScript type safety (no-explicit-any, explicit-return-types)
+- Unused variables detection
+- Module boundary enforcement via NX
+- React best practices (in React projects)
+- Console usage limitations
+
 ## 8. Other Notes
 
 ### LLM Code Generation Guidelines

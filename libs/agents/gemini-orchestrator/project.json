@@ -4,6 +4,7 @@
   "sourceRoot": "libs/agents/gemini-orchestrator/src",
   "projectType": "library",
   "tags": ["scope:backend-lib", "type:agent"],
+  "implicitDependencies": ["gcp"],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",

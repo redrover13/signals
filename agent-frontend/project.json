@@ -13,6 +13,12 @@
       "options": {
         "jestConfig": "agent-frontend/jest.config.ts"
       }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["agent-frontend/**/*.{ts,tsx,js,jsx}"]
+      }
     }
   }
 }

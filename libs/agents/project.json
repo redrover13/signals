@@ -13,6 +13,20 @@
         "main": "libs/agents/src/index.ts",
         "tsConfig": "libs/agents/tsconfig.lib.json",
         "assets": ["libs/agents/*.md"]
+      },
+      "implicitDependencies": [
+        "bq-agent",
+        "content-agent", 
+        "crm-agent",
+        "gemini-orchestrator",
+        "looker-agent",
+        "reviews-agent"
+      ]
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["libs/agents/**/*.{ts,tsx,js,jsx}"]
       }
     }
   }

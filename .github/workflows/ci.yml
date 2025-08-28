@@ -41,7 +41,7 @@ jobs:
         run: pnpm codeql:fix
 
       - name: Run Lint
-        run: pnpm nx lint
+        run: pnpm lint:ci
 
       - name: Run Tests
         run: pnpm nx test

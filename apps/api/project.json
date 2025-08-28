@@ -17,10 +17,9 @@
       }
     },
     "lint": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/eslint:lint",
       "options": {
-        "command": "echo 'lint placeholder'",
-        "cwd": "apps/api"
+        "lintFilePatterns": ["apps/api/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "test": {

@@ -10,3 +10,4 @@
  */
 
 export * from './lib/gemini-orchestrator';
+export * from './lib/mcp.service';

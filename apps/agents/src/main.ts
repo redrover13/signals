@@ -14,6 +14,7 @@ import Fastify from 'fastify';
 import { agentsRoutes } from '../../api/src/routes/agents';
 import { healthRoutes } from '../../api/src/routes/health';
 import { VertexAIClient, VertexAIClientConfig } from 'adk/services/vertex';
+import { mcpService } from '@nx-monorepo/mcp';
 
 const fastify = Fastify({
   logger: true,
@@ -28,26 +29,50 @@ const vertexAIConfig: VertexAIClientConfig = {
 
 const vertexClient = new VertexAIClient(vertexAIConfig);
 
-fastify.post('/api/v1/agent-predict', async (request, reply) => {
+// Initialize MCP service and start server
+async function initializeApp() {
   try {
-    const instancePayload = request.body;
-    const predictions = await vertexClient.predict(instancePayload);
+    console.log('Initializing MCP service...');
+    await mcpService.initialize();
+    console.log('✅ MCP service initialized successfully');
+    console.log('📊 Enabled servers:', mcpService.getEnabledServers());
 
-    fastify.log.info({
-      message: 'Prediction successful',
-      endpointId: vertexAIConfig.endpointId,
+    fastify.post('/api/v1/agent-predict', async (request, reply) => {
+      try {
+        const instancePayload = request.body;
+        const predictions = await vertexClient.predict(instancePayload);
+
+        fastify.log.info({
+          message: 'Prediction successful',
+          endpointId: vertexAIConfig.endpointId,
+        });
+
+        return { success: true, predictions };
+      } catch (error) {
+        fastify.log.error(error);
+        reply.status(500).send({
+          success: false,
+          message: 'An error occurred during prediction.',
+          error: error instanceof Error ? error.name : 'UnknownError',
+        });
+      }
     });
 
-    return { success: true, predictions };
+    const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
+    fastify.listen({ port: PORT, host: '0.0.0.0' }, (err, address) => {
+      if (err) {
+        fastify.log.error(err);
+        process.exit(1);
+      }
+      fastify.log.info(`Agents server listening at ${address}`);
+    });
   } catch (error) {
-    fastify.log.error(error);
-    reply.status(500).send({
-      success: false,
-      message: 'An error occurred during prediction.',
-      error: error instanceof Error ? error.name : 'UnknownError',
-    });
+    console.error('❌ Failed to initialize MCP service:', error);
+    process.exit(1);
   }
-});
+}
+
+initializeApp().catch(console.error);
 
 fastify.register(healthRoutes);
 fastify.register(agentsRoutes);

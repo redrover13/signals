@@ -39,7 +39,13 @@
       "extends": [
         "plugin:@nx/typescript"
       ],
-      "rules": {}
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "warn",
+        "@typescript-eslint/explicit-function-return-type": "warn",
+        "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+        "@typescript-eslint/no-non-null-assertion": "warn",
+        "no-console": ["warn", { "allow": ["warn", "error", "info"] }]
+      }
     },
     {
       "files": [
@@ -49,7 +55,13 @@
       "extends": [
         "plugin:@nx/javascript"
       ],
-      "rules": {}
+      "rules": {
+        "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+        "no-console": ["warn", { "allow": ["warn", "error", "info"] }],
+        "no-undef": "error",
+        "no-var": "error",
+        "prefer-const": "warn"
+      }
     },
     {
       "files": [

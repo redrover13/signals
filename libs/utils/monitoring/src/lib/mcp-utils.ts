@@ -15,14 +15,14 @@
  */
 
 import { readFileSync, writeFileSync } from 'fs';
-import { MCPService } from '../mcp.service';
+import { MCPService } from '@nx-monorepo/agents/gemini-orchestrator';
 import {
   getCurrentConfig,
   getCurrentEnvironment,
   validateConfig,
   Environment,
-} from '../config/environment-config';
-import { MCPEnvironmentConfig } from '../config/mcp-config.schema';
+} from '@nx-monorepo/agents/gemini-orchestrator';
+import { MCPEnvironmentConfig, MCPServerConfig } from '@nx-monorepo/agents/gemini-orchestrator';
 
 /**
  * Create and initialize MCP client
@@ -55,7 +55,7 @@ export function validateMCPEnvironment(environment?: Environment): {
   const warnings: string[] = [];
 
   // Check for common configuration issues
-  const enabledServers = config.servers.filter((s) => s.enabled);
+  const enabledServers = config.servers.filter((s: MCPServerConfig) => s.enabled);
 
   if (enabledServers.length === 0) {
     warnings.push('No servers are enabled');
@@ -63,21 +63,21 @@ export function validateMCPEnvironment(environment?: Environment): {
 
   // Check for missing authentication
   const serversNeedingAuth = enabledServers.filter(
-    (s) => s.auth?.type !== 'none' && !process.env[s.auth?.credentials?.envVar || ''],
+    (s: MCPServerConfig) => s.auth?.type !== 'none' && !process.env[s.auth?.credentials?.envVar || ''],
   );
 
   if (serversNeedingAuth.length > 0) {
     warnings.push(
-      `Missing authentication for servers: ${serversNeedingAuth.map((s) => s.id).join(', ')}`,
+      `Missing authentication for servers: ${serversNeedingAuth.map((s: MCPServerConfig) => s.id).join(', ')}`,
     );
   }
 
   // Check for development-only servers in production
   if (env === 'production') {
-    const devServers = enabledServers.filter((s) => s.category === 'testing');
+    const devServers = enabledServers.filter((s: MCPServerConfig) => s.category === 'testing');
     if (devServers.length > 0) {
       warnings.push(
-        `Testing servers enabled in production: ${devServers.map((s) => s.id).join(', ')}`,
+        `Testing servers enabled in production: ${devServers.map((s: MCPServerConfig) => s.id).join(', ')}`,
       );
     }
   }
@@ -155,7 +155,7 @@ export function generateMCPConfig(
 
   const enabledServerIds = [...recommendations.essential, ...recommendations.recommended];
 
-  const servers = baseConfig.servers.map((server) => {
+  const servers = baseConfig.servers.map((server: MCPServerConfig) => {
     if (enabledServerIds.includes(server.id)) {
       return { ...server, enabled: true };
     }
@@ -182,7 +182,7 @@ export function checkMCPDependencies(): {
   const errors: Record<string, string> = {};
 
   const config = getCurrentConfig();
-  const enabledServers = config.servers.filter((s) => s.enabled);
+  const enabledServers = config.servers.filter((s: MCPServerConfig) => s.enabled);
 
   for (const server of enabledServers) {
     try {
@@ -225,7 +225,7 @@ export function getMCPPerformanceMetrics(mcpService: MCPService): {
 
   // Calculate metrics from available data
   const totalRequests = Array.from(routingStats.loadStats.values()).reduce(
-    (sum, count) => sum + count,
+    (sum: number, count: number) => sum + count,
     0,
   );
 

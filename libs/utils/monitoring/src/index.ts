@@ -10,3 +10,4 @@
  */
 
 export * from './lib/monitoring';
+export * from './lib/mcp-utils';

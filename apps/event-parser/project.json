@@ -20,6 +20,12 @@
       "options": {
         "command": "echo 'No tests defined for event-parser'"
       }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["apps/event-parser/**/*.{ts,tsx,js,jsx}"]
+      }
     }
   },
   "tags": ["gcp", "cloud-function", "event-parser"]

@@ -12,6 +12,13 @@ module.exports = [
             "**/*.jsx"
         ],
         // Override or add rules here
-        rules: {}
+        rules: {
+            "react/jsx-key": "error",
+            "react/prop-types": "error",
+            "react-hooks/rules-of-hooks": "error",
+            "react-hooks/exhaustive-deps": "warn",
+            "@typescript-eslint/no-explicit-any": "warn",
+            "@typescript-eslint/explicit-module-boundary-types": "warn"
+        }
     }
 ];

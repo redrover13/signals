@@ -60,8 +60,8 @@ export async function searchRoutes(fastify: FastifyInstance) {
         };
 
         return reply.send(response);
-      } catch (error: any) {
-        fastify.log.error('Search error:', error);
+      } catch (_error: any) {
+        fastify.log.error('Search error:', _error);
         return reply.status(500).send({
           error: 'Internal server error during search',
         });

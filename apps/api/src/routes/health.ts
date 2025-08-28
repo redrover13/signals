@@ -42,7 +42,7 @@ export async function healthRoutes(fastify: FastifyInstance) {
         heapUsed: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)}MB`,
         heapTotal: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)}MB`,
       },
-      timezone: 'Asia/Ho_Chi_Minh',
+      timezone: 'Asia/Ho_Chi_Minh'
     });
 
     return reply.send({

@@ -9,12 +9,44 @@
  * @license MIT
  */
 
-import Fastify from 'fastify';
-import Fastify from 'fastify';
-import { agentsRoutes } from '../../api/src/routes/agents';
-import { healthRoutes } from '../../api/src/routes/health';
-import { VertexAIClient, VertexAIClientConfig } from 'adk/services/vertex';
+import Fastify, { FastifyInstance, FastifyRequest } from 'fastify';
+import { VertexAIClient, VertexAIClientConfig } from '@nx-monorepo/adk/services/vertex';
 import { mcpService } from '@nx-monorepo/mcp';
+
+// Local route implementations for agents project
+async function healthRoutes(fastify: FastifyInstance) {
+  fastify.get('/health', async (request: FastifyRequest, reply) => {
+    return { status: 'ok', timestamp: new Date().toISOString() };
+  });
+}
+
+async function agentsRoutes(fastify: FastifyInstance) {
+  fastify.post('/start', async (request: FastifyRequest, reply) => {
+    const task = (request.body as any)?.task ?? 'default task';
+    return { ok: true, task, message: 'Agent task queued' };
+  });
+
+  fastify.post('/api/v1/agent-predict', async (request: FastifyRequest, reply) => {
+    try {
+      const instancePayload = request.body;
+      const predictions = await vertexClient.predict(instancePayload);
+
+      fastify.log.info({
+        message: 'Prediction successful',
+        endpointId: vertexAIConfig.endpointId,
+      });
+
+      return { success: true, predictions };
+    } catch (error) {
+      fastify.log.error(error);
+      reply.status(500).send({
+        success: false,
+        message: 'An error occurred during prediction.',
+        error: error instanceof Error ? error.name : 'UnknownError',
+      });
+    }
+  });
+}
 
 const fastify = Fastify({
   logger: true,
@@ -37,26 +69,9 @@ async function initializeApp() {
     console.log('✅ MCP service initialized successfully');
     console.log('📊 Enabled servers:', mcpService.getEnabledServers());
 
-    fastify.post('/api/v1/agent-predict', async (request, reply) => {
-      try {
-        const instancePayload = request.body;
-        const predictions = await vertexClient.predict(instancePayload);
-
-        fastify.log.info({
-          message: 'Prediction successful',
-          endpointId: vertexAIConfig.endpointId,
-        });
-
-        return { success: true, predictions };
-      } catch (error) {
-        fastify.log.error(error);
-        reply.status(500).send({
-          success: false,
-          message: 'An error occurred during prediction.',
-          error: error instanceof Error ? error.name : 'UnknownError',
-        });
-      }
-    });
+    // Register routes
+    await fastify.register(healthRoutes);
+    await fastify.register(agentsRoutes);
 
     const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
     fastify.listen({ port: PORT, host: '0.0.0.0' }, (err, address) => {
@@ -73,16 +88,3 @@ async function initializeApp() {
 }
 
 initializeApp().catch(console.error);
-
-fastify.register(healthRoutes);
-fastify.register(agentsRoutes);
-
-const start = async () => {
-  try {
-    await fastify.listen({ port: 3000 });
-  } catch (err) {
-    fastify.log.error(err);
-    process.exit(1);
-  }
-};
-start();

@@ -14,6 +14,19 @@
         "tsConfig": "libs/mcp/tsconfig.lib.json",
         "assets": ["libs/mcp/*.md"]
       },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "generatePackageJson": true,
+          "sourceMap": false
+        },
+        "development": {
+          "optimization": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production",
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
@@ -24,6 +37,7 @@
       "options": {
         "lintFilePatterns": ["libs/mcp/**/*.ts"]
       },
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
       "cache": true
     },
     "test": {
@@ -33,8 +47,26 @@
         "jestConfig": "libs/mcp/jest.config.ts",
         "passWithNoTests": true
       },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      },
+      "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"],
       "cache": true
     }
   },
-  "tags": []
+  "tags": ["domain:mcp", "type:lib"],
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/.eslintrc.json"
+    ],
+    "sharedGlobals": []
+  }
 }

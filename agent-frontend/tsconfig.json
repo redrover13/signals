@@ -17,7 +17,15 @@
     },
     {
       "path": "./tsconfig.spec.json"
+    },
+    {
+      "path": "./tsconfig.storybook.json"
     }
   ],
-  "extends": "../tsconfig.base.json"
+  "extends": "../tsconfig.base.json",
+  "exclude": [
+    "node_modules",
+    "tmp",
+    "dist"
+  ]
 }

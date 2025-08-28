@@ -3,7 +3,10 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "module": "commonjs",
-    "types": ["jest", "node"],
+    "types": [
+      "jest",
+      "node"
+    ],
     "esModuleInterop": true
   },
   "include": [
@@ -18,5 +21,10 @@
     "src/**/*.test.jsx",
     "src/**/*.spec.jsx",
     "src/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "tmp",
+    "dist"
   ]
 }

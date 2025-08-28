@@ -40,5 +40,10 @@
     "jest.config.ts",
     "**/*.spec.ts",
     "**/*.test.ts"
+  ],
+  "references": [
+    {
+      "path": "../../libs/gcp"
+    }
   ]
 }

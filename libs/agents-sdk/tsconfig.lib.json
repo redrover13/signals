@@ -5,10 +5,13 @@
     "declaration": true,
     "types": [
       "node"
-    ]
+    ],
+    "composite": true,
+    "declarationMap": true
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/**/*"
   ],
   "exclude": [
     "jest.config.ts",

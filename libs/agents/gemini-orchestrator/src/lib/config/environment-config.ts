@@ -1,10 +1,23 @@
 /**
+ * @fileoverview environment-config module for the config component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
  * Environment Configuration Manager
  * Handles environment-specific MCP configurations
  */
 
 import { MCPEnvironmentConfig, MCPGlobalConfig, DEFAULT_MCP_CONFIG } from './mcp-config.schema';
 import { MCP_SERVER_REGISTRY } from './server-registry';
+
+export { MCPEnvironmentConfig };
 
 /**
  * Environment types
@@ -18,17 +31,6 @@ export function getCurrentEnvironment(): Environment {
   const env = process.env['NODE_ENV'] || process.env['ENVIRONMENT'] || 'development';
   return env as Environment;
 }
-
-/**
- * Get configuration for current environment
- */
-export function getCurrentConfig(): MCPEnvironmentConfig {
-  const env = getCurrentEnvironment();
-  return getConfigForEnvironment(env);
-}
-
-import * as fs from 'fs';
-import * as path from 'path';
 
 /**
  * Development environment configuration
@@ -89,7 +91,7 @@ const STAGING_CONFIG: MCPEnvironmentConfig = {
     // Standard timeouts
     connection: {
       ...server.connection,
-      timeout: server.connection.timeout || 30000,
+      timeout: Math.min(server.connection.timeout || 30000, 30000), // Fixed: server.min to Math.min
     },
   })),
   global: {

@@ -33,6 +33,9 @@ permissions:
   packages: write
   id-token: write
 
+env:
+  NODE_VERSION: '20'
+
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false

@@ -1,3 +1,14 @@
+/**
+ * @fileoverview jest.setup module for the mcp component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
 // Global jest setup for libs/mcp tests
 // Mock child_process.spawn globally so tests don't spawn real processes
 

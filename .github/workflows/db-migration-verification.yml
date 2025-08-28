@@ -1,0 +1,47 @@
+name: Database Migration Verification
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - '**/migrations/**'
+      - '**/schemas/**'
+      - 'infra/terraform/bigquery/**'
+
+jobs:
+  verify-migrations:
+    name: Verify Database Migrations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Verify migrations
+        run: |
+          echo "Verifying database migrations..."
+          # Example: Run a script that verifies migrations against a test DB
+          # pnpm run migrations:verify

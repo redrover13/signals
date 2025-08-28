@@ -1,4 +1,15 @@
 /**
+ * @fileoverview request-router.service module for the lib component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
  * Minimal Request Router stub to restore compilation while the real
  * implementation is repaired. This file is intentionally small and
  * preserves the original public API surface used by tests.

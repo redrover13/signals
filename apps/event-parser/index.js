@@ -1,4 +1,3 @@
-<![CDATA[
 /**
  * @fileoverview Cloud Function to process raw agent telemetry events.
  *
@@ -80,4 +79,3 @@ exports.parseAgentEvent = async (pubSubMessage, context) => {
     }
   }
 };
-]]>

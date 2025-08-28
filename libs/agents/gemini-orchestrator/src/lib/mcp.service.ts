@@ -23,6 +23,7 @@ import {
 import { RequestRouter } from './clients/request-router.service';
 import { getCurrentConfig, getCurrentEnvironment } from './config/environment-config';
 import { createServiceErrorHandler, ErrorCategory, ErrorSeverity } from './utils/error-handler';
+import { GeminiOrchestrator } from './gemini-orchestrator'; // Import the orchestrator
 
 /**
  * Main MCP Service - Simplified interface for all MCP operations
@@ -255,6 +256,14 @@ export class MCPService {
    */
   async firebase(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
     return this.request(`firebase.${operation}`, params, { serverId: 'firebase' });
+  }
+
+  /**
+   * Orchestrate with Gemini for agent routing
+   */
+  async orchestrateWithGemini(query: string, config: { apiKey: string; projectId: string; firebaseConfig: any }): Promise<any> {
+    const orchestrator = new GeminiOrchestrator(config.apiKey, config.projectId, config.firebaseConfig);
+    return orchestrator.orchestrate(query);
   }
 
   /**

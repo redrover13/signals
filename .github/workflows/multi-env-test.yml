@@ -16,6 +16,8 @@ jobs:
   test-matrix:
     name: Test Node ${{ matrix.node-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    env:
+      STORE_PATH: $(pnpm store path)
     strategy:
       fail-fast: false
       matrix:
@@ -30,21 +32,30 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@8095b2b9580c96f4e9a8177bec82d79210851024 # v4.0.0
         with:
-          version: 10
+          version: 8
 
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Setup pnpm cache
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --frozen-lockfile
 
       - name: Run type checking
         run: pnpm nx run-many -t type-check --all --parallel=3
@@ -76,7 +87,7 @@ jobs:
           }
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
         if: always()
         with:
           name: test-results-${{ matrix.os }}-node${{ matrix.node-version }}
@@ -88,14 +99,16 @@ jobs:
   compatibility-check:
     name: Compatibility Check
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     needs: test-matrix
     if: always()
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
           node-version: '20'
 
@@ -128,6 +141,15 @@ jobs:
           echo "" >> compatibility-report.md
           echo "**Test Date:** $(date -u)" >> compatibility-report.md
           echo "**Commit:** ${{ github.sha }}" >> compatibility-report.md
+
+      - name: Setup pnpm cache
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
           echo "" >> compatibility-report.md
           
           echo "## Node.js Version Support" >> compatibility-report.md
@@ -142,7 +164,7 @@ jobs:
           echo "" >> compatibility-report.md
 
       - name: Upload compatibility report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
         with:
           name: compatibility-report
           path: compatibility-report.md
@@ -151,21 +173,23 @@ jobs:
   performance-baseline:
     name: Performance Baseline
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@8095b2b9580c96f4e9a8177bec82d79210851024 # v4.0.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
           node-version: '20'
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --frozen-lockfile
 
       - name: Run performance benchmarks
         run: |

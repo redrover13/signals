@@ -47,6 +47,8 @@ jobs:
   prepare-release:
     name: Prepare Release
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     outputs:
       should-release: ${{ steps.check.outputs.should-release }}
       release-type: ${{ steps.check.outputs.release-type }}
@@ -54,22 +56,31 @@ jobs:
       next-version: ${{ steps.version.outputs.next }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js & pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@8095b2b9580c96f4e9a8177bec82d79210851024 # v4.0.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
           node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm cache
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --frozen-lockfile
 
       # Determine if we should create a release
       - name: Check release conditions
@@ -169,25 +180,36 @@ jobs:
   pre-release-validation:
     name: Pre-release Validation
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     needs: prepare-release
     if: needs.prepare-release.outputs.should-release == 'true'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           fetch-depth: 0
 
       - name: Setup Node.js & pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@8095b2b9580c96f4e9a8177bec82d79210851024 # v4.0.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
           node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm cache
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --frozen-lockfile
 
       # Run comprehensive tests
       - name: Run test suite
@@ -247,7 +269,7 @@ jobs:
       # Upload breaking changes artifact
       - name: Upload breaking changes
         if: hashFiles('breaking-changes.txt') != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
         with:
           name: breaking-changes
           path: breaking-changes.txt
@@ -259,6 +281,8 @@ jobs:
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     needs: [prepare-release, pre-release-validation]
     if: needs.prepare-release.outputs.should-release == 'true'
     outputs:
@@ -267,22 +291,31 @@ jobs:
       release-url: ${{ steps.release.outputs.html_url }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js & pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@8095b2b9580c96f4e9a8177bec82d79210851024 # v4.0.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
           node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm cache
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --frozen-lockfile
 
       # Configure git
       - name: Configure Git
@@ -386,7 +419,7 @@ jobs:
             git checkout v${{ needs.prepare-release.outputs.next-version }}
 
             # Install dependencies
-            pnpm install
+            pnpm install --frozen-lockfile
             ```
 
             ## Deployment
@@ -415,11 +448,13 @@ jobs:
   post-release:
     name: Post-release Tasks
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     needs: [prepare-release, create-release]
     if: needs.prepare-release.outputs.should-release == 'true'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           ref: v${{ needs.prepare-release.outputs.next-version }}
 
@@ -435,7 +470,7 @@ jobs:
 
       # Create release announcement
       - name: Create release announcement
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
         with:
           script: |
             const title = `🎉 Release v${{ needs.prepare-release.outputs.next-version }} is now available!`;
@@ -477,7 +512,7 @@ jobs:
 
       # Update project boards or issues
       - name: Update project management
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
         with:
           script: |
             // Close issues that are fixed in this release
@@ -514,6 +549,8 @@ jobs:
   validate-release:
     name: Validate Release
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     needs: [prepare-release, create-release]
     if: needs.prepare-release.outputs.should-release == 'true'
     steps:
@@ -562,7 +599,7 @@ jobs:
       # Alert on validation failure
       - name: Alert on validation failure
         if: failure()
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
         with:
           script: |
             const title = `🚨 Release Validation Failed - v${{ needs.prepare-release.outputs.next-version }}`;

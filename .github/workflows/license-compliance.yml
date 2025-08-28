@@ -24,21 +24,23 @@ permissions:
 jobs:
   license-check:
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@8095b2b9580c96f4e9a8177bec82d79210851024 # v4.0.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
           node-version: '20'
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --frozen-lockfile
 
       - name: Install license checker
         run: npm install -g license-checker license-compatibility-checker
@@ -92,6 +94,15 @@ jobs:
           VIOLATIONS=""
           
           for license in "${RESTRICTED_LICENSES[@]}"; do
+
+      - name: Setup pnpm cache
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
             if grep -q "\"$license\"" licenses.json; then
               VIOLATIONS="$VIOLATIONS\n- $license found in dependencies"
               echo "❌ Restricted license found: $license"
@@ -150,7 +161,7 @@ jobs:
           git checkout origin/${{ github.base_ref }}
           
           if [ -f "package.json" ]; then
-            pnpm install --frozen-lockfile
+            pnpm install --frozen-lockfile --frozen-lockfile
             license-checker --json --out base-licenses.json
           else
             echo "{}" > base-licenses.json
@@ -176,7 +187,7 @@ jobs:
           fi
 
       - name: Upload license reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
         with:
           name: license-reports
           path: |
@@ -188,7 +199,7 @@ jobs:
 
       - name: Comment on PR with license changes
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
         with:
           script: |
             const fs = require('fs');
@@ -213,7 +224,7 @@ jobs:
 
       - name: Create issue for license violations
         if: failure() && github.event_name == 'schedule'
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
         with:
           script: |
             const fs = require('fs');

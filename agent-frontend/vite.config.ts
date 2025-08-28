@@ -55,4 +55,5 @@ export default defineConfig(async () => {
         transformMixedEsModules: true,
       },
     },
-}));
+  };
+});

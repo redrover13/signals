@@ -9,3 +9,34 @@
  * @license MIT
  */
 
+/**
+ * GCP (Google Cloud Platform) utility functions
+ * Provides common GCP service integrations
+ */
+
+/**
+ * Query BigQuery
+ */
+export async function query(sql: string, params?: Record<string, unknown>): Promise<unknown[]> {
+  // TODO: Implement BigQuery client
+  console.log('BigQuery query:', sql, params);
+  return [];
+}
+
+/**
+ * Insert rows into BigQuery table
+ */
+export async function insertRows(table: string, rows: Record<string, unknown>[]): Promise<void> {
+  // TODO: Implement BigQuery insert
+  console.log('BigQuery insert:', table, rows);
+}
+
+/**
+ * Upload string to Cloud Storage
+ */
+export async function uploadString(path: string, contents: string, contentType?: string): Promise<string> {
+  // TODO: Implement Cloud Storage upload
+  console.log('Cloud Storage upload:', path, contentType);
+  return `gs://${path}`;
+}
+

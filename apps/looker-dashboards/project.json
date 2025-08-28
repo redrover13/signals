@@ -21,6 +21,12 @@
       "options": {
         "jestConfig": "apps/looker-dashboards/jest.config.ts"
       }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["apps/looker-dashboards/**/*.{ts,tsx,js,jsx}"]
+      }
     }
   }
 }

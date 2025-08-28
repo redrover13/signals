@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@8095b2b9580c96f4e9a8177bec82d79210851024 # v4.0.0
+        uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
         with:
           version: 8
 
@@ -180,7 +180,7 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@8095b2b9580c96f4e9a8177bec82d79210851024 # v4.0.0
+        uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
 
       - name: Setup Node.js
         uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1

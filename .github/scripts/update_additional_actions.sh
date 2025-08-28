@@ -23,6 +23,7 @@ AMANNN_SEMANTIC_PR_SHA="c3dd2c1cb7502571eec2d79827d0449af3fded7b" # v5.4.0
 GOOGLE_DEPLOY_CLOUDFUNCTIONS_SHA="e9c908f92a2374208c315607f51f2285c59ca4eb" # v2.1.2
 GOOGLE_DEPLOY_CLOUDRUN_SHA="97a9e1c83a2a3d2476a25be6bd83aefa1ee8ade5" # v2.1.0
 FOUNTAINHEAD_WAIT_FOR_CHECK_SHA="2b3d73762755cd85a72a8c8de76ca84df5bf7a6d" # v1.2.0
+PNPM_ACTION_SETUP_SHA="b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9" # v4.0.2
 
 # Function to update workflow files with additional pinned SHAs
 update_additional_actions() {
@@ -55,6 +56,7 @@ update_additional_actions() {
   sed -i 's|uses: gitleaks/gitleaks-action@v2|uses: gitleaks/gitleaks-action@'"$GITLEAKS_ACTION_SHA"' # v2.3.2|g' "$file"
   sed -i 's|uses: amannn/action-semantic-pull-request@v5|uses: amannn/action-semantic-pull-request@'"$AMANNN_SEMANTIC_PR_SHA"' # v5.4.0|g' "$file"
   sed -i 's|uses: fountainhead/action-wait-for-check@v1|uses: fountainhead/action-wait-for-check@'"$FOUNTAINHEAD_WAIT_FOR_CHECK_SHA"' # v1.2.0|g' "$file"
+  sed -i 's|uses: pnpm/action-setup@v4|uses: pnpm/action-setup@'"$PNPM_ACTION_SETUP_SHA"' # v4.0.2|g' "$file"
   
   echo "✅ Updated additional actions in $file"
 }

@@ -9,4 +9,4 @@
  * @license MIT
  */
 
-console.log('Hello World');
+// Reviews API Cloud Function entry point

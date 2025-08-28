@@ -60,8 +60,6 @@ jobs:
             project: saigon-signals
           - environment: staging
             project: saigon-signals-staging
-      - name: Checkout code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
     steps:
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
@@ -235,13 +233,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - name: Setup Node.js & pnpm
+      - name: Setup pnpm
         uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          version: 8
+          run_install: false
 
       - name: Setup pnpm cache
         uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
@@ -251,10 +247,15 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
-
+          
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       # Performance testing with k6 or similar
       - name: Performance Testing
@@ -363,13 +364,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - name: Setup Node.js & pnpm
+      - name: Setup pnpm
         uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          version: 8
+          run_install: false
 
       - name: Setup pnpm cache
         uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
@@ -379,10 +378,15 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
-
+          
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       # Dependency vulnerability scan
       - name: Dependency Security Scan
@@ -484,8 +488,6 @@ jobs:
     if: github.event.schedule == '0 6 * * *' || inputs.check_type == 'comprehensive'
     strategy:
       matrix:
-      - name: Checkout code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         environment: [production, staging]
         include:
           - environment: production
@@ -493,6 +495,9 @@ jobs:
           - environment: staging
             project: saigon-signals-staging
     steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
         with:

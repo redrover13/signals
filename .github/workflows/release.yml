@@ -61,13 +61,11 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Node.js & pnpm
+      - name: Setup pnpm
         uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          version: 8
+          run_install: false
 
       - name: Setup pnpm cache
         uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
@@ -77,10 +75,15 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
-
+          
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       # Determine if we should create a release
       - name: Check release conditions
@@ -190,13 +193,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js & pnpm
+      - name: Setup pnpm
         uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          version: 8
+          run_install: false
 
       - name: Setup pnpm cache
         uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
@@ -206,10 +207,15 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
-
+          
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       # Run comprehensive tests
       - name: Run test suite

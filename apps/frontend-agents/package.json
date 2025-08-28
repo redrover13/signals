@@ -1,0 +1,35 @@
+{
+  "name": "frontend-agents",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "bq-agent": "workspace:*",
+    "content-agent": "workspace:*",
+    "crm-agent": "workspace:*",
+    "gemini-orchestrator": "workspace:*",
+    "looker-agent": "workspace:*",
+    "reviews-agent": "workspace:*",
+    "gcp": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5",
+    "tailwindcss": "^3.4.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
+    "@nx/next": "21.4.0"
+  }
+}

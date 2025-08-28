@@ -9,4 +9,4 @@
  * @license MIT
  */
 
-console.log('Hello World');
+// Social API Cloud Function entry point

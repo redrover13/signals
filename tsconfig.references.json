@@ -1,0 +1,86 @@
+{
+  "extends": "./tsconfig.base.json",
+  "files": [],
+  "references": [
+    {
+      "path": "./libs/mcp"
+    },
+    {
+      "path": "./libs/gcp"
+    },
+    {
+      "path": "./libs/build-tools"
+    },
+    {
+      "path": "./libs/agents-sdk"
+    },
+    {
+      "path": "./libs/adk"
+    },
+    {
+      "path": "./apps/looker-dashboards"
+    },
+    {
+      "path": "./apps/frontend-agents"
+    },
+    {
+      "path": "./apps/api"
+    },
+    {
+      "path": "./apps/agents"
+    },
+    {
+      "path": "./libs/utils/signals"
+    },
+    {
+      "path": "./libs/utils/monitoring"
+    },
+    {
+      "path": "./libs/utils/gcp-auth"
+    },
+    {
+      "path": "./libs/utils/api-clients"
+    },
+    {
+      "path": "./libs/data-models/schemas"
+    },
+    {
+      "path": "./libs/data-models/dbt-models"
+    },
+    {
+      "path": "./libs/agents/reviews-agent"
+    },
+    {
+      "path": "./libs/agents/looker-agent"
+    },
+    {
+      "path": "./libs/agents/gemini-orchestrator"
+    },
+    {
+      "path": "./libs/agents/crm-agent"
+    },
+    {
+      "path": "./libs/agents/content-agent"
+    },
+    {
+      "path": "./libs/agents/bq-agent"
+    },
+    {
+      "path": "./apps/cloud-functions/social-api"
+    },
+    {
+      "path": "./apps/cloud-functions/reviews-api"
+    },
+    {
+      "path": "./apps/cloud-functions/crm-api"
+    },
+    {
+      "path": "./apps/cloud-functions/cms-api"
+    }
+  ],
+  "exclude": [
+    "node_modules",
+    "tmp",
+    "dist"
+  ]
+}

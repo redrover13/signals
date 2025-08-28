@@ -3,6 +3,7 @@
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
  * Contains implementation for TypeScript functionality.
+ * This component is federated and can be used by other applications.
  *
  * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
@@ -15,6 +16,7 @@ import { useState } from 'react';
 
 interface AgentInterfaceProps {
   agentId: string;
+  isFederated?: boolean; // Flag to indicate if this component is being used via federation
 }
 
 interface Message {
@@ -24,7 +26,7 @@ interface Message {
   timestamp: Date;
 }
 
-export default function AgentInterface({ agentId }: AgentInterfaceProps) {
+export default function AgentInterface({ agentId, isFederated = false }: AgentInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);

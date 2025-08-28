@@ -1,0 +1,15 @@
+/**
+ * @fileoverview main.d module for the .storybook component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+import type { StorybookConfig } from '@storybook/react-vite';
+declare const config: StorybookConfig;
+export default config;
+//# sourceMappingURL=main.d.ts.map

@@ -3,21 +3,24 @@
   "compilerOptions": {
     "rootDir": ".",
     "baseUrl": ".",
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
     "paths": {
-      "@dulce-de-saigon/agents-lib": ["dist/libs/agents/src/index.d.ts"],
-      "@dulce/adk": ["dist/adk/index.d.ts"],
-      "@dulce/gcp": ["dist/libs/gcp/src/index.d.ts"],
-      "@nx-monorepo/agents/gemini-orchestrator": [
-        "dist/libs/agents/gemini-orchestrator/src/index.d.ts"
-      ],
-      "@nx-monorepo/bq-agent": ["dist/libs/agents/bq-agent/src/index.d.ts"],
-      "@nx-monorepo/content-agent": ["dist/libs/agents/content-agent/src/index.d.ts"],
-      "@nx-monorepo/crm-agent": ["dist/libs/agents/crm-agent/src/index.d.ts"],
-      "@nx-monorepo/gemini-orchestrator": ["dist/libs/agents/gemini-orchestrator/src/index.d.ts"],
-      "@nx-monorepo/looker-agent": ["dist/libs/agents/looker-agent/src/index.d.ts"],
-      "@nx-monorepo/mcp": ["dist/libs/mcp/src/index.ts"],
-      "@nx-monorepo/reviews-agent": ["dist/libs/agents/reviews-agent/src/index.d.ts"],
-      "@nx-monorepo/utils/monitoring": ["dist/libs/utils/monitoring/src/index.d.ts"],
+      "@dulce-de-saigon/agents-lib": ["libs/agents/src/index.ts"],
+      "@dulce/adk": ["libs/adk/src/index.ts"],
+      "@dulce/gcp": ["libs/gcp/src/index.ts"],
+      "@nx-monorepo/agents/gemini-orchestrator": ["libs/agents/gemini-orchestrator/src/index.ts"],
+      "@nx-monorepo/bq-agent": ["libs/agents/bq-agent/src/index.ts"],
+      "@nx-monorepo/content-agent": ["libs/agents/content-agent/src/index.ts"],
+      "@nx-monorepo/crm-agent": ["libs/agents/crm-agent/src/index.ts"],
+      "@nx-monorepo/gemini-orchestrator": ["libs/agents/gemini-orchestrator/src/index.ts"],
+      "@nx-monorepo/looker-agent": ["libs/agents/looker-agent/src/index.ts"],
+      "@nx-monorepo/mcp": ["libs/mcp/src/index.ts"],
+      "@nx-monorepo/reviews-agent": ["libs/agents/reviews-agent/src/index.ts"],
+      "@nx-monorepo/utils/monitoring": ["libs/utils/monitoring/src/index.ts"],
+      "@nx-monorepo/utils/signals": ["libs/utils/signals/index.ts"],
       "@signals/build-tools": ["libs/build-tools/src/index.ts"],
       "agents-sdk": ["libs/agents-sdk/src/index.ts"],
       "dbt-models": ["libs/data-models/dbt-models/src/index.ts"],
@@ -28,19 +31,24 @@
       "vertex-agents": ["infra/terraform/vertex-agents/src/index.ts"]
     },
     "outDir": "./dist/out-tsc",
-    "sourceMap": true,
-    "declaration": true,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "ES2020",
     "module": "ESNext",
-    "lib": ["ES2020"],
+    "lib": ["ES2020", "dom"],
     "skipLibCheck": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
   },
   "exclude": ["node_modules", "tmp"],
-  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", "**/*.js"]
+  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", "**/*.js"],
+  "references": [
+    { "path": "./tsconfig.references.json" }
+  ]
 }

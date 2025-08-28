@@ -12,6 +12,8 @@
 // Uncomment this line to use CSS modules
 // import styles from './app.module.css';
 import { AgentInterface } from './components/agent-interface';
+import { useState } from 'react';
+import FederationDemo from './federation-demo';
 
 // Configuration - in production, these should come from environment variables
 const agentConfig = {
@@ -28,14 +30,36 @@ const agentConfig = {
 };
 
 export function App() {
+  const [showFederationDemo, setShowFederationDemo] = useState(false);
+
   return (
     <div className="app">
       <header>
         <h1>Dulce de Saigon Agent Frontend</h1>
         <p>Interact with AI agents for BigQuery and Firebase operations</p>
       </header>
+      <nav>
+        <button 
+          onClick={() => setShowFederationDemo(!showFederationDemo)}
+          style={{ 
+            padding: '8px 16px', 
+            background: '#4CAF50', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '4px', 
+            cursor: 'pointer',
+            margin: '10px 0'
+          }}
+        >
+          {showFederationDemo ? 'Show Local Agent Interface' : 'Show Federation Demo'}
+        </button>
+      </nav>
       <main>
-        <AgentInterface config={agentConfig} />
+        {showFederationDemo ? (
+          <FederationDemo agentId="gemini-orchestrator" />
+        ) : (
+          <AgentInterface config={agentConfig} />
+        )}
       </main>
     </div>
   );

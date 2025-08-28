@@ -10,7 +10,9 @@
     "noFallthroughCasesInSwitch": true,
     "noPropertyAccessFromIndexSignature": true,
     "paths": {
-      "@dulce/gcp": ["../../../libs/gcp/src/index.ts"]
+      "@dulce/gcp": [
+        "../../../libs/gcp/src/index.ts"
+      ]
     }
   },
   "files": [],
@@ -22,5 +24,10 @@
     {
       "path": "./tsconfig.spec.json"
     }
+  ],
+  "exclude": [
+    "node_modules",
+    "tmp",
+    "dist"
   ]
 }

@@ -3,7 +3,10 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "declaration": true,
-    "types": ["node", "jest"],
+    "types": [
+      "node",
+      "jest"
+    ],
     "target": "es2022",
     "module": "commonjs",
     "moduleResolution": "node",
@@ -14,8 +17,19 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "composite": true,
+    "declarationMap": true
   },
-  "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts", "test-setup.ts", "jest.setup.ts"],
-  "include": ["**/*.ts"]
+  "exclude": [
+    "jest.config.ts",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "test-setup.ts",
+    "jest.setup.ts"
+  ],
+  "include": [
+    "**/*.ts",
+    "src/**/*"
+  ]
 }

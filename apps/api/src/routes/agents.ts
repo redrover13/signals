@@ -11,7 +11,7 @@
 
 import { FastifyInstance } from 'fastify';
 
-export async function agentsRoutes(app: FastifyInstance) {
+export async function agentsRoutes(app: FastifyInstance): Promise<void> {
   app.post('/start', async (req) => {
     const task = (req.body as any)?.task ?? 'default task';
     // TODO: Implement PubSub integration

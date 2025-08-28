@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/mcp/src",
   "projectType": "library",
+  "implicitDependencies": ["gemini-orchestrator", "monitoring"],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
@@ -12,14 +13,18 @@
         "main": "libs/mcp/src/index.ts",
         "tsConfig": "libs/mcp/tsconfig.lib.json",
         "assets": ["libs/mcp/*.md"]
-      }
+      },
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     },
     "lint": {
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["libs/mcp/**/*.ts"]
-      }
+      },
+      "cache": true
     },
     "test": {
       "executor": "@nx/jest:jest",
@@ -27,7 +32,8 @@
       "options": {
         "jestConfig": "libs/mcp/jest.config.ts",
         "passWithNoTests": true
-      }
+      },
+      "cache": true
     }
   },
   "tags": []

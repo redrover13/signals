@@ -32,7 +32,7 @@ interface SearchResponse {
   totalMatches: number;
 }
 
-export async function searchRoutes(fastify: FastifyInstance) {
+export async function searchRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post(
     '/semantic-code-search',
     async function (request: FastifyRequest, reply: FastifyReply) {
@@ -60,8 +60,8 @@ export async function searchRoutes(fastify: FastifyInstance) {
         };
 
         return reply.send(response);
-      } catch (_error: any) {
-        fastify.log.error('Search error:', _error);
+      } catch (error: any) {
+        fastify.log.error('Search error:', error);
         return reply.status(500).send({
           error: 'Internal server error during search',
         });
@@ -171,7 +171,7 @@ async function searchInFile(
     }
 
     return null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }

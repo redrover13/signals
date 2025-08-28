@@ -112,7 +112,11 @@
     },
     "lint": {
       "cache": true,
-      "inputs": ["default", "{workspaceRoot}/.eslintrc.json", "{workspaceRoot}/tools/eslint-rules/**/*"],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json",
+        "{workspaceRoot}/tools/eslint-rules/**/*"
+      ],
       "outputs": ["{options.outputFile}"]
     },
     "test": {
@@ -143,7 +147,20 @@
   },
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
-    "production": ["default", "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)", "!{projectRoot}/tsconfig.spec.json", "!{projectRoot}/jest.config.[jt]s", "!{projectRoot}/src/test-setup.[jt]s", "!{projectRoot}/.eslintrc.json", "!{projectRoot}/eslint.config.js"],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/src/test-setup.[jt]s",
+      "!{projectRoot}/.eslintrc.json",
+      "!{projectRoot}/eslint.config.js"
+    ],
     "sharedGlobals": ["{workspaceRoot}/babel.config.json"]
+  },
+  "release": {
+    "version": {
+      "preVersionCommand": "pnpm dlx nx run-many -t build"
+    }
   }
 }

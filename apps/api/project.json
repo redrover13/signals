@@ -18,6 +18,7 @@
       }
     },
     "lint": {
+      "executor": "@nx/eslint:lint",
       "options": {
         "args": ["**/*.{ts,tsx,js,jsx}"]
       }

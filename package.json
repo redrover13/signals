@@ -14,7 +14,11 @@
     "mcp:build": "pnpm nx build mcp",
     "mcp:test": "pnpm nx test mcp --testTimeout=30000",
     "mcp:health": "pnpm exec ts-node -e \"import('@nx-monorepo/mcp').then(m => m.testMCPConnectivity().then(console.log))\"",
-    "validate:encoding": "node scripts/validate-encoding.js"
+    "validate:encoding": "node scripts/validate-encoding.js",
+    "codeql:check": "./scripts/simulate-codeql.sh",
+    "codeql:fix": "node scripts/fix-codeql-issues.js",
+    "hooks:install": "./scripts/install-hooks.sh",
+    "postinstall": "pnpm hooks:install"
   },
   "devDependencies": {
     "@nx/esbuild": "21.4.0",
@@ -76,6 +80,7 @@
     "@google-cloud/secret-manager": "^6.1.0",
     "@google-cloud/storage": "7.16.0",
     "@modelcontextprotocol/sdk": "^1.17.3",
+    "@nx/eslint-plugin": "^21.4.1",
     "chalk": "^5.6.0",
     "diff": "^8.0.2",
     "fastify": "^5.5.0",
@@ -91,6 +96,6 @@
   },
   "packageManager": "pnpm@10.0.0",
   "engines": {
-    "node": ">=18 <21 || >=22"
+    "node": ">=20"
   }
 }

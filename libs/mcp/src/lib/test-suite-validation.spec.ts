@@ -119,7 +119,7 @@ describe('Test Suite Validation', () => {
       try {
         // This is a direct validation of the jest config
         // In practice, we'd need to handle how to load the config properly
-        const path = require('path');
+        // Using the already imported path module (from ES Modules)
         
         // Check if jest.config.js exists
         const jestConfigPath = path.join(__dirname, '../../jest.config.ts');

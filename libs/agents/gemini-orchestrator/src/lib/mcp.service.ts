@@ -1,4 +1,15 @@
 /**
+ * @fileoverview mcp.service module for the lib component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
  * MCP Service - Main Facade
  * Provides a simplified interface for all MCP operations
  */
@@ -102,7 +113,7 @@ export class MCPService {
         maxRetries: options?.retries || 2,
         retryDelay: 1000,
         exponentialBackoff: true,
-        onRetry: (attempt, error) => {
+        onRetry: (attempt: any, error: any) => {
           console.warn(`Retrying MCP request ${request.id}, attempt ${attempt}:`, error.message);
         },
       },

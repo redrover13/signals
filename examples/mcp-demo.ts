@@ -1,4 +1,15 @@
 /**
+ * @fileoverview mcp-demo module for the examples component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
  * MCP Integration Demo
  * Demonstrates how to use the MCP system in the Signals project
  */

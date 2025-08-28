@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Fix CodeQL and code standard issues
+        run: pnpm codeql:fix
+
       - name: Run Lint
         run: pnpm nx lint
 

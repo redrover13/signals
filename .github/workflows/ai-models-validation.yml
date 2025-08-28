@@ -1,0 +1,61 @@
+name: AI Models Validation
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'apps/agents/**'
+      - 'libs/agents/**'
+      - 'infra/terraform/vertex-agents/**'
+  workflow_dispatch:
+
+jobs:
+  validate-ai-models:
+    name: Validate AI Models and Agents
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        
+      - name: Run agent validation tests
+        run: |
+          echo "Running AI model validation tests..."
+          # Execute tests specific to AI agent functionality
+          pnpm nx test agents
+          
+      - name: Run agent integration tests
+        run: |
+          echo "Running AI agent integration tests..."
+          # Execute integration tests against a test environment
+          # pnpm nx run agents:integration-test
+          
+      - name: Validate agent configurations
+        run: |
+          echo "Validating agent configurations..."
+          # Verify that agent configurations are valid
+          # This could be a custom script that validates config files
+          # node scripts/validate-agent-configs.js

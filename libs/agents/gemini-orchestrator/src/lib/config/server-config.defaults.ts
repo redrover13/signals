@@ -1,4 +1,15 @@
 /**
+ * @fileoverview server-config.defaults module for the config component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
  * Default Server Configurations
  * Provides standardized configurations for MCP servers to ensure consistency and maintainability.
  */

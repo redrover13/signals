@@ -1,0 +1,70 @@
+name: Bundle Size Monitoring
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'apps/frontend-agents/**'
+      - 'libs/**/*.ts'
+      - 'libs/**/*.tsx'
+
+jobs:
+  analyze:
+    name: Analyze Bundle Size
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Next.js application
+        run: pnpm nx build frontend-agents
+        
+      - name: Analyze bundle
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            
+            try {
+              // Read the Next.js build output stats
+              const stats = JSON.parse(fs.readFileSync('./apps/frontend-agents/.next/build-manifest.json', 'utf8'));
+              
+              let comment = '## Bundle Size Analysis\n\n';
+              comment += 'The following changes to bundle sizes were detected:\n\n';
+              
+              // This is simplified - you'd want to compare with the previous build
+              // and only report significant changes
+              comment += '| Page | Size |\n';
+              comment += '| ---- | ---- |\n';
+              
+              Object.keys(stats.pages).forEach(page => {
+                // This is a placeholder - you'd want to calculate actual sizes
+                comment += `| ${page} | Analyze required |\n`;
+              });
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+              
+            } catch (error) {
+              console.error('Error analyzing bundle size:', error);
+            }

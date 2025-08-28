@@ -1,3 +1,14 @@
+/**
+ * @fileoverview test-setup module for the src component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
 // Jest test setup file for MCP library
 // This file is executed before running tests
 

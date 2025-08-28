@@ -1,4 +1,15 @@
 /**
+ * @fileoverview mcp-client.service module for the lib component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
  * MCP Client Service
  * Main service for managing MCP server connections and requests
  */

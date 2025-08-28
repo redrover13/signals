@@ -1,0 +1,6 @@
+# Copy this file to terraform.tfvars and fill in your values
+
+project_id           = "saigon-signals"
+region              = "asia-southeast1"
+environment         = "prod"
+enable_custom_models = false

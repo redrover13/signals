@@ -650,15 +650,20 @@
         "type": "secret-manager",
         "secretName": "github-token-${NODE_ENV:-development}"
       }
+    },
+    "codacy": {
+      "enabled": true,
+      "apiUrl": "https://api.codacy.com",
+      "token": "secret-manager:CODACY_API_TOKEN"
     }
   },
   "monitoring": {
-    "healthChecks": {
+    "logging": {
       "enabled": true,
-      "interval": "${HEALTH_CHECK_INTERVAL:-60000}",
-      "timeout": "${HEALTH_CHECK_TIMEOUT:-10000}",
-      "retries": 3,
-      "endpoints": ["/health", "/ready", "/metrics"]
+      "level": "${LOGGING_LEVEL:-info}",
+      "destination": "${LOGGING_DESTINATION:-stdout}",
+      "includeRequestResponse": true,
+      "structured": true
     },
     "metrics": {
       "enabled": true,

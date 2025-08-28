@@ -8,8 +8,6 @@ jobs:
   auto-label:
     name: Auto-label PR
     runs-on: ubuntu-latest
-    env:
-      STORE_PATH: $(pnpm store path)
     permissions:
       pull-requests: write
     steps:
@@ -18,20 +16,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-          
       - name: Setup pnpm
         uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
         with:
           version: 8
           run_install: false
-          
+
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Get affected projects
         id: affected
@@ -40,69 +38,34 @@ jobs:
           echo "affected_projects=$AFFECTED_PROJECTS" >> $GITHUB_OUTPUT
 
       - name: Label based on affected projects
-        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffb3087d91ff2b # v7.0.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup pnpm cache
-        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
-        with:
-          path: |
-            ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
           script: |
-            const affectedProjects = '${{ steps.affected.outputs.affected_projects }}'.split(' ');
-            console.log('Affected projects:', affectedProjects);
-            
-            const labelMap = {
-              'api': 'scope: api',
-              'agents': 'scope: agents',
-              'frontend-agents': 'scope: frontend',
-              'looker-dashboards': 'scope: analytics',
-              'data-models': 'scope: data-models',
-              'gcp': 'scope: infrastructure',
-              'adk': 'scope: agent-dev-kit'
-            };
-            
-            const labels = [];
-            
-            // Add labels based on affected projects
-            affectedProjects.forEach(project => {
-              // Extract project name from potentially full path
-              const projectName = project.split('/').pop();
-              if (labelMap[projectName]) {
-                labels.push(labelMap[projectName]);
-              }
-            });
-            
-            // Add size label based on PR size
-            const { data: files } = await github.rest.pulls.listFiles({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-            });
-            
-            const changes = files.reduce((acc, file) => acc + file.changes, 0);
-            
-            if (changes < 10) {
-              labels.push('size: XS');
-            } else if (changes < 50) {
-              labels.push('size: S');
-            } else if (changes < 200) {
-              labels.push('size: M');
-            } else if (changes < 500) {
-              labels.push('size: L');
-            } else {
-              labels.push('size: XL');
+            const affectedProjects = process.env.AFFECTED_PROJECTS.split(',').map(p => p.trim());
+            const labels = new Set();
+
+            if (affectedProjects.includes('api')) {
+              labels.add('api');
             }
-            
-            if (labels.length > 0) {
-              github.rest.issues.addLabels({
+            if (affectedProjects.some(p => p.startsWith('frontend-'))) {
+              labels.add('frontend');
+            }
+            if (affectedProjects.some(p => p.startsWith('cloud-functions/'))) {
+              labels.add('cloud-function');
+            }
+            if (affectedProjects.some(p => p.startsWith('libs/'))) {
+              labels.add('library');
+            }
+            if (affectedProjects.some(p => p.startsWith('infra/'))) {
+              labels.add('infrastructure');
+            }
+
+            if (labels.size > 0) {
+              await github.rest.issues.addLabels({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                labels: labels
+                labels: Array.from(labels)
               });
             }

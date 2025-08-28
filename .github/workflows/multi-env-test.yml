@@ -39,11 +39,6 @@ jobs:
         with:
           version: 8
 
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
-        with:
-          node-version: ${{ matrix.node-version }}
-
       - name: Setup pnpm cache
         uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
         with:
@@ -52,10 +47,15 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-          cache: 'pnpm'
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Run type checking
         run: pnpm nx run-many -t type-check --all --parallel=3
@@ -107,40 +107,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - name: Setup Node.js
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
         with:
-          node-version: '20'
-
-      - name: Check Node.js compatibility
-        run: |
-          echo "Checking Node.js version compatibility..."
-          
-          # Check package.json engines field
-          REQUIRED_NODE=$(node -p "require('./package.json').engines?.node || 'not specified'")
-          echo "Required Node.js version: $REQUIRED_NODE"
-          
-          # Check for Node.js specific APIs usage
-          echo "Checking for Node.js version-specific APIs..."
-          
-          # Check for newer APIs that might not be available in older versions
-          grep -r "fetch(" --include="*.ts" --include="*.js" . || echo "No fetch() usage found"
-          grep -r "AbortController" --include="*.ts" --include="*.js" . || echo "No AbortController usage found"
-          grep -r "structuredClone" --include="*.ts" --include="*.js" . || echo "No structuredClone usage found"
-
-      - name: Check dependency compatibility
-        run: |
-          echo "Checking dependency compatibility..."
-          
-          # Check for dependencies that might have Node.js version requirements
-          npx check-node-version --package
-
-      - name: Generate compatibility report
-        run: |
-          echo "# Multi-Environment Test Results" > compatibility-report.md
-          echo "" >> compatibility-report.md
-          echo "**Test Date:** $(date -u)" >> compatibility-report.md
-          echo "**Commit:** ${{ github.sha }}" >> compatibility-report.md
+          version: 8
+          run_install: false
 
       - name: Setup pnpm cache
         uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
@@ -150,6 +121,15 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
           echo "" >> compatibility-report.md
           
           echo "## Node.js Version Support" >> compatibility-report.md
@@ -181,15 +161,27 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
+        with:
+          version: 8
+          run_install: false
+
+      - name: Setup pnpm cache
+        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Setup Node.js
         uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
           node-version: '20'
-          cache: 'pnpm'
+          cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Run performance benchmarks
         run: |

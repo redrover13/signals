@@ -163,20 +163,6 @@ jobs:
         with:
           version: 8
 
-      - name: Setup Node.js
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --frozen-lockfile
-
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
-
       - name: Setup pnpm cache
         uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
         with:
@@ -185,6 +171,20 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Deploy Social API Function
@@ -243,24 +243,6 @@ jobs:
         with:
           version: 8
 
-      - name: Setup Node.js
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --frozen-lockfile
-
-      - name: Build Frontend
-        run: pnpm nx build frontend-agents
-
-      - name: Deploy to Google Cloud Run (Example)
-        uses: google-github-actions/deploy-cloudrun@97a9e1c83a2a3d2476a25be6bd83aefa1ee8ade5 # v2.1.0
-        with:
-          service: frontend-agents
-          image: gcr.io/${{ env.GCP_PROJECT_ID }}/frontend-agents:${{ github.sha }}
-
       - name: Setup pnpm cache
         uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
         with:
@@ -269,9 +251,49 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Frontend
+        run: pnpm nx build frontend-agents
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@988b5a0280414f521da01fcc63a27aeeb4b104db # v3.0.0
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@98ddc00a17442afd5cc98e3bc12d837f362fca33 # v2.1.0
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker --quiet
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/frontend-agents:${{ github.sha }} \
+            -t gcr.io/${{ env.GCP_PROJECT_ID }}/frontend-agents:latest \
+            -f apps/frontend-agents/Dockerfile .
+          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/frontend-agents:${{ github.sha }}
+          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/frontend-agents:latest
+
+      - name: Deploy to Google Cloud Run
+        uses: google-github-actions/deploy-cloudrun@97a9e1c83a2a3d2476a25be6bd83aefa1ee8ade5 # v2.1.0
+        with:
+          service: frontend-agents
+          image: gcr.io/${{ env.GCP_PROJECT_ID }}/frontend-agents:${{ github.sha }}
           region: ${{ env.GCP_REGION }}
-          project_id: ${{ env.GCP_PROJECT_ID }}
-          # Add other Cloud Run specific configurations as needed
+          platform: managed
 
   deploy-agents:
     runs-on: ubuntu-latest
@@ -289,20 +311,6 @@ jobs:
         with:
           version: 8
 
-      - name: Setup Node.js
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --frozen-lockfile
-
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
-
       - name: Setup pnpm cache
         uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
         with:
@@ -311,6 +319,20 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Build Agents

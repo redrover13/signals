@@ -18,28 +18,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - name: Setup Node.js
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-          
       - name: Setup pnpm
         uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
         with:
           version: 8
           run_install: false
-          
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --frozen-lockfile
-
-      - name: Build Next.js application
-        run: pnpm nx build frontend-agents
-        
-      - name: Analyze bundle
-        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup pnpm cache
         uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
@@ -49,6 +32,23 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Next.js application
+        run: pnpm nx build frontend-agents
+        
+      - name: Analyze bundle
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
             

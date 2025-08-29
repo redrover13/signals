@@ -3,7 +3,10 @@
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "agent-frontend/src",
   "projectType": "application",
-  "tags": [],
+  "tags": [
+    "domain:agent-frontend",
+    "type:application"
+  ],
   "targets": {
     "test": {
       "executor": "@nx/jest:jest",
@@ -12,13 +15,46 @@
       ],
       "options": {
         "jestConfig": "agent-frontend/jest.config.ts"
-      }
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      },
+      "inputs": [
+        "default",
+        "^default",
+        "{workspaceRoot}/jest.preset.js"
+      ],
+      "cache": true
     },
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["agent-frontend/**/*.{ts,tsx,js,jsx}"]
-      }
+        "lintFilePatterns": [
+          "agent-frontend/**/*.{ts,tsx,js,jsx}"
+        ]
+      },
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json"
+      ],
+      "cache": true
     }
+  },
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/.eslintrc.json"
+    ],
+    "sharedGlobals": []
   }
 }

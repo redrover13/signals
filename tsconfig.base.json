@@ -20,7 +20,7 @@
       "@nx-monorepo/mcp": ["libs/mcp/src/index.ts"],
       "@nx-monorepo/reviews-agent": ["libs/agents/reviews-agent/src/index.ts"],
       "@nx-monorepo/utils/monitoring": ["libs/utils/monitoring/src/index.ts"],
-      "@nx-monorepo/utils/signals": ["libs/utils/signals/index.ts"],
+      "@nx-monorepo/utils/signals": ["libs/utils/signals/src/index.ts"],
       "@signals/build-tools": ["libs/build-tools/src/index.ts"],
       "agents-sdk": ["libs/agents-sdk/src/index.ts"],
       "dbt-models": ["libs/data-models/dbt-models/src/index.ts"],

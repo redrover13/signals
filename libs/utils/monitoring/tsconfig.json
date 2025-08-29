@@ -18,6 +18,9 @@
     },
     {
       "path": "./tsconfig.spec.json"
+    },
+    {
+      "path": "../../agents/gemini-orchestrator/tsconfig.lib.json"
     }
   ],
   "exclude": [

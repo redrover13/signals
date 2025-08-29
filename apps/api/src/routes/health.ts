@@ -79,7 +79,7 @@ export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
         timestamp,
         uptime,
         version: '1.0.0',
-        environment: process.env.NODE_ENV || 'development',
+        environment: process.env['NODE_ENV'] || 'development',
         system: {
           nodeVersion,
           platform,
@@ -98,7 +98,8 @@ export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
         }
       });
     } catch (error) {
-      fastify.log.error('Health check failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      fastify.log.error('Health check failed:', errorMessage);
       return reply.code(500).send({
         status: 'error',
         message: 'Health check failed',
@@ -134,7 +135,8 @@ async function checkFilesystem(): Promise<{status: string, message: string}> {
     await fs.unlink(tempFile);
     return { status: 'ok', message: 'Filesystem accessible' };
   } catch (error) {
-    return { status: 'error', message: `Filesystem error: ${error.message}` };
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return { status: 'error', message: `Filesystem error: ${errorMessage}` };
   }
 }
 

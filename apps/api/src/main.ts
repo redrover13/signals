@@ -17,7 +17,7 @@ import { searchRoutes } from './routes/search';
 // Dynamic import to avoid circular dependencies
 let mcpService: any = null;
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const PORT = process.env['PORT'] ? parseInt(process.env['PORT'], 10) : 3000;
 const fastify = Fastify({ logger: true });
 
 fastify.register(healthRoutes, { prefix: '/health' });
@@ -39,7 +39,8 @@ async function initializeApp(): Promise<void> {
       console.log('✅ MCP service initialized successfully');
       console.log('📊 Enabled servers:', mcpService.getEnabledServers());
     } catch (mcpError) {
-      console.warn('⚠️  MCP service initialization failed, continuing without MCP:', mcpError.message);
+      const errorMessage = mcpError instanceof Error ? mcpError.message : 'Unknown error';
+      console.warn('⚠️  MCP service initialization failed, continuing without MCP:', errorMessage);
       console.log('📋 Server will start without MCP functionality');
     }
 

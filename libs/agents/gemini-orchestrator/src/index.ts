@@ -11,3 +11,5 @@
 
 export * from './lib/gemini-orchestrator';
 export * from './lib/mcp.service';
+export * from './lib/config/environment-config';
+export * from './lib/config/mcp-config.schema';

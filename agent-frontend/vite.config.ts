@@ -35,12 +35,13 @@ export default defineConfig(async ({ mode }) => {
     root: __dirname,
     cacheDir: '../node_modules/.vite/agent-frontend',
     
-    // Define environment variables
+    // Define environment variables safely - only expose needed variables
     define: {
-      'process.env': Object.keys(env).reduce((acc, key) => {
-        acc[key] = env[key];
-        return acc;
-      }, {}),
+      'process.env.NODE_ENV': JSON.stringify(mode),
+      'process.env.VITE_APP_NAME': JSON.stringify(env.VITE_APP_NAME || 'Agent Frontend'),
+      'process.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL || 'http://localhost:3000'),
+      // Add other specific environment variables as needed
+      // Never expose the entire process.env object
     },
     
     server: {

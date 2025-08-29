@@ -10,3 +10,5 @@
  */
 
 export * from './lib/looker-dashboards';
+export * from './lib/dashboard-templates';
+export * from './lib/monitoring-queries';

@@ -22,15 +22,49 @@ import { VertexAIClient, VertexAIClientConfig, RootAgent, createRootAgent } from
 import { BigQueryAgent, createBqAgent } from '@nx-monorepo/bq-agent';
 import { ContentAgent, createContentAgent } from '@nx-monorepo/content-agent';
 import { mcpService } from '@nx-monorepo/mcp';
+<<<<<<< HEAD
+import { 
+  initializeOpenTelemetry, 
+  withSpan, 
+  logEvent, 
+  instrument,
+  getTracer 
+} from '@nx-monorepo/utils/monitoring';
+import { SpanKind } from '@opentelemetry/api';
+
+// Initialize OpenTelemetry before any other imports
+initializeOpenTelemetry({
+  serviceName: 'dulce-de-saigon-agents',
+  serviceVersion: '1.0.0',
+  gcpProjectId: process.env.GCP_PROJECT_ID,
+  enableAutoInstrumentation: true,
+  enableCustomExporter: true,
+  enableBigQueryLogs: true,
+}).catch(console.error);
+=======
 import { getPubSubClient, insertRows } from 'gcp-auth';
 
 // Global agent instances
 let rootAgent: RootAgent;
 let vertexClient: VertexAIClient;
+>>>>>>> main
 
 // Local route implementations for agents project
 async function healthRoutes(fastify: FastifyInstance) {
   fastify.get('/health', async (request: FastifyRequest, reply) => {
+<<<<<<< HEAD
+    return withSpan('health-check', async (span) => {
+      span.setAttributes({
+        'http.method': 'GET',
+        'http.route': '/health',
+        'service.component': 'agents',
+      });
+
+      await logEvent('health_check', { status: 'ok' });
+      
+      return { status: 'ok', timestamp: new Date().toISOString() };
+    }, { kind: SpanKind.SERVER });
+=======
     try {
       const agentStatus = await rootAgent.getStatus();
       return { 
@@ -57,11 +91,32 @@ async function healthRoutes(fastify: FastifyInstance) {
         message: error instanceof Error ? error.message : 'Unknown error',
       });
     }
+>>>>>>> main
   });
 }
 
 async function agentsRoutes(fastify: FastifyInstance) {
+  // Instrument the start endpoint
   fastify.post('/start', async (request: FastifyRequest, reply) => {
+<<<<<<< HEAD
+    return withSpan('agent-task-start', async (span) => {
+      const task = (request.body as any)?.task ?? 'default task';
+      
+      span.setAttributes({
+        'http.method': 'POST',
+        'http.route': '/start',
+        'agent.task': task,
+        'service.component': 'agents',
+      });
+
+      await logEvent('agent_task_started', { 
+        task,
+        requestId: request.id,
+      });
+
+      return { ok: true, task, message: 'Agent task queued' };
+    }, { kind: SpanKind.SERVER });
+=======
       if (agent && agent !== 'root') {
         const target = rootAgent.getSubAgent(agent);
         if (!target) {
@@ -112,27 +167,74 @@ async function agentsRoutes(fastify: FastifyInstance) {
         message: error instanceof Error ? error.message : 'Unknown error',
       });
     }
+>>>>>>> main
   });
 
+  // Instrument the prediction endpoint
   fastify.post('/api/v1/agent-predict', async (request: FastifyRequest, reply) => {
-    try {
-      const instancePayload = request.body;
-      const predictions = await vertexClient.predict(instancePayload);
+    return withSpan('vertex-ai-prediction', async (span) => {
+      try {
+        const instancePayload = request.body;
+        
+        span.setAttributes({
+          'http.method': 'POST',
+          'http.route': '/api/v1/agent-predict',
+          'vertex.endpoint_id': vertexAIConfig.endpointId,
+          'vertex.project': vertexAIConfig.project,
+          'service.component': 'agents',
+        });
 
+<<<<<<< HEAD
+        await logEvent('prediction_request', { 
+          endpointId: vertexAIConfig.endpointId,
+          payloadSize: JSON.stringify(instancePayload).length,
+        });
+=======
       fastify.log.info({
         message: 'Prediction successful',
         config: vertexClient.getConfig(),
       });
+>>>>>>> main
 
-      return { success: true, predictions };
-    } catch (error) {
-      fastify.log.error(error);
-      reply.status(500).send({
-        success: false,
-        message: 'An error occurred during prediction.',
-        error: error instanceof Error ? error.name : 'UnknownError',
-      });
-    }
+        const predictions = await vertexClient.predict(instancePayload);
+
+        span.setAttributes({
+          'vertex.prediction_success': true,
+          'vertex.predictions_count': Array.isArray(predictions) ? predictions.length : 1,
+        });
+
+        fastify.log.info({
+          message: 'Prediction successful',
+          endpointId: vertexAIConfig.endpointId,
+        });
+
+        await logEvent('prediction_success', { 
+          endpointId: vertexAIConfig.endpointId,
+          predictionsCount: Array.isArray(predictions) ? predictions.length : 1,
+        });
+
+        return { success: true, predictions };
+      } catch (error) {
+        span.setAttributes({
+          'vertex.prediction_success': false,
+          'error.type': error instanceof Error ? error.constructor.name : 'Unknown',
+          'error.message': error instanceof Error ? error.message : 'Unknown error',
+        });
+
+        fastify.log.error(error);
+        
+        await logEvent('prediction_error', { 
+          endpointId: vertexAIConfig.endpointId,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        }, 'error');
+
+        reply.status(500).send({
+          success: false,
+          message: 'An error occurred during prediction.',
+          error: error instanceof Error ? error.name : 'UnknownError',
+        });
+      }
+    }, { kind: SpanKind.SERVER });
   });
 
   fastify.post('/api/v1/generate-text', async (request: FastifyRequest, reply) => {
@@ -463,9 +565,40 @@ async function startAgentRunner() {
   }
 }
 
+// Instrument the initialization function
+const instrumentedInitialize = instrument('app-initialization', async () => {
+  console.log('Initializing MCP service...');
+  await mcpService.initialize();
+  console.log('✅ MCP service initialized successfully');
+  console.log('📊 Enabled servers:', mcpService.getEnabledServers());
+
+  // Register routes
+  await fastify.register(healthRoutes);
+  await fastify.register(agentsRoutes);
+
+  const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
+  fastify.listen({ port: PORT, host: '0.0.0.0' }, (err, address) => {
+    if (err) {
+      fastify.log.error(err);
+      process.exit(1);
+    }
+    fastify.log.info(`Agents server listening at ${address}`);
+  });
+}, {
+  attributes: {
+    'service.component': 'agents',
+    'service.initialization': true,
+  }
+});
+
 // Initialize MCP service and start server
 async function initializeApp() {
   try {
+<<<<<<< HEAD
+    await logEvent('app_startup', { 
+      service: 'dulce-de-saigon-agents',
+      version: '1.0.0',
+=======
     console.log('Initializing MCP service...');
     await mcpService.initialize();
     console.log('✅ MCP service initialized successfully');
@@ -497,9 +630,22 @@ async function initializeApp() {
       fastify.log.info(`   POST ${address}/workflow - Execute multi-step workflows`);
       fastify.log.info(`   POST ${address}/api/v1/agent-predict - Legacy Vertex AI predictions`);
       fastify.log.info(`   POST ${address}/api/v1/generate-text - Text generation`);
+>>>>>>> main
     });
+
+    await instrumentedInitialize();
   } catch (error) {
+<<<<<<< HEAD
+    console.error('❌ Failed to initialize MCP service:', error);
+    
+    await logEvent('app_startup_error', { 
+      service: 'dulce-de-saigon-agents',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }, 'error');
+    
+=======
     console.error('❌ Failed to initialize application:', error);
+>>>>>>> main
     process.exit(1);
   }
 }

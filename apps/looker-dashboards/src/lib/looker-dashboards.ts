@@ -12,3 +12,6 @@
 export function lookerDashboards(): string {
   return 'looker-dashboards';
 }
+
+export * from './dashboard-templates';
+export * from './monitoring-queries';

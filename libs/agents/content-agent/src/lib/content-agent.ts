@@ -52,28 +52,40 @@ export class ContentAgent extends DulceLlmAgent {
   /**
    * Generate Vietnamese F&B marketing content
    */
-  async generateContent(contentType: string, requirements: any): Promise<any> {
+  // Define in module scope (above class) or import from a shared types module
+  export interface Requirements {
+    [key: string]: unknown;
+  }
+
+  export interface ContentResponse {
+    content: string;
+    metadata?: Record<string, unknown>;
+  }
+
+  public async generateContent(
+    contentType: string,
+    requirements: Requirements
+  ): Promise<ContentResponse> {
     const prompt = `
-You are a Vietnamese F&B content specialist for the Dulce de Saigon platform.
+  You are a Vietnamese F&B content specialist for the Dulce de Saigon platform.
 
-Content Type: ${contentType}
-Requirements: ${JSON.stringify(requirements, null, 2)}
+  Content Type: ${contentType}
+  Requirements: ${JSON.stringify(requirements, null, 2)}
 
-Please generate content that:
-1. Appeals to Vietnamese food culture and preferences
-2. Uses appropriate Vietnamese terminology where relevant
-3. Follows local marketing practices
-4. Considers dietary restrictions and preferences common in Vietnam
-5. Incorporates seasonal Vietnamese ingredients when appropriate
+  Please generate content that:
+  1. Appeals to Vietnamese food culture and preferences
+  2. Uses appropriate Vietnamese terminology where relevant
+  3. Follows local marketing practices
+  4. Considers dietary restrictions and preferences common in Vietnam
+  5. Incorporates seasonal Vietnamese ingredients when appropriate
 
-Generate engaging, culturally appropriate content for the Vietnamese market.
-    `;
+  Generate engaging, culturally appropriate content for the Vietnamese market.
+      `;
 
-    return this.invoke({
+    return this.invoke<ContentResponse>({
       messages: [{ role: 'user', content: prompt }],
     });
   }
-
   /**
    * Create social media content for Vietnamese restaurants
    */

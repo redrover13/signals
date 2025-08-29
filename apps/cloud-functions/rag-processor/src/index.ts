@@ -1,6 +1,6 @@
 import { CloudEvent, getEventData } from '@google-cloud/functions-framework';
 import { Storage } from '@google-cloud/storage';
-import { VertexAIClient } from '@nx-monorepo/adk';
+import { VertexAIClient } from '../../../libs/adk/src';
 
 interface StorageObjectData {
   bucket: string;

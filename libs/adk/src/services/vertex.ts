@@ -118,7 +118,7 @@ export class VertexAIClient {
   chunkDocument(
     content: string,
     metadata: Record<string, any> = {},
-    chunkSize: number = 1000,
+    chunkSize = 1000,
     overlap: number = 200
   ): DocumentChunk[] {
     const chunks: DocumentChunk[] = [];

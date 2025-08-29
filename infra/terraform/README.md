@@ -10,6 +10,7 @@ The infrastructure is organized into modular components:
 - **BigQuery** (`./bigquery/`): Data warehousing and analytics datasets
 - **Functions** (`./functions/`): Cloud Functions and Cloud Run services
 - **Vertex Agents** (`./vertex-agents/`): AI agents and orchestration
+- **RAG Pipeline** (`./rag-pipeline/`): Retrieval-Augmented Generation data ingestion
 - **Looker** (`./looker/`): Business intelligence and reporting
 
 ## 🚀 Quick Start
@@ -113,6 +114,16 @@ The infrastructure is organized into modular components:
   - BigQuery views for reporting
   - Scheduled report generation
 - **Key Outputs**: Integration URL and export bucket
+
+### RAG Pipeline Module
+- **Purpose**: Retrieval-Augmented Generation data ingestion
+- **Resources**:
+  - Vertex AI Search data store and engine
+  - Cloud Function for document processing
+  - Cloud Storage buckets for documents and chunks
+  - Pub/Sub for event-driven processing
+  - Service accounts with appropriate IAM permissions
+- **Key Outputs**: Search engine ID, storage bucket names, processor function
 
 ## 🔧 Configuration
 

@@ -39,7 +39,7 @@ async function agentsRoutes(fastify: FastifyInstance) {
       return { success: true, predictions };
     } catch (error) {
       fastify.log.error(error);
-      reply.status(500).send({
+      return reply.status(500).send({
         success: false,
         message: 'An error occurred during prediction.',
         error: error instanceof Error ? error.name : 'UnknownError',
@@ -54,9 +54,9 @@ const fastify = Fastify({
 
 // --- Vertex AI Integration ---
 const vertexAIConfig: VertexAIClientConfig = {
-  project: process.env.GCP_PROJECT_ID || '324928471234',
-  location: process.env.GCP_LOCATION || 'us-central1',
-  endpointId: process.env.VERTEX_AI_ENDPOINT_ID || '839281723491823912',
+  project: process.env['GCP_PROJECT_ID'] || '324928471234',
+  location: process.env['GCP_LOCATION'] || 'us-central1',
+  endpointId: process.env['VERTEX_AI_ENDPOINT_ID'] || '839281723491823912',
 };
 
 const vertexClient = new VertexAIClient(vertexAIConfig);
@@ -73,7 +73,7 @@ async function initializeApp() {
     await fastify.register(healthRoutes);
     await fastify.register(agentsRoutes);
 
-    const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
+    const PORT = process.env['PORT'] ? parseInt(process.env['PORT'], 10) : 3001;
     fastify.listen({ port: PORT, host: '0.0.0.0' }, (err, address) => {
       if (err) {
         fastify.log.error(err);

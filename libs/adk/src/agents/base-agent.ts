@@ -63,7 +63,7 @@ export class DulceBaseAgent extends AdkBaseAgent {
   /**
    * Execute agent with context
    */
-  async invoke(context: InvocationContext): Promise<any> {
+  public async invoke(context: InvocationContext): Promise<unknown> {
     console.log(`Executing agent: ${this.name}`);
     
     // Add platform-specific logging and monitoring

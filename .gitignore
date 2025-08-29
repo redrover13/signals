@@ -21,6 +21,9 @@ tmp/
 .pnp.loader.mjs
 *.tsbuildinfo
 
+# Module Federation temp files
+.__mf__temp/
+
 # Logs
 *.log
 logs/

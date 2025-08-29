@@ -20,13 +20,22 @@ import {
  * Content-specialized agent for generating F&B marketing content
  */
 export class ContentAgent extends DulceLlmAgent {
-  constructor() {
+export class ContentAgent extends DulceLlmAgent {
+  constructor(cfg?: { model?: string; apiKey?: string; tools?: Array<unknown> }) {
+    // Guard against missing API key (fail-fast)
+    const apiKey = cfg?.apiKey ?? process.env.GOOGLE_API_KEY;
+    if (!apiKey) {
+      throw new Error('GOOGLE_API_KEY is required to initialize ContentAgent');
+    }
+
+    // Allow overriding the model via cfg, defaulting to 'gemini-1.5-pro'
     const llm = new GeminiLlm({
-      model: 'gemini-1.5-pro',
-      apiKey: process.env.GOOGLE_API_KEY,
+      model: cfg?.model ?? 'gemini-1.5-pro',
+      apiKey,
     });
 
-    const tools = [
+    // Allow injecting custom tools, defaulting to GCS upload + HTTP request
+    const tools = cfg?.tools ?? [
       new GCSUploadTool(),
       new HttpRequestTool(),
     ];
@@ -38,6 +47,7 @@ export class ContentAgent extends DulceLlmAgent {
       tools,
     });
   }
+}
 
   /**
    * Generate Vietnamese F&B marketing content

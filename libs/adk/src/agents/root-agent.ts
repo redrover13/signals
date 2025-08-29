@@ -156,8 +156,8 @@ Available tools: ${GCP_TOOLS.map(tool => tool.name).join(', ')}
   /**
    * Get agent status and health
    */
-  async getStatus(): Promise<any> {
-    const subAgentStatuses = Array.from(this.subAgents.entries()).map(([name, agent]) => ({
+  public async getStatus(): Promise<RootAgentStatus> {
+    const subAgentStatuses: SubAgentStatus[] = Array.from(this.subAgents.entries()).map(([name, agent]) => ({
       name,
       description: agent.getDescription(),
       status: 'active',
@@ -174,6 +174,19 @@ Available tools: ${GCP_TOOLS.map(tool => tool.name).join(', ')}
       totalAgents: subAgentStatuses.length + 1,
       lastCheck: new Date().toISOString(),
     };
+  }
+
+  interface RootAgentStatus {
+    rootAgent: { name: string; description: string; status: string; toolsCount: number };
+    subAgents: SubAgentStatus[];
+    totalAgents: number;
+    lastCheck: string;
+  }
+
+  interface SubAgentStatus {
+    name: string;
+    description: string;
+    status: string;
   }
 }
 

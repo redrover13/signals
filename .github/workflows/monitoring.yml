@@ -45,7 +45,7 @@ jobs:
     name: Health Check
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     if: >
       ${{ 
         github.event_name == 'schedule' ||
@@ -217,7 +217,7 @@ jobs:
     name: Performance Monitoring
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     if: github.event.schedule == '0 6 * * *' || inputs.check_type == 'performance' || inputs.check_type == 'comprehensive'
     strategy:
       matrix:
@@ -236,7 +236,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
         with:
-          version: 8
+          version: 10.0.0
           run_install: false
 
       - name: Setup pnpm cache
@@ -358,7 +358,7 @@ jobs:
     name: Security Monitoring
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     if: github.event.schedule == '0 6 * * *' || inputs.check_type == 'security' || inputs.check_type == 'comprehensive'
     steps:
       - name: Checkout repository
@@ -367,7 +367,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
         with:
-          version: 8
+          version: 10.0.0
           run_install: false
 
       - name: Setup pnpm cache
@@ -484,7 +484,7 @@ jobs:
     name: Infrastructure Monitoring
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     if: github.event.schedule == '0 6 * * *' || inputs.check_type == 'comprehensive'
     strategy:
       matrix:
@@ -558,7 +558,7 @@ jobs:
     name: Monitoring Summary
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     needs: [health-check, performance-check, security-monitoring, infrastructure-monitoring]
     if: always() && (github.event.schedule == '0 6 * * *' || inputs.check_type == 'comprehensive')
     steps:

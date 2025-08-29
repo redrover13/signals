@@ -62,15 +62,28 @@ export class VertexAIClient {
    * Generate embeddings for text content
    */
   async generateEmbeddings(texts: string[]): Promise<EmbeddingResponse> {
-    // TODO: Implement proper Vertex AI embedding generation
+    // Use Vertex AI PredictionServiceClient to generate embeddings
     console.log(`Generating embeddings for ${texts.length} texts`);
-    
-    // Return mock embeddings for now
-    const embeddings = texts.map(() => 
-      Array.from({ length: 768 }, () => Math.random() - 0.5)
-    );
 
-    return { embeddings };
+    const endpoint = `projects/${this.projectId}/locations/${this.location}/publishers/google/models/${this.embeddingModel}`;
+
+    // Prepare the instances for the request
+    const instances = texts.map(text => ({ content: text }));
+
+    const request = {
+      endpoint,
+      instances,
+    };
+
+    try {
+      const [response] = await this.predictionClient.predict(request);
+      // The embeddings are typically in response.predictions
+      const embeddings: number[][] = response.predictions?.map((pred: any) => pred.embeddings || pred.values || []) || [];
+      return { embeddings };
+    } catch (error) {
+      console.error('Error generating embeddings from Vertex AI:', error);
+      throw error;
+    }
   }
 
   /**

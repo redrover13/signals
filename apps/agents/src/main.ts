@@ -12,6 +12,7 @@
 import Fastify, { FastifyInstance, FastifyRequest } from 'fastify';
 import { VertexAIClient, VertexAIClientConfig } from '@nx-monorepo/adk/services/vertex';
 import { mcpService } from '@nx-monorepo/mcp';
+import { getPubSubClient, insertRows } from 'gcp-auth';
 
 // Local route implementations for agents project
 async function healthRoutes(fastify: FastifyInstance) {
@@ -61,6 +62,144 @@ const vertexAIConfig: VertexAIClientConfig = {
 
 const vertexClient = new VertexAIClient(vertexAIConfig);
 
+// --- Agent Runner Service ---
+interface AgentTask {
+  id: string;
+  task: any;
+  agentType: string;
+  priority: string;
+  timestamp: string;
+  source: string;
+}
+
+interface AgentRun {
+  id: string;
+  agent_type: string;
+  task: any;
+  status: 'started' | 'completed' | 'failed';
+  result?: any;
+  started_at: string;
+  completed_at?: string;
+  error_message?: string;
+}
+
+async function processAgentTask(taskMessage: AgentTask) {
+  const run: AgentRun = {
+    id: taskMessage.id,
+    agent_type: taskMessage.agentType,
+    task: taskMessage.task,
+    status: 'started',
+    started_at: new Date().toISOString()
+  };
+
+  try {
+    console.log(`Processing agent task: ${taskMessage.id} (${taskMessage.agentType})`);
+    
+    // Route to appropriate agent based on agent type
+    let result;
+    switch (taskMessage.agentType) {
+      case 'gemini-orchestrator':
+        result = await processGeminiTask(taskMessage.task);
+        break;
+      case 'bq-agent':
+        result = await processBigQueryTask(taskMessage.task);
+        break;
+      case 'content-agent':
+        result = await processContentTask(taskMessage.task);
+        break;
+      case 'crm-agent':
+        result = await processCRMTask(taskMessage.task);
+        break;
+      case 'reviews-agent':
+        result = await processReviewsTask(taskMessage.task);
+        break;
+      default:
+        result = await processDefaultTask(taskMessage.task);
+    }
+
+    run.status = 'completed';
+    run.result = result;
+    run.completed_at = new Date().toISOString();
+
+    console.log(`Agent task completed: ${taskMessage.id}`);
+  } catch (error) {
+    run.status = 'failed';
+    run.error_message = error instanceof Error ? error.message : 'Unknown error';
+    run.completed_at = new Date().toISOString();
+    
+    console.error(`Agent task failed: ${taskMessage.id}`, error);
+  }
+
+  // Log to BigQuery for observability
+  try {
+    await insertRows('dulce.agent_runs', [run]);
+  } catch (error) {
+    console.error('Failed to log agent run to BigQuery:', error);
+  }
+
+  return run;
+}
+
+// Agent task processors
+async function processGeminiTask(task: any): Promise<any> {
+  // Placeholder for Gemini orchestrator logic
+  return { type: 'gemini', result: `Processed Gemini task: ${JSON.stringify(task)}` };
+}
+
+async function processBigQueryTask(task: any): Promise<any> {
+  // Placeholder for BigQuery agent logic
+  return { type: 'bigquery', result: `Processed BigQuery task: ${JSON.stringify(task)}` };
+}
+
+async function processContentTask(task: any): Promise<any> {
+  // Placeholder for content agent logic
+  return { type: 'content', result: `Processed content task: ${JSON.stringify(task)}` };
+}
+
+async function processCRMTask(task: any): Promise<any> {
+  // Placeholder for CRM agent logic
+  return { type: 'crm', result: `Processed CRM task: ${JSON.stringify(task)}` };
+}
+
+async function processReviewsTask(task: any): Promise<any> {
+  // Placeholder for reviews agent logic
+  return { type: 'reviews', result: `Processed reviews task: ${JSON.stringify(task)}` };
+}
+
+async function processDefaultTask(task: any): Promise<any> {
+  // Default task processor
+  return { type: 'default', result: `Processed default task: ${JSON.stringify(task)}` };
+}
+
+// Agent Runner Subscription
+async function startAgentRunner() {
+  try {
+    const pubsub = getPubSubClient();
+    const subscription = pubsub.subscription('dulce-agents-sub');
+    
+    console.log('Starting agent runner subscription...');
+    
+    subscription.on('message', async (message) => {
+      try {
+        const taskMessage: AgentTask = JSON.parse(message.data.toString());
+        await processAgentTask(taskMessage);
+        message.ack();
+      } catch (error) {
+        console.error('Error processing message:', error);
+        message.nack();
+      }
+    });
+
+    subscription.on('error', (error) => {
+      console.error('Subscription error:', error);
+    });
+
+    console.log('✅ Agent runner subscription started');
+  } catch (error) {
+    console.error('❌ Failed to start agent runner:', error);
+  }
+}
+
 // Initialize MCP service and start server
 async function initializeApp() {
   try {
@@ -68,6 +207,9 @@ async function initializeApp() {
     await mcpService.initialize();
     console.log('✅ MCP service initialized successfully');
     console.log('📊 Enabled servers:', mcpService.getEnabledServers());
+
+    // Start agent runner subscription
+    await startAgentRunner();
 
     // Register routes
     await fastify.register(healthRoutes);

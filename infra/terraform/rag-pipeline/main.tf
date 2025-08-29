@@ -7,8 +7,9 @@ terraform {
     }
   }
   
-  backend "gcs" {
-    bucket = "saigon-signals-terraform-state"
+    # The bucket name should be provided via a backend configuration file or CLI argument,
+    # and should be parameterized to include the project_id to avoid conflicts.
+    # Example: bucket = "<your-project-id>-terraform-state"
     prefix = "rag-pipeline"
   }
 }

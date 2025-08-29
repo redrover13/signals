@@ -20,13 +20,22 @@ import {
  * BigQuery-specialized agent for data analysis and manipulation
  */
 export class BigQueryAgent extends DulceLlmAgent {
-  constructor() {
+export class BigQueryAgent extends DulceLlmAgent {
+  constructor(cfg?: { model?: string; apiKey?: string; tools?: Array<unknown> }) {
+    // Require an API key, whether passed in or via env, to avoid silent misconfig
+    const apiKey = cfg?.apiKey ?? process.env.GOOGLE_API_KEY;
+    if (!apiKey) {
+      throw new Error('GOOGLE_API_KEY is required to initialize BigQueryAgent');
+    }
+
+    // Allow overriding the model name for flexibility/testing
     const llm = new GeminiLlm({
-      model: 'gemini-1.5-pro',
-      apiKey: process.env.GOOGLE_API_KEY,
+      model: cfg?.model ?? 'gemini-1.5-pro',
+      apiKey,
     });
 
-    const tools = [
+    // Permit injecting custom tools, else use the BigQuery defaults
+    const tools = cfg?.tools ?? [
       new BigQueryQueryTool(),
       new BigQueryInsertTool(),
     ];
@@ -38,6 +47,7 @@ export class BigQueryAgent extends DulceLlmAgent {
       tools,
     });
   }
+}
 
   /**
    * Execute a BigQuery query and analyze results

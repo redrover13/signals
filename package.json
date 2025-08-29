@@ -26,7 +26,6 @@
     "ts:build:watch": "tsc -b tsconfig.references.json --watch",
     "ts:clean": "tsc -b tsconfig.references.json --clean",
     "ts:refs:enable": "node scripts/enable-ts-project-references.js",
-    "postinstall": "pnpm hooks:install",
     "ts:refs:fix": "node scripts/fix-ts-project-references.js",
     "ts:build:project": "tsc -b",
     "ts:build:libs": "tsc -b libs/*/tsconfig.json",

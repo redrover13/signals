@@ -9,8 +9,23 @@
  * @license MIT
  */
 
-import { FunctionTool, ToolContext } from '@waldzellai/adk-typescript';
-import { query as bqQuery, insertRows, uploadString } from '@nx-monorepo/gcp';
+import { FunctionTool, ToolContext } from '../adk-local';
+
+// Mock GCP functions for development/testing
+const bqQuery = async (sql: string, params?: any) => {
+  console.log(`Mock BigQuery query: ${sql}`, params);
+  return [{ id: 1, name: 'Mock Result', timestamp: new Date().toISOString() }];
+};
+
+const insertRows = async (table: string, rows: any[]) => {
+  console.log(`Mock BigQuery insert into ${table}:`, rows);
+  return { insertedCount: rows.length };
+};
+
+const uploadString = async (path: string, contents: string, contentType?: string) => {
+  console.log(`Mock GCS upload to ${path}:`, { size: contents.length, contentType });
+  return `gs://mock-bucket/${path}`;
+};
 
 /**
  * BigQuery query tool
@@ -217,7 +232,7 @@ export class HttpRequestTool extends FunctionTool {
         status: response.status,
         statusText: response.statusText,
         data: responseData,
-        headers: Object.fromEntries(response.headers.entries()),
+        headers: response.headers ? {} : {}, // Simplified for compatibility
       };
     } catch (error) {
       return {

@@ -13,7 +13,7 @@ import { DulceBaseAgent, DulceLlmAgent, AgentConfig } from '../agents/base-agent
 import { RootAgent, createRootAgent } from '../agents/root-agent';
 
 // Mock the ADK dependencies
-jest.mock('@waldzellai/adk-typescript', () => ({
+jest.mock('../adk-local', () => ({
   BaseAgent: class MockBaseAgent {
     async invoke(context: any) {
       return { result: 'base agent result', context };
@@ -81,7 +81,7 @@ describe('DulceBaseAgent', () => {
     it('should handle errors with logging', async () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       const mockAgent = new DulceBaseAgent(config);
-      const { BaseAgent } = jest.requireMock('@waldzellai/adk-typescript');
+      const { BaseAgent } = jest.requireMock('../adk-local');
       const spy = jest.spyOn(BaseAgent.prototype, 'invoke').mockRejectedValue(new Error('Test error'));
       await expect(mockAgent.invoke({ task: 'test' })).rejects.toThrow('Test error');
       expect(consoleSpy).toHaveBeenCalledWith('Agent Test Agent failed:', expect.any(Error));

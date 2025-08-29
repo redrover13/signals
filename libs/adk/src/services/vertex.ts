@@ -9,7 +9,7 @@
  * @license MIT
  */
 
-import { GeminiLlm, BaseLlm, LlmRequest, LlmResponse } from '@waldzellai/adk-typescript';
+import { GeminiLlm, BaseLlm, LlmRequest, LlmResponse } from '../adk-local';
 
 /**
  * Configuration interface for Vertex AI client using ADK
@@ -32,11 +32,11 @@ export class VertexAIClient {
 
   constructor(config: VertexAIClientConfig = {}) {
     this.config = {
-      project:    config.project    ?? process.env.GCP_PROJECT_ID ?? '',
-      location:   config.location   ?? process.env.GCP_LOCATION   ?? 'us-central1',
-      endpointId: config.endpointId ?? process.env.VERTEX_AI_ENDPOINT_ID,
+      project:    config.project    ?? process.env['GCP_PROJECT_ID'] ?? '',
+      location:   config.location   ?? process.env['GCP_LOCATION']   ?? 'us-central1',
+      endpointId: config.endpointId ?? process.env['VERTEX_AI_ENDPOINT_ID'],
       model:      config.model      ?? 'gemini-1.5-pro',
-      apiKey:     config.apiKey     ?? process.env.GOOGLE_API_KEY,
+      apiKey:     config.apiKey     ?? process.env['GOOGLE_API_KEY'],
     };
     if (!this.config.apiKey)   throw new Error('GOOGLE_API_KEY (apiKey) is required for VertexAIClient');
     if (!this.config.project)  throw new Error('GCP_PROJECT_ID (project) is required for VertexAIClient');
@@ -81,12 +81,8 @@ export class VertexAIClient {
       };
     } catch (error) {
       throw new Error(
-        `Vertex AI prediction failed: ${(error as Error)?.message ?? String(error)}`,
-        { cause: error as Error }
+        `Vertex AI prediction failed: ${(error as Error)?.message ?? String(error)}`
       );
-    }
-  }
-      throw new Error(`Vertex AI prediction failed: ${error}`);
     }
   }
 

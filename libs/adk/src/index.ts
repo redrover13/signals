@@ -31,4 +31,4 @@ export {
   GeminiLlm,
   InvocationContext,
   ToolContext,
-} from '@waldzellai/adk-typescript';
+} from './adk-local';

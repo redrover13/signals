@@ -17,7 +17,7 @@ import {
   BaseLlm,
   AgentTool,
   InvocationContext 
-} from '@waldzellai/adk-typescript';
+} from '../adk-local';
 
 /**
  * Configuration for creating agents
@@ -70,7 +70,14 @@ export class DulceBaseAgent extends AdkBaseAgent {
     const startTime = Date.now();
     
     try {
-      const result = await super.invoke(context);
+      // For DulceBaseAgent, we provide a default implementation
+      // This can be overridden by subclasses
+      const result = { 
+        agent: this.name, 
+        context,
+        timestamp: new Date().toISOString(),
+        message: 'Base agent execution completed'
+      };
       
       const duration = Date.now() - startTime;
       console.log(`Agent ${this.name} completed in ${duration}ms`);

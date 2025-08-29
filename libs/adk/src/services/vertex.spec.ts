@@ -12,7 +12,7 @@
 import { VertexAIClient, VertexAIClientConfig } from '../services/vertex';
 
 // Mock the ADK dependencies
-jest.mock('@waldzellai/adk-typescript', () => ({
+jest.mock('../adk-local', () => ({
   GeminiLlm: jest.fn().mockImplementation(() => ({
     invoke: jest.fn().mockResolvedValue({
       content: 'Mocked response from Gemini',

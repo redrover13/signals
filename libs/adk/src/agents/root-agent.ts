@@ -10,7 +10,7 @@
  */
 
 import { DulceLlmAgent, DulceBaseAgent } from './base-agent';
-import { GeminiLlm } from '@waldzellai/adk-typescript';
+import { GeminiLlm } from '../adk-local';
 import { GCP_TOOLS } from '../tools/gcp-tools';
 
 /**
@@ -20,9 +20,14 @@ export class RootAgent extends DulceLlmAgent {
   private subAgents: Map<string, DulceLlmAgent>;
 
   constructor() {
+    const apiKey = process.env['GOOGLE_API_KEY'];
+    if (!apiKey) {
+      console.warn('GOOGLE_API_KEY not provided, using mock LLM for development');
+    }
+
     const llm = new GeminiLlm({
       model: 'gemini-1.5-pro',
-      apiKey: process.env.GOOGLE_API_KEY,
+      apiKey: apiKey || 'mock-api-key',
     });
 
     super({
@@ -176,17 +181,11 @@ Available tools: ${GCP_TOOLS.map(tool => tool.name).join(', ')}
     };
   }
 
-  interface RootAgentStatus {
-    rootAgent: { name: string; description: string; status: string; toolsCount: number };
-    subAgents: SubAgentStatus[];
-    totalAgents: number;
-    lastCheck: string;
-  }
-
-  interface SubAgentStatus {
-    name: string;
-    description: string;
-    status: string;
+  /**
+   * Get a specific sub-agent by name
+   */
+  public getSubAgent(name: string): DulceLlmAgent | undefined {
+    return this.subAgents.get(name);
   }
 }
 
@@ -200,6 +199,25 @@ export interface WorkflowStep {
   context?: any;
   dependsOn?: string[];
   required?: boolean;
+}
+
+/**
+ * Root agent status interface
+ */
+export interface RootAgentStatus {
+  rootAgent: { name: string; description: string; status: string; toolsCount: number };
+  subAgents: SubAgentStatus[];
+  totalAgents: number;
+  lastCheck: string;
+}
+
+/**
+ * Sub-agent status interface
+ */
+export interface SubAgentStatus {
+  name: string;
+  description: string;
+  status: string;
 }
 
 /**

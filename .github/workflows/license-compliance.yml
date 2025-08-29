@@ -1,0 +1,245 @@
+name: License Compliance Check
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '**/package.json'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '**/package.json'
+  schedule:
+    - cron: '0 8 * * 1' # Weekly on Monday at 8 AM UTC
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  license-check:
+    runs-on: ubuntu-latest
+    env:
+      STORE_PATH: $(pnpm store path)
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
+        with:
+          version: 8
+          run_install: false
+
+      - name: Setup pnpm cache
+        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install license checker
+        run: npm install -g license-checker license-compatibility-checker
+
+      - name: Generate license report
+        run: |
+          echo "Generating license report..."
+          
+          # Generate detailed license report
+          license-checker --json --out licenses.json
+          license-checker --csv --out licenses.csv
+          
+          # Generate summary
+          license-checker --summary > license-summary.txt
+
+      - name: Check license compatibility
+        run: |
+          echo "Checking license compatibility..."
+          
+          # Define allowed licenses (adjust based on your requirements)
+          ALLOWED_LICENSES=(
+            "MIT"
+            "Apache-2.0"
+            "BSD-2-Clause"
+            "BSD-3-Clause"
+            "ISC"
+            "CC0-1.0"
+            "Unlicense"
+            "WTFPL"
+          )
+          
+          # Define restricted licenses
+          RESTRICTED_LICENSES=(
+            "GPL-2.0"
+            "GPL-3.0"
+            "AGPL-1.0"
+            "AGPL-3.0"
+            "LGPL-2.0"
+            "LGPL-2.1"
+            "LGPL-3.0"
+            "CDDL-1.0"
+            "CDDL-1.1"
+            "EPL-1.0"
+            "EPL-2.0"
+            "MPL-1.1"
+            "MPL-2.0"
+          )
+          
+          # Check for restricted licenses
+          echo "Checking for restricted licenses..."
+          VIOLATIONS=""
+          
+          for license in "${RESTRICTED_LICENSES[@]}"; do
+            if grep -q "\"$license\"" licenses.json; then
+              VIOLATIONS="$VIOLATIONS\n- $license found in dependencies"
+              echo "❌ Restricted license found: $license"
+            fi
+          done
+          
+          # Check for unknown/undefined licenses
+          UNKNOWN_LICENSES=$(jq -r '.[] | select(.licenses == "UNKNOWN" or .licenses == null or .licenses == "") | .name + "@" + .version' licenses.json)
+          
+          if [ -n "$UNKNOWN_LICENSES" ]; then
+            echo "⚠️ Packages with unknown licenses:"
+            echo "$UNKNOWN_LICENSES"
+            VIOLATIONS="$VIOLATIONS\n- Unknown licenses found in: $UNKNOWN_LICENSES"
+          fi
+          
+          # Generate compliance report
+          cat > license-compliance-report.md << EOF
+          # License Compliance Report
+          
+          **Generated:** $(date -u)
+          **Commit:** ${{ github.sha }}
+          
+          ## Summary
+          $(cat license-summary.txt)
+          
+          ## Compliance Status
+          EOF
+          
+          if [ -n "$VIOLATIONS" ]; then
+            echo "❌ License compliance violations found!"
+            echo -e "## ❌ Violations Found$VIOLATIONS" >> license-compliance-report.md
+            echo "compliance_status=failed" >> $GITHUB_ENV
+          else
+            echo "✅ All licenses are compliant!"
+            echo "## ✅ All licenses are compliant!" >> license-compliance-report.md
+            echo "compliance_status=passed" >> $GITHUB_ENV
+          fi
+          
+          # Add detailed license breakdown
+          echo "" >> license-compliance-report.md
+          echo "## License Breakdown" >> license-compliance-report.md
+          echo "" >> license-compliance-report.md
+          
+          # Count licenses
+          jq -r '.[] | .licenses' licenses.json | sort | uniq -c | sort -nr | while read count license; do
+            echo "- **$license:** $count packages" >> license-compliance-report.md
+          done
+
+      - name: Check for license changes
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "Checking for license changes in PR..."
+          
+          # Get base branch licenses
+          git fetch origin ${{ github.base_ref }}
+          git checkout origin/${{ github.base_ref }}
+          
+          if [ -f "package.json" ]; then
+            pnpm install --frozen-lockfile
+            license-checker --json --out base-licenses.json
+          else
+            echo "{}" > base-licenses.json
+          fi
+          
+          git checkout ${{ github.head_ref }}
+          
+          # Compare licenses
+          echo "## License Changes in this PR" >> license-compliance-report.md
+          echo "" >> license-compliance-report.md
+          
+          # Find new packages
+          NEW_PACKAGES=$(jq -r 'keys[]' licenses.json | grep -v -f <(jq -r 'keys[]' base-licenses.json 2>/dev/null || echo "") || echo "")
+          
+          if [ -n "$NEW_PACKAGES" ]; then
+            echo "### New Dependencies" >> license-compliance-report.md
+            echo "$NEW_PACKAGES" | while read package; do
+              LICENSE=$(jq -r ".\"$package\".licenses" licenses.json)
+              echo "- **$package:** $LICENSE" >> license-compliance-report.md
+            done
+          else
+            echo "### No new dependencies added" >> license-compliance-report.md
+          fi
+
+      - name: Upload license reports
+        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
+        with:
+          name: license-reports
+          path: |
+            licenses.json
+            licenses.csv
+            license-summary.txt
+            license-compliance-report.md
+          retention-days: 90
+
+      - name: Comment on PR with license changes
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
+        with:
+          script: |
+            const fs = require('fs');
+            
+            if (fs.existsSync('license-compliance-report.md')) {
+              const report = fs.readFileSync('license-compliance-report.md', 'utf8');
+              
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## 📄 License Compliance Report\n\n${report}`
+              });
+            }
+
+      - name: Fail on license violations
+        if: env.compliance_status == 'failed'
+        run: |
+          echo "❌ License compliance check failed!"
+          echo "Please review the license compliance report and resolve any violations."
+          exit 1
+
+      - name: Create issue for license violations
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
+        with:
+          script: |
+            const fs = require('fs');
+            
+            if (fs.existsSync('license-compliance-report.md')) {
+              const report = fs.readFileSync('license-compliance-report.md', 'utf8');
+              
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '🚨 License Compliance Violations Detected',
+                body: `## License Compliance Issues Found\n\n${report}\n\n**Action Required:**\n- Review the violations listed above\n- Replace or remove packages with incompatible licenses\n- Update license policy if needed\n\n**Auto-generated by:** License Compliance Check workflow`,
+                labels: ['license', 'compliance', 'security']
+              });
+            }

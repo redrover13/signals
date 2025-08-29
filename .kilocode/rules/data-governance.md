@@ -7,6 +7,7 @@ This document outlines the data governance policies, procedures, and standards f
 ## Data Classification for F&B Industry
 
 ### Customer Data
+
 - **Personal Information**: Names, contact details, addresses, payment information
   - Must be stored encrypted and in compliance with Vietnamese data residency requirements
   - Retention period: 5 years after last interaction or as required by law
@@ -19,6 +20,7 @@ This document outlines the data governance policies, procedures, and standards f
   - Retention period: 2 years or as required by law
 
 ### Business Data
+
 - **Operational Data**: Menu items, pricing, inventory levels, supplier information
   - Real-time updates required for inventory management
   - Version control for menu changes with audit trails
@@ -33,6 +35,7 @@ This document outlines the data governance policies, procedures, and standards f
   - Retention period: 7 years for business analytics
 
 ### Analytics Data
+
 - **Aggregate Reports**: Sales trends, customer demographics, seasonal patterns
   - Generated daily with automated distribution to stakeholders
   - Must exclude any personally identifiable information
@@ -49,6 +52,7 @@ This document outlines the data governance policies, procedures, and standards f
 ## Data Lifecycle Management for F&B Operations
 
 ### Data Creation
+
 - All data must be created through validated and authorized channels
   - POS systems must validate menu item codes against active inventory
   - Customer data collection requires explicit consent with clear purpose statement
@@ -63,6 +67,7 @@ This document outlines the data governance policies, procedures, and standards f
   - Source system identification for data lineage
 
 ### Data Storage
+
 - Data is stored in accordance with Vietnamese data residency requirements
   - All Vietnamese citizen data stored in GCP asia-southeast1 region
   - Cross-border data transfers require explicit consent and legal justification
@@ -77,6 +82,7 @@ This document outlines the data governance policies, procedures, and standards f
   - Monthly backups for archived data with 7-year retention
 
 ### Data Usage
+
 - Role-based access controls ensure appropriate data access
   - Restaurant managers: Access to their location's operational and performance data
   - Supply chain coordinators: Access to supplier and inventory data across all locations
@@ -92,6 +98,7 @@ This document outlines the data governance policies, procedures, and standards f
   - Differential privacy techniques used for sensitive analytics
 
 ### Data Archival
+
 - Historical data is archived based on business requirements and legal obligations
   - Transaction data archived after 2 years of inactivity
   - Customer behavioral data archived after 5 years
@@ -106,6 +113,7 @@ This document outlines the data governance policies, procedures, and standards f
   - Annual review of retention policies with legal team
 
 ### Data Deletion
+
 - Data is deleted in accordance with Vietnamese data protection laws
   - Customer data deleted upon request within 30 days
   - Automated deletion for data exceeding retention periods
@@ -122,6 +130,7 @@ This document outlines the data governance policies, procedures, and standards f
 ## Data Quality Standards for F&B Operations
 
 ### Accuracy
+
 - Data validation rules are implemented at entry points
   - Menu item prices must be positive values with maximum VND 1,000,000
   - Customer phone numbers must match Vietnamese mobile number patterns
@@ -136,6 +145,7 @@ This document outlines the data governance policies, procedures, and standards f
   - Root cause analysis for recurring data quality problems
 
 ### Completeness
+
 - Required fields are enforced through system controls
   - Customer name and phone number required for loyalty program enrollment
   - Supplier name, tax ID, and food safety certification required for new suppliers
@@ -150,6 +160,7 @@ This document outlines the data governance policies, procedures, and standards f
   - SLA tracking for data quality issue resolution
 
 ### Consistency
+
 - Standardized data formats and naming conventions are enforced
   - Vietnamese currency format: 1.000.000 ₫
   - Date format: DD/MM/YYYY (ICT timezone)

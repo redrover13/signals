@@ -36,6 +36,7 @@ gcloud iam service-accounts add-iam-policy-binding \
 ## Step 3: Get Values for GitHub Secrets
 
 The script will output values like:
+
 ```
 GCP_PROJECT_ID: saigon-signals
 WIF_PROVIDER: projects/123456789/locations/global/workloadIdentityPools/github/providers/github
@@ -58,6 +59,7 @@ In your Google Cloud Console with Secret Manager open:
 
 1. Click on `dulce-db-url` secret
 2. Add new version with your actual database URL:
+
    ```
    postgresql://user:password@/dulce?host=/cloudsql/saigon-signals:asia-southeast1:dulce-db
    ```
@@ -68,6 +70,7 @@ In your Google Cloud Console with Secret Manager open:
 ## Step 6: Test the Setup
 
 1. Commit and push the test workflow:
+
    ```bash
    git add .github/workflows/test-wif.yml
    git commit -m "test: Add WIF authentication test"
@@ -82,11 +85,13 @@ In your Google Cloud Console with Secret Manager open:
 ## Troubleshooting
 
 ### If authentication fails:
+
 1. Check the repository path matches exactly in the IAM binding
 2. Ensure the workflow has `id-token: write` permission
 3. Verify all three secrets are set correctly in GitHub
 
 ### Quick verification in Cloud Shell:
+
 ```bash
 # Check workload identity pool
 gcloud iam workload-identity-pools describe github --location=global

@@ -1,0 +1,142 @@
+/**
+ * @fileoverview update-project-configs module for the scripts component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
+ * This script updates all project.json files in the workspace with optimized configurations
+ * for caching, builds, and linting.
+ */
+import * as fs from 'fs';
+import * as path from 'path';
+import * as glob from 'glob';
+
+interface ProjectConfig {
+  name: string;
+  $schema: string;
+  sourceRoot: string;
+  projectType: 'library' | 'application';
+  implicitDependencies?: string[];
+  targets: Record<string, any>;
+  tags: string[];
+  namedInputs?: Record<string, any>;
+}
+
+const updateLibraryProject = (config: ProjectConfig, projectPath: string): ProjectConfig => {
+  const projectName = path.basename(path.dirname(projectPath));
+  const projectType = config.projectType || 'library';
+  
+  // Extract domain from directory structure
+  const pathParts = path.dirname(projectPath).split(path.sep);
+  const domain = pathParts[pathParts.length - 1];
+  
+  // Update build target
+  if (config.targets.build) {
+    config.targets.build = {
+      ...config.targets.build,
+      configurations: {
+        production: {
+          optimization: true,
+          extractLicenses: true,
+          generatePackageJson: true,
+          sourceMap: false
+        },
+        development: {
+          optimization: false,
+          sourceMap: true
+        }
+      },
+      defaultConfiguration: 'production',
+      cache: true,
+      dependsOn: config.targets.build.dependsOn || ["^build"],
+      inputs: ["production", "^production"]
+    };
+  }
+  
+  // Update lint target
+  if (config.targets.lint) {
+    config.targets.lint = {
+      ...config.targets.lint,
+      inputs: ["default", "{workspaceRoot}/.eslintrc.json"],
+      cache: true
+    };
+  }
+  
+  // Update test target
+  if (config.targets.test) {
+    config.targets.test = {
+      ...config.targets.test,
+      configurations: {
+        ci: {
+          ci: true,
+          codeCoverage: true
+        }
+      },
+      inputs: ["default", "^default", "{workspaceRoot}/jest.preset.js"],
+      cache: true
+    };
+  }
+  
+  // Add tags
+  config.tags = [`domain:${domain}`, `type:${projectType}`];
+  
+  // Add namedInputs
+  config.namedInputs = {
+    default: ["{projectRoot}/**/*", "sharedGlobals"],
+    production: [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/.eslintrc.json"
+    ],
+    sharedGlobals: []
+  };
+  
+  return config;
+};
+
+const updateProjectConfigs = (): void => {
+  try {
+    // Find all project.json files
+    const projectFiles = glob.sync('**/project.json', {
+      ignore: ['node_modules/**', 'dist/**', 'tools/**']
+    });
+    
+    console.log(`Found ${projectFiles.length} project.json files to update`);
+    
+    projectFiles.forEach(projectPath => {
+      try {
+        const fullPath = path.resolve(projectPath);
+        const config = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+        
+        // Skip if not a library or application
+        if (!config.projectType) {
+          console.log(`Skipping ${projectPath}: No projectType found`);
+          return;
+        }
+        
+        // Update configuration
+        const updatedConfig = updateLibraryProject(config, projectPath);
+        
+        // Write back to file
+        fs.writeFileSync(fullPath, JSON.stringify(updatedConfig, null, 2));
+        console.log(`Updated ${projectPath}`);
+      } catch (err) {
+        console.error(`Error updating ${projectPath}:`, err);
+      }
+    });
+    
+    console.log('Project configuration update complete!');
+  } catch (err) {
+    console.error('Failed to update project configurations:', err);
+  }
+}
+
+updateProjectConfigs();

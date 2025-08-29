@@ -1,19 +1,13 @@
-# Terraform and provider binaries
-infra/terraform/.terraform/
-.terraform/
-*.tfstate
-*.tfstate.*
-*.tfvars
-*.exe
-*.dll
-*.so
-*.dylib
-*.bin
-*.zip
-*.tar.gz
-infra/terraform/.terraform.lock.hcl
+# System files
+.DS_Store
+Thumbs.db
 
-# Node/Nx/Build artifacts
+# IDE / Editor specific
+.idea/
+.vscode/
+*.swp
+
+# Dependencies / Build artifacts
 node_modules/
 dist/
 out/
@@ -23,26 +17,87 @@ coverage/
 build/
 tmp/
 .cache/
+.pnp.js
+.pnp.loader.mjs
+*.tsbuildinfo
+
+# Logs
+*.log
+logs/
+debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Environment and local config
 .env
 .env.*
 *.local
-*.log
-*.tsbuildinfo
 
-# System files
-.DS_Store
-Thumbs.db
+# Lockfiles for other package managers
+package-lock.json
+yarn.lock
 
-# IDE/editor
-.idea/
-.vscode/
+# Terraform
+infra/terraform/.terraform/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+*.tfstate.backup
+infra/terraform/.terraform.lock.hcl
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+.venv/
+env/
+venv/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Testing
+.coverage
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+coverage.xml
+*.cover
+.hypothesis/
 
 # Misc/legacy
 fix-repository-case.bat
 update-provider-no-condition.bat
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
+servers/
+*.exe
+*.dll
+*.so
+*.dylib
+*.bin
+*.zip
+*.tar.gz
 
 
+.nx/cache
+.nx/workspace-data
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md
+
+# Next.js
+.next
+out
+
+vite.config.*.timestamp*
+vitest.config.*.timestamp*
+
+storybook-static

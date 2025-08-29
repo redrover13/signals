@@ -1,0 +1,18 @@
+paths:
+  - '.'
+paths-ignore:
+  - 'node_modules'
+  - 'dist'
+  - 'coverage'
+  - '.pnpm-store'
+  - 'tmp'
+  - '.nx'
+  - '.vscode'
+
+query-filters:
+  - exclude:
+      tags:
+        - "experimental"
+
+languages:
+  - javascript-typescript

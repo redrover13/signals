@@ -1,0 +1,96 @@
+/**
+ * @fileoverview Tests for MainAgent class
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains unit tests for the main agent orchestration.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+import { MainAgent, BQSubAgent, FirebaseSubAgent } from './main-agent';
+
+// Mock the external dependencies
+jest.mock('@google/generative-ai');
+jest.mock('@google-cloud/bigquery');
+jest.mock('firebase/app');
+jest.mock('firebase/firestore');
+
+describe('MainAgent', () => {
+  let mainAgent: MainAgent;
+  const mockConfig = {
+    apiKey: 'test-api-key',
+    projectId: 'test-project',
+    firebaseConfig: {
+      apiKey: 'test-firebase-key',
+      authDomain: 'test.firebaseapp.com',
+      projectId: 'test-project',
+      storageBucket: 'test.appspot.com',
+      messagingSenderId: '123456789',
+      appId: 'test-app-id'
+    }
+  };
+
+  beforeEach(() => {
+    mainAgent = new MainAgent(mockConfig.apiKey, mockConfig.projectId, mockConfig.firebaseConfig);
+  });
+
+  it('should create an instance', () => {
+    expect(mainAgent).toBeDefined();
+    expect(mainAgent).toBeInstanceOf(MainAgent);
+  });
+
+  it('should handle orchestration errors gracefully', async () => {
+    const result = await mainAgent.orchestrate('test query');
+    expect(result).toHaveProperty('success');
+    expect(typeof result.success).toBe('boolean');
+  });
+});
+
+describe('BQSubAgent', () => {
+  let bqAgent: BQSubAgent;
+
+  beforeEach(() => {
+    bqAgent = new BQSubAgent('test-project');
+  });
+
+  it('should create an instance', () => {
+    expect(bqAgent).toBeDefined();
+    expect(bqAgent).toBeInstanceOf(BQSubAgent);
+  });
+
+  it('should handle SQL execution errors', async () => {
+    const result = await bqAgent.execute('SELECT * FROM invalid_table');
+    expect(result).toHaveProperty('success');
+    expect(typeof result.success).toBe('boolean');
+  });
+});
+
+describe('FirebaseSubAgent', () => {
+  let firebaseAgent: FirebaseSubAgent;
+  const mockFirebaseConfig = {
+    apiKey: 'test-key',
+    authDomain: 'test.firebaseapp.com',
+    projectId: 'test-project',
+    storageBucket: 'test.appspot.com',
+    messagingSenderId: '123456789',
+    appId: 'test-app-id'
+  };
+
+  beforeEach(() => {
+    firebaseAgent = new FirebaseSubAgent(mockFirebaseConfig);
+  });
+
+  it('should create an instance', () => {
+    expect(firebaseAgent).toBeDefined();
+    expect(firebaseAgent).toBeInstanceOf(FirebaseSubAgent);
+  });
+
+  it('should handle Firebase operations', async () => {
+    const testData = { path: 'test/path', value: { test: 'data' } };
+    const result = await firebaseAgent.execute(testData);
+    expect(result).toHaveProperty('success');
+    expect(typeof result.success).toBe('boolean');
+  });
+});

@@ -1,27 +1,17 @@
 /**
- * Agent library — core types & runner skeleton.
- * Not yet wired into the main app flow.
+ * @fileoverview index module for the src component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
  */
 
-export type Tool = {
-  name: string;
-  run: (input: any) => Promise<any>;
-};
-
-export type AgentConfig = {
-  tools: Record<string, Tool>;
-  complete: (
-    prompt: string,
-    history: Array<{ role: 'user' | 'assistant'; content: string }>
-  ) => Promise<string>;
-  maxSteps?: number;
-};
-
-/**
- * Minimal runner loop — safe placeholder until you integrate ADK/Vertex.
- */
-export async function runAgent(task: string, cfg: AgentConfig) {
-  const history = [{ role: 'user', content: task }];
-  const response = await cfg.complete(task, history);
-  return [...history, { role: 'assistant', content: response }];
-}
+export * from '@nx-monorepo/bq-agent';
+export * from '@nx-monorepo/content-agent';
+export * from '@nx-monorepo/crm-agent';
+export * from '@nx-monorepo/gemini-orchestrator';
+export * from '@nx-monorepo/looker-agent';
+export * from '@nx-monorepo/reviews-agent';

@@ -1,0 +1,26 @@
+{
+  "name": "pubsub-workflows",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "infra/workflows/pubsub-workflows/src",
+  "projectType": "library",
+  "tags": ["scope:infra", "type:workflow"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/infra/workflows/pubsub-workflows",
+        "main": "infra/workflows/pubsub-workflows/src/index.ts",
+        "tsConfig": "infra/workflows/pubsub-workflows/tsconfig.lib.json",
+        "assets": ["infra/workflows/pubsub-workflows/*.md"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "infra/workflows/pubsub-workflows/jest.config.ts"
+      }
+    }
+  }
+}

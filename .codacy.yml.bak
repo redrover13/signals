@@ -1,0 +1,22 @@
+---
+engines:
+  eslint:
+    enabled: true
+  lizard:
+    enabled: true
+  semgrep:
+    enabled: true
+  trivy:
+    enabled: true
+
+exclude_paths:
+  - "node_modules/**"
+  - "dist/**"
+  - "build/**"
+  - "coverage/**"
+  - "vendor/**"
+  - "**/*.min.js"
+  - "**/*.d.ts"
+  - "apps/*/generated/**"
+  - "libs/*/generated/**"
+  - "infra/terraform/**"

@@ -21,6 +21,7 @@ All production data and backups must be stored in Google Cloud regions located i
 
 - [Vietnam Data Privacy Law Overview](https://www.dataguidance.com/notes/vietnam-data-protection-overview)
 - [GCP Regional Services](https://cloud.google.com/about/locations)
+
 # Dulce de Saigon Security and Compliance Documentation
 
 ## Overview

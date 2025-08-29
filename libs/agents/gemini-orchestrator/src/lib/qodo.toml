@@ -1,0 +1,9 @@
+[agent]
+id = "gemini-orchestrator"
+name = "Gemini Orchestrator Agent"
+description = "Orchestrates the execution and interaction of various AI agents."
+version = "0.1.0"
+
+[tools]
+"orchestrator.executeAgent" = "Execute a specific agent with given parameters."
+"orchestrator.routeRequest" = "Route a request to the appropriate agent."

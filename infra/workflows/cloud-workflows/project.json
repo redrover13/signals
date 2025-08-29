@@ -1,0 +1,26 @@
+{
+  "name": "cloud-workflows",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "infra/workflows/cloud-workflows/src",
+  "projectType": "library",
+  "tags": ["scope:infra", "type:workflow"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/infra/workflows/cloud-workflows",
+        "main": "infra/workflows/cloud-workflows/src/index.ts",
+        "tsConfig": "infra/workflows/cloud-workflows/tsconfig.lib.json",
+        "assets": ["infra/workflows/cloud-workflows/*.md"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "infra/workflows/cloud-workflows/jest.config.ts"
+      }
+    }
+  }
+}

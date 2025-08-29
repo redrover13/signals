@@ -39,7 +39,7 @@ jobs:
     name: Determine Environment
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     outputs:
       environment: ${{ steps.env.outputs.environment }}
       should-deploy: ${{ steps.env.outputs.should-deploy }}
@@ -98,7 +98,7 @@ jobs:
     name: Pre-deployment Validation
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     needs: determine-environment
     if: needs.determine-environment.outputs.should-deploy == 'true'
     environment: ${{ needs.determine-environment.outputs.environment }}
@@ -111,7 +111,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
         with:
-          version: 8
+          version: 10.0.0
           run_install: false
 
       - name: Setup pnpm cache
@@ -169,7 +169,7 @@ jobs:
     name: Build for Deployment
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     needs: [determine-environment, pre-deployment]
     if: needs.determine-environment.outputs.should-deploy == 'true'
     outputs:
@@ -183,7 +183,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
         with:
-          version: 8
+          version: 10.0.0
           run_install: false
 
       - name: Setup pnpm cache
@@ -240,7 +240,7 @@ jobs:
     name: Deploy to Google Cloud
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     needs: [determine-environment, build-for-deployment]
     if: needs.determine-environment.outputs.should-deploy == 'true'
     environment: ${{ needs.determine-environment.outputs.environment }}
@@ -336,7 +336,7 @@ jobs:
     name: Post-deployment Validation
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     needs: [determine-environment, deploy-to-gcp]
     if: needs.determine-environment.outputs.should-deploy == 'true'
     steps:
@@ -403,7 +403,7 @@ jobs:
     name: Rollback Deployment
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     if: failure() && needs.determine-environment.outputs.should-deploy == 'true'
     needs: [determine-environment, deploy-to-gcp, post-deployment]
     environment: ${{ needs.determine-environment.outputs.environment }}
@@ -453,7 +453,7 @@ jobs:
     name: Deployment Notification
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     needs: [determine-environment, build-for-deployment, deploy-to-gcp, post-deployment]
     if: always() && needs.determine-environment.outputs.should-deploy == 'true'
     steps:

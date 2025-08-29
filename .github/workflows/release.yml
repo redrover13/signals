@@ -48,7 +48,7 @@ jobs:
     name: Prepare Release
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     outputs:
       should-release: ${{ steps.check.outputs.should-release }}
       release-type: ${{ steps.check.outputs.release-type }}
@@ -64,7 +64,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
         with:
-          version: 8
+          version: 10.0.0
           run_install: false
 
       - name: Setup pnpm cache
@@ -184,7 +184,7 @@ jobs:
     name: Pre-release Validation
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     needs: prepare-release
     if: needs.prepare-release.outputs.should-release == 'true'
     steps:
@@ -196,7 +196,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
         with:
-          version: 8
+          version: 10.0.0
           run_install: false
 
       - name: Setup pnpm cache
@@ -288,7 +288,7 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     needs: [prepare-release, pre-release-validation]
     if: needs.prepare-release.outputs.should-release == 'true'
     outputs:
@@ -455,7 +455,7 @@ jobs:
     name: Post-release Tasks
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     needs: [prepare-release, create-release]
     if: needs.prepare-release.outputs.should-release == 'true'
     steps:
@@ -556,7 +556,7 @@ jobs:
     name: Validate Release
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: $(pnpm store path)
+      STORE_PATH: ""
     needs: [prepare-release, create-release]
     if: needs.prepare-release.outputs.should-release == 'true'
     steps:

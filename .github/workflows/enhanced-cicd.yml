@@ -210,18 +210,18 @@ jobs:
 
       - name: Terraform Init - Core Infrastructure
         run: |
-          cd infra/terraform/core-infrastructure
+          cd infra/terraform
           terraform init
 
       - name: Terraform Validate - Core Infrastructure
         run: |
-          cd infra/terraform/core-infrastructure
+          cd infra/terraform
           terraform validate
 
       - name: Terraform Plan - Core Infrastructure
         id: core-plan
         run: |
-          cd infra/terraform/core-infrastructure
+          cd infra/terraform
           
           # Create terraform.tfvars for this environment
           cat > terraform.tfvars << EOF
@@ -230,6 +230,10 @@ jobs:
           environment = "${{ needs.determine-strategy.outputs.environment }}"
           create_github_sa = true
           enable_monitoring = ${{ needs.determine-strategy.outputs.is-production }}
+          enable_legacy_modules = false
+          data_owner_email = "admin@saigon-signals.com"
+          organization_domain = "saigon-signals.com"
+          table_expiration_days = ${{ needs.determine-strategy.outputs.is-production == 'true' && '365' || '30' }}
           EOF
           
           terraform plan -out=tfplan-core-${{ github.sha }}
@@ -242,7 +246,7 @@ jobs:
         with:
           name: terraform-plans-${{ github.sha }}
           path: |
-            infra/terraform/core-infrastructure/tfplan-core-${{ github.sha }}
+            infra/terraform/tfplan-core-${{ github.sha }}
           retention-days: 7
 
   # ============================================================================
@@ -286,7 +290,7 @@ jobs:
       - name: Deploy Infrastructure
         id: deploy
         run: |
-          cd infra/terraform/core-infrastructure
+          cd infra/terraform
           terraform init
           terraform apply -auto-approve tfplan-core-${{ github.sha }}
           
@@ -517,7 +521,7 @@ jobs:
       - name: Deploy to Production
         id: deploy-prod
         run: |
-          cd infra/terraform/core-infrastructure
+          cd infra/terraform
           terraform init
           
           # Update tfvars for production
@@ -527,6 +531,9 @@ jobs:
           environment = "production"
           create_github_sa = true
           enable_monitoring = true
+          enable_legacy_modules = false
+          data_owner_email = "admin@saigon-signals.com"
+          organization_domain = "saigon-signals.com"
           table_expiration_days = 365
           EOF
           

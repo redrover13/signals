@@ -9,14 +9,9 @@
  * @license MIT
  */
 
-import { 
-  DulceSequentialAgent, 
-  DulceLlmAgent,
-  GeminiLlm,
-  GCP_TOOLS,
-  AgentConfig,
-  InvocationContext 
-} from '@nx-monorepo/adk';
+import { DulceLlmAgent, DulceBaseAgent } from './base-agent';
+import { GeminiLlm } from '@waldzellai/adk-typescript';
+import { GCP_TOOLS } from '../tools/gcp-tools';
 
 /**
  * Root orchestrator agent that coordinates all sub-agents

@@ -130,16 +130,23 @@ export const getVertexAIClient = memoize(
   },
 );
 
-export const getPubSubClient = memoize((): PubSub => {
-  try {
-    const projectId = getProjectId();
-    return new PubSub({ projectId });
-  } catch (error) {
-    let msg = 'Could not instantiate Pub/Sub client.';
-    if (error instanceof Error) msg = error.message;
-    throw new GcpInitializationError(msg);
-  }
-});
+export const getPubSubClient = (() => {
+  let client: PubSub | null = null;
+  return (): PubSub => {
+    if (client) return client;
+    try {
+      const projectId = getProjectId();
+      client = new PubSub({ projectId });
+      return client;
+    } catch (error) {
+      // Do not cache the failure; allow retry on next call
+      client = null;
+      let msg = 'Could not instantiate Pub/Sub client.';
+      if (error instanceof Error) msg = error.message;
+      throw new GcpInitializationError(msg);
+    }
+  };
+})();
 
 export { getProjectId };
 

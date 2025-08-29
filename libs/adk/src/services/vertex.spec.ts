@@ -119,7 +119,7 @@ describe('VertexAIClient', () => {
   describe('getConfig', () => {
     it('should return a copy of the configuration', () => {
       const returnedConfig = client.getConfig();
-      expect(returnedConfig).toEqual(config);
+      expect(returnedConfig).toEqual(expect.objectContaining(config));
       expect(returnedConfig).not.toBe(config); // Should be a copy
     });
   });

@@ -53,27 +53,23 @@ async function healthRoutes(fastify: FastifyInstance) {
 
 async function agentsRoutes(fastify: FastifyInstance) {
   fastify.post('/start', async (request: FastifyRequest, reply) => {
-    const { task, agent, context } = request.body as any;
-    
-    try {
-      let result;
-      
       if (agent && agent !== 'root') {
-        // Route to specific agent
-        const availableAgents = rootAgent.getAvailableAgents();
-        if (!availableAgents.includes(agent)) {
+        const target = rootAgent.getSubAgent(agent);
+        if (!target) {
           return reply.status(400).send({
             error: 'Invalid agent',
-            availableAgents,
+            availableAgents: rootAgent.getAvailableAgents(),
           });
         }
-        
-        result = await rootAgent.routeTask(`Route this task to ${agent}: ${task}`, context);
+        // Invoke the selected sub-agent directly
+        result = await target.invoke({
+          messages: [{ role: 'user', content: task || 'default task' }],
+          context,
+        });
       } else {
         // Use root agent to determine routing
         result = await rootAgent.routeTask(task || 'default task', context);
       }
-
       return { 
         ok: true, 
         task: task || 'default task', 

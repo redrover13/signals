@@ -89,15 +89,27 @@ Available tools: ${GCP_TOOLS.map(tool => tool.name).join(', ')}
   /**
    * Execute a complex workflow across multiple agents
    */
-  async executeWorkflow(workflow: WorkflowStep[]): Promise<any> {
-    const results: any[] = [];
+  public async executeWorkflow(workflow: WorkflowStep[]): Promise<unknown> {
+    const results: Array<{
+      step: string;
+      agentName: string;
+      result?: unknown;
+      error?: string;
+      timestamp: string;
+    }> = [];
 
     for (const step of workflow) {
       try {
+        // Resolve dependencies BEFORE invoking the step
+        let resolvedContext = step.context;
+        if (step.dependsOn && step.dependsOn.length > 0) {
+          const dependencies = results.filter(r => step.dependsOn!.includes(r.step));
+          resolvedContext = { ...(resolvedContext as object), dependencies };
+        }
+
         let result;
-        
         if (step.agentName === 'root') {
-          result = await this.routeTask(step.task, step.context);
+          result = await this.routeTask(step.task, resolvedContext);
         } else {
           const agent = this.subAgents.get(step.agentName);
           if (!agent) {
@@ -105,7 +117,7 @@ Available tools: ${GCP_TOOLS.map(tool => tool.name).join(', ')}
           }
           result = await agent.invoke({
             messages: [{ role: 'user', content: step.task }],
-            context: step.context,
+            context: resolvedContext,
           });
         }
 
@@ -116,13 +128,7 @@ Available tools: ${GCP_TOOLS.map(tool => tool.name).join(', ')}
           timestamp: new Date().toISOString(),
         });
 
-        // If step has dependencies on previous results, merge them into context
-        if (step.dependsOn && step.dependsOn.length > 0) {
-          const dependencies = results.filter(r => 
-            step.dependsOn?.includes(r.step)
-          );
-          step.context = { ...step.context, dependencies };
-        }
+        // no-op: dependencies already applied before invocation
 
       } catch (error) {
         results.push({
@@ -138,9 +144,10 @@ Available tools: ${GCP_TOOLS.map(tool => tool.name).join(', ')}
       }
     }
 
+    const failed = results.some(r => r.error);
     return {
       workflowId: `workflow_${Date.now()}`,
-      status: 'completed',
+      status: failed ? 'completed-with-errors' : 'completed',
       results,
       summary: `Executed ${workflow.length} steps with ${results.filter(r => !r.error).length} successful`,
     };

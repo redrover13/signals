@@ -13,13 +13,13 @@ import Fastify from 'fastify';
 import { healthRoutes } from './routes/health';
 import { agentsRoutes } from './routes/agents';
 import { searchRoutes } from './routes/search';
-<<<<<<< HEAD
-import { 
-  initializeOpenTelemetry, 
-  withSpan, 
-  logEvent, 
-  instrument 
+import {
+  initializeOpenTelemetry,
+  withSpan,
+  logEvent,
+  instrument
 } from '@nx-monorepo/utils/monitoring';
+import { registerSecurity } from '@dulce-de-saigon/security';
 
 // Initialize OpenTelemetry before any other imports
 initializeOpenTelemetry({
@@ -30,9 +30,6 @@ initializeOpenTelemetry({
   enableCustomExporter: true,
   enableBigQueryLogs: true,
 }).catch(console.error);
-=======
-import { registerSecurity } from '@dulce-de-saigon/security';
->>>>>>> main
 
 // Dynamic import to avoid circular dependencies
 let mcpService: any = null;
@@ -55,10 +52,23 @@ fastify.register(healthRoutes, { prefix: '/health' });
 fastify.register(agentsRoutes, { prefix: '/agents' });
 fastify.register(searchRoutes, { prefix: '/search' });
 
-<<<<<<< HEAD
+// Initialize security middleware
+async function initializeSecurity() {
+  await registerSecurity(fastify, {
+    authentication: process.env.NODE_ENV === 'production',
+    rateLimit: {
+      max: parseInt(process.env.RATE_LIMIT_MAX || '100'),
+      windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'),
+    },
+  });
+}
+
 // Instrument the initialization function
 const instrumentedInitialize = instrument('api-initialization', async () => {
   console.log('🚀 Starting API server initialization...');
+
+  // Initialize security first
+  await initializeSecurity();
 
   // Initialize MCP service dynamically
   try {
@@ -76,7 +86,7 @@ const instrumentedInitialize = instrument('api-initialization', async () => {
   } catch (mcpError) {
     console.warn('⚠️  MCP service initialization failed, continuing without MCP:', mcpError.message);
     console.log('📋 Server will start without MCP functionality');
-    
+
     await logEvent('mcp_service_initialization_failed', {
       error: mcpError.message,
     }, 'warn');
@@ -96,47 +106,3 @@ const instrumentedInitialize = instrument('api-initialization', async () => {
     'service.initialization': true,
   }
 });
-
-=======
-<<<<<<< HEAD
-const start = async () => {
-  try {
-    // Initialize security first
-    await initializeSecurity();
-    
-    // Start the server
-    await fastify.listen({ port: PORT, host: '0.0.0.0' });
-    fastify.log.info(`API server listening at port ${PORT} with security middleware enabled`);
-  } catch (err) {
-    fastify.log.error(err);
-    process.exit(1);
-  }
-};
-
-start();
-=======
->>>>>>> main
-// Initialize MCP service with better error handling
-async function initializeApp(): Promise<void> {
-  try {
-    await logEvent('app_startup', { 
-      service: 'dulce-de-saigon-api',
-      version: '1.0.0',
-      port: PORT,
-    });
-
-    await instrumentedInitialize();
-  } catch (error) {
-    console.error('💥 Critical error during app initialization:', error);
-    
-    await logEvent('app_startup_error', { 
-      service: 'dulce-de-saigon-api',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    }, 'error');
-    
-    process.exit(1);
-  }
-}
-
-initializeApp().catch(console.error);
->>>>>>> main

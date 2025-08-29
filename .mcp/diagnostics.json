@@ -1,0 +1,38 @@
+{
+  "timestamp": "2025-08-29T13:43:53.324Z",
+  "platform": "linux",
+  "arch": "x64",
+  "node_version": "v22.18.0",
+  "config_paths": [
+    "/home/g_nelson/signals-1/.mcp/config/mcp.json",
+    "/home/g_nelson/signals-1/mcp.json",
+    "/home/g_nelson/.config/mcp/config.json",
+    "/home/g_nelson/.vscode/mcp.json",
+    "/home/g_nelson/.mcp.json",
+    "/etc/mcp/config.json",
+    "/usr/local/etc/mcp/config.json"
+  ],
+  "active_config": "none",
+  "health_check": {
+    "github": {
+      "status": "healthy",
+      "message": "URL format valid"
+    },
+    "codacy": {
+      "status": "healthy",
+      "message": "Command available"
+    },
+    "playwright": {
+      "status": "healthy",
+      "message": "Command available"
+    },
+    "terraform": {
+      "status": "healthy",
+      "message": "Command available"
+    },
+    "sequentialthinking": {
+      "status": "healthy",
+      "message": "Command available"
+    }
+  }
+}

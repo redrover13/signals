@@ -8,12 +8,6 @@
     "declarationMap": true,
     "sourceMap": true,
     "paths": {
-<<<<<<< HEAD
-      "@dulce-de-saigon/agents-lib": ["dist/libs/agents/src/index.d.ts"],
-      "@dulce-de-saigon/security": ["dist/libs/security/src/index.d.ts"],
-      "@dulce/gcp": ["dist/libs/gcp/src/index.d.ts"],
-      "@nx-monorepo/mcp": ["dist/libs/mcp/src/index.d.ts"]
-=======
       "@nx-monorepo/adk": ["libs/adk/src/index.ts"],
       "@nx-monorepo/agents": ["libs/agents/src/index.ts"],
       "@nx-monorepo/agents/gemini-orchestrator": ["libs/agents/gemini-orchestrator/src/index.ts"],
@@ -31,8 +25,10 @@
       "@nx-monorepo/utils/monitoring": ["libs/utils/monitoring/src/index.ts"],
       "@nx-monorepo/utils/signals": ["libs/utils/signals/src/index.ts"],
       "@nx-monorepo/data-models/dbt-models": ["libs/data-models/dbt-models/src/index.ts"],
-      "@nx-monorepo/data-models/schemas": ["libs/data-models/schemas/src/index.ts"]
->>>>>>> main
+      "@nx-monorepo/data-models/schemas": ["libs/data-models/schemas/src/index.ts"],
+      "@dulce-de-saigon/agents-lib": ["dist/libs/agents/src/index.d.ts"],
+      "@dulce-de-saigon/security": ["dist/libs/security/src/index.d.ts"],
+      "@dulce/gcp": ["dist/libs/gcp/src/index.d.ts"]
     },
     "outDir": "./dist/out-tsc",
     "moduleResolution": "node",

@@ -3,7 +3,7 @@ import { composePlugins, withNx } from '@nx/next';
 import { NextFederationPlugin } from '@module-federation/nextjs-mf';
 
 // Import module federation config
-import moduleFederationConfig from './module-federation.config.js';
+import moduleFederationConfig from './module-federation.config.cjs';
 
 /**
  * @type {import('@nx/next/plugins/with-nx').WithNxOptions}

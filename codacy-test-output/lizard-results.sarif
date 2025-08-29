@@ -1,0 +1,158 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "runs": [
+    {
+      "results": [
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "environment-config.ts"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 248
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Method validateConfig has a cyclomatic complexity of 11 (limit is 8)"
+          },
+          "ruleId": "Lizard_ccn-medium"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "error-handler.ts"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 118
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Method categorizeError has a cyclomatic complexity of 18 (limit is 8)"
+          },
+          "ruleId": "Lizard_ccn-medium"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "error-handler.ts"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 201
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Method while has a cyclomatic complexity of 9 (limit is 8)"
+          },
+          "ruleId": "Lizard_ccn-medium"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "mcp-utils.spec.ts"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 162
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Method escapeString has 88 lines of code (limit is 50)"
+          },
+          "ruleId": "Lizard_nloc-medium"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "nx-welcome.tsx"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 8
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Method NxWelcome has 839 lines of code (limit is 50)"
+          },
+          "ruleId": "Lizard_nloc-medium"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "server-registry.ts"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 0
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Method ./libs/agents/gemini-orchestrator/src/lib/config/server-registry.ts has 535 file-nloc (limit is 500)"
+          },
+          "ruleId": "Lizard_file-nloc-medium"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "nx-welcome.tsx"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 0
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Method ./agent-frontend/src/app/nx-welcome.tsx has 839 file-nloc (limit is 500)"
+          },
+          "ruleId": "Lizard_file-nloc-medium"
+        }
+      ],
+      "tool": {
+        "driver": {
+          "informationUri": "https://github.com/terryyin/lizard",
+          "name": "Lizard",
+          "rules": null,
+          "version": "1.17.10"
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}

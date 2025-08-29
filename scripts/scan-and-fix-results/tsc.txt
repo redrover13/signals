@@ -1,0 +1,30 @@
+apps/agents/src/main.ts(1,8): error TS2300: Duplicate identifier 'Fastify'.
+apps/agents/src/main.ts(2,8): error TS2300: Duplicate identifier 'Fastify'.
+apps/agents/src/main.ts(5,54): error TS2307: Cannot find module 'adk/services/vertex' or its corresponding type declarations.
+apps/api/src/routes/agents.ts(2,27): error TS2307: Cannot find module '@/gcp' or its corresponding type declarations.
+apps/web/app/layout.tsx(6,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+apps/web/app/layout.tsx(7,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+apps/web/app/page.tsx(2,10): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+examples/mcp-demo.ts(11,8): error TS2307: Cannot find module '@nx-monorepo/mcp' or its corresponding type declarations.
+examples/mcp-demo.ts(43,44): error TS7006: Parameter 'c' implicitly has an 'any' type.
+examples/mcp-demo.ts(44,41): error TS7006: Parameter 'c' implicitly has an 'any' type.
+examples/mcp-demo.ts(47,24): error TS7006: Parameter 'c' implicitly has an 'any' type.
+examples/mcp-demo.ts(51,23): error TS7006: Parameter 'c' implicitly has an 'any' type.
+examples/mcp-demo.ts(66,52): error TS18046: 'error' is of type 'unknown'.
+examples/mcp-demo.ts(76,44): error TS18046: 'error' is of type 'unknown'.
+examples/mcp-demo.ts(91,47): error TS18046: 'error' is of type 'unknown'.
+examples/mcp-demo.ts(101,45): error TS18046: 'error' is of type 'unknown'.
+examples/mcp-demo.ts(116,43): error TS18046: 'error' is of type 'unknown'.
+examples/mcp-demo.ts(126,48): error TS18046: 'error' is of type 'unknown'.
+examples/mcp-demo.ts(140,49): error TS18046: 'error' is of type 'unknown'.
+examples/mcp-demo.ts(154,50): error TS18046: 'error' is of type 'unknown'.
+examples/mcp-demo.ts(163,47): error TS18046: 'error' is of type 'unknown'.
+examples/mcp-demo.ts(181,60): error TS18046: 'error' is of type 'unknown'.
+libs/agents/src/tools.ts(28,33): error TS2307: Cannot find module '@dulce/gcp' or its corresponding type declarations.
+libs/agents/src/tools.ts(37,33): error TS2307: Cannot find module '@dulce/gcp' or its corresponding type declarations.
+libs/agents/src/tools.ts(47,33): error TS2307: Cannot find module '@dulce/gcp' or its corresponding type declarations.
+libs/mcp/jest.config.ts(1,29): error TS2307: Cannot find module '@jest/types' or its corresponding type declarations.
+libs/mcp/src/lib/config/environment-config.ts(25,17): error TS2323: Cannot redeclare exported variable 'getCurrentConfig'.
+libs/mcp/src/lib/config/environment-config.ts(25,17): error TS2393: Duplicate function implementation.
+libs/mcp/src/lib/config/environment-config.ts(227,17): error TS2323: Cannot redeclare exported variable 'getCurrentConfig'.
+libs/mcp/src/lib/config/environment-config.ts(227,17): error TS2393: Duplicate function implementation.

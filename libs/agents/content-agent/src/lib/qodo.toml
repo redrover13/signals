@@ -1,0 +1,9 @@
+[agent]
+id = "content-agent"
+name = "Content Agent"
+description = "Agent for managing and interacting with content platforms."
+version = "0.1.0"
+
+[tools]
+"content.publish" = "Publish new content."
+"content.update" = "Update existing content."

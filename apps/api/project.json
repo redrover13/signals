@@ -1,5 +1,6 @@
 {
   "name": "api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/api/src",
   "projectType": "application",
   "targets": {
@@ -13,14 +14,13 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-  "command": "tsc -p apps/api/tsconfig.json && node -e 'require(\"fs\").cpSync(\"apps/api/src/routes\", \"dist/apps/api/routes\", { recursive: true })'"
+        "command": "tsc -p apps/api/tsconfig.json && node -e 'require(\"fs\").cpSync(\"apps/api/src/routes\", \"dist/apps/api/routes\", { recursive: true })'"
       }
     },
     "lint": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/eslint:lint",
       "options": {
-        "command": "echo 'lint placeholder'",
-        "cwd": "apps/api"
+        "args": ["**/*.{ts,tsx,js,jsx}"]
       }
     },
     "test": {
@@ -28,6 +28,14 @@
       "options": {
         "command": "echo 'test placeholder'"
       }
+    },
+    "build-all": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "command": "echo 'Building all dependencies' && nx build mcp && nx build gcp"
+      }
     }
-  }
+  },
+  "tags": ["type:app", "scope:api"]
 }

@@ -7,23 +7,27 @@ The Memory Bank is built on a modern, cloud-native architecture leveraging Googl
 ## Architecture Components
 
 ### Frontend Applications
+
 - **Web Dashboard**: React-based interface for business intelligence and analytics
 - **Mobile Applications**: Native mobile apps for restaurant staff and managers
 - **API Gateway**: RESTful and GraphQL APIs for third-party integrations
 
 ### Backend Services
+
 - **Data Ingestion Service**: Handles real-time data from POS systems, inventory management, and customer feedback
 - **Processing Engine**: Event-driven processing using Google Cloud Functions and Pub/Sub
 - **Analytics Engine**: Real-time analytics powered by BigQuery and Looker
 - **Notification Service**: Push notifications and alerts for critical business events
 
 ### Data Layer
+
 - **Primary Storage**: Google Cloud SQL (PostgreSQL) for transactional data
 - **Data Warehouse**: BigQuery for analytics and reporting
 - **Object Storage**: Google Cloud Storage for media assets and backups
 - **Cache Layer**: Memorystore (Redis) for frequently accessed data
 
 ### Infrastructure
+
 - **Containerization**: Docker containers orchestrated with Google Kubernetes Engine (GKE)
 - **Networking**: Virtual Private Cloud (VPC) with private service access
 - **Security**: Identity and Access Management (IAM), Secret Manager for credentials

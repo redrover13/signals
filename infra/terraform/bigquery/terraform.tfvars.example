@@ -1,0 +1,8 @@
+# Copy this file to terraform.tfvars and fill in your values
+
+project_id         = "saigon-signals"
+region            = "asia-southeast1"
+environment       = "prod"
+data_owner_email  = "dulcedesaigon@gmail.com"
+organization_domain = "dulcedesaigon.com"
+enable_data_transfer = false

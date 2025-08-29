@@ -4,9 +4,7 @@ This document describes the process and requirements for enabling and configurin
 
 ## Current State
 
-
 ## What is Missing
-
 
 ## Path Forward
 
@@ -16,10 +14,8 @@ This document describes the process and requirements for enabling and configurin
 4. **Update CI/CD:** Document and automate build/deploy steps for agent services.
 5. **Expand READMEs:** Keep all relevant READMEs up to date as features are added.
 
-
 ## References
 
-
-
 ---
-*Update this guide as the agent-GCP integration evolves.*
+
+_Update this guide as the agent-GCP integration evolves._

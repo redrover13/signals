@@ -1,0 +1,9 @@
+[agent]
+id = "reviews-agent"
+name = "Reviews Agent"
+description = "Agent for handling and analyzing customer reviews."
+version = "0.1.0"
+
+[tools]
+"reviews.get" = "Retrieve customer reviews."
+"reviews.analyze" = "Analyze sentiment of reviews."

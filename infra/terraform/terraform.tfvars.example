@@ -1,0 +1,7 @@
+# Copy this file to terraform.tfvars and fill in your values
+
+project_id                = "saigon-signals"
+region                   = "asia-southeast1"
+environment              = "prod"
+terraform_service_account = "github-actions@saigon-signals.iam.gserviceaccount.com"
+create_github_sa         = false  # Set to false since GitHub Actions SA already exists

@@ -1,0 +1,9 @@
+[agent]
+id = "bq-agent"
+name = "BigQuery Agent"
+description = "Agent for interacting with Google BigQuery."
+version = "0.1.0"
+
+[tools]
+"bq.query" = "Run a BigQuery SQL query."
+"bq.insert" = "Insert rows into a BigQuery table."

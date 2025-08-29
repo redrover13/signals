@@ -1,0 +1,9 @@
+[agent]
+id = "crm-agent"
+name = "CRM Agent"
+description = "Agent for interacting with CRM systems."
+version = "0.1.0"
+
+[tools]
+"crm.createLead" = "Create a new lead in the CRM."
+"crm.updateContact" = "Update an existing contact in the CRM."

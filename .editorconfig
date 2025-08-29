@@ -7,3 +7,11 @@ charset = utf-8
 indent_style = space
 indent_size = 2
 trim_trailing_whitespace = true
+
+# Ensure UTF-8 for files that may contain Vietnamese text
+[*.{ts,js,jsx,tsx,json,md,txt,yml,yaml}]
+charset = utf-8
+
+# Vietnamese-specific content files
+[*.vi.{md,txt,json}]
+charset = utf-8

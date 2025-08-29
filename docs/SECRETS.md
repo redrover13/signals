@@ -16,8 +16,8 @@ To add a new secret or update an existing one, follow this procedure:
 
 1.  **Do NOT add the secret to any file.** This includes temporary files, local configurations, or shell scripts.
 2.  **Submit a request** to the project's Lead Architect or designated Security Officer. The request must include:
-    *   The name of the secret (e.g., `PAYPAL_API_KEY`).
-    *   A brief description of its intended use.
+    - The name of the secret (e.g., `PAYPAL_API_KEY`).
+    - A brief description of its intended use.
 3.  The secret will be provisioned in Google Secret Manager via our automated Terraform workflow. Once approved and deployed, you will be provided with the secret's **resource name** (e.g., `DULCE_API_KEY`), which you will use to reference it in the application.
 
 ## 4. Using a Secret in the Application

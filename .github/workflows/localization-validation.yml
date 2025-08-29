@@ -1,0 +1,64 @@
+name: Localization Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '**/locales/**'
+      - '**/translations/**'
+      - '**/i18n/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - '**/locales/**'
+      - '**/translations/**'
+      - '**/i18n/**'
+
+jobs:
+  validate-translations:
+    name: Validate Translation Files
+    runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ""
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.0.2
+        with:
+          version: 10.0.0
+          run_install: false
+
+      - name: Setup pnpm cache
+        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: '20'
+          cache: pnpm
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run translation validation
+        run: |
+          # Run your custom script for validating Vietnamese encoding
+          pnpm exec node scripts/validate-encoding.js
+          
+          # Run your Vietnamese test script
+          pnpm exec node scripts/test-vietnamese.js
+          
+      - name: Check for missing translations
+        run: |
+          # Add your custom script to check for missing translations across locales
+          echo "Checking for missing translations..."
+          # Example command (replace with your actual check)
+          # pnpm run i18n:check-missing

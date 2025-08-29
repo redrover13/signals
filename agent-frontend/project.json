@@ -3,21 +3,153 @@
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "agent-frontend/src",
   "projectType": "application",
-  "tags": [],
+  "tags": ["type:app", "scope:frontend", "platform:web"],
   "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/agent-frontend"
+      },
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production"
+        },
+        "analyze": {
+          "mode": "analyze",
+          "sourcemap": true
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "agent-frontend:build",
+        "proxyConfig": "agent-frontend/proxy.conf.json"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "agent-frontend:build:development",
+          "hmr": true
+        },
+        "production": {
+          "buildTarget": "agent-frontend:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "preview": {
+      "executor": "@nx/vite:preview-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "agent-frontend:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "agent-frontend:build:development"
+        },
+        "production": {
+          "buildTarget": "agent-frontend:build:production"
+        }
+      }
+    },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "agent-frontend/jest.config.ts"
+        "jestConfig": "agent-frontend/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
       }
     },
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["agent-frontend/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["agent-frontend/**/*.{ts,tsx,js,jsx}"],
+        "fix": false
+      },
+      "configurations": {
+        "fix": {
+          "fix": true
+        }
+      }
+    },
+    "storybook": {
+      "executor": "@nx/storybook:storybook",
+      "options": {
+        "port": 4400,
+        "configDir": "agent-frontend/.storybook"
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "build-storybook": {
+      "executor": "@nx/storybook:build",
+      "outputs": ["{options.outputDir}"],
+      "options": {
+        "outputDir": "dist/storybook/agent-frontend",
+        "configDir": "agent-frontend/.storybook"
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "serve-static": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "agent-frontend:build",
+        "staticFilePath": "dist/agent-frontend"
+      }
+    },
+    "docker-build": {
+      "executor": "@nx-tools/nx-docker:build",
+      "options": {
+        "push": false,
+        "tags": ["dulcedesaigon/agent-frontend:latest"],
+        "file": "agent-frontend/Dockerfile",
+        "context": "."
+      }
+    },
+    "lighthouse": {
+      "executor": "@nx/web:lighthouse",
+      "options": {
+        "url": ["http://localhost:4200"]
+      }
+    },
+    "e2e": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "agent-frontend/cypress.config.ts",
+        "testingType": "e2e",
+        "devServerTarget": "agent-frontend:serve"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "agent-frontend:serve:production"
+        }
+      }
+    },
+    "component-test": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "agent-frontend/cypress.config.ts",
+        "testingType": "component",
+        "devServerTarget": "agent-frontend:serve"
       }
     }
   }

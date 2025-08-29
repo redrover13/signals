@@ -1,38 +1,18 @@
-import * as path from 'path';
-import * as fs from 'fs';
 
-// Mock service class for testing
-class MCPService {
-  public isInitialized = false;
-
-  async initialize(): Promise<void> {
-    this.isInitialized = true;
-    return Promise.resolve();
-  }
-
-  async shutdown(): Promise<void> {
-    this.isInitialized = false;
-    return Promise.resolve();
-  }
-
-  getStatus(): boolean {
-    return this.isInitialized;
-  }
-}
+import { MCPService } from './mcp.service';
 
 describe('MCP Integration', () => {
   let mcpService: MCPService;
 
   beforeEach(() => {
-    mcpService = new MCPService();
+    mcpService = MCPService.getInstance();
   });
 
   afterEach(async () => {
     try {
-      if (mcpService.getStatus()) {
-        // Make sure we clean up after each test
-        mcpService.isInitialized = false;
-        await mcpService.shutdown();
+      if (mcpService.isReady()) {
+      // Make sure we clean up after each test
+      await mcpService.shutdown();
       }
     } catch {
       // Swallow shutdown errors to avoid leaking failures from cleanup
@@ -41,13 +21,13 @@ describe('MCP Integration', () => {
 
   it('should initialize the MCP service', async () => {
     await mcpService.initialize();
-    expect(mcpService.getStatus()).toBe(true);
+    expect(mcpService.isReady()).toBe(true);
   });
 
   it('should shut down the MCP service', async () => {
     await mcpService.initialize();
     await mcpService.shutdown();
-    expect(mcpService.getStatus()).toBe(false);
+    expect(mcpService.isReady()).toBe(false);
   });
 
   describe('Configuration Loading', () => {

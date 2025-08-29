@@ -1,0 +1,20 @@
+[
+  {
+    "type": "missing-implicit",
+    "projects": [
+      "monitoring",
+      "agents",
+      "gemini-orchestrator"
+    ],
+    "message": "monitoring depends on agents, which implicitly depends on gemini-orchestrator, but monitoring doesn't have gemini-orchestrator as an implicit dependency"
+  },
+  {
+    "type": "missing-implicit",
+    "projects": [
+      "monitoring",
+      "agents",
+      "monitoring"
+    ],
+    "message": "monitoring depends on agents, which implicitly depends on monitoring, but monitoring doesn't have monitoring as an implicit dependency"
+  }
+]

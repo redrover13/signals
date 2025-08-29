@@ -1,7 +1,9 @@
 {
   "name": "agents",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/agents/src",
   "projectType": "application",
+  "implicitDependencies": ["gemini-orchestrator", "monitoring"],
   "targets": {
     "dev": {
       "executor": "nx:run-commands",
@@ -21,5 +23,6 @@
         "lintFilePatterns": ["apps/agents/**/*.{ts,tsx,js,jsx}"]
       }
     }
-  }
+  },
+  "tags": ["type:app", "scope:agents"]
 }

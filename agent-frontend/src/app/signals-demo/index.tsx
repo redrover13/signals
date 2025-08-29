@@ -9,52 +9,77 @@
  * @license MIT
  */
 
-import React from 'react';
+import React, { useCallback, memo } from 'react';
 import { createSignal, useSignal } from '@nx-monorepo/utils/signals';
-import { sharedCountSignal } from '../bootstrap';
+import { sharedCountSignal } from '../../bootstrap';
+import styles from './signals-demo.module.css';
 
-export function SignalsDemo() {
+// Create a memo function to optimize performance
+const SignalsDemo = memo(() => {
+  // Use the shared count signal
   const [count, setCount] = useSignal(sharedCountSignal);
+  
+  // Create a local signal with an initial value
   const localSignal = createSignal('Local Value');
   const [localValue, setLocalValue] = useSignal(localSignal);
 
+  // Use callbacks to prevent unnecessary re-renders
+  const handleIncrement = useCallback(() => {
+    setCount(prevCount => prevCount + 1);
+  }, [setCount]);
+
+  const handleDecrement = useCallback(() => {
+    setCount(prevCount => prevCount - 1);
+  }, [setCount]);
+
+  const handleLocalValueChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalValue(e.target.value);
+  }, [setLocalValue]);
+
   return (
-    <div className="signals-demo p-4 border rounded-lg bg-white shadow-md">
-      <h2 className="text-xl font-bold mb-4">Signals Demo (Federated Module)</h2>
+    <div className={styles.signalsDemo}>
+      <h2 className={styles.title}>Signals Demo (Federated Module)</h2>
       
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold">Shared Count: {count}</h3>
-        <div className="flex gap-2 mt-2">
+      <div className={styles.section}>
+        <h3 className={styles.sectionTitle}>Shared Count: {count}</h3>
+        <div className={styles.buttonGroup}>
           <button 
-            className="px-3 py-1 bg-blue-500 text-white rounded"
-            onClick={() => setCount(count + 1)}
+            className={`${styles.button} ${styles.incrementButton}`}
+            onClick={handleIncrement}
+            aria-label="Increment shared count"
           >
             Increment
           </button>
           <button 
-            className="px-3 py-1 bg-red-500 text-white rounded"
-            onClick={() => setCount(count - 1)}
+            className={`${styles.button} ${styles.decrementButton}`}
+            onClick={handleDecrement}
+            aria-label="Decrement shared count"
           >
             Decrement
           </button>
         </div>
       </div>
 
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold">Local Value: {localValue}</h3>
+      <div className={styles.section}>
+        <h3 className={styles.sectionTitle}>Local Value: {localValue}</h3>
         <input
           type="text"
           value={localValue}
-          onChange={(e) => setLocalValue(e.target.value)}
-          className="mt-2 px-3 py-1 border rounded w-full"
+          onChange={handleLocalValueChange}
+          className={styles.input}
+          aria-label="Local value input"
         />
       </div>
 
-      <p className="text-sm text-gray-600">
+      <p className={styles.footer}>
         This component is exposed via Module Federation and can be consumed by other micro-frontends.
       </p>
     </div>
   );
-}
+});
 
+// Add displayName for better debugging
+SignalsDemo.displayName = 'SignalsDemo';
+
+export { SignalsDemo };
 export default SignalsDemo;

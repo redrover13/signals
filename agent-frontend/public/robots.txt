@@ -1,0 +1,17 @@
+# robots.txt for Dulce de Saigon Agent Frontend
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://agents.dulcedesaigon.com/sitemap.xml
+
+# Disallow specific directories
+Disallow: /api/
+Disallow: /private/
+Disallow: /admin/
+Disallow: /internal/
+
+# Crawl delay for bots
+Crawl-delay: 10

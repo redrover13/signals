@@ -1,34 +1,8 @@
+import { MCPService } from './mcp.service';
+
 /**
  * MCP Service unit tests
  */
-
-class MCPService {
-  private static instance: MCPService | null = null;
-  private isInitialized = false;
-
-  private constructor() {}
-
-  public static getInstance(): MCPService {
-    if (!MCPService.instance) {
-      MCPService.instance = new MCPService();
-    }
-    return MCPService.instance;
-  }
-
-  async initialize(): Promise<void> {
-    this.isInitialized = true;
-    return Promise.resolve();
-  }
-
-  async shutdown(): Promise<void> {
-    this.isInitialized = false;
-    return Promise.resolve();
-  }
-
-  isReady(): boolean {
-    return this.isInitialized;
-  }
-}
 
 describe('MCPService', () => {
   let service: MCPService;

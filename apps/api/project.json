@@ -36,5 +36,6 @@
         "command": "echo 'Building all dependencies' && nx build mcp && nx build gcp"
       }
     }
-  }
+  },
+  "tags": ["type:app", "scope:api"]
 }

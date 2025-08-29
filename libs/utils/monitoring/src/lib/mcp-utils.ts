@@ -220,7 +220,7 @@ export function createBasicHealthSummary(metrics: BasicMCPMetrics): {
  * Generate monitoring-focused MCP configuration
  */
 export function generateMonitoringMCPConfig(
-  environment: string = 'development',
+  environment = 'development',
   enabledServers: string[] = ['filesystem', 'git', 'memory'],
 ): BasicMCPConfig {
   const baseServers = [

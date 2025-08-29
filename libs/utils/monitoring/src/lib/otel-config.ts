@@ -142,7 +142,7 @@ export async function shutdownOpenTelemetry(): Promise<void> {
 /**
  * Get the current tracer instance
  */
-export function getTracer(name: string = 'dulce-de-saigon-agent') {
+export function getTracer(name = 'dulce-de-saigon-agent') {
   return trace.getTracer(name);
 }
 

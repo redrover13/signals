@@ -1,0 +1,6 @@
+{
+  "name": "@dulce-de-saigon/security",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "main": "src/index.ts"
+}

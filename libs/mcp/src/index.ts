@@ -1,8 +1,8 @@
 /**
- * @fileoverview Main entry point for the MCP library
+ * @fileoverview index module for the src component
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
- * Exports the main MCP service and utilities.
+ * Contains implementation for TypeScript functionality.
  *
  * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
@@ -10,33 +10,16 @@
  */
 
 /**
- * @fileoverview Main entry point for the MCP library
- *
- * This file is part of the Dulce de Saigon F&B Data Platform.
- * Exports the main MCP service and utilities.
- *
- * @author Dulce de Saigon Engineering
- * @copyright Copyright (c) 2025 Dulce de Saigon
- * @license MIT
+ * MCP Library - Main Export
+ * Comprehensive MCP (Model Context Protocol) integration for the signals project
  */
 
-// Re-export the main MCP service from the gemini-orchestrator library
-export { mcpService, MCPService } from '../../agents/gemini-orchestrator/src/index';
+// Configuration exports
+export * from './lib/config/server-registry';
 
-// Re-export utility functions
-export { createMCPClient } from '../../utils/monitoring/src/index';
+// Client service exports
+export * from './lib/clients/mcp-client.service';
+export * from './lib/clients/request-router.service';
 
-// Re-export validation and testing functions
-export { validateMCPEnvironment } from '../../agents/gemini-orchestrator/src/index';
-export { testMCPConnectivity } from '../../agents/gemini-orchestrator/src/index';
-
-// Re-export error handling utilities
-export {
-  createServiceErrorHandler,
-  ErrorCategory,
-  ErrorSeverity,
-  withErrorHandler
-} from '../../agents/gemini-orchestrator/src/index';
-
-// Re-export health monitoring utilities
-export { getMCPHealthSummary, getMCPPerformanceMetrics } from '../../utils/monitoring/src/index';
+// Main MCP service facade
+export { MCPService } from './lib/mcp.service';

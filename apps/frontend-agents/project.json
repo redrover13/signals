@@ -1,0 +1,50 @@
+{
+  "name": "frontend-agents",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/frontend-agents/src",
+  "projectType": "application",
+  "tags": ["scope:frontend", "type:ui"],
+  "targets": {
+    "build": {
+      "executor": "@nx/next:build",
+      "outputs": ["{projectRoot}/dist"],
+      "defaultConfiguration": "production",
+      "options": {},
+      "configurations": {
+        "development": {
+          "outputPath": "apps/frontend-agents"
+        },
+        "production": {
+          "outputPath": "dist/apps/frontend-agents"
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/next:server",
+      "defaultConfiguration": "development",
+      "options": {},
+      "configurations": {
+        "development": {
+          "buildTarget": "frontend-agents:build:development",
+          "dev": true
+        },
+        "production": {
+          "buildTarget": "frontend-agents:build:production",
+          "dev": false
+        }
+      }
+    },
+    "export": {
+      "executor": "@nx/next:export",
+      "options": {
+        "buildTarget": "frontend-agents:build:production"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["apps/frontend-agents/**/*.{ts,tsx,js,jsx}"]
+      }
+    }
+  }
+}

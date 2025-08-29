@@ -1,0 +1,54 @@
+name: API Documentation
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'apps/api/**'
+      - 'apps/cloud-functions/**'
+      - 'libs/data-models/**'
+  workflow_dispatch:
+
+jobs:
+  generate-api-docs:
+    name: Generate API Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.0.2
+        with:
+          version: 10.0.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate API documentation
+        run: |
+          # Run your documentation generation tool
+          # Example: Using TypeDoc or other documentation generators
+          pnpm nx run api:generate-docs
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@bae45bd7c0cd6f338596808adca97f47cf91dfac # v3.9.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/api
+
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+          publish_dir: ./docs/api
+          destination_dir: api
+          keep_files: true

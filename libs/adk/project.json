@@ -1,0 +1,32 @@
+{
+  "name": "adk",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/adk/src",
+  "projectType": "library",
+  "tags": ["scope:backend-lib", "type:adk"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/adk",
+        "main": "libs/adk/src/index.ts",
+        "tsConfig": "libs/adk/tsconfig.lib.json",
+        "assets": ["libs/adk/*.md"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/adk/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["libs/adk/**/*.{ts,tsx,js,jsx}"]
+      }
+    }
+  }
+}

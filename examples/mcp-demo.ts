@@ -1,9 +1,25 @@
 /**
+ * @fileoverview mcp-demo module for the examples component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
  * MCP Integration Demo
  * Demonstrates how to use the MCP system in the Signals project
  */
 
-import { mcpService, createMCPClient, validateMCPEnvironment, testMCPConnectivity } from '@nx-monorepo/mcp';
+import {
+  mcpService,
+  createMCPClient,
+  validateMCPEnvironment,
+  testMCPConnectivity,
+} from '@nx-monorepo/mcp';
 
 async function runMCPDemo() {
   console.log('🚀 Starting MCP Integration Demo...\n');
@@ -12,16 +28,16 @@ async function runMCPDemo() {
     // 1. Validate environment
     console.log('1. Validating MCP Environment...');
     const validation = validateMCPEnvironment();
-    
+
     if (!validation.valid) {
       console.error('❌ Environment validation failed:', validation.errors);
       return;
     }
-    
+
     if (validation.warnings.length > 0) {
       console.warn('⚠️  Environment warnings:', validation.warnings);
     }
-    
+
     console.log('✅ Environment validation passed\n');
 
     // 2. Initialize MCP service
@@ -35,21 +51,21 @@ async function runMCPDemo() {
     // 3. Test connectivity
     console.log('3. Testing Server Connectivity...');
     const connectivity = await testMCPConnectivity();
-    const connected = connectivity.filter(c => c.connected);
-    const failed = connectivity.filter(c => !c.connected);
-    
+    const connected = connectivity.filter((c) => c.connected);
+    const failed = connectivity.filter((c) => !c.connected);
+
     console.log(`✅ Connected servers: ${connected.length}`);
-    connected.forEach(c => console.log(`  - ${c.serverId}: ${c.responseTime}ms`));
-    
+    connected.forEach((c) => console.log(`  - ${c.serverId}: ${c.responseTime}ms`));
+
     if (failed.length > 0) {
       console.log(`❌ Failed servers: ${failed.length}`);
-      failed.forEach(c => console.log(`  - ${c.serverId}: ${c.error}`));
+      failed.forEach((c) => console.log(`  - ${c.serverId}: ${c.error}`));
     }
     console.log('');
 
     // 4. Demonstrate core services
     console.log('4. Testing Core Services...');
-    
+
     // File system operations
     try {
       const packageJson = await mcpService.fs('read', { path: 'package.json' });
@@ -65,7 +81,7 @@ async function runMCPDemo() {
     try {
       const gitStatus = await mcpService.git('status');
       if (!gitStatus.error) {
-        console.log('��� Git status retrieved successfully');
+        console.log('✅ Git status retrieved successfully');
       }
     } catch (error) {
       console.log('⚠️  Git test skipped:', error.message);
@@ -73,11 +89,11 @@ async function runMCPDemo() {
 
     // Memory operations
     try {
-      await mcpService.memory('store', { 
-        key: 'demo-test', 
-        value: { timestamp: new Date(), demo: true } 
+      await mcpService.memory('store', {
+        key: 'demo-test',
+        value: { timestamp: new Date(), demo: true },
       });
-      
+
       const retrieved = await mcpService.memory('retrieve', { key: 'demo-test' });
       if (!retrieved.error) {
         console.log('✅ Memory store/retrieve test passed');
@@ -100,7 +116,7 @@ async function runMCPDemo() {
 
     // 5. Demonstrate development services
     console.log('5. Testing Development Services...');
-    
+
     // Nx operations
     try {
       const nxProjects = await mcpService.nx('list-projects');
@@ -125,7 +141,7 @@ async function runMCPDemo() {
 
     // 6. Demonstrate data services (if available)
     console.log('6. Testing Data Services...');
-    
+
     try {
       const dbTest = await mcpService.database('list-datasets');
       if (!dbTest.error) {
@@ -139,7 +155,7 @@ async function runMCPDemo() {
 
     // 7. Demonstrate web services
     console.log('7. Testing Web Services...');
-    
+
     try {
       const fetchTest = await mcpService.fetch('https://api.github.com/zen');
       if (!fetchTest.error) {
@@ -162,17 +178,15 @@ async function runMCPDemo() {
 
     // 8. Demonstrate sequential thinking
     console.log('8. Testing Sequential Thinking...');
-    
+
     try {
       const thinkingTest = await mcpService.think(
-        'What are the key considerations for building a scalable microservices architecture?'
+        'What are the key considerations for building a scalable microservices architecture?',
       );
-      
+
       if (!thinkingTest.error) {
         console.log('✅ Sequential thinking test completed');
-        console.log('💭 Thinking result preview:', 
-          thinkingTest.result?.slice(0, 100) + '...'
-        );
+        console.log('💭 Thinking result preview:', thinkingTest.result?.slice(0, 100) + '...');
       }
     } catch (error) {
       console.log('⚠️  Sequential thinking test skipped:', error.message);
@@ -182,14 +196,14 @@ async function runMCPDemo() {
 
     // 9. Performance and routing analysis
     console.log('9. Performance and Routing Analysis...');
-    
+
     const routingStats = mcpService.getRoutingStats();
     console.log(`📊 Routing rules: ${routingStats.rules.length}`);
     console.log('📈 Load statistics:', Object.fromEntries(routingStats.loadStats));
-    
+
     // Test routing for different methods
     const testMethods = ['git.status', 'db.query', 'search.web', 'nx.build'];
-    testMethods.forEach(method => {
+    testMethods.forEach((method) => {
       const routing = mcpService.testRouting(method);
       console.log(`🔀 ${method} → ${routing.selectedServer || 'no server'}`);
     });
@@ -202,11 +216,10 @@ async function runMCPDemo() {
     console.log('🏥 Final system health:', {
       totalServers: finalHealth.totalServers,
       healthyServers: finalHealth.healthyServers,
-      uptime: `${finalHealth.averageUptime.toFixed(1)}%`
+      uptime: `${finalHealth.averageUptime.toFixed(1)}%`,
     });
 
     console.log('\n🎉 MCP Integration Demo completed successfully!');
-
   } catch (error) {
     console.error('❌ Demo failed:', error);
   } finally {

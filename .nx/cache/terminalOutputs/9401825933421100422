@@ -1,8 +1,0 @@
-[2m> [22mtsc -p apps/api/tsconfig.json && node -e 'require("fs").cpSync("apps/api/src/routes", "dist/apps/api/routes", { recursive: true })'
-
-apps/api/src/routes/agents.ts(2,10): error TS2305: Module '"@dulce/gcp"' has no exported member 'ensureTopic'.
-apps/api/src/routes/agents.ts(2,23): error TS2305: Module '"@dulce/gcp"' has no exported member 'getPubSub'.
-libs/gcp/src/index.ts(81,7): error TS18046: 'error' is of type 'unknown'.
-libs/gcp/src/index.ts(102,7): error TS18046: 'error' is of type 'unknown'.
-libs/gcp/src/index.ts(122,7): error TS18046: 'error' is of type 'unknown'.
-libs/gcp/src/index.ts(147,9): error TS18046: 'error' is of type 'unknown'.

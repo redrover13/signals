@@ -1,0 +1,55 @@
+# CodeQL TypeScript Configuration
+paths:
+  - 'apps'
+  - 'libs'
+  - 'infra'
+paths-ignore:
+  - 'node_modules'
+  - 'dist'
+  - 'coverage'
+  - '.pnpm-store'
+  - 'tmp'
+  - '.nx'
+
+# CodeQL query suites for JavaScript/TypeScript
+query-filters:
+  - exclude:
+      tags:
+        - "experimental"
+        - "deprecated"
+
+# TypeScript specific overrides
+languages:
+  - javascript-typescript
+
+extraction:
+  javascript:
+    index:
+      # Analyze TypeScript code using Node.js mode (default)
+      # To analyze browser code, use 'browser' instead
+      mode: node
+
+      # Include additional ECMAScript features
+      features: 
+        - typescript
+        - es2021
+
+      # Additional TypeScript extensions
+      extensions:
+        - .tsx
+        - .jsx
+        - .ts
+        - .js
+        - .mjs
+
+      # Default filters
+      exclude:
+        - "node_modules/**"
+        - "dist/**"
+        - ".nx/**"
+        - "**/*.d.ts"
+      
+      # TypeScript-specific configuration
+      typescript:
+        # Use tsconfig.base.json to configure the TypeScript analysis
+        tsconfig: tsconfig.base.json

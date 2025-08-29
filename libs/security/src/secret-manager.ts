@@ -1,4 +1,15 @@
 /**
+ * @fileoverview secret-manager module for the src component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
  * Google Cloud Secret Manager integration for Dulce de Saigon F&B Platform
  * Provides secure credential management following Vietnamese data privacy requirements
  */

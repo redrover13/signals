@@ -1,0 +1,9 @@
+[agent]
+id = "looker-agent"
+name = "Looker Agent"
+description = "Agent for interacting with Looker dashboards and data."
+version = "0.1.0"
+
+[tools]
+"looker.query" = "Run a Looker query."
+"looker.dashboard" = "Access Looker dashboard data."

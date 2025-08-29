@@ -1,40 +1,29 @@
-/**
- * @fileoverview This file defines the core input variables for the Terraform
- *               configuration for the entire Dulce de Saigon platform.
- * @description Best practice is to manage sensitive variables through a
- *              `.tfvars` file or environment variables, not by hardcoding
- *              them here.
- */
-
-variable "gcp_project_id" {
-  description = "The ID of the Google Cloud project."
+variable "project_id" {
+  description = "The GCP project ID"
   type        = string
+  default     = "saigon-signals"
 }
 
-variable "gcp_region" {
-  description = "The GCP region to deploy resources in. For compliance with Vietnamese data residency laws, this should be asia-southeast1."
+variable "region" {
+  description = "The GCP region"
   type        = string
   default     = "asia-southeast1"
 }
 
 variable "environment" {
-  description = "The environment to deploy to (dev, staging, prod)."
+  description = "Environment name (dev, staging, prod)"
   type        = string
-  validation {
-    condition     = contains(["dev", "staging", "prod"], var.environment)
-    error_message = "The environment must be one of 'dev', 'staging', or 'prod'."
-  }
+  default     = "prod"
 }
 
-// Variables for Terraform backend configuration
-variable "terraform_state_bucket" {
-  description = "The name of the GCS bucket to store the Terraform state. If empty, local backend will be used."
+variable "terraform_service_account" {
+  description = "Service account email for Terraform operations"
   type        = string
-  default     = ""
+  default     = "github-actions@saigon-signals.iam.gserviceaccount.com"
 }
 
-variable "terraform_state_prefix" {
-  description = "The prefix (path) within the GCS bucket to store the Terraform state."
-  type        = string
-  default     = "terraform/state"
+variable "create_github_sa" {
+  description = "Create a service account for GitHub Actions (set to false if using existing)"
+  type        = bool
+  default     = false
 }

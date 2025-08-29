@@ -1,7 +1,9 @@
 {
   "name": "agents",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/agents/src",
   "projectType": "application",
+  "implicitDependencies": ["gemini-orchestrator", "monitoring"],
   "targets": {
     "dev": {
       "executor": "nx:run-commands",
@@ -16,11 +18,11 @@
       }
     },
     "lint": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/eslint:lint",
       "options": {
-        "command": "echo 'lint placeholder'",
-        "cwd": "apps/agents"
+        "lintFilePatterns": ["apps/agents/**/*.{ts,tsx,js,jsx}"]
       }
     }
-  }
+  },
+  "tags": ["type:app", "scope:agents"]
 }

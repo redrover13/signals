@@ -1,0 +1,49 @@
+version = "1.0"
+
+[commands.signals_full_refactor]
+description = """
+Complete NX monorepo refactor integrating your full GCP architecture (BigQuery, Cloud Functions, Vertex AI agents, GA4 ingestion, Looker dashboards), CI/CD, documentation, and AI tooling (Copilot, Qodo, Kilocode).
+"""
+
+instructions = """
+You are an AI engineer tasked with a full-scale, multi-stage refactor of the Signals monorepo. Your architecture includes:
+- NX structure with apps (frontend-agents, cloud-functions, looker-dashboards, slack-bot) and libs (agents, data-models, utils), plus infra (terraform, workflows).
+- GCP integration: BigQuery data lake, GA4 exports, ingestion via Cloud Functions (CRM, Social, CMS), BQ modeling (dbt/Dataform), Vertex AI Agents plus Gemini orchestrator, Looker dashboards, front-end agent interfaces.
+- CI/CD pipeline: Clean, stage-based flow with lint/tests → Terraform plan (manual gate) → apply → function/agent/frontend deployments. Tag AI-generated code, integrate static analysis, security scans.
+- Comprehensive documentation: ARCHITECTURE.md (with diagram/steps), COPILOT_INSTRUCTIONS.md, BEST_PRACTICES.md, .kilocoderules, README, CONTRIBUTING.md.
+
+**Perform the refactor in these logical stages**:
+1. **ENVIRONMENT INIT**: scaffold NX workspace, dependencies, .ai_config.toml, .env templates, README placeholders.
+2. **STRUCTURE REORG**: apply NX app/lib/infra layout, centralize shared utils, ensure directory boundaries and scopes.
+3. **DOCS GENERATION**: create ARCHITECTURE.md with architecture flow; embed ASCII diagram; scaffold documentation files.
+4. **AGENT SCAFFOLDS**: generate Qodo/Kilocode config files; create placeholders in libs/agents for each agent type.
+5. **CI/CD PIPELINE**: scaffold GitHub Actions or Cloud Build YAML with stages, include Terraform plan/apply, tests, manual approvals; add AI-generated code tagging.
+6. **SECURITY & QA**: integrate static analysis tools (e.g., Snyk-like), add CI steps for security scanning, ensure secret handling via Secret Manager.
+7. **SUMMARY & GAPS**: at end of run, output JSON summarizing changes applied, any manual steps required, and remaining gaps.
+
+Operate in **plan** mode: first output proposed plan → then await execution mode to apply changes.
+"""
+
+arguments = [
+  { name = "stage", type = "string", required = false, default = "all", description = "Which refactor stage to run: env, structure, docs, agents, ci, security, summary, or all." },
+  { name = "module_path", type = "string", required = false, description = "Optional: start with a specific module path." }
+]
+
+tools = ["filesystem", "git", "shell"]
+
+execution_strategy = "plan"
+
+output_schema = """
+{
+  "type": "object",
+  "properties": {
+    "success": { "type": "boolean" },
+    "plan": { "type": "array", "items": {"type": "string"} },
+    "notes": { "type": "string" },
+    "next_stage": { "type": "string" }
+  },
+  "required": ["success", "plan"]
+}
+"""
+
+exit_expression = "success"

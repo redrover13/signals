@@ -1,5 +1,6 @@
 {
   "name": "event-parser",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/event-parser",
   "projectType": "application",
   "targets": {
@@ -19,6 +20,12 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'No tests defined for event-parser'"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["apps/event-parser/**/*.{ts,tsx,js,jsx}"]
       }
     }
   },

@@ -1,3 +1,4 @@
+file
 name: Infrastructure Monitoring & Alerting
 
 on:
@@ -43,6 +44,8 @@ jobs:
   health-check:
     name: Health Check
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ""
     if: >
       ${{ 
         github.event_name == 'schedule' ||
@@ -58,14 +61,18 @@ jobs:
           - environment: staging
             project: saigon-signals-staging
     steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+          cleanup_credentials: true
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@e2ab1afc8b16a89a5bc7eac718364352c9ebb8d6 # v2.1.0
         with:
           project_id: ${{ matrix.project }}
 
@@ -73,10 +80,17 @@ jobs:
       - name: Check Cloud Run Services
         id: cloud-run
         run: |
-          SERVICES=("dulce-api" "agent-runner")
+          # Get the list of deployed services instead of hardcoding
+          SERVICES=$(gcloud run services list --region=asia-southeast1 --format="value(metadata.name)")
+          
+          # If no services found, use known service names
+          if [ -z "$SERVICES" ]; then
+            SERVICES=("api" "event-parser")
+          fi
+          
           FAILED_SERVICES=()
 
-          for service in "${SERVICES[@]}"; do
+          for service in $SERVICES; do
             echo "Checking $service in ${{ matrix.environment }}..."
             
             # Check service status
@@ -146,20 +160,24 @@ jobs:
       # Alert on failures
       - name: Alert on Health Check Failures
         if: steps.cloud-run.outputs.status == 'failed' || steps.cloud-functions.outputs.status == 'failed'
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
+        env:
+          FAILED_CLOUD_RUN: ${{ steps.cloud-run.outputs.failed_services }}
+          FAILED_CLOUD_FUNCTIONS: ${{ steps.cloud-functions.outputs.failed_functions }}
+          ENVIRONMENT: ${{ matrix.environment }}
         with:
           script: |
-            const title = `🚨 Health Check Failed - ${{ matrix.environment }}`;
+            const title = `🚨 Health Check Failed - ${process.env.ENVIRONMENT}`;
             const body = `
             ## Health Check Failure Alert
 
-            **Environment:** ${{ matrix.environment }}
+            **Environment:** ${process.env.ENVIRONMENT}
             **Time:** ${new Date().toISOString()}
             **Workflow:** ${context.workflow}
 
             ### Failed Services
-            ${steps.cloud-run.outputs.failed_services ? '**Cloud Run:** ' + steps.cloud-run.outputs.failed_services : ''}
-            ${steps.cloud-functions.outputs.failed_functions ? '**Cloud Functions:** ' + steps.cloud-functions.outputs.failed_functions : ''}
+            ${process.env.FAILED_CLOUD_RUN ? '**Cloud Run:** ' + process.env.FAILED_CLOUD_RUN : ''}
+            ${process.env.FAILED_CLOUD_FUNCTIONS ? '**Cloud Functions:** ' + process.env.FAILED_CLOUD_FUNCTIONS : ''}
 
             ### Action Required
             Please investigate the failed services immediately.
@@ -198,6 +216,8 @@ jobs:
   performance-check:
     name: Performance Monitoring
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ""
     if: github.event.schedule == '0 6 * * *' || inputs.check_type == 'performance' || inputs.check_type == 'comprehensive'
     strategy:
       matrix:
@@ -205,21 +225,35 @@ jobs:
         include:
           - environment: production
             project: saigon-signals
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
           - environment: staging
             project: saigon-signals-staging
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - name: Setup Node.js & pnpm
-        uses: pnpm/action-setup@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.0.2
+        with:
+          version: 10.0.0
+          run_install: false
 
+      - name: Setup pnpm cache
+        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+          
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
-
+          
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -281,10 +315,13 @@ jobs:
       # Alert on performance issues
       - name: Alert on Performance Issues
         if: steps.performance.outputs.status != 'good'
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
+        env:
+          PERFORMANCE_STATUS: ${{ steps.performance.outputs.status }}
+          ENVIRONMENT: ${{ matrix.environment }}
         with:
           script: |
-            const title = `⚠️ Performance Issue Detected - ${{ matrix.environment }}`;
+            const title = `⚠️ Performance Issue Detected - ${process.env.ENVIRONMENT}`;
             const body = `
             ## Performance Alert
 
@@ -315,23 +352,39 @@ jobs:
   # ============================================================================
   # SECURITY MONITORING
   # ============================================================================
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
   security-monitoring:
     name: Security Monitoring
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ""
     if: github.event.schedule == '0 6 * * *' || inputs.check_type == 'security' || inputs.check_type == 'comprehensive'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - name: Setup Node.js & pnpm
-        uses: pnpm/action-setup@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.0.2
+        with:
+          version: 10.0.0
+          run_install: false
 
+      - name: Setup pnpm cache
+        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+          
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
-
+          
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -383,7 +436,11 @@ jobs:
       # Alert on security issues
       - name: Alert on Security Issues
         if: steps.deps.outputs.status == 'critical' || steps.secrets.outputs.status == 'secrets_found'
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
+        env:
+          DEPS_STATUS: ${{ steps.deps.outputs.status }}
+          SECRETS_COUNT: ${{ steps.secrets.outputs.secrets_found }}
+          ENVIRONMENT: ${{ matrix.environment }}
         with:
           script: |
             const title = `🔒 Security Alert - Critical Issues Detected`;
@@ -426,6 +483,8 @@ jobs:
   infrastructure-monitoring:
     name: Infrastructure Monitoring
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ""
     if: github.event.schedule == '0 6 * * *' || inputs.check_type == 'comprehensive'
     strategy:
       matrix:
@@ -436,14 +495,19 @@ jobs:
           - environment: staging
             project: saigon-signals-staging
     steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+          create_credentials_file: true
+          cleanup_credentials: true
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@e2ab1afc8b16a89a5bc7eac718364352c9ebb8d6 # v2.1.0
         with:
           project_id: ${{ matrix.project }}
 
@@ -493,15 +557,22 @@ jobs:
   monitoring-summary:
     name: Monitoring Summary
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ""
     needs: [health-check, performance-check, security-monitoring, infrastructure-monitoring]
     if: always() && (github.event.schedule == '0 6 * * *' || inputs.check_type == 'comprehensive')
     steps:
       - name: Generate Monitoring Report
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
+        env:
+          HEALTH_CHECK_RESULT: ${{ needs.health-check.result }}
+          PERFORMANCE_CHECK_RESULT: ${{ needs.performance-check.result }}
+          SECURITY_MONITORING_RESULT: ${{ needs.security-monitoring.result }}
+          INFRASTRUCTURE_MONITORING_RESULT: ${{ needs.infrastructure-monitoring.result }}
         with:
           script: |
             const jobs = [
-              { name: 'Health Check', status: '${{ needs.health-check.result }}' },
+              { name: 'Health Check', status: process.env.HEALTH_CHECK_RESULT },
               { name: 'Performance Check', status: '${{ needs.performance-check.result }}' },
               { name: 'Security Monitoring', status: '${{ needs.security-monitoring.result }}' },
               { name: 'Infrastructure Monitoring', status: '${{ needs.infrastructure-monitoring.result }}' }

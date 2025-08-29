@@ -1,20 +1,24 @@
 {
   "name": "gcp",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/gcp/src",
   "projectType": "library",
+  "tags": ["scope:backend-lib", "type:gcp"],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/gcp",
         "main": "libs/gcp/src/index.ts",
-        "tsConfig": "libs/gcp/tsconfig.lib.json"
+        "tsConfig": "libs/gcp/tsconfig.lib.json",
+        "assets": ["libs/gcp/*.md"]
       }
     },
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["libs/gcp/**/*.ts", "!libs/gcp/**/*.d.ts"]
+        "lintFilePatterns": ["libs/gcp/**/*.{ts,tsx,js,jsx}"]
       }
     }
   }

@@ -24,9 +24,11 @@ jobs:
   validate-pr:
     name: Validate PR
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ""
     steps:
       - name: Validate PR title
-        uses: amannn/action-semantic-pull-request@v5
+        uses: amannn/action-semantic-pull-request@c3dd2c1cb7502571eec2d79827d0449af3fded7b # v5.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -46,7 +48,7 @@ jobs:
           subjectPattern: ^(?![A-Z]).+$
 
       - name: Check PR size
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
         with:
           script: |
             const pr = context.payload.pull_request;
@@ -63,12 +65,91 @@ jobs:
   security-check:
     name: Security Check
     runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ""
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           fetch-depth: 0
 
       - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@c1d738a51fa598f273a26bed229b2ecd53177205 # v2.3.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  encoding-validation:
+    name: UTF-8 Encoding Validation
+    runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ""
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.0.2
+        with:
+          version: 10.0.0
+          run_install: false
+
+      - name: Setup pnpm cache
+        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate UTF-8 encoding
+        run: pnpm run validate:encoding
+
+  code-quality:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ""
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.0.2
+        with:
+          version: 10.0.0
+          run_install: false
+
+      - name: Setup pnpm cache
+        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run ESLint
+        run: pnpm lint:ci
+
+      - name: Check code formatting
+        run: pnpm exec prettier --check .

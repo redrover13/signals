@@ -1,0 +1,96 @@
+/**
+ * @fileoverview Fallback component styles
+ *
+ * This file contains styles for the fallback components.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+.fallbackContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 300px;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.fallbackContent {
+  text-align: center;
+  max-width: 500px;
+}
+
+.fallbackTitle {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #343a40;
+}
+
+.fallbackMessage {
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+}
+
+.errorDetails {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: #fff4f4;
+  border-left: 4px solid #dc3545;
+  border-radius: 4px;
+  text-align: left;
+}
+
+.errorMessage {
+  margin: 0;
+  font-family: monospace;
+  word-break: break-word;
+  color: #dc3545;
+}
+
+.retryButton {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.retryButton:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.retryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .fallbackContainer {
+    padding: 1rem;
+  }
+  
+  .fallbackTitle {
+    font-size: 1.25rem;
+  }
+  
+  .fallbackMessage {
+    font-size: 0.875rem;
+  }
+  
+  .retryButton {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+}

@@ -1,9 +1,0 @@
-{
-  "run": {
-    "command": "nx test security",
-    "startTime": "2025-08-23T04:29:55.369Z",
-    "endTime": "2025-08-23T04:29:55.379Z",
-    "inner": false
-  },
-  "tasks": []
-}

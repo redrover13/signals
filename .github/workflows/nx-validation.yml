@@ -1,0 +1,68 @@
+name: NX Monorepo Validation
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Validate NX Monorepo
+    runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ""
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
+        with:
+          version: 10.0.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      
+      - name: Install dependencies
+        run: |
+          pnpm install --frozen-lockfile
+          bash tools/scripts/install-tool-dependencies.sh
+      
+      - name: Run TypeScript validation
+        run: npx ts-node tools/scripts/check-typescript-issues.ts
+      
+      - name: Analyze dependencies
+        run: npx ts-node tools/scripts/analyze-dependencies.ts
+      
+      - name: Run NX affected commands
+        run: |
+          npx nx affected --target=lint
+          npx nx affected --target=test
+          npx nx affected --target=build
+      
+      - name: Upload validation reports
+        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
+        with:
+          name: validation-reports
+          path: |
+            typescript-issues.json
+            dependency-issues.json

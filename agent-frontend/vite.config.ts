@@ -17,7 +17,7 @@ import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 import { federation } from '@module-federation/vite';
 
 // Import the module federation config
-import moduleFederationConfig from './module-federation.config.js';
+import moduleFederationConfig from './module-federation.config.cjs';
 
 export default defineConfig(async () => {
   const federationPlugin = await federation({

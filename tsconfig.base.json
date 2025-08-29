@@ -10,6 +10,7 @@
     "paths": {
       "@dulce-de-saigon/agents-lib": ["libs/agents/src/index.ts"],
       "@dulce/adk": ["libs/adk/src/index.ts"],
+      "@dulce/env": ["libs/env/src/index.ts"],
       "@dulce/gcp": ["libs/gcp/src/index.ts"],
       "@nx-monorepo/agents/gemini-orchestrator": ["libs/agents/gemini-orchestrator/src/index.ts"],
       "@nx-monorepo/bq-agent": ["libs/agents/bq-agent/src/index.ts"],
@@ -49,6 +50,8 @@
   "exclude": ["node_modules", "tmp"],
   "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", "**/*.js"],
   "references": [
-    { "path": "./tsconfig.references.json" }
+    {
+      "path": "./tsconfig.references.json"
+    }
   ]
 }

@@ -9,8 +9,18 @@
  * @license MIT
  */
 
-export interface VertexAIClientConfig {}
+export interface VertexAIClientConfig {
+  project: string;
+  location: string;
+  endpointId?: string;
+}
 
 export class VertexAIClient {
-  constructor(config: VertexAIClientConfig) {}
+  constructor(private config: VertexAIClientConfig) {}
+
+  async predict(instancePayload: any): Promise<any> {
+    // TODO: Implement actual Vertex AI prediction
+    console.log('Vertex AI prediction called with:', instancePayload);
+    return { predictions: [] };
+  }
 }

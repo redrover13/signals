@@ -172,8 +172,8 @@ const vertexAIConfig: VertexAIClientConfig = {
 };
 
 // Initialize agents and services
-async function initializeAgents() {
-  console.log('Initializing ADK-based agents...');
+async function initializeAgents(): Promise<{ rootAgent: RootAgent; bqAgent: BigQueryAgent; contentAgent: ReturnType<typeof createContentAgent>; vertexClient: VertexAIClient; }> {
+  fastify.log.info('Initializing ADK-based agents...');
   
   // Create vertex client
   vertexClient = new VertexAIClient(vertexAIConfig);
@@ -188,8 +188,8 @@ async function initializeAgents() {
   rootAgent.registerSubAgent('bigquery', bqAgent);
   rootAgent.registerSubAgent('content', contentAgent);
   
-  console.log('✅ ADK agents initialized successfully');
-  console.log('📊 Available agents:', rootAgent.getAvailableAgents());
+  fastify.log.info('✅ ADK agents initialized successfully');
+  fastify.log.info({ msg: '📊 Available agents', agents: rootAgent.getAvailableAgents() });
   
   return { rootAgent, bqAgent, contentAgent, vertexClient };
 }

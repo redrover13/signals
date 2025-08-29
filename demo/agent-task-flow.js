@@ -1,0 +1,89 @@
+#!/usr/bin/env node
+/**
+ * @fileoverview Demo script to verify agent task publishing functionality
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for JavaScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+async function demonstrateAgentTaskFlow() {
+  console.log('🚀 Demonstrating Agent Task Flow...\n');
+
+  try {
+    // Simulate the same message structure that the API endpoint creates
+    const taskMessage = {
+      id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      task: 'Analyze customer sentiment from recent reviews',
+      agentType: 'reviews-agent',
+      priority: 'high',
+      timestamp: new Date().toISOString(),
+      source: 'demo'
+    };
+
+    console.log('📝 Task Message Structure:');
+    console.log(JSON.stringify(taskMessage, null, 2));
+    console.log('');
+
+    // Simulate Pub/Sub publishing (without actual GCP calls)
+    console.log('📡 Publishing task to dulce.agents topic...');
+    const result = {
+      messageId: `demo-message-${Date.now()}`,
+      name: 'dulce.agents'
+    };
+    
+    console.log('✅ Task published successfully!');
+    console.log(`   Message ID: ${result.messageId}`);
+    console.log(`   Topic: ${result.name}`);
+    console.log('');
+
+    console.log('🔄 In a real environment, the agent runner would:');
+    console.log('   1. Receive this message from the dulce.agents subscription');
+    console.log('   2. Route it to the reviews-agent processor');
+    console.log('   3. Execute the sentiment analysis task');
+    console.log('   4. Log the run details to dulce.agent_runs table');
+    console.log('   5. Return the analysis results');
+    console.log('');
+
+    console.log('🎯 Expected Agent Run Log Entry:');
+    const expectedAgentRun = {
+      id: taskMessage.id,
+      agent_type: taskMessage.agentType,
+      task: taskMessage.task,
+      status: 'completed',
+      result: {
+        type: 'reviews',
+        sentiment_summary: {
+          positive: 75,
+          neutral: 15,
+          negative: 10
+        },
+        key_themes: ['service quality', 'food taste', 'delivery speed'],
+        processed_reviews: 1234
+      },
+      started_at: new Date().toISOString(),
+      completed_at: new Date().toISOString()
+    };
+    
+    console.log(JSON.stringify(expectedAgentRun, null, 2));
+    console.log('');
+
+    console.log('✨ Agent Task Flow Demo Complete!');
+    console.log('');
+    console.log('🔧 Next Steps for Production:');
+    console.log('   • Deploy infrastructure: terraform apply infra/terraform/dulce-core/');
+    console.log('   • Build and deploy API: docker build apps/api && deploy to Cloud Run');
+    console.log('   • Build and deploy agent runner: docker build apps/agents && deploy to Cloud Run');
+    console.log('   • Configure monitoring and alerts');
+
+  } catch (error) {
+    console.error('❌ Demo failed:', error);
+    process.exit(1);
+  }
+}
+
+// Run the demo
+demonstrateAgentTaskFlow().catch(console.error);

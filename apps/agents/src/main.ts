@@ -129,15 +129,12 @@ async function agentsRoutes(fastify: FastifyInstance) {
   fastify.post('/api/v1/generate-text', async (request: FastifyRequest, reply) => {
     try {
       const { prompt, options } = request.body as any;
-      
-      if (!prompt) {
-        return reply.status(400).send({
-          error: 'Prompt is required',
-        });
+      if (typeof prompt !== 'string' || !prompt.trim()) {
+        return reply.status(400).send({ error: 'Prompt must be a non-empty string' });
       }
 
       const text = await vertexClient.generateText(prompt, options);
-      
+    
       return { 
         success: true, 
         text,

@@ -30,20 +30,21 @@ export class VertexAIClient {
   private llm: BaseLlm;
   private config: VertexAIClientConfig;
 
-  constructor(config: VertexAIClientConfig) {
+  constructor(config: VertexAIClientConfig = {}) {
     this.config = {
-      project: config.project || process.env.GCP_PROJECT_ID,
-      location: config.location || process.env.GCP_LOCATION || 'us-central1',
-      endpointId: config.endpointId || process.env.VERTEX_AI_ENDPOINT_ID,
-      model: config.model || 'gemini-1.5-pro',
-      apiKey: config.apiKey || process.env.GOOGLE_API_KEY,
-      ...config,
+      project:    config.project    ?? process.env.GCP_PROJECT_ID ?? '',
+      location:   config.location   ?? process.env.GCP_LOCATION   ?? 'us-central1',
+      endpointId: config.endpointId ?? process.env.VERTEX_AI_ENDPOINT_ID,
+      model:      config.model      ?? 'gemini-1.5-pro',
+      apiKey:     config.apiKey     ?? process.env.GOOGLE_API_KEY,
     };
+    if (!this.config.apiKey)   throw new Error('GOOGLE_API_KEY (apiKey) is required for VertexAIClient');
+    if (!this.config.project)  throw new Error('GCP_PROJECT_ID (project) is required for VertexAIClient');
 
     // Initialize Gemini LLM using ADK
     this.llm = new GeminiLlm({
       apiKey: this.config.apiKey,
-      model: this.config.model,
+      model:  this.config.model,
     });
   }
 

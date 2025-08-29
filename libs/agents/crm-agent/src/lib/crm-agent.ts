@@ -225,7 +225,7 @@ export class CRMAgent {
   /**
    * Get customer activity history
    */
-  async getCustomerActivity(customerId: string, limit: number = 50): Promise<CRMResult<any[]>> {
+  async getCustomerActivity(customerId: string, limit = 50): Promise<CRMResult<any[]>> {
     return this.makeRequest(`/customers/${customerId}/activities?limit=${limit}`);
   }
 

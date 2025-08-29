@@ -9,8 +9,23 @@
  * @license MIT
  */
 
-export interface VertexAIClientConfig {}
+export interface VertexAIClientConfig {
+  project: string;
+  location: string;
+  endpointId: string;
+}
 
 export class VertexAIClient {
-  constructor(config: VertexAIClientConfig) {}
+  constructor(private config: VertexAIClientConfig) {}
+
+  async predict(instancePayload: any): Promise<any> {
+    // TODO: Implement actual Vertex AI prediction
+    // This is a placeholder implementation
+    return {
+      predictions: [{
+        result: 'placeholder prediction',
+        confidence: 0.95
+      }]
+    };
+  }
 }

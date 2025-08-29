@@ -3,6 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/utils/monitoring/src",
   "projectType": "library",
+  "implicitDependencies": ["gemini-orchestrator"],
   "tags": [
     "domain:monitoring",
     "type:library"
@@ -42,6 +43,19 @@
         "production",
         "^production"
       ]
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/utils/monitoring/**/*.{ts,tsx,js,jsx}"
+        ]
+      },
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json"
+      ],
+      "cache": true
     },
     "test": {
       "executor": "@nx/jest:jest",

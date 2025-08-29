@@ -175,10 +175,11 @@ async function processAgentTask<TTask = AgentTaskPayload, TResult = AgentResultP
 
   return run;
 }
+const subscriptionName = process.env.AGENTS_SUBSCRIPTION || 'dulce-agents-sub';
+const subscription = pubsub.subscription(subscriptionName);
 
-// Agent task processors
-async function processGeminiTask(task: any): Promise<any> {
-  // Placeholder for Gemini orchestrator logic
+console.log(`Starting agent runner subscription: ${subscriptionName}...`);
+
   return { type: 'gemini', result: `Processed Gemini task: ${JSON.stringify(task)}` };
     try {
       const raw = message.data?.toString();

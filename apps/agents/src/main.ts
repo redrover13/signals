@@ -63,28 +63,64 @@ const vertexAIConfig: VertexAIClientConfig = {
 const vertexClient = new VertexAIClient(vertexAIConfig);
 
 // --- Agent Runner Service ---
-interface AgentTask {
+// Define task/result types for each agent
+type GeminiTask = { prompt: string; context?: any };
+type GeminiResult = { response: string; metadata?: any };
+
+type BigQueryTask = { query: string; params?: any[] };
+type BigQueryResult = { rows: any[]; schema?: any };
+
+type ContentTask = { contentId: string; action: string; data?: any };
+type ContentResult = { success: boolean; details?: any };
+
+type CRMTask = { customerId: string; operation: string; payload?: any };
+type CRMResult = { status: string; data?: any };
+
+type ReviewsTask = { reviewId: string; action: string; payload?: any };
+type ReviewsResult = { updated: boolean; review?: any };
+
+type DefaultTask = any;
+type DefaultResult = any;
+
+// Union types for all agent tasks/results
+type AgentTaskPayload =
+  | GeminiTask
+  | BigQueryTask
+  | ContentTask
+  | CRMTask
+  | ReviewsTask
+  | DefaultTask;
+
+type AgentResultPayload =
+  | GeminiResult
+  | BigQueryResult
+  | ContentResult
+  | CRMResult
+  | ReviewsResult
+  | DefaultResult;
+
+interface AgentTask<TTask = AgentTaskPayload> {
   id: string;
-  task: any;
+  task: TTask;
   agentType: string;
   priority: string;
   timestamp: string;
   source: string;
 }
 
-interface AgentRun {
+interface AgentRun<TTask = AgentTaskPayload, TResult = AgentResultPayload> {
   id: string;
   agent_type: string;
-  task: any;
+  task: TTask;
   status: 'started' | 'completed' | 'failed';
-  result?: any;
+  result?: TResult;
   started_at: string;
   completed_at?: string;
   error_message?: string;
 }
 
-async function processAgentTask(taskMessage: AgentTask) {
-  const run: AgentRun = {
+async function processAgentTask<TTask = AgentTaskPayload, TResult = AgentResultPayload>(taskMessage: AgentTask<TTask>): Promise<AgentRun<TTask, TResult>> {
+  const run: AgentRun<TTask, TResult> = {
     id: taskMessage.id,
     agent_type: taskMessage.agentType,
     task: taskMessage.task,

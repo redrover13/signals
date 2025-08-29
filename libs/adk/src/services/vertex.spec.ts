@@ -9,7 +9,7 @@
  * @license MIT
  */
 
-import { VertexAIClient, DocumentChunk } from '../src/services/vertex';
+import { VertexAIClient, DocumentChunk } from './vertex';
 
 describe('VertexAIClient RAG functionality', () => {
   let client: VertexAIClient;

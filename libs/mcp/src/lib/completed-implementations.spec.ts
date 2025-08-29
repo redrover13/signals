@@ -1,5 +1,3 @@
-import * as path from 'path';
-import * as fs from 'fs';
 
 describe('MCP Implementation Validation', () => {
   it('should have all required implementations completed', () => {

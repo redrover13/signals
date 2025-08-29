@@ -1,0 +1,12 @@
+{
+  "name": "agent-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test:jest": "nx test agent-frontend",
+    "test:vitest": "vitest run",
+    "test:vitest:watch": "vitest",
+    "test:vitest:coverage": "vitest run --coverage",
+    "test:all": "npm run test:jest && npm run test:vitest"
+  }
+}

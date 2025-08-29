@@ -72,7 +72,7 @@ describe('ExampleButton', () => {
     // Setup code
     mock.clearAllMocks();
   });
-  
+
   afterEach(() => {
     // Cleanup code
   });
@@ -83,7 +83,7 @@ describe('Async functionality', () => {
   it('handles promises correctly', async () => {
     // Create a mock function using the appropriate API
     const asyncMock = mock.fn().mockResolvedValue('success');
-    
+
     const result = await asyncMock();
     expect(result).toBe('success');
     expect(asyncMock).toHaveBeenCalledTimes(1);

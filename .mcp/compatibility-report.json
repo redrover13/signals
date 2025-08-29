@@ -1,0 +1,101 @@
+{
+  "timestamp": "2025-08-29T13:49:06.621Z",
+  "masterConfig": {
+    "path": "/home/g_nelson/signals-1/.mcp/config/mcp.json",
+    "serverCount": 5,
+    "servers": [
+      "github",
+      "codacy",
+      "playwright",
+      "terraform",
+      "sequentialthinking"
+    ]
+  },
+  "platforms": {
+    "github-copilot": {
+      "configFiles": [
+        {
+          "path": "/home/g_nelson/AppData/Roaming/Code/User/mcp.json",
+          "valid": true,
+          "serverCount": 5
+        },
+        {
+          "path": "/home/g_nelson/.config/Code/User/mcp.json",
+          "valid": true,
+          "serverCount": 5
+        },
+        {
+          "path": "/home/g_nelson/.vscode/mcp.json",
+          "valid": true,
+          "serverCount": 5
+        }
+      ],
+      "accessibility": "accessible"
+    },
+    "kilocode": {
+      "configFiles": [
+        {
+          "path": "/home/g_nelson/.vscode-server/data/User/globalStorage/kilocode.kilo-code/settings/mcp_settings.json",
+          "valid": true,
+          "serverCount": 5
+        },
+        {
+          "path": "/home/g_nelson/.kilocode/mcp.json",
+          "valid": true,
+          "serverCount": 5
+        },
+        {
+          "path": "/home/g_nelson/signals-1/.kilocode/mcp.json",
+          "valid": true,
+          "serverCount": 5
+        }
+      ],
+      "accessibility": "accessible"
+    },
+    "qodo-gen": {
+      "configFiles": [
+        {
+          "path": "/home/g_nelson/.qodo/mcp.json",
+          "valid": true,
+          "serverCount": 5
+        },
+        {
+          "path": "/home/g_nelson/.codegpt/mcp_config.json",
+          "valid": true,
+          "serverCount": 5
+        },
+        {
+          "path": "/home/g_nelson/signals-1/.qodo/mcp.json",
+          "valid": true,
+          "serverCount": 5
+        }
+      ],
+      "accessibility": "accessible"
+    },
+    "vscode-extensions": {
+      "configFiles": [
+        {
+          "path": "/home/g_nelson/.vscode/extensions/mcp.json",
+          "valid": true,
+          "serverCount": 5
+        },
+        {
+          "path": "/home/g_nelson/signals-1/.vscode",
+          "valid": false,
+          "error": "EISDIR: illegal operation on a directory, read"
+        },
+        {
+          "path": "mcp.json",
+          "valid": true,
+          "serverCount": 5
+        }
+      ],
+      "accessibility": "accessible"
+    }
+  },
+  "summary": {
+    "totalPlatforms": 4,
+    "accessiblePlatforms": 4,
+    "universalAccess": true
+  }
+}

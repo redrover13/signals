@@ -1,0 +1,239 @@
+{
+  "version": "2.0.0",
+  "metadata": {
+    "description": "Enhanced Universal MCP server configuration with all discovered resources",
+    "compatibility": ["github-copilot", "kilocode", "qodo-gen", "vscode-extensions", "ai-assistants"],
+    "environment": "development",
+    "lastUpdated": "2025-08-29T13:49:06.621Z"
+  },
+  "servers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "github-token"
+      }
+    },
+    "codacy": {
+      "command": "npx",
+      "args": ["-y", "@codacy/codacy-mcp@latest"],
+      "env": {
+        "CODACY_API_TOKEN": "codacy-token"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    },
+    "terraform": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "hashicorp/terraform-mcp-server"]
+    },
+    "sequentialthinking": {
+      "command": "npx",
+      "args": ["-y", "mcp-sequentialthinking@latest"]
+    },
+    "nx": {
+      "command": "npx",
+      "args": ["-y", "@nx/mcp-server@latest"],
+      "env": {
+        "NX_CLOUD_ACCESS_TOKEN": "nx-cloud-token"
+      }
+    },
+    "typescript": {
+      "command": "node",
+      "args": ["/home/g_nelson/signals-1/.mcp/servers/typescript-mcp-server.mjs"]
+    },
+    "python": {
+      "command": "python3",
+      "args": ["/home/g_nelson/signals-1/.mcp/servers/python-mcp-server.py"]
+    },
+    "sentry": {
+      "command": "npx",
+      "args": ["-y", "@sentry/mcp-server@latest"],
+      "env": {
+        "SENTRY_AUTH_TOKEN": "sentry-token",
+        "SENTRY_ORG": "signals-org"
+      }
+    },
+    "tavily": {
+      "command": "npx",
+      "args": ["-y", "tavily-mcp@latest"],
+      "env": {
+        "TAVILY_API_KEY": "tavily-api-key"
+      }
+    },
+    "qdrant": {
+      "command": "npx",
+      "args": ["-y", "@qdrant/mcp-server@latest"],
+      "env": {
+        "QDRANT_URL": "qdrant-url",
+        "QDRANT_API_KEY": "qdrant-api-key"
+      }
+    },
+    "codecov": {
+      "command": "npx",
+      "args": ["-y", "@codecov/mcp-server@latest"],
+      "env": {
+        "CODECOV_TOKEN": "codecov-token"
+      }
+    },
+    "google-search": {
+      "command": "npx",
+      "args": ["-y", "@google/search-mcp@latest"],
+      "env": {
+        "GOOGLE_API_KEY": "google-api-key",
+        "GOOGLE_CSE_ID": "google-cse-id"
+      }
+    },
+    "google-drive": {
+      "command": "npx",
+      "args": ["-y", "@google/drive-mcp@latest"],
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "google-service-account"
+      }
+    },
+    "google-cloud": {
+      "command": "npx",
+      "args": ["-y", "@google-cloud/mcp-server@latest"],
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "google-service-account",
+        "GCP_PROJECT_ID": "gcp-project-id"
+      }
+    },
+    "bigquery": {
+      "command": "npx",
+      "args": ["-y", "@google-cloud/bigquery-mcp@latest"],
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "google-service-account",
+        "GCP_PROJECT_ID": "gcp-project-id"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "postgres-connection"
+      }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+      "args2": ["/home/g_nelson/signals-1"]
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "brave-api-key"
+      }
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+    },
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git"],
+      "args2": ["/home/g_nelson/signals-1"]
+    },
+    "everything": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-everything"]
+    }
+  },
+  "secrets": {
+    "github-token": {
+      "description": "GitHub Personal Access Token",
+      "env": "GITHUB_TOKEN",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/github-token/versions/latest"
+    },
+    "codacy-token": {
+      "description": "Codacy API Token",
+      "env": "CODACY_API_TOKEN", 
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/codacy-token/versions/latest"
+    },
+    "nx-cloud-token": {
+      "description": "NX Cloud Access Token",
+      "env": "NX_CLOUD_ACCESS_TOKEN",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/nx-cloud-token/versions/latest"
+    },
+    "sentry-token": {
+      "description": "Sentry Auth Token",
+      "env": "SENTRY_AUTH_TOKEN",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/sentry-token/versions/latest"
+    },
+    "tavily-api-key": {
+      "description": "Tavily AI Search API Key",
+      "env": "TAVILY_API_KEY",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/tavily-api-key/versions/latest"
+    },
+    "qdrant-api-key": {
+      "description": "Qdrant Vector Database API Key", 
+      "env": "QDRANT_API_KEY",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/qdrant-api-key/versions/latest"
+    },
+    "qdrant-url": {
+      "description": "Qdrant Vector Database URL",
+      "env": "QDRANT_URL",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/qdrant-url/versions/latest"
+    },
+    "codecov-token": {
+      "description": "Codecov API Token",
+      "env": "CODECOV_TOKEN",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/codecov-token/versions/latest"
+    },
+    "google-api-key": {
+      "description": "Google API Key",
+      "env": "GOOGLE_API_KEY",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/google-api-key/versions/latest"
+    },
+    "google-cse-id": {
+      "description": "Google Custom Search Engine ID",
+      "env": "GOOGLE_CSE_ID",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/google-cse-id/versions/latest"
+    },
+    "google-service-account": {
+      "description": "Google Service Account Key",
+      "env": "GOOGLE_APPLICATION_CREDENTIALS",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/google-service-account/versions/latest"
+    },
+    "gcp-project-id": {
+      "description": "GCP Project ID",
+      "env": "GCP_PROJECT_ID",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/gcp-project-id/versions/latest"
+    },
+    "postgres-connection": {
+      "description": "PostgreSQL Connection String",
+      "env": "POSTGRES_CONNECTION_STRING",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/postgres-connection/versions/latest"
+    },
+    "brave-api-key": {
+      "description": "Brave Search API Key",
+      "env": "BRAVE_API_KEY",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/brave-api-key/versions/latest"
+    }
+  },
+  "orchestration": {
+    "healthChecks": {
+      "enabled": true,
+      "interval": 30000,
+      "timeout": 5000,
+      "retries": 3
+    },
+    "logging": {
+      "level": "info",
+      "destination": "console",
+      "structured": true
+    },
+    "security": {
+      "enableTLS": false,
+      "validateCertificates": false,
+      "maxRequestSize": 10485760
+    }
+  }
+}

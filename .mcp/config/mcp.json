@@ -1,0 +1,54 @@
+{
+  "$schema": "./mcp-schema.json",
+  "version": "1.0.0",
+  "metadata": {
+    "name": "Enterprise MCP Configuration",
+    "description": "Universal MCP server configuration for AI tools: Copilot, Kilocode, Qodo Gen, and all compatible platforms",
+    "environment": "development",
+    "compatibility": ["github-copilot", "kilocode", "qodo-gen", "vscode-extensions", "ai-assistants"]
+  },
+  "servers": {
+    "github": {
+      "url": "https://api.githubcopilot.com/mcp/",
+      "type": "http",
+      "timeout": 30000
+    },
+    "codacy": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@codacy/codacy-mcp@latest"
+      ],
+      "type": "stdio",
+      "env": {
+        "CODACY_ACCOUNT_TOKEN": "XGRPGPYzQLheHvDcCrUT"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ],
+      "type": "stdio"
+    },
+    "terraform": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "hashicorp/terraform-mcp-server"
+      ],
+      "type": "stdio"
+    },
+    "sequentialthinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "type": "stdio"
+    }
+  },
+  "inputs": []
+}

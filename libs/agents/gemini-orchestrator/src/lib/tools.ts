@@ -25,7 +25,7 @@ interface StorageUploadInput {
   contentType?: string;
 }
 
-import { query, insertRows, uploadString } from '../../../gcp/src';
+import { query, insertRows, uploadString } from '@dulce/gcp';
 
 export const tools = {
   'bq.query': {

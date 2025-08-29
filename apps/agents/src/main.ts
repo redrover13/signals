@@ -10,7 +10,7 @@
  */
 
 import Fastify, { FastifyInstance, FastifyRequest } from 'fastify';
-import { VertexAIClient, VertexAIClientConfig } from '@nx-monorepo/adk/services/vertex';
+import { VertexAIClient, VertexAIClientConfig } from '@dulce/adk';
 import { mcpService } from '@nx-monorepo/mcp';
 
 // Local route implementations for agents project

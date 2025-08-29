@@ -53,7 +53,12 @@ export class VertexAIClient {
    * @param instancePayload - The input data for prediction
    * @returns Promise with prediction results
    */
-  async predict(instancePayload: any): Promise<any> {
+  public async predict(
+    instancePayload: unknown
+  ): Promise<{
+    predictions: string[];
+    metadata: { model?: string; project?: string; location?: string };
+  }> {
     try {
       const request: LlmRequest = {
         messages: [
@@ -65,9 +70,9 @@ export class VertexAIClient {
       };
 
       const response: LlmResponse = await this.llm.invoke(request);
-      
+
       return {
-        predictions: [response.content],
+        predictions: [response.content as string],
         metadata: {
           model: this.config.model,
           project: this.config.project,
@@ -75,6 +80,12 @@ export class VertexAIClient {
         },
       };
     } catch (error) {
+      throw new Error(
+        `Vertex AI prediction failed: ${(error as Error)?.message ?? String(error)}`,
+        { cause: error as Error }
+      );
+    }
+  }
       throw new Error(`Vertex AI prediction failed: ${error}`);
     }
   }

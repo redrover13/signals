@@ -1,0 +1,417 @@
+/**
+ * @fileoverview Looker Studio dashboard templates for agent monitoring
+ *
+ * This file contains JSON templates for creating Looker Studio dashboards
+ * to monitor agent performance, traces, and logs in the F&B data platform.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
+ * Configuration for dashboard data sources
+ */
+export interface DashboardDataSource {
+  type: 'bigquery' | 'cloud-monitoring';
+  projectId: string;
+  datasetId?: string;
+  tableId?: string;
+  query?: string;
+}
+
+/**
+ * Main agent monitoring dashboard template
+ */
+export const AGENT_MONITORING_DASHBOARD = {
+  "name": "Dulce de Saigon - Agent Monitoring Dashboard",
+  "description": "Comprehensive monitoring dashboard for F&B agent performance and telemetry",
+  "version": "1.0.0",
+  "dataSources": [
+    {
+      "id": "agent_logs",
+      "name": "Agent Logs",
+      "type": "bigquery",
+      "projectId": "${GCP_PROJECT_ID}",
+      "datasetId": "agent_logs",
+      "tableId": "trace_logs"
+    },
+    {
+      "id": "processed_events",
+      "name": "Processed Events", 
+      "type": "bigquery",
+      "projectId": "${GCP_PROJECT_ID}",
+      "datasetId": "${BIGQUERY_DATASET}",
+      "tableId": "${BIGQUERY_TABLE}"
+    }
+  ],
+  "pages": [
+    {
+      "name": "Overview",
+      "charts": [
+        {
+          "id": "agent_health_score",
+          "type": "scorecard",
+          "title": "Overall Agent Health",
+          "dataSource": "agent_logs",
+          "metric": "health_score",
+          "query": `
+            SELECT 
+              CASE 
+                WHEN error_rate < 0.01 AND avg_response_time < 1000 THEN 'Excellent'
+                WHEN error_rate < 0.05 AND avg_response_time < 2000 THEN 'Good' 
+                WHEN error_rate < 0.1 AND avg_response_time < 5000 THEN 'Fair'
+                ELSE 'Poor'
+              END as health_score
+            FROM (
+              SELECT 
+                COUNT(*) FILTER (WHERE level = 'error') / COUNT(*) as error_rate,
+                AVG(CAST(JSON_EXTRACT_SCALAR(data, '$.duration_ms') AS FLOAT64)) as avg_response_time
+              FROM \`{project_id}.agent_logs.trace_logs\`
+              WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR)
+                AND service = 'dulce-de-saigon-agent'
+            )
+          `,
+          "position": { "x": 0, "y": 0, "width": 3, "height": 2 }
+        },
+        {
+          "id": "requests_per_minute",
+          "type": "time_series",
+          "title": "Agent Requests per Minute",
+          "dataSource": "agent_logs",
+          "query": `
+            SELECT 
+              TIMESTAMP_TRUNC(timestamp, MINUTE) as time,
+              COUNT(*) as requests
+            FROM \`{project_id}.agent_logs.trace_logs\`
+            WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+              AND event IN ('agent_task_started', 'prediction_request')
+            GROUP BY time
+            ORDER BY time
+          `,
+          "position": { "x": 3, "y": 0, "width": 9, "height": 4 }
+        },
+        {
+          "id": "error_rate",
+          "type": "time_series", 
+          "title": "Error Rate",
+          "dataSource": "agent_logs",
+          "query": `
+            SELECT 
+              TIMESTAMP_TRUNC(timestamp, MINUTE) as time,
+              COUNT(*) FILTER (WHERE level = 'error') / COUNT(*) * 100 as error_rate_percent
+            FROM \`{project_id}.agent_logs.trace_logs\`
+            WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+            GROUP BY time
+            ORDER BY time
+          `,
+          "position": { "x": 0, "y": 4, "width": 6, "height": 4 }
+        },
+        {
+          "id": "response_times",
+          "type": "time_series",
+          "title": "Average Response Times",
+          "dataSource": "agent_logs", 
+          "query": `
+            SELECT 
+              TIMESTAMP_TRUNC(timestamp, MINUTE) as time,
+              AVG(CAST(JSON_EXTRACT_SCALAR(data, '$.duration_ms') AS FLOAT64)) as avg_response_time_ms
+            FROM \`{project_id}.agent_logs.trace_logs\`
+            WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+              AND JSON_EXTRACT_SCALAR(data, '$.duration_ms') IS NOT NULL
+            GROUP BY time
+            ORDER BY time
+          `,
+          "position": { "x": 6, "y": 4, "width": 6, "height": 4 }
+        }
+      ]
+    },
+    {
+      "name": "F&B Operations",
+      "charts": [
+        {
+          "id": "restaurant_interactions",
+          "type": "bar_chart",
+          "title": "Restaurant Interactions by Type",
+          "dataSource": "agent_logs",
+          "query": `
+            SELECT 
+              JSON_EXTRACT_SCALAR(data, '$.action') as interaction_type,
+              COUNT(*) as interaction_count
+            FROM \`{project_id}.agent_logs.trace_logs\`
+            WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+              AND event = 'user_interaction'
+              AND JSON_EXTRACT_SCALAR(data, '$.action') IS NOT NULL
+            GROUP BY interaction_type
+            ORDER BY interaction_count DESC
+          `,
+          "position": { "x": 0, "y": 0, "width": 6, "height": 4 }
+        },
+        {
+          "id": "menu_item_requests",
+          "type": "pie_chart",
+          "title": "Most Requested Menu Items",
+          "dataSource": "agent_logs",
+          "query": `
+            SELECT 
+              JSON_EXTRACT_SCALAR(data, '$.menu_item_id') as menu_item,
+              COUNT(*) as request_count
+            FROM \`{project_id}.agent_logs.trace_logs\`
+            WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+              AND event = 'user_interaction'
+              AND JSON_EXTRACT_SCALAR(data, '$.menu_item_id') IS NOT NULL
+            GROUP BY menu_item
+            ORDER BY request_count DESC
+            LIMIT 10
+          `,
+          "position": { "x": 6, "y": 0, "width": 6, "height": 4 }
+        },
+        {
+          "id": "restaurant_performance",
+          "type": "table",
+          "title": "Restaurant Performance Metrics",
+          "dataSource": "agent_logs",
+          "query": `
+            SELECT 
+              JSON_EXTRACT_SCALAR(data, '$.restaurant_id') as restaurant_id,
+              COUNT(*) as total_interactions,
+              COUNT(*) FILTER (WHERE level = 'error') as error_count,
+              AVG(CAST(JSON_EXTRACT_SCALAR(data, '$.duration_ms') AS FLOAT64)) as avg_response_time_ms,
+              COUNT(*) FILTER (WHERE level = 'error') / COUNT(*) * 100 as error_rate_percent
+            FROM \`{project_id}.agent_logs.trace_logs\`
+            WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+              AND JSON_EXTRACT_SCALAR(data, '$.restaurant_id') IS NOT NULL
+            GROUP BY restaurant_id
+            ORDER BY total_interactions DESC
+          `,
+          "position": { "x": 0, "y": 4, "width": 12, "height": 4 }
+        }
+      ]
+    },
+    {
+      "name": "Trace Analysis",
+      "charts": [
+        {
+          "id": "trace_spans_distribution",
+          "type": "histogram",
+          "title": "Trace Span Duration Distribution",
+          "dataSource": "agent_logs",
+          "query": `
+            SELECT 
+              CAST(JSON_EXTRACT_SCALAR(data, '$.duration_ms') AS FLOAT64) as span_duration_ms
+            FROM \`{project_id}.agent_logs.trace_logs\`
+            WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+              AND JSON_EXTRACT_SCALAR(data, '$.duration_ms') IS NOT NULL
+              AND CAST(JSON_EXTRACT_SCALAR(data, '$.duration_ms') AS FLOAT64) < 10000
+          `,
+          "position": { "x": 0, "y": 0, "width": 6, "height": 4 }
+        },
+        {
+          "id": "slowest_operations",
+          "type": "table",
+          "title": "Slowest Operations",
+          "dataSource": "agent_logs", 
+          "query": `
+            SELECT 
+              event,
+              trace_id,
+              span_id,
+              CAST(JSON_EXTRACT_SCALAR(data, '$.duration_ms') AS FLOAT64) as duration_ms,
+              timestamp
+            FROM \`{project_id}.agent_logs.trace_logs\`
+            WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+              AND JSON_EXTRACT_SCALAR(data, '$.duration_ms') IS NOT NULL
+            ORDER BY duration_ms DESC
+            LIMIT 20
+          `,
+          "position": { "x": 6, "y": 0, "width": 6, "height": 4 }
+        },
+        {
+          "id": "trace_errors",
+          "type": "table",
+          "title": "Recent Trace Errors",
+          "dataSource": "agent_logs",
+          "query": `
+            SELECT 
+              timestamp,
+              trace_id,
+              span_id,
+              event,
+              JSON_EXTRACT_SCALAR(data, '$.error_message') as error_message,
+              JSON_EXTRACT_SCALAR(data, '$.span_name') as span_name
+            FROM \`{project_id}.agent_logs.trace_logs\`
+            WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+              AND level = 'error'
+            ORDER BY timestamp DESC
+            LIMIT 50
+          `,
+          "position": { "x": 0, "y": 4, "width": 12, "height": 4 }
+        }
+      ]
+    },
+    {
+      "name": "Compliance & Security",
+      "charts": [
+        {
+          "id": "data_location_compliance",
+          "type": "pie_chart",
+          "title": "Data Processing by Region",
+          "dataSource": "agent_logs",
+          "query": `
+            SELECT 
+              region,
+              COUNT(*) as processing_count
+            FROM \`{project_id}.agent_logs.trace_logs\`
+            WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+            GROUP BY region
+          `,
+          "position": { "x": 0, "y": 0, "width": 6, "height": 4 }
+        },
+        {
+          "id": "compliance_status",
+          "type": "scorecard",
+          "title": "Vietnam Data Law Compliance",
+          "dataSource": "agent_logs",
+          "query": `
+            SELECT 
+              COUNT(*) FILTER (WHERE compliance_marker = 'GDPR-VIETNAM-COMPLIANT') / COUNT(*) * 100 as compliance_percentage
+            FROM \`{project_id}.agent_logs.trace_logs\`
+            WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 24 HOUR)
+          `,
+          "position": { "x": 6, "y": 0, "width": 3, "height": 2 }
+        },
+        {
+          "id": "data_retention_status",
+          "type": "scorecard", 
+          "title": "Data Retention Compliance",
+          "dataSource": "agent_logs",
+          "query": `
+            SELECT 
+              COUNT(*) FILTER (WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 90 DAY)) / COUNT(*) * 100 as retention_compliance
+            FROM \`{project_id}.agent_logs.trace_logs\`
+          `,
+          "position": { "x": 9, "y": 0, "width": 3, "height": 2 }
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "time_range",
+      "name": "Time Range",
+      "type": "date_range",
+      "defaultValue": "LAST_24_HOURS",
+      "appliedToAllPages": true
+    },
+    {
+      "id": "service_filter",
+      "name": "Service",
+      "type": "dropdown",
+      "field": "service",
+      "values": [
+        "dulce-de-saigon-agent",
+        "dulce-de-saigon-api", 
+        "dulce-de-saigon-event-parser"
+      ],
+      "appliedToAllPages": true
+    }
+  ],
+  "themes": {
+    "primary_color": "#FF6B35",
+    "secondary_color": "#2ECC71", 
+    "background_color": "#FFFFFF",
+    "text_color": "#2C3E50"
+  },
+  "metadata": {
+    "created_for": "Dulce de Saigon F&B Data Platform",
+    "compliance": "GDPR-Vietnam Compatible",
+    "region": "Asia-Southeast1",
+    "version": "1.0.0"
+  }
+};
+
+/**
+ * Real-time agent performance dashboard
+ */
+export const REALTIME_DASHBOARD = {
+  "name": "Real-time Agent Performance",
+  "description": "Live monitoring of agent performance metrics",
+  "refreshInterval": "30s",
+  "charts": [
+    {
+      "id": "live_requests",
+      "type": "time_series",
+      "title": "Live Requests (Last 30 minutes)",
+      "query": `
+        SELECT 
+          TIMESTAMP_TRUNC(timestamp, MINUTE) as time,
+          COUNT(*) as requests
+        FROM \`{project_id}.agent_logs.trace_logs\`
+        WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 MINUTE)
+        GROUP BY time
+        ORDER BY time
+      `,
+      "autoRefresh": true
+    },
+    {
+      "id": "live_errors",
+      "type": "number",
+      "title": "Errors (Last 5 minutes)",
+      "query": `
+        SELECT COUNT(*) as error_count
+        FROM \`{project_id}.agent_logs.trace_logs\`
+        WHERE timestamp >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 5 MINUTE)
+          AND level = 'error'
+      `,
+      "autoRefresh": true,
+      "alertThreshold": 10
+    }
+  ]
+};
+
+/**
+ * Generate a dashboard template with custom parameters
+ */
+export function generateDashboardTemplate(options: {
+  projectId: string;
+  datasetId: string;
+  tableId: string;
+  dashboardName?: string;
+}): any {
+  const template = JSON.parse(JSON.stringify(AGENT_MONITORING_DASHBOARD));
+  
+  // Replace placeholders
+  const templateStr = JSON.stringify(template)
+    .replace(/\{project_id\}/g, options.projectId)
+    .replace(/\$\{GCP_PROJECT_ID\}/g, options.projectId)
+    .replace(/\$\{BIGQUERY_DATASET\}/g, options.datasetId)
+    .replace(/\$\{BIGQUERY_TABLE\}/g, options.tableId);
+  
+  const customizedTemplate = JSON.parse(templateStr);
+  
+  if (options.dashboardName) {
+    customizedTemplate.name = options.dashboardName;
+  }
+  
+  return customizedTemplate;
+}
+
+/**
+ * Export dashboard template to file
+ */
+export function exportDashboardTemplate(
+  template: any,
+  format: 'json' | 'looker' = 'json'
+): string {
+  if (format === 'json') {
+    return JSON.stringify(template, null, 2);
+  }
+  
+  // For Looker Studio format, return a simplified version
+  return JSON.stringify({
+    dashboardName: template.name,
+    dataConnectors: template.dataSources,
+    charts: template.pages.flatMap((page: any) => page.charts),
+    filters: template.filters
+  }, null, 2);
+}

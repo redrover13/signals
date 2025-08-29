@@ -1,7 +1,202 @@
 import { monitoring } from './monitoring';
+import { 
+  initializeOpenTelemetry, 
+  withSpan, 
+  logEvent, 
+  instrument,
+  shutdownOpenTelemetry 
+} from './otel-config';
+import { CloudTraceExporter } from './cloud-trace-exporter';
+import { BigQueryLogger } from './bigquery-logger';
+
+// Mock dependencies
+jest.mock('@google-cloud/bigquery');
+jest.mock('@google-cloud/storage');
+jest.mock('@opentelemetry/sdk-node');
 
 describe('monitoring', () => {
   it('should work', () => {
     expect(monitoring()).toEqual('monitoring');
+  });
+
+  describe('OpenTelemetry Configuration', () => {
+    beforeEach(() => {
+      // Clear any existing SDK
+      jest.clearAllMocks();
+    });
+
+    afterEach(async () => {
+      await shutdownOpenTelemetry();
+    });
+
+    it('should initialize OpenTelemetry with default configuration', async () => {
+      const sdk = await initializeOpenTelemetry({
+        serviceName: 'test-service',
+        gcpProjectId: 'test-project',
+      });
+
+      expect(sdk).toBeDefined();
+    });
+
+    it('should create spans with proper attributes', async () => {
+      await initializeOpenTelemetry({
+        serviceName: 'test-service',
+        gcpProjectId: 'test-project',
+      });
+
+      const result = await withSpan('test-span', async (span) => {
+        expect(span).toBeDefined();
+        return 'test-result';
+      }, {
+        attributes: { 'test.attribute': 'test-value' }
+      });
+
+      expect(result).toBe('test-result');
+    });
+
+    it('should handle span errors properly', async () => {
+      await initializeOpenTelemetry({
+        serviceName: 'test-service',
+        gcpProjectId: 'test-project',
+      });
+
+      await expect(
+        withSpan('test-error-span', async () => {
+          throw new Error('Test error');
+        })
+      ).rejects.toThrow('Test error');
+    });
+
+    it('should instrument functions correctly', async () => {
+      await initializeOpenTelemetry({
+        serviceName: 'test-service',
+        gcpProjectId: 'test-project',
+      });
+
+      const testFunction = jest.fn().mockResolvedValue('test-result');
+      const instrumentedFunction = instrument('test-function', testFunction);
+
+      const result = await instrumentedFunction('arg1', 'arg2');
+
+      expect(testFunction).toHaveBeenCalledWith('arg1', 'arg2');
+      expect(result).toBe('test-result');
+    });
+
+    it('should log events with trace context', async () => {
+      await initializeOpenTelemetry({
+        serviceName: 'test-service',
+        gcpProjectId: 'test-project',
+      });
+
+      // This should not throw
+      await logEvent('test-event', { key: 'value' }, 'info');
+    });
+  });
+
+  describe('CloudTraceExporter', () => {
+    let exporter: CloudTraceExporter;
+    const mockConfig = {
+      projectId: 'test-project',
+      bucketName: 'test-bucket',
+    };
+
+    beforeEach(() => {
+      exporter = new CloudTraceExporter(mockConfig);
+    });
+
+    it('should create exporter with configuration', () => {
+      expect(exporter).toBeDefined();
+    });
+
+    it('should handle export of spans', async () => {
+      const mockSpan = {
+        spanContext: () => ({
+          traceId: 'test-trace-id',
+          spanId: 'test-span-id',
+        }),
+        name: 'test-span',
+        startTime: [Date.now() / 1000, 0],
+        endTime: [Date.now() / 1000 + 1, 0],
+        status: { code: 1 },
+        attributes: {},
+        events: [],
+        links: [],
+        resource: {},
+      };
+
+      const mockCallback = jest.fn();
+      
+      // Should not throw
+      await exporter.export([mockSpan as any], mockCallback);
+      
+      expect(mockCallback).toHaveBeenCalled();
+    });
+  });
+
+  describe('BigQueryLogger', () => {
+    let logger: BigQueryLogger;
+    const mockConfig = {
+      projectId: 'test-project',
+      datasetId: 'test-dataset',
+      tableId: 'test-table',
+    };
+
+    beforeEach(() => {
+      logger = new BigQueryLogger(mockConfig);
+    });
+
+    it('should create logger with configuration', () => {
+      expect(logger).toBeDefined();
+    });
+
+    it('should log events to BigQuery', async () => {
+      const logEntry = {
+        timestamp: new Date(),
+        level: 'info' as const,
+        service: 'test-service',
+        event: 'test-event',
+        data: { key: 'value' },
+      };
+
+      // Should not throw
+      await logger.logEvent(logEntry);
+    });
+
+    it('should log errors with stack traces', async () => {
+      const errorEntry = {
+        timestamp: new Date(),
+        spanName: 'test-span',
+        error: 'Test error message',
+        stack: 'Error stack trace',
+      };
+
+      // Should not throw
+      await logger.logError(errorEntry);
+    });
+
+    it('should log performance metrics', async () => {
+      const metrics = {
+        operation: 'test-operation',
+        duration: 1500,
+        success: true,
+        errorCount: 0,
+      };
+
+      // Should not throw
+      await logger.logPerformanceMetrics(metrics);
+    });
+
+    it('should log user interactions', async () => {
+      const interaction = {
+        userId: 'user-123',
+        sessionId: 'session-456',
+        action: 'view_menu',
+        restaurantId: 'restaurant-789',
+        menuItemId: 'item-101',
+      };
+
+      // Should not throw
+      await logger.logUserInteraction(interaction);
+    });
   });
 });

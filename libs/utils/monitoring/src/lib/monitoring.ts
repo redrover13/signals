@@ -9,6 +9,11 @@
  * @license MIT
  */
 
+// Export all monitoring utilities
+export * from './otel-config';
+export * from './cloud-trace-exporter';
+export * from './bigquery-logger';
+
 export function monitoring(): string {
   return 'monitoring';
 }

@@ -11,3 +11,6 @@
 
 export * from './lib/monitoring';
 export * from './lib/mcp-utils';
+export * from './lib/otel-config';
+export * from './lib/cloud-trace-exporter';
+export * from './lib/bigquery-logger';

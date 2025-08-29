@@ -9,7 +9,8 @@ echo "🧪 Infrastructure Validation Tests"
 echo "=================================="
 
 # Configuration
-TERRAFORM_DIR="infra/terraform/core-infrastructure"
+TERRAFORM_DIR="infra/terraform"
+CORE_INFRASTRUCTURE_DIR="infra/terraform/core-infrastructure"
 TEST_PROJECT_ID="saigon-signals-test"
 TEST_REGION="asia-southeast1"
 
@@ -152,7 +153,7 @@ EOF
 test_naming_conventions() {
     log_test "Checking resource naming conventions..."
     
-    MAIN_FILE="$TERRAFORM_DIR/main.tf"
+    MAIN_FILE="$CORE_INFRASTRUCTURE_DIR/main.tf"
     
     # Check for consistent labeling
     if grep -q 'managed_by.*=.*"terraform"' "$MAIN_FILE"; then
@@ -175,7 +176,7 @@ test_naming_conventions() {
 test_security_practices() {
     log_test "Checking security best practices..."
     
-    MAIN_FILE="$TERRAFORM_DIR/main.tf"
+    MAIN_FILE="$CORE_INFRASTRUCTURE_DIR/main.tf"
     
     # Check for uniform bucket access
     if grep -q "uniform_bucket_level_access.*=.*true" "$MAIN_FILE"; then
@@ -206,7 +207,7 @@ test_security_practices() {
 test_bigquery_optimization() {
     log_test "Checking BigQuery optimization..."
     
-    MAIN_FILE="$TERRAFORM_DIR/main.tf"
+    MAIN_FILE="$CORE_INFRASTRUCTURE_DIR/main.tf"
     
     # Check for table partitioning
     if grep -q "time_partitioning" "$MAIN_FILE"; then
@@ -229,7 +230,7 @@ test_bigquery_optimization() {
 test_documentation() {
     log_test "Checking documentation completeness..."
     
-    README_FILE="$TERRAFORM_DIR/README.md"
+    README_FILE="$CORE_INFRASTRUCTURE_DIR/README.md"
     
     if [ -f "$README_FILE" ]; then
         log_pass "README.md exists"

@@ -180,9 +180,21 @@ async function processAgentTask<TTask = AgentTaskPayload, TResult = AgentResultP
 async function processGeminiTask(task: any): Promise<any> {
   // Placeholder for Gemini orchestrator logic
   return { type: 'gemini', result: `Processed Gemini task: ${JSON.stringify(task)}` };
-}
-
-async function processBigQueryTask(task: any): Promise<any> {
+    try {
+      const raw = message.data?.toString();
+      if (!raw) {
+        console.error('Received message with no data');
+        message.ack();
+        return;
+      }
+      const parsed = JSON.parse(raw);
+      if (!parsed?.id || !parsed?.agentType) {
+        console.error('Invalid task message structure:', parsed);
+        message.ack();
+        return;
+      }
+      const taskMessage: AgentTask = parsed;
+      await processAgentTask(taskMessage);
   // Placeholder for BigQuery agent logic
   return { type: 'bigquery', result: `Processed BigQuery task: ${JSON.stringify(task)}` };
 }

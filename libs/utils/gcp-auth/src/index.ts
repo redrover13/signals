@@ -11,6 +11,7 @@
 
 import { BigQuery } from '@google-cloud/bigquery';
 import { Storage } from '@google-cloud/storage';
+import { PubSub } from '@google-cloud/pubsub';
 import { PredictionServiceClient, v1 } from '@google-cloud/aiplatform';
 import { GoogleAuth } from 'google-auth-library';
 import { memoize } from 'lodash';
@@ -129,25 +130,47 @@ export const getVertexAIClient = memoize(
   },
 );
 
+export const getPubSubClient = memoize((): PubSub => {
+  try {
+    const projectId = getProjectId();
+    return new PubSub({ projectId });
+  } catch (error) {
+    let msg = 'Could not instantiate Pub/Sub client.';
+    if (error instanceof Error) msg = error.message;
+    throw new GcpInitializationError(msg);
+  }
+});
+
 export { getProjectId };
 
 /**
- * Minimal Pub/Sub helpers for tests and local usage.
- * These are lightweight wrappers that can be replaced by full implementations.
+ * Pub/Sub helpers for publishing messages to topics.
  */
 export function getPubSub() {
-  // Minimal stub that resembles the @google-cloud/pubsub client enough for tests
+  const pubsub = getPubSubClient();
   return {
     topic: (name: string) => ({
       publishMessage: async (msg: unknown) => {
-        // no-op publish for tests
-        return Promise.resolve({ messageId: 'test-message-id', name });
+        const topic = pubsub.topic(name);
+        const data = Buffer.from(JSON.stringify(msg));
+        const [messageId] = await topic.publishMessage({ data });
+        return { messageId, name };
       },
     }),
   };
 }
 
 export async function ensureTopic(name: string) {
-  // Minimal no-op implementation for tests
-  return Promise.resolve(true);
+  try {
+    const pubsub = getPubSubClient();
+    const topic = pubsub.topic(name);
+    const [exists] = await topic.exists();
+    if (!exists) {
+      await topic.create();
+    }
+    return true;
+  } catch (error) {
+    console.warn(`Failed to ensure topic ${name}:`, error);
+    return false;
+  }
 }

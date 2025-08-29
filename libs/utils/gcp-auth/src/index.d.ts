@@ -9,9 +9,9 @@
  * @license MIT
  */
 
-export declare function ensureTopic(): Promise<void>;
+export declare function ensureTopic(name: string): Promise<boolean>;
 export declare function getPubSub(): {
   topic: (name: string) => {
-    publishMessage: (msg: any) => Promise<string>;
+    publishMessage: (msg: any) => Promise<{ messageId: string; name: string }>;
   };
 };

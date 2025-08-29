@@ -73,7 +73,7 @@ class SimpleCRMAgent {
     this.config = { timeout: 30000, ...config };
   }
 
-  async makeRequest(endpoint: string, method: string = 'GET', data?: any): Promise<{ success: boolean; data?: any; error?: string }> {
+  async makeRequest(endpoint: string, method = 'GET', data?: any): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
       const url = `${this.config.baseUrl || 'https://api.crm.dulcedesaigon.com'}${endpoint}`;
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };

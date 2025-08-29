@@ -7,7 +7,28 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'No build step for event-parser (Node.js Cloud Function)'"
-      }
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "generatePackageJson": true,
+          "sourceMap": false
+        },
+        "development": {
+          "optimization": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production",
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ]
     },
     "deploy": {
       "executor": "nx:run-commands",
@@ -19,14 +40,50 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'No tests defined for event-parser'"
-      }
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      },
+      "inputs": [
+        "default",
+        "^default",
+        "{workspaceRoot}/jest.preset.js"
+      ],
+      "cache": true
     },
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["apps/event-parser/**/*.{ts,tsx,js,jsx}"]
-      }
+        "lintFilePatterns": [
+          "apps/event-parser/**/*.{ts,tsx,js,jsx}"
+        ]
+      },
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json"
+      ],
+      "cache": true
     }
   },
-  "tags": ["gcp", "cloud-function", "event-parser"]
+  "tags": [
+    "domain:event-parser",
+    "type:application"
+  ],
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/.eslintrc.json"
+    ],
+    "sharedGlobals": []
+  }
 }

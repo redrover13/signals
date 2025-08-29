@@ -1,0 +1,20 @@
+{
+  "/api": {
+    "target": "http://localhost:3000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/agents-api": {
+    "target": "http://localhost:3001",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/agents-api": "/api"
+    }
+  },
+  "/socket.io": {
+    "target": "ws://localhost:3002",
+    "ws": true,
+    "secure": false
+  }
+}

@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { validateInput } from "@dulce-de-saigon/security";
+import { z } from "zod";
+const fs = require('fs');
+const path = require('path');
+const _ = require('lodash');
+=======
 /**
  * @fileoverview search module for the routes component
  *
@@ -13,10 +21,27 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
+>>>>>>> main
+
+// Input validation schema for search requests
+const searchRequestSchema = z.object({
+  tool: z.literal("semantic-code-search"),
+  query: z.string()
+    .min(1, "Query is required")
+    .max(200, "Query too long")
+    .regex(/^[a-zA-Z0-9\s\-_.]+$/, "Query contains invalid characters"),
+  repoOwner: z.string().optional(),
+  repoName: z.string().optional(),
+});
 
 interface SearchRequest {
   tool: string;
   query: string;
+<<<<<<< HEAD
+  repoOwner?: string;
+  repoName?: string;
+=======
+>>>>>>> main
 }
 
 interface SearchResult {
@@ -34,6 +59,18 @@ interface SearchResponse {
 
 export async function searchRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post(
+<<<<<<< HEAD
+    "/semantic-code-search",
+    {
+      preHandler: validateInput(searchRequestSchema),
+    },
+    async function (request: FastifyRequest, reply: FastifyReply) {
+      try {
+        const { query } = request.body as SearchRequest;
+        
+        const results = await performSemanticSearch(query);
+        
+=======
     '/semantic-code-search',
     async function (request: FastifyRequest, reply: FastifyReply) {
       try {
@@ -53,8 +90,9 @@ export async function searchRoutes(fastify: FastifyInstance): Promise<void> {
 
         const results = await performSemanticSearch(body.query);
 
+>>>>>>> main
         const response: SearchResponse = {
-          query: body.query,
+          query,
           results,
           totalMatches: results.length,
         };

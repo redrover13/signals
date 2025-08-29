@@ -1,0 +1,79 @@
+/**
+ * @fileoverview CSS Module for the Signals Demo component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains styles for the Signals Demo component.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+.signalsDemo {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.section {
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.button {
+  padding: 0.375rem 0.75rem;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.incrementButton {
+  background-color: #3b82f6;
+}
+
+.incrementButton:hover {
+  background-color: #2563eb;
+}
+
+.decrementButton {
+  background-color: #ef4444;
+}
+
+.decrementButton:hover {
+  background-color: #dc2626;
+}
+
+.input {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+}
+
+.footer {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}

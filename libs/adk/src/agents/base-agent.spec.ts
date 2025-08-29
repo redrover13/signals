@@ -81,16 +81,11 @@ describe('DulceBaseAgent', () => {
     it('should handle errors with logging', async () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       const mockAgent = new DulceBaseAgent(config);
-      
-      // Mock the super.invoke to throw an error
-      const originalInvoke = Object.getPrototypeOf(Object.getPrototypeOf(mockAgent)).invoke;
-      Object.getPrototypeOf(Object.getPrototypeOf(mockAgent)).invoke = jest.fn().mockRejectedValue(new Error('Test error'));
-
+      const { BaseAgent } = jest.requireMock('@waldzellai/adk-typescript');
+      const spy = jest.spyOn(BaseAgent.prototype, 'invoke').mockRejectedValue(new Error('Test error'));
       await expect(mockAgent.invoke({ task: 'test' })).rejects.toThrow('Test error');
       expect(consoleSpy).toHaveBeenCalledWith('Agent Test Agent failed:', expect.any(Error));
-
-      // Restore
-      Object.getPrototypeOf(Object.getPrototypeOf(mockAgent)).invoke = originalInvoke;
+      spy.mockRestore();
       consoleSpy.mockRestore();
     });
   });

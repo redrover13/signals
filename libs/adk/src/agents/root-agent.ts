@@ -52,12 +52,21 @@ export class RootAgent extends DulceLlmAgent {
   /**
    * Route task to appropriate sub-agent or handle directly
    */
-  async routeTask(task: string, context?: any): Promise<any> {
+  public async routeTask(task: string, context?: unknown): Promise<unknown> {
+    let contextStr = 'None';
+    try {
+      if (context !== undefined) {
+        contextStr = JSON.stringify(context, null, 2);
+      }
+    } catch {
+      contextStr = '[Unserializable context]';
+    }
+
     const prompt = `
 You are the Root Orchestrator Agent for the Dulce de Saigon F&B platform.
 
 Task: ${task}
-Context: ${context ? JSON.stringify(context, null, 2) : 'None'}
+Context: ${contextStr}
 
 Available sub-agents: ${this.getAvailableAgents().join(', ')}
 

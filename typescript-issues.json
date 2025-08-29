@@ -16,96 +16,24 @@
     "severity": "error"
   },
   {
-    "filePath": "agent-frontend/vite.config.ts",
-    "line": 20,
+    "filePath": "apps/agents/src/main.ts",
+    "line": 32,
+    "character": 46,
+    "code": 2339,
+    "message": "Property 'predict' does not exist on type 'VertexAIClient'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "apps/agents/src/main.ts",
+    "line": 36,
     "character": 36,
-    "code": 7016,
-    "message": "Could not find a declaration file for module './module-federation.config.js'. '/home/runner/work/signals/signals/agent-frontend/module-federation.config.js' implicitly has an 'any' type.",
-    "severity": "error"
-  },
-  {
-    "filePath": "apps/agents/src/main.ts",
-    "line": 13,
-    "character": 54,
-    "code": 2307,
-    "message": "Cannot find module '@nx-monorepo/adk/services/vertex' or its corresponding type declarations.",
-    "severity": "error"
-  },
-  {
-    "filePath": "apps/agents/src/main.ts",
-    "line": 29,
-    "character": 41,
-    "code": 7030,
-    "message": "Not all code paths return a value.",
-    "severity": "error"
-  },
-  {
-    "filePath": "apps/agents/src/main.ts",
-    "line": 57,
-    "character": 24,
-    "code": 4111,
-    "message": "Property 'GCP_PROJECT_ID' comes from an index signature, so it must be accessed with ['GCP_PROJECT_ID'].",
-    "severity": "error"
-  },
-  {
-    "filePath": "apps/agents/src/main.ts",
-    "line": 58,
-    "character": 25,
-    "code": 4111,
-    "message": "Property 'GCP_LOCATION' comes from an index signature, so it must be accessed with ['GCP_LOCATION'].",
-    "severity": "error"
-  },
-  {
-    "filePath": "apps/agents/src/main.ts",
-    "line": 59,
-    "character": 27,
-    "code": 4111,
-    "message": "Property 'VERTEX_AI_ENDPOINT_ID' comes from an index signature, so it must be accessed with ['VERTEX_AI_ENDPOINT_ID'].",
-    "severity": "error"
-  },
-  {
-    "filePath": "apps/agents/src/main.ts",
-    "line": 76,
-    "character": 30,
-    "code": 4111,
-    "message": "Property 'PORT' comes from an index signature, so it must be accessed with ['PORT'].",
-    "severity": "error"
-  },
-  {
-    "filePath": "apps/agents/src/main.ts",
-    "line": 76,
-    "character": 58,
-    "code": 4111,
-    "message": "Property 'PORT' comes from an index signature, so it must be accessed with ['PORT'].",
+    "code": 2339,
+    "message": "Property 'endpointId' does not exist on type 'VertexAIClientConfig'.",
     "severity": "error"
   },
   {
     "filePath": "apps/api/src/main.ts",
-    "line": 20,
-    "character": 26,
-    "code": 4111,
-    "message": "Property 'PORT' comes from an index signature, so it must be accessed with ['PORT'].",
-    "severity": "error"
-  },
-  {
-    "filePath": "apps/api/src/main.ts",
-    "line": 20,
-    "character": 54,
-    "code": 4111,
-    "message": "Property 'PORT' comes from an index signature, so it must be accessed with ['PORT'].",
-    "severity": "error"
-  },
-  {
-    "filePath": "apps/api/src/main.ts",
-    "line": 42,
-    "character": 86,
-    "code": 18046,
-    "message": "'mcpError' is of type 'unknown'.",
-    "severity": "error"
-  },
-  {
-    "filePath": "apps/api/src/main.ts",
-    "line": 48,
+    "line": 49,
     "character": 56,
     "code": 2345,
     "message": "Argument of type 'Error' is not assignable to parameter of type 'undefined'.",
@@ -161,14 +89,6 @@
   },
   {
     "filePath": "/home/runner/work/signals/signals/apps/api/src/routes/health.ts",
-    "line": 82,
-    "character": 34,
-    "code": 4111,
-    "message": "Property 'NODE_ENV' comes from an index signature, so it must be accessed with ['NODE_ENV'].",
-    "severity": "error"
-  },
-  {
-    "filePath": "/home/runner/work/signals/signals/apps/api/src/routes/health.ts",
     "line": 95,
     "character": 16,
     "code": 2304,
@@ -177,18 +97,10 @@
   },
   {
     "filePath": "/home/runner/work/signals/signals/apps/api/src/routes/health.ts",
-    "line": 101,
+    "line": 102,
     "character": 49,
     "code": 2345,
-    "message": "Argument of type 'unknown' is not assignable to parameter of type 'undefined'.",
-    "severity": "error"
-  },
-  {
-    "filePath": "/home/runner/work/signals/signals/apps/api/src/routes/health.ts",
-    "line": 137,
-    "character": 61,
-    "code": 18046,
-    "message": "'error' is of type 'unknown'.",
+    "message": "Argument of type 'string' is not assignable to parameter of type 'undefined'.",
     "severity": "error"
   },
   {
@@ -597,62 +509,6 @@
     "character": 52,
     "code": 7006,
     "message": "Parameter 's' implicitly has an 'any' type.",
-    "severity": "error"
-  },
-  {
-    "filePath": "libs/utils/gcp-auth/src/index.ts",
-    "line": 26,
-    "character": 33,
-    "code": 4111,
-    "message": "Property 'GCP_PROJECT_ID' comes from an index signature, so it must be accessed with ['GCP_PROJECT_ID'].",
-    "severity": "error"
-  },
-  {
-    "filePath": "/home/runner/work/signals/signals/libs/utils/monitoring/src/lib/mcp-utils.ts",
-    "line": 20,
-    "character": 3,
-    "code": 2305,
-    "message": "Module '\"@nx-monorepo/agents/gemini-orchestrator\"' has no exported member 'getCurrentConfig'.",
-    "severity": "error"
-  },
-  {
-    "filePath": "/home/runner/work/signals/signals/libs/utils/monitoring/src/lib/mcp-utils.ts",
-    "line": 21,
-    "character": 3,
-    "code": 2305,
-    "message": "Module '\"@nx-monorepo/agents/gemini-orchestrator\"' has no exported member 'getCurrentEnvironment'.",
-    "severity": "error"
-  },
-  {
-    "filePath": "/home/runner/work/signals/signals/libs/utils/monitoring/src/lib/mcp-utils.ts",
-    "line": 22,
-    "character": 3,
-    "code": 2305,
-    "message": "Module '\"@nx-monorepo/agents/gemini-orchestrator\"' has no exported member 'validateConfig'.",
-    "severity": "error"
-  },
-  {
-    "filePath": "/home/runner/work/signals/signals/libs/utils/monitoring/src/lib/mcp-utils.ts",
-    "line": 23,
-    "character": 3,
-    "code": 2305,
-    "message": "Module '\"@nx-monorepo/agents/gemini-orchestrator\"' has no exported member 'Environment'.",
-    "severity": "error"
-  },
-  {
-    "filePath": "/home/runner/work/signals/signals/libs/utils/monitoring/src/lib/mcp-utils.ts",
-    "line": 25,
-    "character": 10,
-    "code": 2305,
-    "message": "Module '\"@nx-monorepo/agents/gemini-orchestrator\"' has no exported member 'MCPEnvironmentConfig'.",
-    "severity": "error"
-  },
-  {
-    "filePath": "/home/runner/work/signals/signals/libs/utils/monitoring/src/lib/mcp-utils.ts",
-    "line": 25,
-    "character": 32,
-    "code": 2305,
-    "message": "Module '\"@nx-monorepo/agents/gemini-orchestrator\"' has no exported member 'MCPServerConfig'.",
     "severity": "error"
   },
   {

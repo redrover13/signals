@@ -46,7 +46,7 @@ async function initializeApp(): Promise<void> {
 
     fastify.listen({ port: PORT, host: '0.0.0.0' }, (err, address) => {
       if (err) {
-        fastify.log.error('❌ Failed to start server:', err);
+        fastify.log.error('❌ Failed to start server:', err.message);
         process.exit(1);
       }
       fastify.log.info(`🎉 API server listening at ${address}`);

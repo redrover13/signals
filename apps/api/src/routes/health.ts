@@ -13,19 +13,17 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 // Security middleware for rate limiting and validation
 export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
+  // In-memory rate limiting (for demo purposes only)
+  const rateLimitMap = new Map<string, number[]>();
+
   // Add rate limiting for health checks
   fastify.addHook('preHandler', async (request, reply) => {
     // Basic rate limiting (in production, use Redis/external service)
     const clientIP = request.ip;
     const now = Date.now();
 
-    // Simple in-memory rate limiting (for demo purposes)
-    if (!fastify.rateLimit) {
-      fastify.rateLimit = new Map();
-    }
-
-    const requests = fastify.rateLimit.get(clientIP) || [];
-    const recentRequests = requests.filter(time => now - time < 60000); // 1 minute window
+    const requests = rateLimitMap.get(clientIP) || [];
+    const recentRequests = requests.filter((time: number) => now - time < 60000); // 1 minute window
 
     if (recentRequests.length >= 10) { // 10 requests per minute
       reply.code(429).send({
@@ -37,7 +35,7 @@ export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
     }
 
     recentRequests.push(now);
-    fastify.rateLimit.set(clientIP, recentRequests);
+    rateLimitMap.set(clientIP, recentRequests);
   });
 
   fastify.get('/', async function (request: FastifyRequest, reply: FastifyReply) {
@@ -92,7 +90,7 @@ export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
           }
         },
         services: {
-          mcp: mcpService ? 'initialized' : 'not_available',
+          mcp: 'unknown', // MCP service status would be checked here
           database: 'unknown', // Add database health check
           cache: 'unknown'     // Add cache health check
         }

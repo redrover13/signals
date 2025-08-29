@@ -119,7 +119,7 @@ export class VertexAIClient {
     content: string,
     metadata: Record<string, any> = {},
     chunkSize = 1000,
-    overlap: number = 200
+    overlap = 200
   ): DocumentChunk[] {
     const chunks: DocumentChunk[] = [];
     const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);

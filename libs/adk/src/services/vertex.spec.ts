@@ -1,0 +1,195 @@
+/**
+ * @fileoverview Test suite for Vertex AI RAG client
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains tests for the RAG functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+import { VertexAIClient, DocumentChunk } from '../src/services/vertex';
+
+describe('VertexAIClient RAG functionality', () => {
+  let client: VertexAIClient;
+
+  beforeEach(() => {
+    client = new VertexAIClient({
+      projectId: 'test-project',
+      location: 'us-central1'
+    });
+  });
+
+  describe('Document chunking', () => {
+    it('should chunk a document into appropriate pieces', () => {
+      const content = 'This is a test document. It has multiple sentences. Each sentence should be processed correctly. The chunking algorithm should handle this properly.';
+      const metadata = { documentId: 'test-doc', source: 'test' };
+      
+      const chunks = client.chunkDocument(content, metadata, 50, 10);
+      
+      expect(chunks).toHaveLength(3);
+      expect(chunks[0].id).toBe('test-doc_chunk_0');
+      expect(chunks[0].metadata).toEqual({
+        documentId: 'test-doc',
+        source: 'test',
+        chunkIndex: 0,
+        originalLength: content.length
+      });
+    });
+
+    it('should handle empty documents', () => {
+      const chunks = client.chunkDocument('', { documentId: 'empty' });
+      
+      expect(chunks).toHaveLength(0);
+    });
+
+    it('should handle single sentence documents', () => {
+      const content = 'This is a single sentence.';
+      const chunks = client.chunkDocument(content, { documentId: 'single' });
+      
+      expect(chunks).toHaveLength(1);
+      expect(chunks[0].content).toBe(content);
+    });
+
+    it('should apply overlap correctly', () => {
+      const content = 'First sentence. Second sentence. Third sentence. Fourth sentence.';
+      const chunks = client.chunkDocument(content, { documentId: 'overlap' }, 30, 10);
+      
+      expect(chunks.length).toBeGreaterThan(1);
+      // Check that subsequent chunks have some overlap with previous ones
+      if (chunks.length > 1) {
+        const firstChunkEnd = chunks[0].content.split(' ').slice(-2).join(' ');
+        const secondChunkStart = chunks[1].content.split(' ').slice(0, 2).join(' ');
+        expect(chunks[1].content).toContain(firstChunkEnd.split(' ')[1]);
+      }
+    });
+  });
+
+  describe('Text extraction', () => {
+    it('should extract text from plain text files', async () => {
+      const buffer = Buffer.from('This is plain text content', 'utf-8');
+      
+      const extracted = await client.extractTextFromFile(buffer, 'text/plain', 'test.txt');
+      
+      expect(extracted).toBe('This is plain text content');
+    });
+
+    it('should extract text from JSON files', async () => {
+      const jsonData = { title: 'Test', content: 'JSON content' };
+      const buffer = Buffer.from(JSON.stringify(jsonData), 'utf-8');
+      
+      const extracted = await client.extractTextFromFile(buffer, 'application/json', 'test.json');
+      
+      expect(extracted).toContain('Test');
+      expect(extracted).toContain('JSON content');
+    });
+
+    it('should handle markdown files', async () => {
+      const markdown = '# Title\n\nThis is **bold** text.';
+      const buffer = Buffer.from(markdown, 'utf-8');
+      
+      const extracted = await client.extractTextFromFile(buffer, 'text/markdown', 'test.md');
+      
+      expect(extracted).toBe(markdown);
+    });
+
+    it('should handle unsupported file types gracefully', async () => {
+      const buffer = Buffer.from('Some content', 'utf-8');
+      
+      const extracted = await client.extractTextFromFile(buffer, 'application/octet-stream', 'test.bin');
+      
+      expect(extracted).toBe('Some content');
+    });
+  });
+
+  describe('Mock implementations', () => {
+    it('should handle embedding generation', async () => {
+      const texts = ['First text', 'Second text'];
+      
+      const response = await client.generateEmbeddings(texts);
+      
+      expect(response).toBeDefined();
+      expect(response.embeddings).toBeDefined();
+    });
+
+    it('should handle document indexing', async () => {
+      const documents: DocumentChunk[] = [
+        {
+          id: 'doc1',
+          content: 'Test content',
+          metadata: { source: 'test' }
+        }
+      ];
+      
+      await expect(client.indexDocuments('test-datastore', documents))
+        .resolves.not.toThrow();
+    });
+
+    it('should handle document search', async () => {
+      const results = await client.searchDocuments('test-engine', {
+        query: 'test query',
+        maxResults: 5
+      });
+      
+      expect(results).toBeDefined();
+      expect(Array.isArray(results)).toBe(true);
+      if (results.length > 0) {
+        expect(results[0]).toHaveProperty('id');
+        expect(results[0]).toHaveProperty('content');
+        expect(results[0]).toHaveProperty('score');
+      }
+    });
+  });
+
+  describe('End-to-end processing', () => {
+    it('should process a document for RAG', async () => {
+      const content = 'This is a test document for RAG processing. It contains multiple sentences for testing.';
+      const metadata = { documentId: 'e2e-test', source: 'test' };
+      
+      const chunks = await client.processDocumentForRAG(
+        content,
+        metadata,
+        'test-datastore',
+        {
+          chunkSize: 50,
+          overlap: 10,
+          generateEmbeddings: true
+        }
+      );
+      
+      expect(chunks).toBeDefined();
+      expect(chunks.length).toBeGreaterThan(0);
+      expect(chunks[0]).toHaveProperty('id');
+      expect(chunks[0]).toHaveProperty('content');
+      expect(chunks[0]).toHaveProperty('metadata');
+    });
+  });
+
+  describe('Vietnamese content handling', () => {
+    it('should handle Vietnamese text correctly', () => {
+      const content = 'Xin chào! Đây là nội dung tiếng Việt. Chúng tôi cung cấp dịch vụ ăn uống tốt nhất.';
+      const metadata = { documentId: 'vietnamese-test', language: 'vi' };
+      
+      const chunks = client.chunkDocument(content, metadata, 40, 5);
+      
+      expect(chunks).toBeDefined();
+      expect(chunks.length).toBeGreaterThan(0);
+      expect(chunks[0].content).toContain('Xin chào');
+    });
+
+    it('should preserve Vietnamese characters in metadata', () => {
+      const content = 'Test content';
+      const metadata = { 
+        documentId: 'vn-meta-test',
+        title: 'Món ăn Việt Nam',
+        description: 'Các món ăn truyền thống'
+      };
+      
+      const chunks = client.chunkDocument(content, metadata);
+      
+      expect(chunks[0].metadata.title).toBe('Món ăn Việt Nam');
+      expect(chunks[0].metadata.description).toBe('Các món ăn truyền thống');
+    });
+  });
+});

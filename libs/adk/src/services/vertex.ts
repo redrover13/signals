@@ -86,9 +86,6 @@ export class VertexAIClient {
       );
     }
   }
-      throw new Error(`Vertex AI prediction failed: ${error}`);
-    }
-  }
 
   /**
    * Generate text using the LLM

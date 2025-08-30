@@ -20,7 +20,6 @@ import {
  * BigQuery-specialized agent for data analysis and manipulation
  */
 export class BigQueryAgent extends DulceLlmAgent {
-export class BigQueryAgent extends DulceLlmAgent {
   constructor(cfg?: { model?: string; apiKey?: string; tools?: Array<unknown> }) {
     // Require an API key, whether passed in or via env, to avoid silent misconfig
     const apiKey = cfg?.apiKey ?? process.env.GOOGLE_API_KEY;
@@ -47,7 +46,6 @@ export class BigQueryAgent extends DulceLlmAgent {
       tools,
     });
   }
-}
 
   /**
    * Execute a BigQuery query and analyze results
@@ -101,7 +99,14 @@ Ensure all data complies with Vietnamese data privacy regulations.
 /**
  * Factory function to create a BigQuery agent
  */
-export function createBqAgent(): BigQueryAgent {
+export function createBqAgent(config?: {
+  vertexClient?: any;
+  projectId?: string;
+  datasetId?: string;
+  tableId?: string;
+}): BigQueryAgent {
+  // For now, just return a new instance
+  // In the future, we can use the config parameters for initialization
   return new BigQueryAgent();
 }
 

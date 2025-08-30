@@ -14,9 +14,28 @@ import { GeminiLlm } from '@waldzellai/adk-typescript';
 import { GCP_TOOLS } from '../tools/gcp-tools';
 
 /**
- * Root orchestrator agent that coordinates all sub-agents
+ * Root agent status interface
  */
-export class RootAgent extends DulceLlmAgent {
+export interface RootAgentStatus {
+  rootAgent: { name: string; description: string; status: string; toolsCount: number };
+  subAgents: SubAgentStatus[];
+  totalAgents: number;
+  lastCheck: string;
+}
+
+/**
+ * Sub-agent status interface
+ */
+export interface SubAgentStatus {
+  name: string;
+  description: string;
+  status: string;
+}
+
+/**
+ * Root agent class for coordinating multiple specialized agents
+ */
+export class RootAgent {
   private subAgents: Map<string, DulceLlmAgent>;
 
   constructor() {
@@ -174,19 +193,6 @@ Available tools: ${GCP_TOOLS.map(tool => tool.name).join(', ')}
       totalAgents: subAgentStatuses.length + 1,
       lastCheck: new Date().toISOString(),
     };
-  }
-
-  interface RootAgentStatus {
-    rootAgent: { name: string; description: string; status: string; toolsCount: number };
-    subAgents: SubAgentStatus[];
-    totalAgents: number;
-    lastCheck: string;
-  }
-
-  interface SubAgentStatus {
-    name: string;
-    description: string;
-    status: string;
   }
 }
 

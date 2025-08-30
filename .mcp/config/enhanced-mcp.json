@@ -216,6 +216,21 @@
       "description": "Brave Search API Key",
       "env": "BRAVE_API_KEY",
       "secretManager": "projects/${GCP_PROJECT_ID}/secrets/brave-api-key/versions/latest"
+    },
+    "dictl-dop-token": {
+      "description": "DigitalOcean Personal Access Token",
+      "env": "DIGITALOCEAN_ACCESS_TOKEN",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/dictl-dop-token/versions/latest"
+    },
+    "gitguardian-token": {
+      "description": "GitGuardian API Token",
+      "env": "GITGUARDIAN_API_TOKEN",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/gitguardian-token/versions/latest"
+    },
+    "smither-token": {
+      "description": "Smither API Token",
+      "env": "SMITHER_API_TOKEN",
+      "secretManager": "projects/${GCP_PROJECT_ID}/secrets/smither-token/versions/latest"
     }
   },
   "orchestration": {

@@ -16,35 +16,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Setup PNPM
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
         with:
-          version: 8
+          version: 10.0.0
           run_install: false
 
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
         run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
       - name: Cache pnpm modules
-        uses: actions/cache@v3
+        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
         with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          path: ${{ env.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Lint
         run: cd adk && pnpm lint

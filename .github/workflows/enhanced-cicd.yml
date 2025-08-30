@@ -155,11 +155,21 @@ jobs:
           pnpm secretlint "**/*" || echo "Potential secrets detected"
 
       - name: Run unit tests
+        id: unit-tests
         run: |
           echo "🧪 Running unit tests..."
-          # Skip tests that have configuration issues for now
-          echo "Tests temporarily skipped due to module federation config issues"
-          # pnpm nx test --parallel=3 --ci
+          set +e
+          pnpm nx test --parallel=3 --ci --skip-nx-cache
+          TEST_EXIT_CODE=$?
+          set -e
+          
+          if [ $TEST_EXIT_CODE -ne 0 ]; then
+            echo "::warning::Some unit tests failed. Review test results."
+            echo "tests-passed=false" >> $GITHUB_OUTPUT
+          else
+            echo "All unit tests passed successfully!"
+            echo "tests-passed=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Build applications
         run: |
@@ -169,9 +179,26 @@ jobs:
           # Other builds can be added here as configs are fixed
 
       - name: Security scan
+        id: security-scan
         run: |
           echo "🔒 Running security scans..."
-          pnpm audit --audit-level moderate || echo "Security issues found"
+          AUDIT_RESULT=$(pnpm audit --audit-level moderate)
+          if echo "$AUDIT_RESULT" | grep -i vulnerability; then
+            echo "::warning::Security vulnerabilities found in dependencies"
+            echo "$AUDIT_RESULT" > security-audit-results.txt
+            echo "has-vulnerabilities=true" >> $GITHUB_OUTPUT
+          else
+            echo "No critical or high security issues found"
+            echo "has-vulnerabilities=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload security scan results
+        if: steps.security-scan.outputs.has-vulnerabilities == 'true'
+        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
+        with:
+          name: security-scan-results-${{ github.sha }}
+          path: security-audit-results.txt
+          retention-days: 7
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0

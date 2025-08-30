@@ -5,10 +5,22 @@
  * Centralizes MCP server lifecycle management and provides enterprise-grade monitoring
  */
 
-const fs = require('fs').promises;
-const path = require('path');
-const { spawn, exec } = require('child_process');
-const { EventEmitter } = require('events');
+import { promises as fs } from 'fs';
+import { spawn } from 'child_process';
+import { EventEmitter } from 'events';
+import { z } from 'zod';
+
+const ServerConfigSchema = z.object({
+  type: z.enum(['stdio', 'http']),
+  command: z.string().optional(),
+  args: z.array(z.string()).optional(),
+  env: z.record(z.string()).optional(),
+  cwd: z.string().optional(),
+});
+
+const ConfigSchema = z.object({
+  servers: z.record(ServerConfigSchema),
+});
 
 class MCPOrchestrator extends EventEmitter {
   constructor(configPath) {
@@ -25,10 +37,14 @@ class MCPOrchestrator extends EventEmitter {
   async loadConfig() {
     try {
       const content = await fs.readFile(this.configPath, 'utf8');
-      this.config = JSON.parse(content);
-      console.log(`✅ Configuration loaded from: ${this.configPath}`);
+      const rawConfig = JSON.parse(content);
+      this.config = ConfigSchema.parse(rawConfig);
+      console.log(`✅ Configuration loaded and validated from: ${this.configPath}`);
       return this.config;
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        throw new Error(`Invalid configuration: ${error.errors.map(e => `${e.path.join('.')} - ${e.message}`).join(', ')}`);
+      }
       throw new Error(`Failed to load config from ${this.configPath}: ${error.message}`);
     }
   }
@@ -296,9 +312,9 @@ async function main() {
 MCP Server Orchestrator
 
 Usage:
-  node mcp-orchestrator.cjs [config-path] start   - Start all MCP servers
-  node mcp-orchestrator.cjs [config-path] status  - Get server status
-  node mcp-orchestrator.cjs [config-path] stop    - Stop all servers
+  node mcp-orchestrator.mjs [config-path] start   - Start all MCP servers
+  node mcp-orchestrator.mjs [config-path] status  - Get server status
+  node mcp-orchestrator.mjs [config-path] stop    - Stop all servers
 
 Default config: /home/g_nelson/signals-1/.mcp/config/mcp.json
         `);
@@ -309,8 +325,6 @@ Default config: /home/g_nelson/signals-1/.mcp/config/mcp.json
   }
 }
 
-if (require.main === module) {
-  main();
-}
+main();
 
-module.exports = MCPOrchestrator;
+export default MCPOrchestrator;

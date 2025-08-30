@@ -54,7 +54,7 @@ export interface MCPServerConnection {
 /**
  * Main MCP Client Service
  */
-import { MCPEnvironmentConfig } from '../config/mcp-config.schema';
+
 
 export class MCPClientService extends EventEmitter {
   private connections = new Map<string, MCPServerConnection>();

@@ -15,8 +15,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { MCPServerConfig } from '../config/mcp-config.schema';
-import { getCurrentConfig } from '../config/environment-config';
+import { MCPServerConfig, getCurrentConfig } from '@dulce/agents-sdk';
 import { MCPClientService, MCPServerConnection } from './mcp-client.service';
 
 export interface HealthCheckResult {

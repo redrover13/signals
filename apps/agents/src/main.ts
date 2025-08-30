@@ -12,9 +12,9 @@
 import Fastify, { FastifyInstance, FastifyRequest } from 'fastify';
 import { runAgent } from "@dulce-de-saigon/agents-lib";
 import { registerSecurity, loadAppConfig } from "@dulce-de-saigon/security";
-import { VertexAIClient, VertexAIClientConfig } from "adk/services/vertex";
-import { WebAnalyticsTracker } from "adk/services/analytics/tracking/web-tracker";
-import { EventCategory } from "adk/services/analytics/tracking/core-events";
+import { VertexAIClient, VertexAIClientConfig } from "@nx-monorepo/adk";
+import { WebAnalyticsTracker } from "@nx-monorepo/adk";
+import { EventCategory } from "@nx-monorepo/adk";
 import { mcpService } from '@nx-monorepo/mcp';
 import { 
   initializeOpenTelemetry, 

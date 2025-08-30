@@ -19,6 +19,23 @@ export * from './agents/root-agent';
 // GCP Tools
 export * from './tools/gcp-tools';
 
+// Analytics - minimal implementation for compatibility
+export class WebAnalyticsTracker {
+  constructor(config?: any) {
+    console.log('WebAnalyticsTracker initialized with config:', config);
+  }
+  
+  track(event: any) {
+    console.log('Analytics event tracked:', event);
+  }
+}
+
+export enum EventCategory {
+  AGENT = 'agent',
+  SYSTEM = 'system',
+  USER = 'user',
+}
+
 // Re-export key ADK types for convenience
 export {
   BaseAgent,

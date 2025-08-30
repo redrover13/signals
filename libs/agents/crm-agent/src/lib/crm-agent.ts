@@ -1,160 +1,258 @@
 /**
- * @fileoverview crm-agent module for the lib component
+ * @fileoverview crm-agent module for Customer Relationship Management
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
- * Contains CRM agent implementation using Google's ADK.
+ * Contains implementation for CRM operations, customer data management, and external API integrations.
  *
  * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
  */
 
-import {
-  DulceLlmAgent,
-  GeminiLlm,
-  BigQueryQueryTool,
-  HttpRequestTool
-} from '@nx-monorepo/adk';
+export interface CRMConfig {
+  baseUrl?: string;
+  apiKey?: string;
+  timeout?: number;
+}
 
-/**
- * Customer data interface
- */
-export interface CustomerData {
-  customerId: string;
+export interface Customer {
+  id: string;
+  email: string;
   name: string;
-  email?: string;
   phone?: string;
-  preferences?: Record<string, any>;
-  orderHistory?: any[];
-  location?: string;
+  preferredCuisine?: string;
+  dietaryRestrictions?: string[];
+  loyaltyPoints?: number;
+  status: 'active' | 'inactive' | 'vip';
+  createdAt: string;
+  lastOrderDate?: string;
+}
+
+export interface CRMResult<T = any> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  statusCode?: number;
+}
+
+export interface CustomerSegment {
+  id: string;
+  name: string;
+  criteria: Record<string, any>;
+  customerCount: number;
 }
 
 /**
- * CRM-specialized agent for customer relationship management
+ * CRM Agent for managing customer relationships and external integrations
  */
-export class CrmAgent extends DulceLlmAgent {
-  constructor(cfg?: { model?: string; apiKey?: string; tools?: Array<unknown> }) {
-    // Require an API key, whether passed in or via env, to avoid silent misconfig
-    const apiKey = cfg?.apiKey ?? process.env.GOOGLE_API_KEY;
-    if (!apiKey) {
-      throw new Error('GOOGLE_API_KEY is required to initialize CrmAgent');
+export class CRMAgent {
+  private config: CRMConfig;
+  private baseUrl: string;
+
+  constructor(config: CRMConfig = {}) {
+    this.config = {
+      timeout: 30000,
+      ...config
+    };
+    this.baseUrl = config.baseUrl || 'https://api.crm.dulcedesaigon.com';
+  }
+
+  /**
+   * Make HTTP request to CRM API
+   */
+  private async makeRequest<T>(
+    endpoint: string, 
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET',
+    data?: any
+  ): Promise<CRMResult<T>> {
+    try {
+      const url = `${this.baseUrl}${endpoint}`;
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Dulce-CRM-Agent/1.0'
+      };
+
+      if (this.config.apiKey) {
+        headers['Authorization'] = `Bearer ${this.config.apiKey}`;
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
+
+      const response = await fetch(url, {
+        method,
+        headers,
+        body: data ? JSON.stringify(data) : undefined,
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: result.message || `HTTP ${response.status}: ${response.statusText}`,
+          statusCode: response.status
+        };
+      }
+
+      return {
+        success: true,
+        data: result,
+        statusCode: response.status
+      };
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return {
+          success: false,
+          error: 'Request timeout'
+        };
+      }
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
     }
-
-    // Allow overriding the model name for flexibility/testing
-    const llm = new GeminiLlm({
-      model: cfg?.model ?? 'gemini-1.5-pro',
-      apiKey,
-    });
-
-    // Permit injecting custom tools, else use the CRM defaults
-    const tools = cfg?.tools ?? [
-      new BigQueryQueryTool(),
-      new HttpRequestTool(),
-    ];
-
-    super({
-      name: 'CRM Agent',
-      description: 'Specialized agent for Vietnamese F&B customer relationship management',
-      llm,
-      tools,
-    });
   }
 
   /**
-   * Analyze customer behavior and preferences
+   * Get customer information
    */
-  async analyzeCustomerBehavior(customerId: string, context?: string): Promise<any> {
-    const prompt = `
-You are a CRM analyst for the Dulce de Saigon F&B platform.
-
-Customer ID: ${customerId}
-${context ? `Context: ${context}` : ''}
-
-Please:
-1. Query customer data using BigQuery
-2. Analyze ordering patterns and preferences
-3. Identify opportunities for personalized marketing
-4. Suggest targeted promotions based on Vietnamese F&B preferences
-5. Consider cultural factors and local holidays
-
-Focus on insights that can improve customer satisfaction and retention.
-    `;
-
-    return this.invoke({
-      messages: [{ role: 'user', content: prompt }],
-    });
+  async getCustomer(customerId: string): Promise<CRMResult<Customer>> {
+    return this.makeRequest<Customer>(`/customers/${customerId}`);
   }
 
   /**
-   * Generate personalized recommendations
+   * Create a new customer
    */
-  async generateRecommendations(customerData: CustomerData): Promise<any> {
-    const prompt = `
-Generate personalized recommendations for Vietnamese F&B customer.
-
-Customer Data: ${JSON.stringify(customerData, null, 2)}
-
-Please:
-1. Analyze customer's order history and preferences
-2. Consider Vietnamese culinary preferences and dietary restrictions
-3. Suggest dishes based on seasonal ingredients
-4. Recommend restaurants in their area
-5. Create personalized marketing messages
-
-Ensure recommendations are culturally appropriate and appealing to Vietnamese customers.
-    `;
-
-    return this.invoke({
-      messages: [{ role: 'user', content: prompt }],
-    });
+  async createCustomer(customerData: Partial<Customer>): Promise<CRMResult<Customer>> {
+    const customer = {
+      status: 'active',
+      loyaltyPoints: 0,
+      createdAt: new Date().toISOString(),
+      ...customerData
+    };
+    
+    return this.makeRequest<Customer>('/customers', 'POST', customer);
   }
 
   /**
-   * Handle customer feedback and sentiment analysis
+   * Update customer information
    */
-  async processFeedback(feedback: string, customerId?: string): Promise<any> {
-    const prompt = `
-Process customer feedback for the Dulce de Saigon platform.
+  async updateCustomer(customerId: string, updates: Partial<Customer>): Promise<CRMResult<Customer>> {
+    return this.makeRequest<Customer>(`/customers/${customerId}`, 'PUT', updates);
+  }
 
-Feedback: ${feedback}
-${customerId ? `Customer ID: ${customerId}` : ''}
-
-Please:
-1. Analyze the sentiment of the feedback
-2. Identify key themes and concerns
-3. Suggest appropriate responses or actions
-4. Consider Vietnamese cultural context in communication
-5. Recommend improvements to service or products
-
-Provide actionable insights for improving customer experience.
-    `;
-
-    return this.invoke({
-      messages: [{ role: 'user', content: prompt }],
+  /**
+   * Search customers by various criteria
+   */
+  async searchCustomers(criteria: {
+    email?: string;
+    phone?: string;
+    name?: string;
+    status?: string;
+    preferredCuisine?: string;
+  }): Promise<CRMResult<Customer[]>> {
+    const params = new URLSearchParams();
+    Object.entries(criteria).forEach(([key, value]) => {
+      if (value) params.append(key, value);
     });
+    
+    return this.makeRequest<Customer[]>(`/customers/search?${params.toString()}`);
+  }
+
+  /**
+   * Add loyalty points to customer
+   */
+  async addLoyaltyPoints(customerId: string, points: number, reason: string): Promise<CRMResult<{ newBalance: number }>> {
+    return this.makeRequest(`/customers/${customerId}/loyalty`, 'POST', { points, reason });
+  }
+
+  /**
+   * Send marketing email to customer
+   */
+  async sendMarketingEmail(customerId: string, template: string, data: Record<string, any>): Promise<CRMResult<{ messageId: string }>> {
+    const emailData = {
+      customerId,
+      template,
+      data,
+      timestamp: new Date().toISOString()
+    };
+    
+    return this.makeRequest('/marketing/email', 'POST', emailData);
+  }
+
+  /**
+   * Create customer segment based on criteria
+   */
+  async createCustomerSegment(segment: Omit<CustomerSegment, 'id' | 'customerCount'>): Promise<CRMResult<CustomerSegment>> {
+    return this.makeRequest<CustomerSegment>('/segments', 'POST', segment);
+  }
+
+  /**
+   * Get customers in a specific segment
+   */
+  async getCustomersInSegment(segmentId: string): Promise<CRMResult<Customer[]>> {
+    return this.makeRequest<Customer[]>(`/segments/${segmentId}/customers`);
+  }
+
+  /**
+   * Send SMS notification to customer
+   */
+  async sendSMS(customerId: string, message: string): Promise<CRMResult<{ messageId: string }>> {
+    return this.makeRequest('/notifications/sms', 'POST', { customerId, message });
+  }
+
+  /**
+   * Track customer activity/event
+   */
+  async trackActivity(customerId: string, activity: {
+    type: string;
+    data: Record<string, any>;
+    timestamp?: string;
+  }): Promise<CRMResult<{ activityId: string }>> {
+    const activityData = {
+      customerId,
+      timestamp: new Date().toISOString(),
+      ...activity
+    };
+    
+    return this.makeRequest('/activities', 'POST', activityData);
+  }
+
+  /**
+   * Get customer activity history
+   */
+  async getCustomerActivity(customerId: string, limit = 50): Promise<CRMResult<any[]>> {
+    return this.makeRequest(`/customers/${customerId}/activities?limit=${limit}`);
+  }
+
+  /**
+   * Sync customer data with external CRM systems (e.g., Salesforce, HubSpot)
+   */
+  async syncWithExternalCRM(customerId: string, externalSystem: 'salesforce' | 'hubspot' | 'mailchimp'): Promise<CRMResult<{ syncId: string }>> {
+    return this.makeRequest('/integrations/sync', 'POST', { customerId, externalSystem });
+  }
+
+  /**
+   * Get customer analytics and insights
+   */
+  async getCustomerInsights(customerId: string): Promise<CRMResult<{
+    totalOrders: number;
+    totalSpent: number;
+    averageOrderValue: number;
+    lastOrderDate: string;
+    preferredRestaurants: string[];
+    riskScore: number;
+    loyaltyTier: string;
+  }>> {
+    return this.makeRequest(`/customers/${customerId}/insights`);
   }
 }
 
-/**
- * Factory function to create a CRM agent
- */
-export function createCrmAgent(config?: {
-  vertexClient?: any;
-  projectId?: string;
-  datasetId?: string;
-  customerTableId?: string;
-  feedbackTableId?: string;
-  pubSubClient?: any;
-  topicName?: string;
-}): CrmAgent {
-  // For now, just return a new instance
-  // In the future, we can use the config parameters for initialization
-  return new CrmAgent();
-}
-
-/**
- * Legacy function for backward compatibility
- */
+// Export legacy function for backwards compatibility
 export function crmAgent(): string {
-  return 'crm-agent (ADK-enabled)';
+  return 'crm-agent';
 }

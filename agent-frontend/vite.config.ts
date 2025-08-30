@@ -19,7 +19,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // Import the module federation config
-import moduleFederationConfig from './module-federation.config.cjs';
+import moduleFederationConfig from './module-federation.config.js';
 
 export default defineConfig(async ({ mode }) => {
   // Load environment variables

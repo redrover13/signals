@@ -65,7 +65,7 @@ export class MCPClientService extends EventEmitter {
 
   constructor() {
     super();
-    this.healthService = new ServerHealthService(this);
+    this.healthService = new ServerHealthService();
     this.requestRouter = new RequestRouter(this);
     this.connectionPool = connectionPoolService;
 

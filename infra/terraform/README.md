@@ -133,7 +133,7 @@ Each module supports these common variables:
 
 ```hcl
 project_id  = "saigon-signals"
-region      = "us-central1"
+region      = "asia-southeast1"
 environment = "prod"
 ```
 

@@ -4,5 +4,5 @@
  * This mock allows Jest to handle SVG imports in tests.
  */
 
-module.exports = 'SvgMock';
-module.exports.ReactComponent = 'svg';
+export default 'SvgMock';
+export const ReactComponent = 'svg';

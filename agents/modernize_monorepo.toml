@@ -1,0 +1,419 @@
+# agents/modernize_monorepo.toml
+
+version = "1.0"
+
+[commands.modernize_monorepo]
+
+description = """
+Refactor and modernize an existing Nx monorepo. Standardize it on ES modules, resolve
+configuration conflicts, enforce module boundaries, expand Storybook coverage, tighten
+security practices, consolidate documentation and update CI/CD scripts.
+"""
+
+instructions = """
+You are acting as a senior software engineer tasked with modernizing a large Nx monorepo.
+Follow these high-level steps and ask for approval before performing any destructive action.
+
+**IMPORTANT: This project uses PNPM as the package manager - use pnpm commands throughout.**
+
+1. **Scoping and Audit**
+• Read nx.json, tsconfig.base.json and tsconfig.references.json to understand the current projects and path mappings.
+• Use the git MCP to list all branches and show the current working branch. Verify no uncommitted changes.
+• Search the repository for uses of CommonJS (`require`, `module.exports`) and list files that need conversion.
+• Detect unresolved merge conflict markers (e.g., `<<<<<<< HEAD`) in tsconfig and other configs.
+• Identify unused or outdated dependencies by reading package.json and each project's project.json.
+• Validate existing MCP server configurations in .mcp/config/ directory.
+
+2. **Fix Configuration Conflicts**
+• Resolve any merge-conflict markers and choose a single namespace for TypeScript paths (e.g., `@nx-monorepo/*`).
+• Regenerate path mappings based on `apps/` and `libs/` directories.
+• Update tsconfig.references.json to reflect the final structure and remove stale references.
+• Ensure MCP server configurations are properly integrated with secrets management.
+
+3. **ESM Migration**
+• For each file using CommonJS, convert it to ESM syntax: replace `require` with `import`, `module.exports` with `export`, and update import paths.
+• For runtime scripts that must stay CJS (e.g., config files), isolate them in their own package and document the reason.
+• Add `"exports"` and `"type": "module"` fields to package.json files as needed and update ESLint parser options to enforce ESM.
+• Run `/fix` workflow to review the changes and suggest additional refactoring.
+
+4. **Enforce Boundaries and Dependencies**
+• Review project tags (`type:*` and `scope:*`) in each `project.json`. Add missing tags and implicit dependencies.
+• Run `pnpm exec ts-node tools/scripts/analyze-dependencies.ts` to detect circular dependencies. Update implicitDependencies accordingly.
+• Ensure `@nx/enforce-module-boundaries` is enabled in the ESLint config.
+
+5. **Expand Storybook and UI Libraries**
+• Identify shared UI components and generate dedicated libraries (`libs/ui/components`, `libs/agents-ui`) using Nx generators.
+• For each UI library, run `nx g @nx/react:storybook-configuration <libName>` to set up Storybook.
+• Migrate existing Storybook config from `agent-frontend` to the new libraries and create example stories.
+
+6. **Consolidate Documentation**
+• Read all existing README files. Create a new root README with: project overview, Nx commands, environment setup, deployment steps and pointers to docs/.
+• Minimize content in individual library READMEs. Replace them with links back to the root docs.
+• Move scattered guides (e.g., RAG pipeline, testing strategy) into a unified docs/ folder.
+
+7. **MCP Integration and Enhancement**
+• Validate all MCP servers from .mcp/config/enhanced-mcp.json are properly configured with secrets.
+• Ensure MCP servers for development tools (nx, typescript, python) are enabled and functional.
+• Test connectivity to Google Cloud MCP servers (google-search, google-drive, google-cloud, bigquery).
+• Verify Vertex AI integration through existing @google-cloud/aiplatform and @google/generative-ai packages.
+• Add mcp-gemini-google-search if not already configured for enhanced search capabilities.
+
+8. **Security and Environment Hardening**
+• **Secrets Management Integration**: Validate all secrets from Google Secret Manager are properly configured:
+  - GITHUB_PERSONAL_ACCESS_TOKEN for GitHub MCP server
+  - CODACY_API_TOKEN for Codacy integration
+  - PLAYWRIGHT_SERVICE_URL for testing
+  - TERRAFORM_CLOUD_TOKEN for infrastructure
+  - GOOGLE_SEARCH_API_KEY and GOOGLE_SEARCH_ENGINE_ID for search
+  - GOOGLE_DRIVE_CREDENTIALS for drive access
+  - SENTRY_DSN for error tracking
+  - TAVILY_API_KEY for research
+  - QDRANT_API_KEY and QDRANT_URL for vector database
+  - CODECOV_TOKEN for coverage reporting
+  - GRAFANA_API_KEY and GRAFANA_URL for monitoring
+  - POSTGRES_CONNECTION_STRING for database
+• **Environment Variable Security**: Audit Vite and other build configs to ensure only whitelisted env variables (`NODE_ENV`, `VITE_APP_NAME`, `VITE_API_URL`, `NEXT_PUBLIC_*`) are exposed.
+• **Secret Manager Best Practices**: Review `libs/utils/secrets-manager` and centralize secret reads via a single service with proper IAM roles, rotation procedures, and audit logging.
+• **Security Scanning**: Integrate secretlint validation and GitGuardian API for continuous secret scanning.
+• **Vietnamese Data Privacy Compliance**: Ensure all data processing complies with Vietnamese regulations using asia-southeast1 region.
+• **Infrastructure Security**: Implement CSP headers, TLS configuration, and Workload Identity Federation for GCP services.
+
+9. **CI/CD and Automation**
+• Verify that Nx target defaults enable caching for build, test, lint, e2e and storybook.
+• Update CI scripts to use `nx affected` commands based on git diffs.
+• Add automated dependency checks and Nx graph analysis to the pipeline.
+• Ensure pnpm is used consistently in all CI/CD scripts.
+• Integrate MCP server health checks into the CI pipeline.
+
+10. **Comprehensive Cleanup and Finalization**
+• **Dependency Cleanup**:
+  - Run `pnpm audit` and fix security vulnerabilities
+  - Remove unused dependencies from all package.json files using `pnpm exec depcheck`
+  - Update outdated dependencies with `pnpm update --latest`
+  - Clean up duplicate dependencies and consolidate versions
+  - Remove legacy @types packages that are no longer needed with modern TypeScript
+
+• **File System Cleanup**:
+  - Remove temporary files, build artifacts, and old migration files
+  - Clean up unused assets, images, and static files
+  - Remove obsolete configuration files and merge duplicates
+  - Delete empty directories and unused test fixtures
+  - Clean up .env files and remove test/development secrets
+
+• **Code Cleanup**:
+  - Use `/cleanup` to remove dead code, unused imports, and commented-out code
+  - Remove console.log statements and debug code from production files
+  - Clean up unused CSS classes and styles
+  - Remove deprecated API calls and legacy code patterns
+  - Consolidate duplicate utility functions and constants
+
+• **Configuration Cleanup**:
+  - Merge duplicate ESLint, Prettier, and TypeScript configurations
+  - Remove obsolete Webpack, Vite, and build configurations
+  - Clean up environment variable files and remove unused variables
+  - Consolidate Jest and testing configurations
+  - Remove legacy CI/CD configuration files
+
+• **Git and Version Control Cleanup**:
+  - Clean up merged branches with `git branch --merged | grep -v main | xargs git branch -d`
+  - Remove merge conflict artifacts and temporary files
+  - Clean up .gitignore duplicates and consolidate ignore patterns
+  - Optimize git history if needed (with approval for destructive operations)
+
+• **Cache and Performance Cleanup**:
+  - Clear Nx cache with `nx reset`
+  - Clean pnpm cache with `pnpm store prune`
+  - Remove node_modules and reinstall with `pnpm install --frozen-lockfile`
+  - Clean up build caches and temporary directories
+  - Optimize bundle sizes and remove unused chunks
+
+• **Documentation Cleanup**:
+  - Use `/docs` to update docstrings and remove outdated documentation
+  - Remove broken links and consolidate scattered README files
+  - Clean up API documentation and remove deprecated endpoints
+  - Consolidate migration guides and remove obsolete instructions
+  - Generate a `best_practices.md` file via `/generate-best-practices` with ESM, Nx, MCP, and testing guidelines
+
+• **Security and Secrets Cleanup**:
+  - Audit all files for hardcoded secrets or credentials
+  - Remove test credentials and development keys from codebase
+  - Clean up exposed endpoints and remove debug routes
+  - Validate all secrets are properly managed through Google Secret Manager
+  - Run secretlint scan to ensure no secrets are committed
+
+• **Testing and Quality Cleanup**:
+  - Use `/unit-test` to generate unit tests for newly migrated modules
+  - Remove obsolete test files and update test configurations
+  - Clean up test data and fixtures
+  - Remove flaky or redundant tests
+  - Ensure all tests pass with `pnpm test`
+
+• **Final Validation and Health Checks**:
+  - **MCP Server Validation**: Test all MCP server connections and validate secrets management integration
+  - **Build Validation**: Run `pnpm build` to ensure all projects build successfully
+  - **Lint Validation**: Run `pnpm lint` to ensure code quality standards
+  - **Type Validation**: Run `pnpm ts:build` to ensure TypeScript compilation
+  - **Dependency Validation**: Run `nx graph` to verify workspace integrity
+  - **Performance Validation**: Run bundle analysis and performance benchmarks
+  - **Security Validation**: Run final security scans and vulnerability checks
+
+• **Rollback Procedures and Documentation**:
+  - Prepare comprehensive rollback procedures that preserve secrets configuration
+  - Document all changes made during modernization
+  - Create maintenance runbook for ongoing operations
+  - Generate migration summary with before/after comparisons
+  - Provide recommendations for periodic maintenance and future upgrades
+
+• **Final Summary and Handoff**:
+  - Summarize all modernization actions taken with metrics and improvements
+  - List any outstanding items that require future attention
+  - Provide comprehensive recommendations for periodic maintenance
+  - Document new development workflows and best practices
+  - Create troubleshooting guide for common issues
+"""
+
+# Optional arguments: allow customization of namespace and dry run mode
+arguments = [
+  { name = "namespace", type = "string", required = false, default = "@nx-monorepo", description = "Base import namespace for tsconfig paths" },
+  { name = "dry_run", type = "boolean", required = false, default = true, description = "If true, report changes without writing to disk" },
+  { name = "validate_secrets", type = "boolean", required = false, default = true, description = "Validate all secrets from Google Secret Manager" },
+  { name = "enable_mcp_servers", type = "array", required = false, default = ["nx", "typescript", "google-cloud", "github"], description = "List of MCP servers to enable during modernization" }
+]
+
+# Define which MCP servers to use for complex operations - comprehensive configuration
+mcpServers = """
+{
+  "shell": {
+    "command": "uvx",
+    "args": ["mcp-shell-server"],
+    "env": {
+      "ALLOW_COMMANDS": "git,nx,pnpm,node,ts-node,grep,sed,jq,ls,rm,cp,mv,tsc,eslint"
+    }
+  },
+  "filesystem": {
+    "command": "uvx",
+    "args": ["mcp-filesystem-server"],
+    "env": {
+      "ALLOWED_DIRECTORIES": "/home/g_nelson/signals-1"
+    }
+  },
+  "github": {
+    "command": "docker",
+    "args": ["run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN", "ghcr.io/github/github-mcp-server"],
+    "env": {
+      "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+    }
+  },
+  "nx": {
+    "command": "uvx",
+    "args": ["mcp-nx-server"],
+    "env": {
+      "NX_WORKSPACE_ROOT": "/home/g_nelson/signals-1"
+    }
+  },
+  "typescript": {
+    "command": "uvx",
+    "args": ["mcp-typescript-server"],
+    "env": {
+      "TS_CONFIG_PATH": "/home/g_nelson/signals-1/tsconfig.base.json"
+    }
+  },
+  "google-cloud": {
+    "command": "uvx",
+    "args": ["mcp-google-cloud-server"],
+    "env": {
+      "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}",
+      "GOOGLE_CLOUD_PROJECT": "${GOOGLE_CLOUD_PROJECT}"
+    }
+  },
+  "google-search": {
+    "command": "uvx",
+    "args": ["mcp-google-search-server"],
+    "env": {
+      "GOOGLE_SEARCH_API_KEY": "${GOOGLE_SEARCH_API_KEY}",
+      "GOOGLE_SEARCH_ENGINE_ID": "${GOOGLE_SEARCH_ENGINE_ID}"
+    }
+  },
+  "google-drive": {
+    "command": "uvx",
+    "args": ["mcp-google-drive-server"],
+    "env": {
+      "GOOGLE_DRIVE_CREDENTIALS": "${GOOGLE_DRIVE_CREDENTIALS}"
+    }
+  },
+  "bigquery": {
+    "command": "uvx",
+    "args": ["mcp-bigquery-server"],
+    "env": {
+      "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}",
+      "GOOGLE_CLOUD_PROJECT": "${GOOGLE_CLOUD_PROJECT}"
+    }
+  },
+  "codacy": {
+    "command": "uvx",
+    "args": ["mcp-codacy-server"],
+    "env": {
+      "CODACY_API_TOKEN": "${CODACY_API_TOKEN}"
+    }
+  },
+  "playwright": {
+    "command": "uvx",
+    "args": ["mcp-playwright-server"],
+    "env": {
+      "PLAYWRIGHT_SERVICE_URL": "${PLAYWRIGHT_SERVICE_URL}"
+    }
+  },
+  "terraform": {
+    "command": "uvx",
+    "args": ["mcp-terraform-server"],
+    "env": {
+      "TERRAFORM_CLOUD_TOKEN": "${TERRAFORM_CLOUD_TOKEN}"
+    }
+  },
+  "sentry": {
+    "command": "uvx",
+    "args": ["mcp-sentry-server"],
+    "env": {
+      "SENTRY_DSN": "${SENTRY_DSN}"
+    }
+  },
+  "tavily": {
+    "command": "uvx",
+    "args": ["mcp-tavily-server"],
+    "env": {
+      "TAVILY_API_KEY": "${TAVILY_API_KEY}"
+    }
+  },
+  "qdrant": {
+    "command": "uvx",
+    "args": ["mcp-qdrant-server"],
+    "env": {
+      "QDRANT_API_KEY": "${QDRANT_API_KEY}",
+      "QDRANT_URL": "${QDRANT_URL}"
+    }
+  },
+  "codecov": {
+    "command": "uvx",
+    "args": ["mcp-codecov-server"],
+    "env": {
+      "CODECOV_TOKEN": "${CODECOV_TOKEN}"
+    }
+  },
+  "grafana": {
+    "command": "uvx",
+    "args": ["mcp-grafana-server"],
+    "env": {
+      "GRAFANA_API_KEY": "${GRAFANA_API_KEY}",
+      "GRAFANA_URL": "${GRAFANA_URL}"
+    }
+  },
+  "postgres": {
+    "command": "uvx",
+    "args": ["mcp-postgres-server"],
+    "env": {
+      "POSTGRES_CONNECTION_STRING": "${POSTGRES_CONNECTION_STRING}"
+    }
+  },
+  "python": {
+    "command": "uvx",
+    "args": ["mcp-python-server"],
+    "env": {
+      "PYTHON_PATH": "/usr/bin/python3"
+    }
+  },
+  "memory": {
+    "command": "uvx",
+    "args": ["mcp-memory-server"],
+    "env": {
+      "MEMORY_STORE_PATH": "/tmp/mcp-memory"
+    }
+  },
+  "brave-search": {
+    "command": "uvx",
+    "args": ["mcp-brave-search-server"],
+    "env": {
+      "BRAVE_SEARCH_API_KEY": "${BRAVE_SEARCH_API_KEY}"
+    }
+  },
+  "fetch": {
+    "command": "uvx",
+    "args": ["mcp-fetch-server"],
+    "env": {
+      "ALLOWED_DOMAINS": "github.com,npmjs.com,googleapis.com"
+    }
+  },
+  "git": {
+    "command": "uvx",
+    "args": ["mcp-git-server"],
+    "env": {
+      "GIT_REPOSITORY_PATH": "/home/g_nelson/signals-1"
+    }
+  },
+  "everything": {
+    "command": "uvx",
+    "args": ["mcp-everything-server"],
+    "env": {
+      "SEARCH_PATHS": "/home/g_nelson/signals-1"
+    }
+  },
+  "gemini-google-search": {
+    "command": "pnpm",
+    "args": ["exec", "mcp-gemini-google-search"],
+    "env": {
+      "GOOGLE_API_KEY": "${GOOGLE_API_KEY}",
+      "GOOGLE_SEARCH_ENGINE_ID": "${GOOGLE_SEARCH_ENGINE_ID}"
+    }
+  }
+}
+"""
+
+# Tools to expose to the agent - comprehensive toolkit
+tools = ["filesystem", "git", "shell", "github", "nx", "typescript", "google-cloud", "google-search", "google-drive", "bigquery", "codacy", "playwright", "terraform", "sentry", "tavily", "qdrant", "codecov", "grafana", "postgres", "python", "memory", "brave-search", "fetch", "everything", "gemini-google-search"]
+
+# Plan execution to let the model reason through multiple steps before acting
+execution_strategy = "plan"
+
+# Structured JSON output describing success and a summary of actions
+output_schema = """
+{
+  "type": "object",
+  "properties": {
+    "success": { "type": "boolean" },
+    "changedFiles": { "type": "array", "items": { "type": "string" } },
+    "removedFiles": { "type": "array", "items": { "type": "string" } },
+    "mcpServersValidated": { "type": "array", "items": { "type": "string" } },
+    "secretsValidated": { "type": "array", "items": { "type": "string" } },
+    "securityImprovements": { "type": "array", "items": { "type": "string" } },
+    "summary": { "type": "string" },
+    "recommendations": { "type": "array", "items": { "type": "string" } },
+    "rollbackProcedures": { "type": "string" }
+  },
+  "required": ["success", "summary"]
+}
+"""
+
+# Use the success field to determine exit status in CI
+exit_expression = "success"
+
+# Validation hooks for secrets and MCP server connectivity
+[commands.modernize_monorepo.validation]
+pre_execution = [
+  "Validate Google Secret Manager connectivity",
+  "Test MCP server configurations",
+  "Verify pnpm installation and workspace integrity",
+  "Check Nx workspace configuration"
+]
+
+post_execution = [
+  "Validate all secrets are still accessible",
+  "Test MCP server connectivity after changes",
+  "Run pnpm install to ensure dependencies are resolved",
+  "Execute nx graph to verify workspace integrity"
+]
+
+error_handling = [
+  "On secrets validation failure: halt execution and report missing secrets",
+  "On MCP server failure: continue with warning and disable affected server",
+  "On pnpm failure: attempt npm fallback with warning",
+  "On Nx configuration error: provide rollback to previous tsconfig state"
+]

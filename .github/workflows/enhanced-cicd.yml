@@ -209,6 +209,9 @@ jobs:
             apps/*/dist/
           retention-days: 7
 
+       - name: MCP Server Health Check
+        run: pnpm mcp:health
+
   # ============================================================================
   # TERRAFORM VALIDATION AND PLANNING
   # ============================================================================

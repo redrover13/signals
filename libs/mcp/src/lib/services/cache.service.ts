@@ -41,8 +41,8 @@ export class CacheService {
     deletes: 0
   };
 
-  private readonly defaultTTL = 300000; // 5 minutes default TTL
-  private readonly maxEntries = 10000; // Maximum cache entries
+  private readonly defaultTTL: number = 300000; // 5 minutes default TTL
+  private readonly maxEntries: number = 10000; // Maximum cache entries
   private cleanupInterval: NodeJS.Timeout | null = null;
 
   constructor(options?: {

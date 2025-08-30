@@ -81,7 +81,8 @@
   },
   "tags": [
     "domain:api",
-    "type:application"
+    "type:application",
+    "scope:server"
   ],
   "namedInputs": {
     "default": [

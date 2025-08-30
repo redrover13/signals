@@ -1,10 +1,10 @@
 {
-  "name": "looker-dashboards",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/looker-dashboards/src",
+  "name": "ui-components",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/ui/components/src",
   "projectType": "library",
   "tags": [
-    "domain:looker-dashboards",
+    "domain:ui",
     "type:library",
     "scope:client"
   ],
@@ -15,11 +15,11 @@
         "{options.outputPath}"
       ],
       "options": {
-        "outputPath": "dist/apps/looker-dashboards",
-        "main": "apps/looker-dashboards/src/index.ts",
-        "tsConfig": "apps/looker-dashboards/tsconfig.lib.json",
+        "outputPath": "dist/libs/ui/components",
+        "main": "libs/ui/components/src/index.ts",
+        "tsConfig": "libs/ui/components/tsconfig.lib.json",
         "assets": [
-          "apps/looker-dashboards/*.md"
+          "libs/ui/components/*.md"
         ]
       },
       "configurations": {
@@ -50,7 +50,7 @@
         "{workspaceRoot}/coverage/{projectRoot}"
       ],
       "options": {
-        "jestConfig": "apps/looker-dashboards/jest.config.ts"
+        "jestConfig": "libs/ui/components/jest.config.ts"
       },
       "configurations": {
         "ci": {
@@ -69,7 +69,7 @@
       "executor": "@nx/eslint:lint",
       "options": {
         "lintFilePatterns": [
-          "apps/looker-dashboards/**/*.{ts,tsx,js,jsx}"
+          "libs/ui/components/**/*.{ts,tsx,js,jsx}"
         ]
       },
       "inputs": [

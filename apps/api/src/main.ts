@@ -36,23 +36,6 @@ fastify.register(healthRoutes, { prefix: '/health' });
 fastify.register(agentsRoutes, { prefix: '/agents' });
 fastify.register(searchRoutes, { prefix: '/search' });
 
-<<<<<<< HEAD
-const start = async () => {
-  try {
-    // Initialize security first
-    await initializeSecurity();
-    
-    // Start the server
-    await fastify.listen({ port: PORT, host: '0.0.0.0' });
-    fastify.log.info(`API server listening at port ${PORT} with security middleware enabled`);
-  } catch (err) {
-    fastify.log.error(err);
-    process.exit(1);
-  }
-};
-
-start();
-=======
 // Initialize MCP service with better error handling
 async function initializeApp(): Promise<void> {
   try {
@@ -87,4 +70,3 @@ async function initializeApp(): Promise<void> {
 }
 
 initializeApp().catch(console.error);
->>>>>>> main

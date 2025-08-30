@@ -9,11 +9,6 @@
  * @license MIT
  */
 
-/**
- * MCP Service - Main Facade
- * Provides a simplified interface for all MCP operations
- */
-
 import { MCPClientService, MCPRequest, MCPResponse } from './clients/mcp-client.service';
 import { ServerHealthService, HealthCheckResult, ServerHealthStats } from './clients/server-health.service';
 import { RequestRouter } from './clients/request-router.service';
@@ -35,7 +30,7 @@ export class MCPService {
 
   private constructor() {
     this.clientService = new MCPClientService();
-    this.healthService = new ServerHealthService(this.clientService);
+    this.healthService = new ServerHealthService();
     this.requestRouter = new RequestRouter(this.clientService);
     this.cacheService = cacheService;
     this.performanceService = performanceMetricsService;
@@ -86,7 +81,7 @@ export class MCPService {
     }
 
     const requestId = `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const serverId = options?.serverId || this.requestRouter.routeRequest({ method, params } as MCPRequest);
+    const serverId = options?.serverId || await this.requestRouter.routeRequest({ method, params } as MCPRequest);
     
     // Start performance tracking
     this.performanceService.startRequest(requestId, method, serverId);
@@ -230,7 +225,7 @@ export class MCPService {
       location: 'asia-southeast1', // Singapore region for Vietnamese data residency
       useQueryCache: true,
       useLegacySql: false,
-      maxResults: params?.maxResults || 10000 // Reasonable limit for Vietnamese network
+      maxResults: params?.['maxResults'] || 10000 // Reasonable limit for Vietnamese network
     }, { 
       serverId: 'databases',
       enableCache: true,
@@ -362,7 +357,7 @@ export class MCPService {
   /**
    * Force health check
    */
-  async checkHealth(serverId?: string): Promise<HealthCheckResult | HealthCheckResult[] | null> {
+  async checkHealth(serverId?: string): Promise<HealthCheckResult | Map<string, HealthCheckResult> | null> {
     if (serverId) {
       return this.healthService.forceHealthCheck(serverId);
     }
@@ -592,7 +587,7 @@ export class MCPService {
     }
     
     // Optimize for Vietnamese data residency
-    if (!query.includes('location') && params?.location !== false) {
+    if (!query.includes('location') && params?.['location'] !== false) {
       // Ensure queries run in asia-southeast1 region
       optimizedQuery = `-- Vietnamese Market Optimized Query
 -- Region: asia-southeast1

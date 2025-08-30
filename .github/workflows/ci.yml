@@ -12,7 +12,7 @@ on:
 
 env:
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  GCP_REGION: us-central1
+  GCP_REGION: asia-southeast1
 
 jobs:
   build-test-lint:
@@ -54,19 +54,48 @@ jobs:
         run: pnpm codeql:fix
 
       - name: Run Lint
-        run: pnpm nx run-many --target=lint --all --parallel=3 || true
+        run: pnpm nx affected --target=lint --parallel=3
 
       - name: Run Tests
-        run: pnpm nx run-many --target=test --all --parallel=3 || true
+        run: pnpm nx affected --target=test --parallel=3 --ci --code-coverage
 
       - name: Run Type Check
-        run: pnpm nx run-many --target=type-check --all --parallel=3 || echo "Type-check target not found in all projects"
+        run: pnpm nx affected --target=type-check --parallel=3
 
       - name: Run Static Analysis (SAST) on AI-Generated Code
         run: |
           echo "Running SAST on AI-generated code sections..."
           # For demonstration, we'll just list files with AI-GENERATED tag
           grep -r "// AI-GENERATED" . || true
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.0.2
+        with:
+          version: 10.0.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run dependency-cruiser
+        run: pnpm nx dep-graph --file=dep-graph.json
+
+      - name: Upload dependency graph artifact
+        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
+        with:
+          name: dep-graph
+          path: dep-graph.json
 
   terraform-plan:
     runs-on: ubuntu-latest

@@ -8,9 +8,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "paths": {
-      "@dulce-de-saigon/agents-lib": ["dist/libs/agents/src/index.d.ts"],
-      "@dulce-de-saigon/security": ["dist/libs/security/src/index.d.ts"],
-      "@dulce/gcp": ["dist/libs/gcp/src/index.d.ts"],
+      "@nx-monorepo/*": ["libs/*"],
       "@nx-monorepo/adk": ["libs/adk/src/index.ts"],
       "@nx-monorepo/agents": ["libs/agents/src/index.ts"],
       "@nx-monorepo/agents/gemini-orchestrator": ["libs/agents/gemini-orchestrator/src/index.ts"],

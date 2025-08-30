@@ -5,7 +5,6 @@
     "libsDir": "libs"
   },
   "nxCloudId": "68a7ffbfebaf020a3eb6c033",
-  "nxCloudAccessToken": "ZDIzN2I2ZGEtNDVkMC00YTRiLWE5YTQtNmI3MTk3ZmIyODQ0fHJlYWQtd3JpdGU=",
   "defaultBase": "main",
   "plugins": [
     {
@@ -139,16 +138,18 @@
     },
     "dev": {
       "cache": false
+    },
+    "e2e": {
+      "cache": true
+    },
+    "build-storybook": {
+      "cache": true
     }
   },
   "tasksRunnerOptions": {
     "default": {
-      "runner": "nx-cloud",
       "options": {
-        "cacheableOperations": ["build", "lint", "test", "e2e", "build-storybook"],
-        "parallel": 3,
         "maxParallel": 5,
-        "useDaemonProcess": true,
         "remoteCache": {
           "enabled": true
         }
@@ -175,5 +176,7 @@
     "version": {
       "preVersionCommand": "pnpm dlx nx run-many -t build"
     }
-  }
+  },
+  "useDaemonProcess": true,
+  "parallel": 3
 }

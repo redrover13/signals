@@ -34,9 +34,6 @@ const getProjectId = memoize((): string => {
   return projectId;
 });
 
-// Export getProjectId for external use
-export { getProjectId };
-
 export async function getGoogleCloudCredentials(): Promise<{
   auth: GoogleAuth;
   projectId: string;

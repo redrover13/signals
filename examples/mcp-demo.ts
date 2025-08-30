@@ -74,7 +74,7 @@ async function runMCPDemo() {
         console.log(`✅ Read package.json: ${pkg.name} v${pkg.version}`);
       }
     } catch (error) {
-      console.log('⚠️  File system test skipped:', error instanceof Error ? error instanceof Error ? error.message : String(error) : String(error));
+      console.log('⚠️  File system test skipped:', error instanceof Error ? error.message : String(error));
     }
 
     // Git operations

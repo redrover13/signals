@@ -1,432 +1,152 @@
 /**
- * @fileoverview content-agent module for Content Management
+ * @fileoverview content-agent module for the lib component
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
- * Contains implementation for content management, media processing, and content distribution.
+ * Contains content generation agent implementation using Google's ADK.
  *
  * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
  */
 
-import { Storage } from '@google-cloud/storage';
+import { 
+  DulceLlmAgent, 
+  GeminiLlm, 
+  GCSUploadTool, 
+  HttpRequestTool 
+} from '@nx-monorepo/adk';
 
-export interface ContentConfig {
-  bucketName?: string;
-  projectId?: string;
-  cdnUrl?: string;
-}
-
-export interface ContentItem {
-  id: string;
-  type: 'image' | 'video' | 'document' | 'menu' | 'banner';
-  title: string;
-  description?: string;
-  url: string;
-  metadata: Record<string, any>;
-  tags: string[];
-  status: 'draft' | 'published' | 'archived';
-  createdAt: string;
-  updatedAt: string;
-  restaurantId?: string;
-}
-
-export interface ContentResult<T = any> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  contentUrl?: string;
-}
-
-export interface MenuContent {
-  restaurantId: string;
-  sections: MenuSection[];
-  lastUpdated: string;
-  version: string;
-}
-
-export interface MenuSection {
-  id: string;
-  name: string;
-  description?: string;
-  items: MenuItem[];
-  order: number;
-}
-
-export interface MenuItem {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  currency: string;
-  image?: string;
-  allergens: string[];
-  dietaryInfo: string[];
-  availability: boolean;
-  preparationTime?: number;
-}
+import { Requirements, ContentResponse } from '@nx-monorepo/data-models';
 
 /**
- * Content Agent for managing restaurant content, menus, and media
+ * Content-specialized agent for generating F&B marketing content
  */
-export class ContentAgent {
-  private storage: Storage;
-  private config: ContentConfig;
+export class ContentAgent extends DulceLlmAgent {
+  constructor(cfg?: { model?: string; apiKey?: string; tools?: Array<unknown> }) {
+    // Guard against missing API key (fail-fast)
+    const apiKey = cfg?.apiKey ?? process.env.GOOGLE_API_KEY;
+    if (!apiKey) {
+      throw new Error('GOOGLE_API_KEY is required to initialize ContentAgent');
+    }
 
-  constructor(config: ContentConfig = {}) {
-    this.config = {
-      bucketName: 'dulce-content-bucket',
-      ...config
-    };
-    
-    this.storage = new Storage({
-      projectId: config.projectId
+    // Allow overriding the model via cfg, defaulting to 'gemini-1.5-pro'
+    const llm = new GeminiLlm({
+      model: cfg?.model ?? 'gemini-1.5-pro',
+      apiKey,
+    });
+
+    // Allow injecting custom tools, defaulting to GCS upload + HTTP request
+    const tools = cfg?.tools ?? [
+      new GCSUploadTool(),
+      new HttpRequestTool(),
+    ];
+
+    super({
+      name: 'Content Agent',
+      description: 'Specialized agent for Vietnamese F&B content generation and marketing',
+      llm,
+      tools,
     });
   }
 
   /**
-   * Upload content to Google Cloud Storage
+   * Generate Vietnamese F&B marketing content
    */
-  async uploadContent(
-    fileName: string, 
-    content: Buffer | string, 
-    metadata: Record<string, any> = {}
-  ): Promise<ContentResult<{ url: string; fileId: string }>> {
-    try {
-      const bucket = this.storage.bucket(this.config.bucketName!);
-      const file = bucket.file(fileName);
-      
-      const stream = file.createWriteStream({
-        metadata: {
-          contentType: this.getContentType(fileName),
-          metadata: metadata
-        },
-        public: true
-      });
+  public async generateContent(
+    contentType: string,
+    requirements: Requirements
+  ): Promise<ContentResponse> {
+    const prompt = `
+  You are a Vietnamese F&B content specialist for the Dulce de Saigon platform.
 
-      return new Promise((resolve) => {
-        stream.on('error', (error) => {
-          resolve({
-            success: false,
-            error: error.message
-          });
-        });
+  Content Type: ${contentType}
+  Requirements: ${JSON.stringify(requirements, null, 2)}
 
-        stream.on('finish', () => {
-          const publicUrl = `https://storage.googleapis.com/${this.config.bucketName}/${fileName}`;
-          resolve({
-            success: true,
-            data: {
-              url: publicUrl,
-              fileId: fileName
-            },
-            contentUrl: publicUrl
-          });
-        });
+  Please generate content that:
+  1. Appeals to Vietnamese food culture and preferences
+  2. Uses appropriate Vietnamese terminology where relevant
+  3. Follows local marketing practices
+  4. Considers dietary restrictions and preferences common in Vietnam
+  5. Incorporates seasonal Vietnamese ingredients when appropriate
 
-        if (Buffer.isBuffer(content)) {
-          stream.end(content);
-        } else {
-          stream.end(Buffer.from(content));
-        }
-      });
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
+  Generate engaging, culturally appropriate content for the Vietnamese market.
+      `;
+
+    return this.invoke<ContentResponse>({
+      messages: [{ role: 'user', content: prompt }],
+    });
   }
 
   /**
-   * Generate menu content for a restaurant
+   * Create social media content for Vietnamese restaurants
    */
-  async generateMenu(restaurantId: string, menuData: Omit<MenuContent, 'lastUpdated' | 'version'>): Promise<ContentResult<MenuContent>> {
-    try {
-      const menu: MenuContent = {
-        ...menuData,
-        restaurantId,
-        lastUpdated: new Date().toISOString(),
-        version: `v${Date.now()}`
-      };
+  async createSocialContent(platform: string, restaurantInfo: any): Promise<any> {
+    const prompt = `
+Create social media content for platform: ${platform}
 
-      // Upload menu as JSON
-      const menuJson = JSON.stringify(menu, null, 2);
-      const fileName = `menus/${restaurantId}/menu-${menu.version}.json`;
-      
-      const uploadResult = await this.uploadContent(fileName, menuJson, {
-        restaurantId,
-        contentType: 'menu',
-        version: menu.version
-      });
+Restaurant Information: ${JSON.stringify(restaurantInfo, null, 2)}
 
-      if (!uploadResult.success) {
-        return uploadResult;
-      }
+Please:
+1. Generate platform-appropriate content (Instagram, Facebook, TikTok, etc.)
+2. Use Vietnamese cultural references where appropriate
+3. Include relevant hashtags for the Vietnamese F&B market
+4. Consider local holidays and events
+5. Suggest optimal posting times for Vietnamese audiences
 
-      return {
-        success: true,
-        data: menu,
-        contentUrl: uploadResult.contentUrl
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
+Create content that resonates with Vietnamese food lovers.
+    `;
+
+    return this.invoke({
+      messages: [{ role: 'user', content: prompt }],
+    });
   }
 
   /**
-   * Generate Vietnamese food content with localization
+   * Generate menu descriptions with Vietnamese localization
    */
-  async generateVietnameseContent(item: {
-    name: string;
-    description: string;
-    ingredients: string[];
-    preparationMethod: string;
-  }): Promise<ContentResult<{
-    vietnamese: any;
-    english: any;
-    contentId: string;
-  }>> {
-    try {
-      const contentId = `vn-content-${Date.now()}`;
-      
-      const vietnameseContent = {
-        tên: item.name,
-        mô_tả: item.description,
-        nguyên_liệu: item.ingredients,
-        cách_chế_biến: item.preparationMethod,
-        ngôn_ngữ: 'vi-VN'
-      };
+  async generateMenuContent(dishes: any[], targetLanguage: 'vietnamese' | 'english' | 'both' = 'both'): Promise<any> {
+    const prompt = `
+Generate menu descriptions for Vietnamese F&B platform.
 
-      const englishContent = {
-        name: item.name,
-        description: item.description,
-        ingredients: item.ingredients,
-        preparation_method: item.preparationMethod,
-        language: 'en-US'
-      };
+Dishes: ${JSON.stringify(dishes, null, 2)}
+Target Language: ${targetLanguage}
 
-      const content = {
-        id: contentId,
-        vietnamese: vietnameseContent,
-        english: englishContent,
-        createdAt: new Date().toISOString()
-      };
+Please:
+1. Create appetizing descriptions that highlight unique flavors
+2. Include Vietnamese translations where appropriate
+3. Mention key ingredients and cooking methods
+4. Consider dietary preferences common in Vietnam
+5. Use food terminology that Vietnamese customers understand
+6. Suggest pricing strategies for the Vietnamese market
 
-      const fileName = `content/vietnamese/${contentId}.json`;
-      const uploadResult = await this.uploadContent(fileName, JSON.stringify(content, null, 2), {
-        contentType: 'vietnamese-food',
-        language: 'vi-VN'
-      });
+Generate menu content that drives orders and reflects Vietnamese culinary culture.
+    `;
 
-      return {
-        success: true,
-        data: {
-          vietnamese: vietnameseContent,
-          english: englishContent,
-          contentId
-        },
-        contentUrl: uploadResult.contentUrl
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
-  }
-
-  /**
-   * Process and optimize images
-   */
-  async processImage(
-    imageBuffer: Buffer, 
-    fileName: string,
-    options: {
-      resize?: { width: number; height: number };
-      quality?: number;
-      format?: 'jpeg' | 'png' | 'webp';
-    } = {}
-  ): Promise<ContentResult<{ url: string; sizes: Record<string, string> }>> {
-    try {
-      // Upload original image
-      const originalResult = await this.uploadContent(fileName, imageBuffer, {
-        contentType: 'image',
-        processing: 'original'
-      });
-
-      if (!originalResult.success) {
-        return originalResult;
-      }
-
-      // For demo purposes, we'll just return the original URL
-      // In a real implementation, you'd use image processing libraries like Sharp
-      const sizes = {
-        original: originalResult.contentUrl!,
-        thumbnail: originalResult.contentUrl!, // Would be processed
-        medium: originalResult.contentUrl!,    // Would be processed
-        large: originalResult.contentUrl!      // Would be processed
-      };
-
-      return {
-        success: true,
-        data: {
-          url: originalResult.contentUrl!,
-          sizes
-        },
-        contentUrl: originalResult.contentUrl
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
-  }
-
-  /**
-   * Create promotional banner content
-   */
-  async createPromoBanner(promoData: {
-    title: string;
-    description: string;
-    restaurantId: string;
-    discount?: number;
-    validUntil: string;
-    imageUrl?: string;
-  }): Promise<ContentResult<ContentItem>> {
-    try {
-      const bannerId = `promo-${Date.now()}`;
-      const banner: ContentItem = {
-        id: bannerId,
-        type: 'banner',
-        title: promoData.title,
-        description: promoData.description,
-        url: promoData.imageUrl || '',
-        metadata: {
-          discount: promoData.discount,
-          validUntil: promoData.validUntil,
-          restaurantId: promoData.restaurantId
-        },
-        tags: ['promotion', 'banner', 'marketing'],
-        status: 'published',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        restaurantId: promoData.restaurantId
-      };
-
-      // Save banner data
-      const fileName = `banners/${promoData.restaurantId}/${bannerId}.json`;
-      const uploadResult = await this.uploadContent(fileName, JSON.stringify(banner, null, 2), {
-        contentType: 'promotional-banner'
-      });
-
-      return {
-        success: true,
-        data: banner,
-        contentUrl: uploadResult.contentUrl
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
-  }
-
-  /**
-   * Get content list by type and restaurant
-   */
-  async getContentList(filters: {
-    type?: string;
-    restaurantId?: string;
-    status?: string;
-    limit?: number;
-  } = {}): Promise<ContentResult<ContentItem[]>> {
-    try {
-      // This would typically query a database
-      // For demo purposes, we'll return mock data
-      const mockContent: ContentItem[] = [
-        {
-          id: 'content-1',
-          type: 'menu',
-          title: 'Vietnamese Spring Menu',
-          description: 'Fresh spring menu featuring Vietnamese specialties',
-          url: `https://storage.googleapis.com/${this.config.bucketName}/menus/restaurant-1/menu-v1.json`,
-          metadata: { season: 'spring', year: 2025 },
-          tags: ['vietnamese', 'spring', 'menu'],
-          status: 'published',
-          createdAt: '2025-01-01T00:00:00.000Z',
-          updatedAt: '2025-01-01T00:00:00.000Z',
-          restaurantId: filters.restaurantId || 'restaurant-1'
-        }
-      ];
-
-      return {
-        success: true,
-        data: mockContent
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
-  }
-
-  /**
-   * Delete content
-   */
-  async deleteContent(fileName: string): Promise<ContentResult<{ deleted: boolean }>> {
-    try {
-      const bucket = this.storage.bucket(this.config.bucketName!);
-      const file = bucket.file(fileName);
-      
-      await file.delete();
-      
-      return {
-        success: true,
-        data: { deleted: true }
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
-    }
-  }
-
-  /**
-   * Helper method to determine content type
-   */
-  private getContentType(fileName: string): string {
-    const ext = fileName.split('.').pop()?.toLowerCase();
-    switch (ext) {
-      case 'jpg':
-      case 'jpeg':
-        return 'image/jpeg';
-      case 'png':
-        return 'image/png';
-      case 'gif':
-        return 'image/gif';
-      case 'webp':
-        return 'image/webp';
-      case 'pdf':
-        return 'application/pdf';
-      case 'json':
-        return 'application/json';
-      case 'txt':
-        return 'text/plain';
-      default:
-        return 'application/octet-stream';
-    }
+    return this.invoke({
+      messages: [{ role: 'user', content: prompt }],
+    });
   }
 }
 
-// Export legacy function for backwards compatibility
+/**
+ * Factory function to create a Content agent
+ */
+export function createContentAgent(config?: {
+  vertexClient?: any;
+  projectId?: string;
+  language?: string;
+  region?: string;
+  pubSubClient?: any;
+  topicName?: string;
+}): ContentAgent {
+  // For now, just return a new instance
+  // In the future, we can use the config parameters for initialization
+  return new ContentAgent();
+}
+
+/**
+ * Legacy function for backward compatibility
+ */
 export function contentAgent(): string {
-  return 'content-agent';
+  return 'content-agent (ADK-enabled)';
 }

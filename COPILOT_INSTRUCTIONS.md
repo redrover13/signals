@@ -28,10 +28,13 @@ This document provides guidelines for using GitHub Copilot effectively within th
 *   **Environment Variables**: Sensitive information should be accessed via environment variables (e.g., `process.env.GCP_PROJECT_ID`) and managed through Secret Manager, not hardcoded.
 *   **Logging and Monitoring**: Encourage Copilot to include appropriate logging and error handling using GCP's logging and monitoring services.
 
-### c. AI Agents and Orchestration
+### d. RAG Pipeline Development
 
-*   **Tool Definitions**: When defining new tools for agents, ensure they are clearly described and follow the existing `tools.ts` pattern.
-*   **Orchestration Logic**: For the Gemini Orchestrator, ensure Copilot's suggestions align with the state machine or workflow patterns used for agent coordination.
+*   **GCP Integration**: When working with RAG pipeline components, ensure all GCP services are properly configured with appropriate IAM permissions and environment variables.
+*   **BigQuery Optimization**: For BigQuery operations, suggest optimized queries with proper clustering, partitioning, and indexing strategies.
+*   **Cloud Function Best Practices**: When generating Cloud Functions, include proper error handling, logging, and timeout management.
+*   **Document Processing**: For document processing logic, ensure robust parsing, chunking algorithms, and metadata extraction.
+*   **Security Compliance**: All RAG pipeline code must comply with Vietnamese data privacy regulations and GCP security best practices.
 
 ## 4. Tagging AI-Generated Code
 

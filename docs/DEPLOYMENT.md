@@ -231,6 +231,131 @@ After deployment, verify the setup:
    ```
 4. Check the agents service is processing tasks (if enabled)
 
+## RAG Pipeline Deployment
+
+The RAG (Retrieval-Augmented Generation) pipeline provides AI-powered document processing and retrieval capabilities. This section covers the deployment of the RAG pipeline infrastructure.
+
+### Prerequisites
+
+- Google Cloud Project with billing enabled
+- Terraform 1.0+
+- Google Cloud SDK
+- PNPM package manager
+
+### Infrastructure Deployment
+
+1. **Navigate to RAG Pipeline Terraform Directory:**
+
+   ```bash
+   cd infra/terraform/rag-pipeline
+   ```
+
+2. **Initialize Terraform:**
+
+   ```bash
+   terraform init
+   ```
+
+3. **Review the Plan:**
+
+   ```bash
+   terraform plan
+   ```
+
+4. **Apply Infrastructure:**
+
+   ```bash
+   terraform apply
+   ```
+
+   This creates:
+   - Cloud Storage buckets for documents and chunks
+   - BigQuery dataset and table for processed data
+   - Cloud Function for document processing
+   - Pub/Sub topic for event messaging
+   - Service account with appropriate IAM permissions
+
+### Cloud Function Deployment
+
+1. **Build the Cloud Function:**
+
+   ```bash
+   cd apps/cloud-functions/rag-processor
+   pnpm install
+   pnpm run build
+   ```
+
+2. **Package the Function:**
+
+   ```bash
+   zip -r function-source.zip package.json index.js index.d.ts
+   ```
+
+3. **Deploy to GCP:**
+
+   The Cloud Function is automatically deployed by Terraform. If manual deployment is needed:
+
+   ```bash
+   gcloud functions deploy rag-document-processor \
+     --runtime nodejs18 \
+     --trigger-http \
+     --allow-unauthenticated \
+     --region asia-southeast1 \
+     --memory 1024MB \
+     --timeout 60s \
+     --set-env-vars GCP_PROJECT_ID=PROJECT_ID,DOCUMENTS_BUCKET=saigon-signals-rag-documents,CHUNKS_BUCKET=saigon-signals-rag-chunks,BQ_DATASET=rag_dataset,BQ_TABLE=document_chunks,PUBSUB_TOPIC=rag-document-processing
+   ```
+
+### Verification
+
+1. **Check GCP Resources:**
+
+   ```bash
+   # List Cloud Storage buckets
+   gsutil ls
+
+   # Check BigQuery dataset
+   bq ls rag_dataset
+
+   # Verify Cloud Function
+   gcloud functions list
+   ```
+
+2. **Test Document Processing:**
+
+   Upload a test document to the documents bucket and verify processing:
+
+   ```bash
+   # Upload test document
+   gsutil cp test-document.pdf gs://saigon-signals-rag-documents/
+
+   # Check processed chunks
+   gsutil ls gs://saigon-signals-rag-chunks/
+
+   # Query BigQuery for processed data
+   bq query "SELECT * FROM rag_dataset.document_chunks LIMIT 10"
+   ```
+
+### Environment Variables
+
+The RAG pipeline uses the following environment variables:
+
+- `GCP_PROJECT_ID` - Google Cloud Project ID
+- `DOCUMENTS_BUCKET` - Source documents bucket name
+- `CHUNKS_BUCKET` - Processed chunks bucket name
+- `BQ_DATASET` - BigQuery dataset name
+- `BQ_TABLE` - BigQuery table name
+- `PUBSUB_TOPIC` - Pub/Sub topic for processing events
+
+### Rollback
+
+To rollback the RAG pipeline infrastructure:
+
+```bash
+cd infra/terraform/rag-pipeline
+terraform destroy
+```
+
 ## Monitoring and Logging
 
 The platform uses Google Cloud's built-in monitoring:

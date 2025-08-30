@@ -19,7 +19,7 @@ import {
   createMCPClient,
   validateMCPEnvironment,
   testMCPConnectivity,
-} from '@nx-monorepo/mcp';
+} from '../libs/mcp/src/index.js';
 
 async function runMCPDemo() {
   console.log('🚀 Starting MCP Integration Demo...\n');
@@ -237,7 +237,7 @@ async function runMCPDemo() {
 }
 
 // Run the demo
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   runMCPDemo().catch(console.error);
 }
 

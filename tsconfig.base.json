@@ -8,30 +8,31 @@
     "declarationMap": true,
     "sourceMap": true,
     "paths": {
-      "@dulce-de-saigon/agents-lib": ["libs/agents/src/index.ts"],
-      "@dulce/adk": ["libs/adk/src/index.ts"],
-      "@dulce/env": ["libs/env/src/index.ts"],
-      "@dulce/gcp": ["libs/gcp/src/index.ts"],
+<<<<<<< HEAD
+      "@dulce-de-saigon/agents-lib": ["dist/libs/agents/src/index.d.ts"],
+      "@dulce-de-saigon/security": ["dist/libs/security/src/index.d.ts"],
+      "@dulce/gcp": ["dist/libs/gcp/src/index.d.ts"],
+      "@nx-monorepo/mcp": ["dist/libs/mcp/src/index.d.ts"]
+=======
       "@nx-monorepo/adk": ["libs/adk/src/index.ts"],
-      "@nx-monorepo/adk/services/vertex": ["libs/adk/src/services/vertex.ts"],
+      "@nx-monorepo/agents": ["libs/agents/src/index.ts"],
       "@nx-monorepo/agents/gemini-orchestrator": ["libs/agents/gemini-orchestrator/src/index.ts"],
-      "@nx-monorepo/bq-agent": ["libs/agents/bq-agent/src/index.ts"],
-      "@nx-monorepo/content-agent": ["libs/agents/content-agent/src/index.ts"],
-      "@nx-monorepo/crm-agent": ["libs/agents/crm-agent/src/index.ts"],
-      "@nx-monorepo/gemini-orchestrator": ["libs/agents/gemini-orchestrator/src/index.ts"],
-      "@nx-monorepo/looker-agent": ["libs/agents/looker-agent/src/index.ts"],
+      "@nx-monorepo/agents/bq-agent": ["libs/agents/bq-agent/src/index.ts"],
+      "@nx-monorepo/agents/content-agent": ["libs/agents/content-agent/src/index.ts"],
+      "@nx-monorepo/agents/crm-agent": ["libs/agents/crm-agent/src/index.ts"],
+      "@nx-monorepo/agents/looker-agent": ["libs/agents/looker-agent/src/index.ts"],
+      "@nx-monorepo/agents/reviews-agent": ["libs/agents/reviews-agent/src/index.ts"],
+      "@nx-monorepo/agents-sdk": ["libs/agents-sdk/src/index.ts"],
+      "@nx-monorepo/build-tools": ["libs/build-tools/src/index.ts"],
+      "@nx-monorepo/gcp": ["libs/gcp/src/index.ts"],
       "@nx-monorepo/mcp": ["libs/mcp/src/index.ts"],
-      "@nx-monorepo/reviews-agent": ["libs/agents/reviews-agent/src/index.ts"],
+      "@nx-monorepo/utils/api-clients": ["libs/utils/api-clients/src/index.ts"],
+      "@nx-monorepo/utils/gcp-auth": ["libs/utils/gcp-auth/src/index.ts"],
       "@nx-monorepo/utils/monitoring": ["libs/utils/monitoring/src/index.ts"],
       "@nx-monorepo/utils/signals": ["libs/utils/signals/src/index.ts"],
-      "@signals/build-tools": ["libs/build-tools/src/index.ts"],
-      "agents-sdk": ["libs/agents-sdk/src/index.ts"],
-      "dbt-models": ["libs/data-models/dbt-models/src/index.ts"],
-      "gcp-auth": ["libs/utils/gcp-auth/src/index.ts"],
-      "gemini-orchestrator": ["libs/agents/gemini-orchestrator/src/index.ts"],
-      "looker-dashboards": ["apps/looker-dashboards/src/index.ts"],
-      "reviews-agent": ["libs/agents/reviews-agent/src/index.ts"],
-      "vertex-agents": ["infra/terraform/vertex-agents/src/index.ts"]
+      "@nx-monorepo/data-models/dbt-models": ["libs/data-models/dbt-models/src/index.ts"],
+      "@nx-monorepo/data-models/schemas": ["libs/data-models/schemas/src/index.ts"]
+>>>>>>> main
     },
     "outDir": "./dist/out-tsc",
     "moduleResolution": "node",
@@ -52,8 +53,6 @@
   "exclude": ["node_modules", "tmp"],
   "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", "**/*.js"],
   "references": [
-    {
-      "path": "./tsconfig.references.json"
-    }
+    { "path": "./tsconfig.references.json" }
   ]
 }

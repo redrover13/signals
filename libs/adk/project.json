@@ -3,17 +3,45 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/adk/src",
   "projectType": "library",
-  "tags": ["scope:backend-lib", "type:adk"],
+  "tags": [
+    "domain:adk",
+    "type:library"
+  ],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/adk",
         "main": "libs/adk/src/index.ts",
         "tsConfig": "libs/adk/tsconfig.lib.json",
-        "assets": ["libs/adk/*.md"]
-      }
+        "assets": [
+          "libs/adk/*.md"
+        ]
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "generatePackageJson": true,
+          "sourceMap": false
+        },
+        "development": {
+          "optimization": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production",
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ]
     },
     "test": {
       "executor": "@nx/jest:jest",
@@ -25,8 +53,29 @@
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["libs/adk/**/*.{ts,tsx,js,jsx}"]
-      }
+        "lintFilePatterns": [
+          "libs/adk/**/*.{ts,tsx,js,jsx}"
+        ]
+      },
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json"
+      ],
+      "cache": true
     }
+  },
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/.eslintrc.json"
+    ],
+    "sharedGlobals": []
   }
 }

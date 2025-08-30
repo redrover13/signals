@@ -12,7 +12,7 @@
 export interface VertexAIClientConfig {
   project: string;
   location: string;
-  endpointId?: string;
+  endpointId: string;
 }
 
 export class VertexAIClient {
@@ -20,7 +20,12 @@ export class VertexAIClient {
 
   async predict(instancePayload: any): Promise<any> {
     // TODO: Implement actual Vertex AI prediction
-    console.log('Vertex AI prediction called with:', instancePayload);
-    return { predictions: [] };
+    // This is a placeholder implementation
+    return {
+      predictions: [{
+        result: 'placeholder prediction',
+        confidence: 0.95
+      }]
+    };
   }
 }

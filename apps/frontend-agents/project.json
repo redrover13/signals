@@ -3,21 +3,38 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/frontend-agents/src",
   "projectType": "application",
-  "tags": ["scope:frontend", "type:ui"],
+  "tags": [
+    "domain:frontend-agents",
+    "type:application"
+  ],
   "targets": {
     "build": {
       "executor": "@nx/next:build",
-      "outputs": ["{projectRoot}/dist"],
+      "outputs": [
+        "{projectRoot}/dist"
+      ],
       "defaultConfiguration": "production",
       "options": {},
       "configurations": {
-        "development": {
-          "outputPath": "apps/frontend-agents"
-        },
         "production": {
-          "outputPath": "dist/apps/frontend-agents"
+          "optimization": true,
+          "extractLicenses": true,
+          "generatePackageJson": true,
+          "sourceMap": false
+        },
+        "development": {
+          "optimization": false,
+          "sourceMap": true
         }
-      }
+      },
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ]
     },
     "serve": {
       "executor": "@nx/next:server",
@@ -43,8 +60,29 @@
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["apps/frontend-agents/**/*.{ts,tsx,js,jsx}"]
-      }
+        "lintFilePatterns": [
+          "apps/frontend-agents/**/*.{ts,tsx,js,jsx}"
+        ]
+      },
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json"
+      ],
+      "cache": true
     }
+  },
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/.eslintrc.json"
+    ],
+    "sharedGlobals": []
   }
 }

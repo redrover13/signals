@@ -1,0 +1,618 @@
+[
+  {
+    "filePath": "agent-frontend/src/app/signals-demo/remote-entry.ts",
+    "line": 12,
+    "character": 25,
+    "code": 6142,
+    "message": "Module './index' was resolved to '/home/runner/work/signals/signals/agent-frontend/src/app/signals-demo/index.tsx', but '--jsx' is not set.",
+    "severity": "error"
+  },
+  {
+    "filePath": "agent-frontend/src/remote-entry.ts",
+    "line": 12,
+    "character": 8,
+    "code": 6142,
+    "message": "Module './bootstrap' was resolved to '/home/runner/work/signals/signals/agent-frontend/src/bootstrap.tsx', but '--jsx' is not set.",
+    "severity": "error"
+  },
+  {
+    "filePath": "apps/agents/src/main.ts",
+    "line": 32,
+    "character": 46,
+    "code": 2339,
+    "message": "Property 'predict' does not exist on type 'VertexAIClient'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "apps/agents/src/main.ts",
+    "line": 36,
+    "character": 36,
+    "code": 2339,
+    "message": "Property 'endpointId' does not exist on type 'VertexAIClientConfig'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "apps/api/src/main.ts",
+    "line": 49,
+    "character": 56,
+    "code": 2345,
+    "message": "Argument of type 'Error' is not assignable to parameter of type 'undefined'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/apps/api/src/routes/health.ts",
+    "line": 23,
+    "character": 18,
+    "code": 2339,
+    "message": "Property 'rateLimit' does not exist on type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/apps/api/src/routes/health.ts",
+    "line": 24,
+    "character": 15,
+    "code": 2339,
+    "message": "Property 'rateLimit' does not exist on type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/apps/api/src/routes/health.ts",
+    "line": 27,
+    "character": 30,
+    "code": 2339,
+    "message": "Property 'rateLimit' does not exist on type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/apps/api/src/routes/health.ts",
+    "line": 28,
+    "character": 44,
+    "code": 7006,
+    "message": "Parameter 'time' implicitly has an 'any' type.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/apps/api/src/routes/health.ts",
+    "line": 40,
+    "character": 13,
+    "code": 2339,
+    "message": "Property 'rateLimit' does not exist on type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/apps/api/src/routes/health.ts",
+    "line": 56,
+    "character": 50,
+    "code": 2345,
+    "message": "Argument of type '{ timestamp: string; uptime: string; memory: { rss: string; heapUsed: string; heapTotal: string; }; system: { nodeVersion: string; platform: NodeJS.Platform; timezone: string; }; request: { ...; }; }' is not assignable to parameter of type 'undefined'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/apps/api/src/routes/health.ts",
+    "line": 95,
+    "character": 16,
+    "code": 2304,
+    "message": "Cannot find name 'mcpService'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/apps/api/src/routes/health.ts",
+    "line": 102,
+    "character": 49,
+    "code": 2345,
+    "message": "Argument of type 'string' is not assignable to parameter of type 'undefined'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 54,
+    "character": 44,
+    "code": 7006,
+    "message": "Parameter 'c' implicitly has an 'any' type.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 55,
+    "character": 41,
+    "code": 7006,
+    "message": "Parameter 'c' implicitly has an 'any' type.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 58,
+    "character": 24,
+    "code": 7006,
+    "message": "Parameter 'c' implicitly has an 'any' type.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 62,
+    "character": 23,
+    "code": 7006,
+    "message": "Parameter 'c' implicitly has an 'any' type.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 72,
+    "character": 24,
+    "code": 2339,
+    "message": "Property 'error' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 73,
+    "character": 44,
+    "code": 2339,
+    "message": "Property 'result' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 77,
+    "character": 52,
+    "code": 18046,
+    "message": "'error' is of type 'unknown'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 83,
+    "character": 22,
+    "code": 2339,
+    "message": "Property 'error' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 87,
+    "character": 44,
+    "code": 18046,
+    "message": "'error' is of type 'unknown'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 98,
+    "character": 22,
+    "code": 2339,
+    "message": "Property 'error' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 102,
+    "character": 47,
+    "code": 18046,
+    "message": "'error' is of type 'unknown'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 108,
+    "character": 24,
+    "code": 2339,
+    "message": "Property 'error' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 109,
+    "character": 52,
+    "code": 2339,
+    "message": "Property 'result' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 112,
+    "character": 45,
+    "code": 18046,
+    "message": "'error' is of type 'unknown'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 123,
+    "character": 23,
+    "code": 2339,
+    "message": "Property 'error' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 124,
+    "character": 56,
+    "code": 2339,
+    "message": "Property 'result' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 127,
+    "character": 43,
+    "code": 18046,
+    "message": "'error' is of type 'unknown'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 133,
+    "character": 21,
+    "code": 2339,
+    "message": "Property 'error' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 134,
+    "character": 52,
+    "code": 2339,
+    "message": "Property 'result' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 137,
+    "character": 48,
+    "code": 18046,
+    "message": "'error' is of type 'unknown'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 147,
+    "character": 19,
+    "code": 2339,
+    "message": "Property 'error' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 151,
+    "character": 49,
+    "code": 18046,
+    "message": "'error' is of type 'unknown'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 161,
+    "character": 22,
+    "code": 2339,
+    "message": "Property 'error' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 162,
+    "character": 52,
+    "code": 2339,
+    "message": "Property 'result' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 165,
+    "character": 50,
+    "code": 18046,
+    "message": "'error' is of type 'unknown'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 170,
+    "character": 23,
+    "code": 2339,
+    "message": "Property 'error' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 171,
+    "character": 56,
+    "code": 2339,
+    "message": "Property 'result' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 174,
+    "character": 47,
+    "code": 18046,
+    "message": "'error' is of type 'unknown'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 187,
+    "character": 25,
+    "code": 2339,
+    "message": "Property 'error' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 189,
+    "character": 65,
+    "code": 2339,
+    "message": "Property 'result' does not exist on type 'MCPResponse'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "examples/mcp-demo.ts",
+    "line": 192,
+    "character": 60,
+    "code": 18046,
+    "message": "'error' is of type 'unknown'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "libs/agents/gemini-orchestrator/src/lib/tools.ts",
+    "line": 28,
+    "character": 49,
+    "code": 2307,
+    "message": "Cannot find module '../../../gcp/src' or its corresponding type declarations.",
+    "severity": "error"
+  },
+  {
+    "filePath": "libs/mcp/src/index.ts",
+    "line": 30,
+    "character": 10,
+    "code": 2305,
+    "message": "Module '\"../../agents/gemini-orchestrator/src/index\"' has no exported member 'validateMCPEnvironment'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "libs/mcp/src/index.ts",
+    "line": 31,
+    "character": 10,
+    "code": 2305,
+    "message": "Module '\"../../agents/gemini-orchestrator/src/index\"' has no exported member 'testMCPConnectivity'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "libs/mcp/src/index.ts",
+    "line": 35,
+    "character": 3,
+    "code": 2305,
+    "message": "Module '\"../../agents/gemini-orchestrator/src/index\"' has no exported member 'createServiceErrorHandler'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "libs/mcp/src/index.ts",
+    "line": 36,
+    "character": 3,
+    "code": 2305,
+    "message": "Module '\"../../agents/gemini-orchestrator/src/index\"' has no exported member 'ErrorCategory'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "libs/mcp/src/index.ts",
+    "line": 37,
+    "character": 3,
+    "code": 2305,
+    "message": "Module '\"../../agents/gemini-orchestrator/src/index\"' has no exported member 'ErrorSeverity'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "libs/mcp/src/index.ts",
+    "line": 38,
+    "character": 3,
+    "code": 2305,
+    "message": "Module '\"../../agents/gemini-orchestrator/src/index\"' has no exported member 'withErrorHandler'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/libs/utils/api-clients/src/lib/mcp-client.service.ts",
+    "line": 18,
+    "character": 33,
+    "code": 2307,
+    "message": "Cannot find module '../config/mcp-config.schema' or its corresponding type declarations.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/libs/utils/api-clients/src/lib/mcp-client.service.ts",
+    "line": 19,
+    "character": 57,
+    "code": 2307,
+    "message": "Cannot find module '../config/environment-config' or its corresponding type declarations.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/libs/utils/api-clients/src/lib/mcp-client.service.ts",
+    "line": 57,
+    "character": 38,
+    "code": 2307,
+    "message": "Cannot find module '../config/mcp-config.schema' or its corresponding type declarations.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/libs/utils/api-clients/src/lib/mcp-client.service.ts",
+    "line": 89,
+    "character": 58,
+    "code": 7006,
+    "message": "Parameter 'server' implicitly has an 'any' type.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/libs/utils/api-clients/src/lib/mcp-client.service.ts",
+    "line": 93,
+    "character": 50,
+    "code": 7006,
+    "message": "Parameter 'a' implicitly has an 'any' type.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/libs/utils/api-clients/src/lib/mcp-client.service.ts",
+    "line": 93,
+    "character": 53,
+    "code": 7006,
+    "message": "Parameter 'b' implicitly has an 'any' type.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/libs/utils/api-clients/src/lib/request-router.service.ts",
+    "line": 19,
+    "character": 34,
+    "code": 2307,
+    "message": "Cannot find module '../config/environment-config' or its corresponding type declarations.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/libs/utils/api-clients/src/lib/request-router.service.ts",
+    "line": 20,
+    "character": 33,
+    "code": 2307,
+    "message": "Cannot find module '../config/mcp-config.schema' or its corresponding type declarations.",
+    "severity": "error"
+  },
+  {
+    "filePath": "libs/utils/api-clients/src/lib/server-health.service.ts",
+    "line": 18,
+    "character": 33,
+    "code": 2307,
+    "message": "Cannot find module '../config/mcp-config.schema' or its corresponding type declarations.",
+    "severity": "error"
+  },
+  {
+    "filePath": "libs/utils/api-clients/src/lib/server-health.service.ts",
+    "line": 19,
+    "character": 34,
+    "code": 2307,
+    "message": "Cannot find module '../config/environment-config' or its corresponding type declarations.",
+    "severity": "error"
+  },
+  {
+    "filePath": "libs/utils/api-clients/src/lib/server-health.service.ts",
+    "line": 71,
+    "character": 8,
+    "code": 7006,
+    "message": "Parameter 'server' implicitly has an 'any' type.",
+    "severity": "error"
+  },
+  {
+    "filePath": "libs/utils/api-clients/src/lib/server-health.service.ts",
+    "line": 361,
+    "character": 33,
+    "code": 7006,
+    "message": "Parameter 's' implicitly has an 'any' type.",
+    "severity": "error"
+  },
+  {
+    "filePath": "libs/utils/api-clients/src/lib/server-health.service.ts",
+    "line": 382,
+    "character": 52,
+    "code": 7006,
+    "message": "Parameter 's' implicitly has an 'any' type.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/libs/utils/monitoring/src/lib/mcp-utils.ts",
+    "line": 228,
+    "character": 5,
+    "code": 2769,
+    "message": "No overload matches this call.\n  Overload 1 of 3, '(callbackfn: (previousValue: unknown, currentValue: unknown, currentIndex: number, array: unknown[]) => unknown, initialValue: unknown): unknown', gave the following error.\n    Argument of type '(sum: number, count: number) => number' is not assignable to parameter of type '(previousValue: unknown, currentValue: unknown, currentIndex: number, array: unknown[]) => unknown'.\n      Types of parameters 'sum' and 'previousValue' are incompatible.\n        Type 'unknown' is not assignable to type 'number'.\n  Overload 2 of 3, '(callbackfn: (previousValue: number, currentValue: unknown, currentIndex: number, array: unknown[]) => number, initialValue: number): number', gave the following error.\n    Argument of type '(sum: number, count: number) => number' is not assignable to parameter of type '(previousValue: number, currentValue: unknown, currentIndex: number, array: unknown[]) => number'.\n      Types of parameters 'count' and 'currentValue' are incompatible.\n        Type 'unknown' is not assignable to type 'number'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/libs/utils/monitoring/src/lib/mcp-utils.ts",
+    "line": 236,
+    "character": 5,
+    "code": 2322,
+    "message": "Type 'unknown' is not assignable to type 'number'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "/home/runner/work/signals/signals/libs/utils/monitoring/src/lib/mcp-utils.ts",
+    "line": 379,
+    "character": 28,
+    "code": 2339,
+    "message": "Property 'healthy' does not exist on type 'HealthCheckResult'.",
+    "severity": "error"
+  },
+  {
+    "filePath": "tools/scripts/update-project-configs.ts",
+    "line": 40,
+    "character": 22,
+    "code": 4111,
+    "message": "Property 'build' comes from an index signature, so it must be accessed with ['build'].",
+    "severity": "error"
+  },
+  {
+    "filePath": "tools/scripts/update-project-configs.ts",
+    "line": 41,
+    "character": 20,
+    "code": 4111,
+    "message": "Property 'build' comes from an index signature, so it must be accessed with ['build'].",
+    "severity": "error"
+  },
+  {
+    "filePath": "tools/scripts/update-project-configs.ts",
+    "line": 42,
+    "character": 25,
+    "code": 4111,
+    "message": "Property 'build' comes from an index signature, so it must be accessed with ['build'].",
+    "severity": "error"
+  },
+  {
+    "filePath": "tools/scripts/update-project-configs.ts",
+    "line": 57,
+    "character": 33,
+    "code": 4111,
+    "message": "Property 'build' comes from an index signature, so it must be accessed with ['build'].",
+    "severity": "error"
+  },
+  {
+    "filePath": "tools/scripts/update-project-configs.ts",
+    "line": 63,
+    "character": 22,
+    "code": 4111,
+    "message": "Property 'lint' comes from an index signature, so it must be accessed with ['lint'].",
+    "severity": "error"
+  },
+  {
+    "filePath": "tools/scripts/update-project-configs.ts",
+    "line": 64,
+    "character": 20,
+    "code": 4111,
+    "message": "Property 'lint' comes from an index signature, so it must be accessed with ['lint'].",
+    "severity": "error"
+  },
+  {
+    "filePath": "tools/scripts/update-project-configs.ts",
+    "line": 65,
+    "character": 25,
+    "code": 4111,
+    "message": "Property 'lint' comes from an index signature, so it must be accessed with ['lint'].",
+    "severity": "error"
+  },
+  {
+    "filePath": "tools/scripts/update-project-configs.ts",
+    "line": 72,
+    "character": 22,
+    "code": 4111,
+    "message": "Property 'test' comes from an index signature, so it must be accessed with ['test'].",
+    "severity": "error"
+  },
+  {
+    "filePath": "tools/scripts/update-project-configs.ts",
+    "line": 73,
+    "character": 20,
+    "code": 4111,
+    "message": "Property 'test' comes from an index signature, so it must be accessed with ['test'].",
+    "severity": "error"
+  },
+  {
+    "filePath": "tools/scripts/update-project-configs.ts",
+    "line": 74,
+    "character": 25,
+    "code": 4111,
+    "message": "Property 'test' comes from an index signature, so it must be accessed with ['test'].",
+    "severity": "error"
+  }
+]

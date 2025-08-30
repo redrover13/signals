@@ -17,6 +17,7 @@
 import { MCPRequest } from './mcp-client.service';
 import { getCurrentConfig } from '../config/environment-config';
 import { MCPServerConfig } from '../config/mcp-config.schema';
+import { MCPClientService } from './mcp-client.service';
 
 export interface RoutingRule {
   pattern: string | RegExp;
@@ -38,13 +39,13 @@ export interface LoadBalancingStrategy {
  * Request Router Service
  */
 export class RequestRouter {
-  private mcpClient: unknown; // MCPClientService reference
+  private mcpClient: MCPClientService; // MCPClientService reference
   private config = getCurrentConfig();
   private routingRules: RoutingRule[] = [];
   private serverLoadCounters = new Map<string, number>();
   private roundRobinCounters = new Map<string, number>();
 
-  constructor(mcpClient: unknown) {
+  constructor(mcpClient: MCPClientService) {
     this.mcpClient = mcpClient;
     this.initializeRoutingRules();
   }
@@ -388,14 +389,14 @@ export class RequestRouter {
    */
   private isServerAvailable(serverId: string): boolean {
     const connection = this.mcpClient.getServerStatus(serverId);
-    return connection && connection.status === 'connected';
+    return Boolean(connection && connection.status === 'connected');
   }
 
   /**
    * Get server configuration
    */
   private getServerConfig(serverId: string): MCPServerConfig | undefined {
-    return this.config.servers.find(server => server.id === serverId);
+    return this.config.servers.find((server: MCPServerConfig) => server.id === serverId);
   }
 
   /**

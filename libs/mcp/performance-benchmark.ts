@@ -16,9 +16,9 @@
  * Tests and validates performance optimizations for the Vietnamese F&B market
  */
 
-import { MCPService } from '../src/lib/mcp.service';
-import { CacheService } from '../src/lib/services/cache.service';
-import { PerformanceMetricsService } from '../src/lib/services/performance-metrics.service';
+import { MCPService } from './src/lib/mcp.service';
+import { CacheService } from './src/lib/services/cache.service';
+import { PerformanceMetricsService } from './src/lib/services/performance-metrics.service';
 
 interface BenchmarkResult {
   name: string;

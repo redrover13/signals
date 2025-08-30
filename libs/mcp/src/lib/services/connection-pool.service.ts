@@ -330,7 +330,10 @@ export class ConnectionPoolService extends EventEmitter {
       // Simulate connection creation
       setTimeout(() => {
         clearTimeout(timer);
-        resolve({ type: serverConfig.connection.type, endpoint: serverConfig.connection.endpoint });
+        resolve({ 
+          type: serverConfig.connection?.type || serverConfig.type, 
+          endpoint: serverConfig.connection?.endpoint || `${serverConfig.command} ${(serverConfig.args || []).join(' ')}` 
+        });
       }, 100);
     });
   }

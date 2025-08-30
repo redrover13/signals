@@ -1,6 +1,103 @@
 {
   "graph": {
     "nodes": {
+      "rag-document-processor": {
+        "name": "rag-document-processor",
+        "type": "app",
+        "data": {
+          "root": "apps/cloud-functions/rag-processor",
+          "targets": {
+            "eslint:lint": {
+              "cache": true,
+              "options": {
+                "cwd": "apps/cloud-functions/rag-processor",
+                "env": {
+                  "ESLINT_USE_FLAT_CONFIG": "false"
+                },
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default"
+              ],
+              "outputs": [
+                "{workspaceRoot}/dist/{projectRoot}"
+              ],
+              "metadata": {
+                "technologies": [
+                  "eslint"
+                ],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "start": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "start"
+              },
+              "metadata": {
+                "scriptContent": "node index.js",
+                "runCommand": "pnpm run start"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "dev": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "dev"
+              },
+              "metadata": {
+                "scriptContent": "tsc --watch",
+                "runCommand": "pnpm run dev"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": false
+            },
+            "nx-release-publish": {
+              "executor": "@nx/js:release-publish",
+              "dependsOn": [
+                "^nx-release-publish"
+              ],
+              "options": {},
+              "configurations": {},
+              "parallelism": true
+            }
+          },
+          "name": "rag-document-processor",
+          "projectType": "application",
+          "tags": [
+            "npm:public"
+          ],
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "start",
+                "dev"
+              ]
+            },
+            "description": "Cloud Function for processing documents in the RAG pipeline",
+            "js": {
+              "packageName": "rag-document-processor",
+              "packageMain": "index.js",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "implicitDependencies": []
+        }
+      },
       "pubsub-workflows": {
         "name": "pubsub-workflows",
         "type": "lib",
@@ -85,16 +182,28 @@
                   "infra/workflows/pubsub-workflows/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
@@ -104,21 +213,26 @@
               "options": {
                 "jestConfig": "infra/workflows/pubsub-workflows/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             }
           },
           "name": "pubsub-workflows",
           "tags": [
             "npm:private",
-            "scope:infra",
-            "type:workflow"
+            "domain:pubsub-workflows",
+            "type:library"
           ],
           "metadata": {
             "targetGroups": {},
@@ -131,6 +245,20 @@
           "$schema": "../../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "infra/workflows/pubsub-workflows/src",
           "projectType": "library",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -201,25 +329,26 @@
                 }
               },
               "configurations": {
-                "development": {},
                 "production": {
-                  "esbuildOptions": {
-                    "sourcemap": false,
-                    "outExtension": {
-                      ".js": ".js"
-                    }
-                  }
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
                 }
               },
-              "parallelism": true,
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "prune-lockfile": {
               "dependsOn": [
@@ -290,9 +419,23 @@
           "sourceRoot": "apps/cloud-functions/reviews-api/src",
           "projectType": "application",
           "tags": [
-            "scope:backend-app",
-            "type:api"
+            "domain:reviews-api",
+            "type:application"
           ],
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -380,16 +523,28 @@
                   "infra/workflows/cloud-workflows/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
@@ -399,21 +554,26 @@
               "options": {
                 "jestConfig": "infra/workflows/cloud-workflows/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             }
           },
           "name": "cloud-workflows",
           "tags": [
             "npm:private",
-            "scope:infra",
-            "type:workflow"
+            "domain:cloud-workflows",
+            "type:library"
           ],
           "metadata": {
             "targetGroups": {},
@@ -426,6 +586,20 @@
           "$schema": "../../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "infra/workflows/cloud-workflows/src",
           "projectType": "library",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -513,16 +687,28 @@
                   "libs/agents/gemini-orchestrator/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
@@ -532,22 +718,27 @@
               "options": {
                 "jestConfig": "libs/agents/gemini-orchestrator/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             }
           },
           "name": "gemini-orchestrator",
           "projectType": "library",
           "tags": [
             "npm:private",
-            "scope:backend-lib",
-            "type:agent"
+            "domain:gemini-orchestrator",
+            "type:library"
           ],
           "metadata": {
             "targetGroups": {},
@@ -561,7 +752,21 @@
           "sourceRoot": "libs/agents/gemini-orchestrator/src",
           "implicitDependencies": [
             "gcp"
-          ]
+          ],
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          }
         }
       },
       "social-api": {
@@ -631,25 +836,26 @@
                 }
               },
               "configurations": {
-                "development": {},
                 "production": {
-                  "esbuildOptions": {
-                    "sourcemap": false,
-                    "outExtension": {
-                      ".js": ".js"
-                    }
-                  }
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
                 }
               },
-              "parallelism": true,
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "prune-lockfile": {
               "dependsOn": [
@@ -720,9 +926,23 @@
           "sourceRoot": "apps/cloud-functions/social-api/src",
           "projectType": "application",
           "tags": [
-            "scope:backend-app",
-            "type:api"
+            "domain:social-api",
+            "type:application"
           ],
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -793,25 +1013,26 @@
                 }
               },
               "configurations": {
-                "development": {},
                 "production": {
-                  "esbuildOptions": {
-                    "sourcemap": false,
-                    "outExtension": {
-                      ".js": ".js"
-                    }
-                  }
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
                 }
               },
-              "parallelism": true,
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "prune-lockfile": {
               "dependsOn": [
@@ -882,9 +1103,23 @@
           "sourceRoot": "apps/cloud-functions/cms-api/src",
           "projectType": "application",
           "tags": [
-            "scope:backend-app",
-            "type:api"
+            "domain:cms-api",
+            "type:application"
           ],
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -955,25 +1190,26 @@
                 }
               },
               "configurations": {
-                "development": {},
                 "production": {
-                  "esbuildOptions": {
-                    "sourcemap": false,
-                    "outExtension": {
-                      ".js": ".js"
-                    }
-                  }
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
                 }
               },
-              "parallelism": true,
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "prune-lockfile": {
               "dependsOn": [
@@ -1044,9 +1280,23 @@
           "sourceRoot": "apps/cloud-functions/crm-api/src",
           "projectType": "application",
           "tags": [
-            "scope:backend-app",
-            "type:api"
+            "domain:crm-api",
+            "type:application"
           ],
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -1134,16 +1384,28 @@
                   "libs/data-models/dbt-models/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
@@ -1153,22 +1415,27 @@
               "options": {
                 "jestConfig": "libs/data-models/dbt-models/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             }
           },
           "name": "dbt-models",
           "projectType": "library",
           "tags": [
             "npm:private",
-            "scope:data",
-            "type:data"
+            "domain:dbt-models",
+            "type:library"
           ],
           "metadata": {
             "targetGroups": {},
@@ -1180,6 +1447,165 @@
           },
           "$schema": "../../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "libs/data-models/dbt-models/src",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
+          "implicitDependencies": []
+        }
+      },
+      "utils-secrets-manager": {
+        "name": "utils-secrets-manager",
+        "type": "lib",
+        "data": {
+          "root": "libs/utils/secrets-manager",
+          "targets": {
+            "eslint:lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/utils/secrets-manager",
+                "env": {
+                  "ESLINT_USE_FLAT_CONFIG": "false"
+                },
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default"
+              ],
+              "outputs": [
+                "{workspaceRoot}/dist/{projectRoot}"
+              ],
+              "metadata": {
+                "technologies": [
+                  "eslint"
+                ],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "nx-release-publish": {
+              "executor": "@nx/js:release-publish",
+              "dependsOn": [
+                "^nx-release-publish"
+              ],
+              "options": {},
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "@nx/rollup:rollup",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/utils/secrets-manager",
+                "tsConfig": "libs/utils/secrets-manager/tsconfig.lib.json",
+                "project": "libs/utils/secrets-manager/package.json",
+                "entryFile": "libs/utils/secrets-manager/src/index.ts",
+                "external": [
+                  "rxjs",
+                  "@google-cloud/secret-manager"
+                ],
+                "rollupConfig": "@nx/react/plugins/bundle-rollup"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "default",
+                "^default"
+              ]
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "libs/utils/secrets-manager/**/*.ts"
+                ]
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true,
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json",
+                "{workspaceRoot}/tools/eslint-rules/**/*"
+              ]
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/secrets-manager/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "coverage": true
+                }
+              },
+              "parallelism": true,
+              "cache": true,
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ]
+            }
+          },
+          "name": "utils-secrets-manager",
+          "projectType": "library",
+          "tags": [
+            "npm:public",
+            "scope:utils",
+            "type:data-access"
+          ],
+          "metadata": {
+            "targetGroups": {},
+            "js": {
+              "packageName": "@nx-monorepo/utils-secrets-manager",
+              "packageExports": {
+                ".": {
+                  "import": "./src/index.ts",
+                  "default": "./src/index.ts"
+                }
+              },
+              "packageMain": "./src/index.ts",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/utils/secrets-manager/src",
           "implicitDependencies": []
         }
       },
@@ -1267,16 +1693,28 @@
                   "libs/agents/content-agent/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
@@ -1286,22 +1724,27 @@
               "options": {
                 "jestConfig": "libs/agents/content-agent/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             }
           },
           "name": "content-agent",
           "projectType": "library",
           "tags": [
             "npm:private",
-            "scope:backend-lib",
-            "type:agent"
+            "domain:content-agent",
+            "type:library"
           ],
           "metadata": {
             "targetGroups": {},
@@ -1313,6 +1756,20 @@
           },
           "$schema": "../../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "libs/agents/content-agent/src",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -1400,16 +1857,28 @@
                   "libs/agents/reviews-agent/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
@@ -1419,22 +1888,27 @@
               "options": {
                 "jestConfig": "libs/agents/reviews-agent/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             }
           },
           "name": "reviews-agent",
           "projectType": "library",
           "tags": [
             "npm:private",
-            "scope:backend-lib",
-            "type:agent"
+            "domain:reviews-agent",
+            "type:library"
           ],
           "metadata": {
             "targetGroups": {},
@@ -1446,6 +1920,20 @@
           },
           "$schema": "../../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "libs/agents/reviews-agent/src",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -1533,16 +2021,28 @@
                   "libs/agents/looker-agent/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
@@ -1552,22 +2052,27 @@
               "options": {
                 "jestConfig": "libs/agents/looker-agent/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             }
           },
           "name": "looker-agent",
           "projectType": "library",
           "tags": [
             "npm:private",
-            "scope:backend-lib",
-            "type:agent"
+            "domain:looker-agent",
+            "type:library"
           ],
           "metadata": {
             "targetGroups": {},
@@ -1579,6 +2084,20 @@
           },
           "$schema": "../../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "libs/agents/looker-agent/src",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -1666,16 +2185,28 @@
                   "libs/data-models/schemas/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
@@ -1685,22 +2216,27 @@
               "options": {
                 "jestConfig": "libs/data-models/schemas/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             }
           },
           "name": "schemas",
           "projectType": "library",
           "tags": [
             "npm:private",
-            "scope:data",
-            "type:data"
+            "domain:schemas",
+            "type:library"
           ],
           "metadata": {
             "targetGroups": {},
@@ -1712,6 +2248,20 @@
           },
           "$schema": "../../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "libs/data-models/schemas/src",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -1799,16 +2349,28 @@
                   "libs/utils/api-clients/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
@@ -1818,22 +2380,27 @@
               "options": {
                 "jestConfig": "libs/utils/api-clients/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             }
           },
           "name": "api-clients",
           "projectType": "library",
           "tags": [
             "npm:private",
-            "scope:backend-lib",
-            "type:util"
+            "domain:api-clients",
+            "type:library"
           ],
           "metadata": {
             "targetGroups": {},
@@ -1845,6 +2412,20 @@
           },
           "$schema": "../../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "libs/utils/api-clients/src",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -1932,16 +2513,28 @@
                   "apps/looker-dashboards/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
@@ -1951,14 +2544,19 @@
               "options": {
                 "jestConfig": "apps/looker-dashboards/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             },
             "lint": {
               "executor": "@nx/eslint:lint",
@@ -1967,14 +2565,13 @@
                   "apps/looker-dashboards/**/*.{ts,tsx,js,jsx}"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
               "inputs": [
                 "default",
-                "{workspaceRoot}/.eslintrc.json",
-                "{workspaceRoot}/tools/eslint-rules/**/*"
+                "{workspaceRoot}/.eslintrc.json"
               ],
+              "cache": true,
+              "configurations": {},
+              "parallelism": true,
               "outputs": [
                 "{options.outputFile}"
               ]
@@ -1984,8 +2581,9 @@
           "projectType": "library",
           "tags": [
             "npm:private",
-            "scope:frontend",
-            "type:ui"
+            "domain:looker-dashboards",
+            "type:library",
+            "scope:client"
           ],
           "metadata": {
             "targetGroups": {},
@@ -1997,6 +2595,20 @@
           },
           "$schema": "../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "apps/looker-dashboards/src",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -2084,16 +2696,28 @@
                   "libs/agents/crm-agent/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
@@ -2103,22 +2727,27 @@
               "options": {
                 "jestConfig": "libs/agents/crm-agent/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             }
           },
           "name": "crm-agent",
           "projectType": "library",
           "tags": [
             "npm:private",
-            "scope:backend-lib",
-            "type:agent"
+            "domain:crm-agent",
+            "type:library"
           ],
           "metadata": {
             "targetGroups": {},
@@ -2130,6 +2759,20 @@
           },
           "$schema": "../../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "libs/agents/crm-agent/src",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -2217,16 +2860,46 @@
                   "libs/utils/monitoring/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
+                "production",
+                "^production"
+              ],
+              "parallelism": true
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "libs/utils/monitoring/**/*.ts"
+                ]
+              },
+              "inputs": [
                 "default",
-                "^default"
-              ]
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true,
+              "configurations": {},
+              "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
@@ -2236,22 +2909,27 @@
               "options": {
                 "jestConfig": "libs/utils/monitoring/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             }
           },
           "name": "monitoring",
           "projectType": "library",
           "tags": [
             "npm:private",
-            "scope:backend-lib",
-            "type:util"
+            "domain:monitoring",
+            "type:library"
           ],
           "metadata": {
             "targetGroups": {},
@@ -2263,7 +2941,23 @@
           },
           "$schema": "../../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "libs/utils/monitoring/src",
-          "implicitDependencies": []
+          "implicitDependencies": [
+            "gemini-orchestrator"
+          ],
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          }
         }
       },
       "bq-agent": {
@@ -2350,16 +3044,28 @@
                   "libs/agents/bq-agent/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
@@ -2369,22 +3075,27 @@
               "options": {
                 "jestConfig": "libs/agents/bq-agent/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             }
           },
           "name": "bq-agent",
           "projectType": "library",
           "tags": [
             "npm:private",
-            "scope:backend-lib",
-            "type:agent"
+            "domain:bq-agent",
+            "type:library"
           ],
           "metadata": {
             "targetGroups": {},
@@ -2396,6 +3107,20 @@
           },
           "$schema": "../../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "libs/agents/bq-agent/src",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -2594,22 +3319,26 @@
               "defaultConfiguration": "production",
               "options": {},
               "configurations": {
-                "development": {
-                  "outputPath": "apps/frontend-agents"
-                },
                 "production": {
-                  "outputPath": "dist/apps/frontend-agents"
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
                 }
               },
-              "parallelism": true,
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "serve": {
               "executor": "@nx/next:server",
@@ -2644,14 +3373,13 @@
                   "apps/frontend-agents/**/*.{ts,tsx,js,jsx}"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
               "inputs": [
                 "default",
-                "{workspaceRoot}/.eslintrc.json",
-                "{workspaceRoot}/tools/eslint-rules/**/*"
+                "{workspaceRoot}/.eslintrc.json"
               ],
+              "cache": true,
+              "configurations": {},
+              "parallelism": true,
               "outputs": [
                 "{options.outputFile}"
               ]
@@ -2661,8 +3389,9 @@
           "projectType": "application",
           "tags": [
             "npm:private",
-            "scope:frontend",
-            "type:ui"
+            "domain:frontend-agents",
+            "type:application",
+            "scope:client"
           ],
           "metadata": {
             "targetGroups": {
@@ -2679,6 +3408,20 @@
           },
           "$schema": "../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "apps/frontend-agents/src",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -2766,16 +3509,28 @@
                   "libs/utils/gcp-auth/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
@@ -2785,22 +3540,27 @@
               "options": {
                 "jestConfig": "libs/utils/gcp-auth/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             }
           },
           "name": "gcp-auth",
           "projectType": "library",
           "tags": [
             "npm:private",
-            "scope:backend-lib",
-            "type:util"
+            "domain:gcp-auth",
+            "type:library"
           ],
           "metadata": {
             "targetGroups": {},
@@ -2812,6 +3572,20 @@
           },
           "$schema": "../../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "libs/utils/gcp-auth/src",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -2903,16 +3677,28 @@
                 ],
                 "generatePackageJson": true
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "lint": {
               "executor": "@nx/eslint:lint",
@@ -2924,14 +3710,13 @@
                   "libs/utils/signals/**/*.ts"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
               "inputs": [
                 "default",
-                "{workspaceRoot}/.eslintrc.json",
-                "{workspaceRoot}/tools/eslint-rules/**/*"
-              ]
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true,
+              "configurations": {},
+              "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
@@ -2948,13 +3733,13 @@
                   "codeCoverage": true
                 }
               },
-              "parallelism": true,
-              "cache": true,
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             }
           },
           "name": "signals",
@@ -2962,10 +3747,200 @@
           "sourceRoot": "libs/utils/signals/src",
           "projectType": "library",
           "tags": [
-            "npm:private",
-            "scope:backend-lib",
-            "type:util"
+            "domain:signals",
+            "type:library"
           ],
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
+          "implicitDependencies": []
+        }
+      },
+      "ui-components": {
+        "name": "ui-components",
+        "type": "lib",
+        "data": {
+          "root": "libs/ui/components",
+          "targets": {
+            "eslint:lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/ui/components",
+                "env": {
+                  "ESLINT_USE_FLAT_CONFIG": "false"
+                },
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default"
+              ],
+              "outputs": [
+                "{workspaceRoot}/dist/{projectRoot}"
+              ],
+              "metadata": {
+                "technologies": [
+                  "eslint"
+                ],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "jest:test": {
+              "options": {
+                "cwd": "libs/ui/components",
+                "env": {
+                  "TS_NODE_COMPILER_OPTIONS": "{\"moduleResolution\":\"node10\",\"module\":\"commonjs\",\"customConditions\":null}"
+                },
+                "command": "jest"
+              },
+              "metadata": {
+                "technologies": [
+                  "jest"
+                ],
+                "description": "Run Jest Tests",
+                "help": {
+                  "command": "pnpm exec jest --help",
+                  "example": {
+                    "options": {
+                      "coverage": true
+                    }
+                  }
+                }
+              },
+              "cache": true,
+              "inputs": [
+                "default",
+                "^default"
+              ],
+              "outputs": [
+                "{workspaceRoot}/dist/{projectRoot}"
+              ],
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/ui/components",
+                "main": "libs/ui/components/src/index.ts",
+                "tsConfig": "libs/ui/components/tsconfig.lib.json",
+                "assets": [
+                  "libs/ui/components/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ],
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/ui/components/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true,
+              "parallelism": true
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "options": {
+                "lintFilePatterns": [
+                  "libs/ui/components/**/*.{ts,tsx,js,jsx}"
+                ]
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true,
+              "configurations": {},
+              "parallelism": true,
+              "outputs": [
+                "{options.outputFile}"
+              ]
+            }
+          },
+          "name": "ui-components",
+          "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/ui/components/src",
+          "projectType": "library",
+          "tags": [
+            "domain:ui",
+            "type:library",
+            "scope:client"
+          ],
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -3014,13 +3989,28 @@
               "options": {
                 "command": "echo 'No build step for event-parser (Node.js Cloud Function)'"
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
-              "inputs": [
-                "default",
-                "^default"
+              "dependsOn": [
+                "^build"
               ],
+              "inputs": [
+                "production",
+                "^production"
+              ],
+              "parallelism": true,
               "outputs": [
                 "{workspaceRoot}/dist/{projectRoot}"
               ]
@@ -3046,13 +4036,19 @@
               "options": {
                 "command": "echo 'No tests defined for event-parser'"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
-                "^default"
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
               ],
+              "cache": true,
+              "parallelism": true,
               "outputs": [
                 "{workspaceRoot}/dist/{projectRoot}"
               ]
@@ -3064,14 +4060,13 @@
                   "apps/event-parser/**/*.{ts,tsx,js,jsx}"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
               "inputs": [
                 "default",
-                "{workspaceRoot}/.eslintrc.json",
-                "{workspaceRoot}/tools/eslint-rules/**/*"
+                "{workspaceRoot}/.eslintrc.json"
               ],
+              "cache": true,
+              "configurations": {},
+              "parallelism": true,
               "outputs": [
                 "{options.outputFile}"
               ]
@@ -3081,9 +4076,8 @@
           "projectType": "application",
           "tags": [
             "npm:private",
-            "gcp",
-            "cloud-function",
-            "event-parser"
+            "domain:event-parser",
+            "type:application"
           ],
           "metadata": {
             "targetGroups": {},
@@ -3094,7 +4088,22 @@
               "isInPackageManagerWorkspaces": true
             }
           },
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "apps/event-parser",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -3393,14 +4402,19 @@
               "options": {
                 "jestConfig": "libs/build-tools/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             }
           },
           "projectType": "library",
@@ -3414,7 +4428,9 @@
           },
           "name": "build-tools",
           "tags": [
-            "npm:public"
+            "npm:public",
+            "domain:build-tools",
+            "type:library"
           ],
           "$schema": "../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "libs/build-tools/src",
@@ -3426,6 +4442,20 @@
               "currentVersionResolver": "git-tag",
               "fallbackCurrentVersionResolver": "disk"
             }
+          },
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
           },
           "implicitDependencies": []
         }
@@ -3509,14 +4539,19 @@
               "options": {
                 "jestConfig": "libs/agents-sdk/jest.config.ts"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
                 "^default",
                 "{workspaceRoot}/jest.preset.js"
-              ]
+              ],
+              "cache": true,
+              "parallelism": true
             },
             "lint": {
               "executor": "@nx/eslint:lint",
@@ -3525,14 +4560,13 @@
                   "libs/agents-sdk/**/*.{ts,tsx,js,jsx}"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
               "inputs": [
                 "default",
-                "{workspaceRoot}/.eslintrc.json",
-                "{workspaceRoot}/tools/eslint-rules/**/*"
+                "{workspaceRoot}/.eslintrc.json"
               ],
+              "cache": true,
+              "configurations": {},
+              "parallelism": true,
               "outputs": [
                 "{options.outputFile}"
               ]
@@ -3542,7 +4576,24 @@
           "$schema": "../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "libs/agents-sdk/src",
           "projectType": "library",
-          "tags": [],
+          "tags": [
+            "domain:agents-sdk",
+            "type:library"
+          ],
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -3615,6 +4666,28 @@
               ],
               "executor": "nx:run-commands",
               "configurations": {},
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "agent-frontend/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true,
               "parallelism": true
             },
             "build": {
@@ -3870,28 +4943,238 @@
               "configurations": {},
               "parallelism": true
             },
-            "test": {
-              "executor": "@nx/jest:jest",
-              "outputs": [
-                "{workspaceRoot}/coverage/{projectRoot}"
-              ],
+            "test:jest": {
+              "executor": "nx:run-script",
               "options": {
-                "jestConfig": "agent-frontend/jest.config.ts"
+                "script": "test:jest"
+              },
+              "metadata": {
+                "scriptContent": "nx test agent-frontend",
+                "runCommand": "pnpm run test:jest"
               },
               "configurations": {},
-              "parallelism": true,
-              "cache": true,
-              "inputs": [
-                "default",
-                "^default",
-                "{workspaceRoot}/jest.preset.js"
-              ]
+              "parallelism": true
+            },
+            "test:vitest": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:vitest"
+              },
+              "metadata": {
+                "scriptContent": "vitest run",
+                "runCommand": "pnpm run test:vitest"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:vitest:watch": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:vitest:watch"
+              },
+              "metadata": {
+                "scriptContent": "vitest",
+                "runCommand": "pnpm run test:vitest:watch"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:vitest:coverage": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:vitest:coverage"
+              },
+              "metadata": {
+                "scriptContent": "vitest run --coverage",
+                "runCommand": "pnpm run test:vitest:coverage"
+              },
+              "configurations": {},
+              "parallelism": true
+            },
+            "test:all": {
+              "executor": "nx:run-script",
+              "options": {
+                "script": "test:all"
+              },
+              "metadata": {
+                "scriptContent": "npm run test:jest && npm run test:vitest",
+                "runCommand": "pnpm run test:all"
+              },
+              "configurations": {},
+              "parallelism": true
             },
             "lint": {
               "executor": "@nx/eslint:lint",
               "options": {
                 "lintFilePatterns": [
                   "agent-frontend/**/*.{ts,tsx,js,jsx}"
+                ]
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true,
+              "configurations": {},
+              "parallelism": true,
+              "outputs": [
+                "{options.outputFile}"
+              ]
+            }
+          },
+          "projectType": "application",
+          "metadata": {
+            "targetGroups": {
+              "NPM Scripts": [
+                "test:jest",
+                "test:vitest",
+                "test:vitest:watch",
+                "test:vitest:coverage",
+                "test:all"
+              ]
+            },
+            "js": {
+              "packageName": "agent-frontend",
+              "isInPackageManagerWorkspaces": false
+            }
+          },
+          "name": "agent-frontend",
+          "tags": [
+            "npm:private",
+            "domain:agent-frontend",
+            "type:application"
+          ],
+          "$schema": "../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "agent-frontend/src",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
+          "implicitDependencies": []
+        }
+      },
+      "security": {
+        "name": "security",
+        "type": "lib",
+        "data": {
+          "root": "libs/security",
+          "targets": {
+            "eslint:lint": {
+              "cache": true,
+              "options": {
+                "cwd": "libs/security",
+                "env": {
+                  "ESLINT_USE_FLAT_CONFIG": "false"
+                },
+                "command": "eslint ."
+              },
+              "inputs": [
+                "default",
+                "^default"
+              ],
+              "outputs": [
+                "{workspaceRoot}/dist/{projectRoot}"
+              ],
+              "metadata": {
+                "technologies": [
+                  "eslint"
+                ],
+                "description": "Runs ESLint on project",
+                "help": {
+                  "command": "pnpm exec eslint --help",
+                  "example": {
+                    "options": {
+                      "max-warnings": 0
+                    }
+                  }
+                }
+              },
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "jest:test": {
+              "options": {
+                "cwd": "libs/security",
+                "env": {
+                  "TS_NODE_COMPILER_OPTIONS": "{\"moduleResolution\":\"node10\",\"module\":\"commonjs\",\"customConditions\":null}"
+                },
+                "command": "jest"
+              },
+              "metadata": {
+                "technologies": [
+                  "jest"
+                ],
+                "description": "Run Jest Tests",
+                "help": {
+                  "command": "pnpm exec jest --help",
+                  "example": {
+                    "options": {
+                      "coverage": true
+                    }
+                  }
+                }
+              },
+              "cache": true,
+              "inputs": [
+                "default",
+                "^default"
+              ],
+              "outputs": [
+                "{workspaceRoot}/dist/{projectRoot}"
+              ],
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
+            "nx-release-publish": {
+              "executor": "@nx/js:release-publish",
+              "dependsOn": [
+                "^nx-release-publish"
+              ],
+              "options": {},
+              "configurations": {},
+              "parallelism": true
+            },
+            "build": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/security",
+                "tsConfig": "libs/security/tsconfig.lib.json",
+                "packageJson": "libs/security/package.json"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "default",
+                "^default"
+              ]
+            },
+            "lint": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "libs/security/**/*.ts"
                 ]
               },
               "configurations": {},
@@ -3901,18 +5184,44 @@
                 "default",
                 "{workspaceRoot}/.eslintrc.json",
                 "{workspaceRoot}/tools/eslint-rules/**/*"
-              ],
+              ]
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
               "outputs": [
-                "{options.outputFile}"
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/security/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true,
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
               ]
             }
           },
-          "projectType": "application",
-          "metadata": {},
-          "name": "agent-frontend",
-          "$schema": "../node_modules/nx/schemas/project-schema.json",
-          "sourceRoot": "agent-frontend/src",
-          "tags": [],
+          "name": "security",
+          "projectType": "library",
+          "tags": [
+            "npm:public",
+            "type:util",
+            "scope:security"
+          ],
+          "metadata": {
+            "targetGroups": {},
+            "js": {
+              "packageName": "@dulce-de-saigon/security",
+              "packageMain": "src/index.ts",
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "$schema": "../../node_modules/nx/schemas/project-schema.json",
+          "sourceRoot": "libs/security/src",
           "implicitDependencies": []
         }
       },
@@ -3956,6 +5265,15 @@
               "configurations": {},
               "parallelism": true
             },
+            "nx-release-publish": {
+              "executor": "@nx/js:release-publish",
+              "dependsOn": [
+                "^nx-release-publish"
+              ],
+              "options": {},
+              "configurations": {},
+              "parallelism": true
+            },
             "dev": {
               "executor": "nx:run-commands",
               "options": {
@@ -3977,13 +5295,28 @@
               "options": {
                 "command": "tsc -p apps/agents/tsconfig.json"
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
-              "inputs": [
-                "default",
-                "^default"
+              "dependsOn": [
+                "^build"
               ],
+              "inputs": [
+                "production",
+                "^production"
+              ],
+              "parallelism": true,
               "outputs": [
                 "{workspaceRoot}/dist/{projectRoot}"
               ]
@@ -3995,24 +5328,52 @@
                   "apps/agents/**/*.{ts,tsx,js,jsx}"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
               "inputs": [
                 "default",
-                "{workspaceRoot}/.eslintrc.json",
-                "{workspaceRoot}/tools/eslint-rules/**/*"
+                "{workspaceRoot}/.eslintrc.json"
               ],
+              "cache": true,
+              "configurations": {},
+              "parallelism": true,
               "outputs": [
                 "{options.outputFile}"
               ]
             }
           },
           "name": "agents",
-          "sourceRoot": "apps/agents/src",
           "projectType": "application",
-          "implicitDependencies": [],
-          "tags": []
+          "tags": [
+            "npm:public",
+            "domain:agents",
+            "type:application",
+            "scope:server"
+          ],
+          "metadata": {
+            "targetGroups": {},
+            "js": {
+              "isInPackageManagerWorkspaces": true
+            }
+          },
+          "sourceRoot": "apps/agents/src",
+          "implicitDependencies": [
+            "gemini-orchestrator",
+            "monitoring",
+            "gcp"
+          ],
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          }
         }
       },
       "agents-lib": {
@@ -4068,24 +5429,28 @@
                   "libs/agents/*.md"
                 ]
               },
-              "implicitDependencies": [
-                "bq-agent",
-                "content-agent",
-                "crm-agent",
-                "gemini-orchestrator",
-                "looker-agent",
-                "reviews-agent"
-              ],
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "lint": {
               "executor": "@nx/eslint:lint",
@@ -4094,14 +5459,13 @@
                   "libs/agents/**/*.{ts,tsx,js,jsx}"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
               "inputs": [
                 "default",
-                "{workspaceRoot}/.eslintrc.json",
-                "{workspaceRoot}/tools/eslint-rules/**/*"
+                "{workspaceRoot}/.eslintrc.json"
               ],
+              "cache": true,
+              "configurations": {},
+              "parallelism": true,
               "outputs": [
                 "{options.outputFile}"
               ]
@@ -4112,10 +5476,26 @@
           "sourceRoot": "libs/agents/src",
           "projectType": "library",
           "tags": [
-            "scope:backend-lib",
-            "type:agent-lib"
+            "domain:agents",
+            "type:library"
           ],
-          "implicitDependencies": []
+          "implicitDependencies": [
+            "gcp"
+          ],
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          }
         }
       },
       "adk": {
@@ -4158,6 +5538,40 @@
               "configurations": {},
               "parallelism": true
             },
+            "jest:test": {
+              "options": {
+                "cwd": "libs/adk",
+                "env": {
+                  "TS_NODE_COMPILER_OPTIONS": "{\"moduleResolution\":\"node10\",\"module\":\"commonjs\",\"customConditions\":null}"
+                },
+                "command": "jest"
+              },
+              "metadata": {
+                "technologies": [
+                  "jest"
+                ],
+                "description": "Run Jest Tests",
+                "help": {
+                  "command": "pnpm exec jest --help",
+                  "example": {
+                    "options": {
+                      "coverage": true
+                    }
+                  }
+                }
+              },
+              "cache": true,
+              "inputs": [
+                "default",
+                "^default"
+              ],
+              "outputs": [
+                "{workspaceRoot}/dist/{projectRoot}"
+              ],
+              "executor": "nx:run-commands",
+              "configurations": {},
+              "parallelism": true
+            },
             "build": {
               "executor": "@nx/js:tsc",
               "outputs": [
@@ -4171,15 +5585,44 @@
                   "libs/adk/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
+                "production",
+                "^production"
+              ],
+              "parallelism": true
+            },
+            "test": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/adk/jest.config.ts"
+              },
+              "configurations": {},
+              "parallelism": true,
+              "cache": true,
+              "inputs": [
                 "default",
-                "^default"
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
               ]
             },
             "lint": {
@@ -4189,14 +5632,13 @@
                   "libs/adk/**/*.{ts,tsx,js,jsx}"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
               "inputs": [
                 "default",
-                "{workspaceRoot}/.eslintrc.json",
-                "{workspaceRoot}/tools/eslint-rules/**/*"
+                "{workspaceRoot}/.eslintrc.json"
               ],
+              "cache": true,
+              "configurations": {},
+              "parallelism": true,
               "outputs": [
                 "{options.outputFile}"
               ]
@@ -4207,9 +5649,23 @@
           "sourceRoot": "libs/adk/src",
           "projectType": "library",
           "tags": [
-            "scope:backend-lib",
-            "type:adk"
+            "domain:adk",
+            "type:library"
           ],
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -4253,6 +5709,15 @@
               "configurations": {},
               "parallelism": true
             },
+            "nx-release-publish": {
+              "executor": "@nx/js:release-publish",
+              "dependsOn": [
+                "^nx-release-publish"
+              ],
+              "options": {},
+              "configurations": {},
+              "parallelism": true
+            },
             "serve": {
               "executor": "nx:run-commands",
               "options": {
@@ -4277,13 +5742,28 @@
               "options": {
                 "command": "tsc -p apps/api/tsconfig.json && node -e 'require(\"fs\").cpSync(\"apps/api/src/routes\", \"dist/apps/api/routes\", { recursive: true })'"
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
-              "inputs": [
-                "default",
-                "^default"
+              "dependsOn": [
+                "^build"
               ],
+              "inputs": [
+                "production",
+                "^production"
+              ],
+              "parallelism": true,
               "outputs": [
                 "{workspaceRoot}/dist/{projectRoot}"
               ]
@@ -4295,14 +5775,13 @@
                   "**/*.{ts,tsx,js,jsx}"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
               "inputs": [
                 "default",
-                "{workspaceRoot}/.eslintrc.json",
-                "{workspaceRoot}/tools/eslint-rules/**/*"
+                "{workspaceRoot}/.eslintrc.json"
               ],
+              "cache": true,
+              "configurations": {},
+              "parallelism": true,
               "outputs": [
                 "{options.outputFile}"
               ]
@@ -4312,13 +5791,19 @@
               "options": {
                 "command": "echo 'test placeholder'"
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
               "inputs": [
                 "default",
-                "^default"
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
               ],
+              "cache": true,
+              "parallelism": true,
               "outputs": [
                 "{workspaceRoot}/dist/{projectRoot}"
               ]
@@ -4339,11 +5824,36 @@
             }
           },
           "name": "api",
+          "projectType": "application",
+          "tags": [
+            "npm:public",
+            "domain:api",
+            "type:application",
+            "scope:server"
+          ],
+          "metadata": {
+            "targetGroups": {},
+            "js": {
+              "isInPackageManagerWorkspaces": true
+            }
+          },
           "$schema": "../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "apps/api/src",
-          "projectType": "application",
-          "implicitDependencies": [],
-          "tags": []
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
+          "implicitDependencies": []
         }
       },
       "gcp": {
@@ -4399,16 +5909,28 @@
                   "libs/gcp/*.md"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
               "cache": true,
               "dependsOn": [
                 "^build"
               ],
               "inputs": [
-                "default",
-                "^default"
-              ]
+                "production",
+                "^production"
+              ],
+              "parallelism": true
             },
             "lint": {
               "executor": "@nx/eslint:lint",
@@ -4417,14 +5939,13 @@
                   "libs/gcp/**/*.{ts,tsx,js,jsx}"
                 ]
               },
-              "configurations": {},
-              "parallelism": true,
-              "cache": true,
               "inputs": [
                 "default",
-                "{workspaceRoot}/.eslintrc.json",
-                "{workspaceRoot}/tools/eslint-rules/**/*"
+                "{workspaceRoot}/.eslintrc.json"
               ],
+              "cache": true,
+              "configurations": {},
+              "parallelism": true,
               "outputs": [
                 "{options.outputFile}"
               ]
@@ -4434,8 +5955,8 @@
           "projectType": "library",
           "tags": [
             "npm:private",
-            "scope:backend-lib",
-            "type:gcp"
+            "domain:gcp",
+            "type:library"
           ],
           "metadata": {
             "targetGroups": {},
@@ -4447,6 +5968,20 @@
           },
           "$schema": "../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "libs/gcp/src",
+          "namedInputs": {
+            "default": [
+              "{projectRoot}/**/*",
+              "sharedGlobals"
+            ],
+            "production": [
+              "default",
+              "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+              "!{projectRoot}/tsconfig.spec.json",
+              "!{projectRoot}/jest.config.[jt]s",
+              "!{projectRoot}/.eslintrc.json"
+            ],
+            "sharedGlobals": []
+          },
           "implicitDependencies": []
         }
       },
@@ -4608,7 +6143,7 @@
           "projectType": "library",
           "tags": [
             "domain:mcp",
-            "type:lib"
+            "type:library"
           ],
           "implicitDependencies": [
             "gemini-orchestrator",
@@ -4666,6 +6201,7 @@
       }
     },
     "dependencies": {
+      "rag-document-processor": [],
       "pubsub-workflows": [],
       "reviews-api": [],
       "cloud-workflows": [],
@@ -4677,7 +6213,7 @@
         },
         {
           "source": "gemini-orchestrator",
-          "target": "agents-lib",
+          "target": "gcp",
           "type": "static"
         }
       ],
@@ -4685,18 +6221,37 @@
       "cms-api": [],
       "crm-api": [],
       "dbt-models": [],
-      "content-agent": [],
+      "utils-secrets-manager": [
+        {
+          "source": "utils-secrets-manager",
+          "target": "security",
+          "type": "static"
+        }
+      ],
+      "content-agent": [
+        {
+          "source": "content-agent",
+          "target": "adk",
+          "type": "static"
+        }
+      ],
       "reviews-agent": [],
       "looker-agent": [],
       "schemas": [],
       "api-clients": [],
       "looker-dashboards": [],
-      "crm-agent": [],
+      "crm-agent": [
+        {
+          "source": "crm-agent",
+          "target": "adk",
+          "type": "static"
+        }
+      ],
       "monitoring": [
         {
           "source": "monitoring",
           "target": "gemini-orchestrator",
-          "type": "static"
+          "type": "implicit"
         }
       ],
       "bq-agent": [],
@@ -4739,69 +6294,110 @@
       ],
       "gcp-auth": [],
       "signals": [],
-      "event-parser": [],
+      "ui-components": [],
+      "event-parser": [
+        {
+          "source": "event-parser",
+          "target": "monitoring",
+          "type": "static"
+        }
+      ],
       "build-tools": [],
       "agents-sdk": [],
       "agent-frontend": [
-        {
-          "source": "agent-frontend",
-          "target": "agents-sdk",
-          "type": "static"
-        },
         {
           "source": "agent-frontend",
           "target": "signals",
           "type": "static"
         }
       ],
+      "security": [
+        {
+          "source": "security",
+          "target": "gcp",
+          "type": "static"
+        }
+      ],
       "agents": [
         {
           "source": "agents",
+          "target": "gemini-orchestrator",
+          "type": "implicit"
+        },
+        {
+          "source": "agents",
+          "target": "monitoring",
+          "type": "implicit"
+        },
+        {
+          "source": "agents",
+          "target": "gcp",
+          "type": "implicit"
+        },
+        {
+          "source": "agents",
+          "target": "security",
+          "type": "static"
+        },
+        {
+          "source": "agents",
+          "target": "adk",
+          "type": "static"
+        },
+        {
+          "source": "agents",
           "target": "mcp",
+          "type": "static"
+        },
+        {
+          "source": "agents",
+          "target": "monitoring",
           "type": "static"
         }
       ],
       "agents-lib": [
         {
           "source": "agents-lib",
-          "target": "bq-agent",
-          "type": "static"
-        },
+          "target": "gcp",
+          "type": "implicit"
+        }
+      ],
+      "adk": [
         {
-          "source": "agents-lib",
-          "target": "content-agent",
-          "type": "static"
-        },
-        {
-          "source": "agents-lib",
-          "target": "crm-agent",
-          "type": "static"
-        },
-        {
-          "source": "agents-lib",
-          "target": "gemini-orchestrator",
-          "type": "static"
-        },
-        {
-          "source": "agents-lib",
-          "target": "looker-agent",
-          "type": "static"
-        },
-        {
-          "source": "agents-lib",
-          "target": "reviews-agent",
+          "source": "adk",
+          "target": "gcp",
           "type": "static"
         }
       ],
-      "adk": [],
       "api": [
+        {
+          "source": "api",
+          "target": "gcp-auth",
+          "type": "dynamic"
+        },
+        {
+          "source": "api",
+          "target": "security",
+          "type": "static"
+        },
         {
           "source": "api",
           "target": "mcp",
           "type": "dynamic"
+        },
+        {
+          "source": "api",
+          "target": "gcp",
+          "type": "static"
         }
       ],
-      "gcp": [],
+      "gcp": [
+        {
+          "source": "gcp",
+          "target": "gcp-auth",
+          "type": "static"
+        }
+      ],
       "mcp": [
         {
           "source": "mcp",
@@ -4812,22 +6408,27 @@
           "source": "mcp",
           "target": "monitoring",
           "type": "implicit"
-        },
-        {
-          "source": "mcp",
-          "target": "gemini-orchestrator",
-          "type": "static"
-        },
-        {
-          "source": "mcp",
-          "target": "monitoring",
-          "type": "static"
         }
       ],
       "nx-monorepo": [
         {
           "source": "nx-monorepo",
+          "target": "gcp-auth",
+          "type": "static"
+        },
+        {
+          "source": "nx-monorepo",
           "target": "mcp",
+          "type": "static"
+        },
+        {
+          "source": "nx-monorepo",
+          "target": "monitoring",
+          "type": "static"
+        },
+        {
+          "source": "nx-monorepo",
+          "target": "looker-dashboards",
           "type": "static"
         }
       ]

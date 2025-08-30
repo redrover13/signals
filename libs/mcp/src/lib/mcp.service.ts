@@ -13,6 +13,7 @@ import { MCPClientService, MCPRequest, MCPResponse } from './clients/mcp-client.
 import { ServerHealthService, HealthCheckResult, ServerHealthStats } from './clients/server-health.service';
 import { RequestRouter } from './clients/request-router.service';
 import { getCurrentConfig, getCurrentEnvironment } from './config/environment-config';
+import { MCPServerConfig } from './config/mcp-config.schema';
 import { CacheService, cacheService } from './services/cache.service';
 import { PerformanceMetricsService, performanceMetricsService } from './services/performance-metrics.service';
 
@@ -475,9 +476,9 @@ export class MCPService {
    */
   getEnabledServers(): string[] {
     return this.getConfig().servers
-      .filter(server => server.enabled)
-      .sort((a, b) => b.priority - a.priority)
-      .map(server => server.id);
+      .filter((server: MCPServerConfig) => server.enabled)
+      .sort((a: MCPServerConfig, b: MCPServerConfig) => b.priority - a.priority)
+      .map((server: MCPServerConfig) => server.id);
   }
 
   /**

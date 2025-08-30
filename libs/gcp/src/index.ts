@@ -14,6 +14,9 @@
  * Provides common GCP service integrations
  */
 
+// Re-export core GCP authentication utilities
+export { getProjectId } from '@nx-monorepo/utils/gcp-auth';
+
 /**
  * Query BigQuery
  */

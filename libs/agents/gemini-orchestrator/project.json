@@ -8,7 +8,8 @@
     "type:library"
   ],
   "implicitDependencies": [
-    "gcp"
+    "gcp",
+    "gcp-auth"
   ],
   "targets": {
     "build": {

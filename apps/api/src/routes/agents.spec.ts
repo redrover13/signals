@@ -81,11 +81,12 @@ describe('Agents Routes', () => {
 
     it('should handle errors gracefully', async () => {
       // Mock a failing pub/sub call
-      const { getPubSub } = require('gcp-auth');
-      getPubSub.mockImplementation(() => ({
-        topic: () => ({
-          publishMessage: jest.fn().mockRejectedValue(new Error('Pub/Sub error'))
-        })
+      jest.mock('gcp-auth', () => ({
+        getPubSub: jest.fn(() => ({
+          topic: () => ({
+            publishMessage: jest.fn().mockRejectedValue(new Error('Pub/Sub error'))
+          })
+        }))
       }));
 
       const response = await app.inject({

@@ -7,6 +7,9 @@
     "domain:adk",
     "type:library"
   ],
+  "implicitDependencies": [
+    "gcp-auth"
+  ],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",

@@ -2,10 +2,37 @@
   {
     "type": "missing-implicit",
     "projects": [
-      "agents",
-      "agents-lib",
-      "gcp"
+      "security",
+      "gcp",
+      "gcp-auth"
     ],
-    "message": "agents depends on agents-lib, which implicitly depends on gcp, but agents doesn't have gcp as an implicit dependency"
+    "message": "security depends on gcp, which implicitly depends on gcp-auth, but security doesn't have gcp-auth as an implicit dependency"
+  },
+  {
+    "type": "missing-implicit",
+    "projects": [
+      "gemini-orchestrator",
+      "gcp",
+      "gcp-auth"
+    ],
+    "message": "gemini-orchestrator depends on gcp, which implicitly depends on gcp-auth, but gemini-orchestrator doesn't have gcp-auth as an implicit dependency"
+  },
+  {
+    "type": "missing-implicit",
+    "projects": [
+      "adk",
+      "gcp",
+      "gcp-auth"
+    ],
+    "message": "adk depends on gcp, which implicitly depends on gcp-auth, but adk doesn't have gcp-auth as an implicit dependency"
+  },
+  {
+    "type": "missing-implicit",
+    "projects": [
+      "api",
+      "gcp",
+      "gcp-auth"
+    ],
+    "message": "api depends on gcp, which implicitly depends on gcp-auth, but api doesn't have gcp-auth as an implicit dependency"
   }
 ]

@@ -1,6 +1,6 @@
 {
   "$schema": "./mcp-schema.json",
-  "ver        "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json",ion": "1.0.0",
+  "version": "1.0.0",
   "metadata": {
     "name": "Enterprise MCP Configuration",
     "description": "Universal MCP server configuration for AI tools: Copilot, Kilocode, Qodo Gen, and all compatible platforms",

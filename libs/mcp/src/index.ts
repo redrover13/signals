@@ -69,17 +69,17 @@ export type MCPClient = {
 };
 
 export function createMCPClient(config?: Record<string, unknown>): MCPClient {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env['NODE_ENV'] !== 'production') {
     console.log('Creating MCP client with config:', config);
   }
   return {
     connect: async () => {
-      if (process.env.NODE_ENV !== 'production') {
+      if (process.env['NODE_ENV'] !== 'production') {
         console.log('MCP client connected');
       }
     },
     disconnect: async () => {
-      if (process.env.NODE_ENV !== 'production') {
+      if (process.env['NODE_ENV'] !== 'production') {
         console.log('MCP client disconnected');
       }
     },
@@ -87,7 +87,7 @@ export function createMCPClient(config?: Record<string, unknown>): MCPClient {
 }
 
 export function validateMCPEnvironment(): { valid: boolean; errors: string[]; warnings: string[] } {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env['NODE_ENV'] !== 'production') {
     console.log('Validating MCP environment');
   }
   return { valid: true, errors: [], warnings: [] };

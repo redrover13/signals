@@ -16,8 +16,7 @@
  */
 
 import { MCPRequest } from './mcp-client.service';
-import { getCurrentConfig } from '../config/environment-config';
-import { MCPServerConfig } from '../config/mcp-config.schema';
+import { getCurrentConfig, MCPServerConfig } from '@dulce/agents-sdk';
 
 export interface RoutingRule {
   pattern: string | RegExp;

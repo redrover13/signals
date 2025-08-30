@@ -1,0 +1,30 @@
+# Example values for terraform.tfvars
+# Copy this file to terraform.tfvars and modify values as needed
+
+# GCP Project Configuration
+project_id = "saigon-signals"
+region     = "asia-southeast1"
+
+# Environment Configuration
+environment = "prod"
+
+# Data Access Configuration  
+data_owner_email     = "admin@saigon-signals.com"
+organization_domain  = "saigon-signals.com"
+
+# Service Account Configuration
+create_github_sa = false
+
+# Data Retention Configuration
+table_expiration_days = 90
+
+# Feature Flags
+enable_monitoring    = true
+enable_vpc_connector = false
+
+# Additional Labels
+labels = {
+  project     = "dulce-de-saigon"
+  team        = "platform"
+  cost-center = "engineering"
+}

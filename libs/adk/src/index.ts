@@ -20,13 +20,26 @@ export * from './agents/root-agent';
 export * from './tools/gcp-tools';
 
 // Analytics - minimal implementation for compatibility
+export interface AnalyticsEvent {
+  category: EventCategory;
+  action: string;
+  label?: string;
+  value?: number;
+  metadata?: Record<string, unknown>;
+}
+
 export class WebAnalyticsTracker {
   constructor(config?: any) {
     console.log('WebAnalyticsTracker initialized with config:', config);
   }
-  
-  track(event: any) {
+
+  track(event: AnalyticsEvent) {
     console.log('Analytics event tracked:', event);
+  }
+
+  // Back-compat with existing callers
+  trackEvent(event: AnalyticsEvent) {
+    this.track(event);
   }
 }
 

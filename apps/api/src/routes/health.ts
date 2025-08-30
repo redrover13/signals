@@ -10,6 +10,7 @@
  */
 
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { detailedHealthCheckResponseSchema } from '../schemas/health';
 
 // Security middleware for rate limiting and validation
 export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
@@ -107,7 +108,7 @@ export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
   });
 
   // Add a detailed health endpoint
-  fastify.get('/detailed', async function (request: FastifyRequest, reply: FastifyReply) {
+  fastify.get('/detailed', { schema: { response: { 200: detailedHealthCheckResponseSchema } } }, async function (request: FastifyRequest, reply: FastifyReply) {
     const healthDetails = {
       status: 'ok',
       timestamp: new Date().toISOString(),

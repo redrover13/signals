@@ -1,26 +1,26 @@
 output "documents_bucket_name" {
-  description = "Name of the bucket for storing documents"
-  value       = google_storage_bucket.rag_documents.name
+  description = "Name of the documents bucket"
+  value       = google_storage_bucket.documents_bucket.name
 }
 
 output "chunks_bucket_name" {
-  description = "Name of the bucket for storing processed chunks"
-  value       = google_storage_bucket.rag_chunks.name
+  description = "Name of the chunks bucket"
+  value       = google_storage_bucket.chunks_bucket.name
 }
 
-output "search_engine_id" {
-  description = "ID of the Vertex AI Search engine"
-  value       = google_discovery_engine_search_engine.rag_search_engine.engine_id
+output "dataset_id" {
+  description = "ID of the BigQuery dataset"
+  value       = google_bigquery_dataset.rag_dataset.dataset_id
 }
 
-output "datastore_id" {
-  description = "ID of the Vertex AI Search data store"
-  value       = google_discovery_engine_data_store.rag_datastore.data_store_id
+output "table_id" {
+  description = "ID of the BigQuery table for document chunks"
+  value       = google_bigquery_table.document_chunks.table_id
 }
 
-output "processor_function_name" {
-  description = "Name of the document processor Cloud Function"
-  value       = google_cloudfunctions2_function.rag_processor.name
+output "function_name" {
+  description = "Name of the Cloud Function"
+  value       = google_cloudfunctions_function.rag_document_processor.name
 }
 
 output "processing_topic_name" {
@@ -29,6 +29,6 @@ output "processing_topic_name" {
 }
 
 output "service_account_email" {
-  description = "Email of the RAG pipeline service account"
+  description = "Email of the service account"
   value       = google_service_account.rag_pipeline_sa.email
 }

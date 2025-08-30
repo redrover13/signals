@@ -1,6 +1,6 @@
 {
   "$schema": "./mcp-schema.json",
-  "version": "1.0.0",
+  "ver        "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json",ion": "1.0.0",
   "metadata": {
     "name": "Enterprise MCP Configuration",
     "description": "Universal MCP server configuration for AI tools: Copilot, Kilocode, Qodo Gen, and all compatible platforms",
@@ -37,9 +37,26 @@
         "run",
         "-i",
         "--rm",
+        "-v",
+        "/home/g_nelson/.config/gcloud:/home/g_nelson/.config/gcloud:ro",
+        "-e",
+        "GOOGLE_APPLICATION_CREDENTIALS=/home/g_nelson/.config/gcloud/application_default_credentials.json",
+        "-e",
+        "GOOGLE_CLOUD_PROJECT=saigon-signals",
+        "-e",
+        "GOOGLE_REGION=asia-southeast1",
+        "-w",
+        "/workspace",
+        "-v",
+        "/home/g_nelson/signals-1:/workspace:ro",
         "hashicorp/terraform-mcp-server"
       ],
-      "type": "stdio"
+      "type": "stdio",
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json",
+        "GOOGLE_CLOUD_PROJECT": "saigon-signals",
+        "GOOGLE_REGION": "asia-southeast1"
+      }
     },
     "sequentialthinking": {
       "command": "npx",
@@ -48,6 +65,53 @@
         "@modelcontextprotocol/server-sequential-thinking"
       ],
       "type": "stdio"
+    },
+    "google-search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@google/search-mcp@latest"
+      ],
+      "type": "stdio",
+      "env": {
+        "GOOGLE_API_KEY": "${GOOGLE_API_KEY}",
+        "GOOGLE_CSE_ID": "${GOOGLE_CSE_ID}"
+      }
+    },
+    "google-drive": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@google/drive-mcp@latest"
+      ],
+      "type": "stdio",
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json"
+      }
+    },
+    "google-cloud": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@google-cloud/mcp-server@latest"
+      ],
+      "type": "stdio",
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json",
+        "GCP_PROJECT_ID": "saigon-signals"
+      }
+    },
+    "bigquery": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@google-cloud/bigquery-mcp@latest"
+      ],
+      "type": "stdio",
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json",
+        "GCP_PROJECT_ID": "saigon-signals"
+      }
     }
   },
   "inputs": []

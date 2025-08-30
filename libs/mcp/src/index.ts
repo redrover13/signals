@@ -62,13 +62,11 @@ export function createMCPClient(config?: Record<string, unknown>) {
   };
 }
 
-export function validateMCPEnvironment() {
-  console.log('Validating MCP environment');
-  return {
-    valid: true,
-    errors: [] as string[],
-    warnings: [] as string[],
-  };
+export function validateMCPEnvironment(): { valid: boolean; errors: string[]; warnings: string[] } {
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('Validating MCP environment');
+  }
+  return { valid: true, errors: [], warnings: [] };
 }
 
 interface ConnectivityResult {

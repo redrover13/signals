@@ -6,6 +6,11 @@ terraform {
       version = "~> 5.0"
     }
   }
+  
+  backend "gcs" {
+    bucket = "saigon-signals-terraform-state"
+    prefix = "main"
+  }
 }
 
 provider "google" {
@@ -13,64 +18,80 @@ provider "google" {
   region  = var.region
 }
 
-# Enable required APIs
-resource "google_project_service" "required_apis" {
-  for_each = toset([
-    "cloudfunctions.googleapis.com",
-    "run.googleapis.com",
-    "bigquery.googleapis.com",
-    "storage.googleapis.com",
-    "secretmanager.googleapis.com",
-    "aiplatform.googleapis.com",
-    "pubsub.googleapis.com",
-    "cloudscheduler.googleapis.com",
-    "cloudbuild.googleapis.com",
-    "containerregistry.googleapis.com",
-    "iam.googleapis.com",
-    "cloudresourcemanager.googleapis.com"
-  ])
+# ============================================================================
+# CORE INFRASTRUCTURE MODULE
+# ============================================================================
+
+# Deploy core infrastructure
+module "core_infrastructure" {
+  source = "./core-infrastructure"
   
-  service = each.value
-  disable_dependent_services = true
-}
-
-# Reference existing Terraform state bucket
-data "google_storage_bucket" "terraform_state" {
-  name = "saigon-signals-terraform-state"
-}
-
-# Ensure proper permissions on the state bucket
-resource "google_storage_bucket_iam_member" "terraform_state_admin" {
-  bucket = data.google_storage_bucket.terraform_state.name
-  role   = "roles/storage.admin"
-  member = "serviceAccount:${var.terraform_service_account}"
-}
-
-# Create a service account for GitHub Actions (if not using WIF)
-resource "google_service_account" "github_actions" {
-  count = var.create_github_sa ? 1 : 0
+  project_id   = var.project_id
+  region       = var.region
+  environment  = var.environment
   
-  account_id   = "github-actions-sa"
-  display_name = "GitHub Actions Service Account"
-  description  = "Service account for GitHub Actions CI/CD"
+  data_owner_email    = var.data_owner_email
+  organization_domain = var.organization_domain
+  create_github_sa    = var.create_github_sa
+  
+  table_expiration_days = var.table_expiration_days
+  enable_monitoring     = var.enable_monitoring
+  
+  labels = var.labels
 }
 
-# Grant necessary permissions to GitHub Actions service account
-resource "google_project_iam_member" "github_actions_permissions" {
-  for_each = var.create_github_sa ? toset([
-    "roles/cloudfunctions.admin",
-    "roles/run.admin",
-    "roles/storage.admin",
-    "roles/bigquery.admin",
-    "roles/secretmanager.admin",
-    "roles/aiplatform.admin",
-    "roles/pubsub.admin",
-    "roles/cloudscheduler.admin",
-    "roles/iam.serviceAccountUser",
-    "roles/cloudbuild.builds.editor"
-  ]) : toset([])
+# ============================================================================
+# LEGACY MODULES (for backwards compatibility)
+# ============================================================================
+
+# BigQuery module (now consolidated in core infrastructure)
+module "bigquery" {
+  source = "./bigquery"
   
-  project = var.project_id
-  role    = each.value
-  member  = "serviceAccount:${google_service_account.github_actions[0].email}"
+  project_id = var.project_id
+  region     = var.region
+  environment = var.environment
+  
+  data_owner_email     = var.data_owner_email
+  organization_domain  = var.organization_domain
+  enable_data_transfer = false
+  
+  # Disable to avoid conflicts with core infrastructure
+  count = var.enable_legacy_modules ? 1 : 0
+}
+
+# Functions module
+module "functions" {
+  source = "./functions"
+  
+  project_id  = var.project_id
+  region      = var.region
+  environment = var.environment
+  
+  # Disable to avoid conflicts with core infrastructure
+  count = var.enable_legacy_modules ? 1 : 0
+}
+
+# Vertex Agents module
+module "vertex_agents" {
+  source = "./vertex-agents"
+  
+  project_id  = var.project_id
+  region      = var.region
+  environment = var.environment
+  
+  # Disable to avoid conflicts with core infrastructure
+  count = var.enable_legacy_modules ? 1 : 0
+}
+
+# Looker module
+module "looker" {
+  source = "./looker"
+  
+  project_id  = var.project_id
+  region      = var.region
+  environment = var.environment
+  
+  # Disable to avoid conflicts with core infrastructure
+  count = var.enable_legacy_modules ? 1 : 0
 }

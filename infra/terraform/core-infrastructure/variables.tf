@@ -5,7 +5,7 @@ variable "project_id" {
 }
 
 variable "region" {
-  description = "The GCP region"
+  description = "The GCP region for resources"
   type        = string
   default     = "asia-southeast1"
 }
@@ -33,16 +33,10 @@ variable "organization_domain" {
   default     = "saigon-signals.com"
 }
 
-variable "terraform_service_account" {
-  description = "Service account email for Terraform operations"
-  type        = string
-  default     = "github-actions@saigon-signals.iam.gserviceaccount.com"
-}
-
 variable "create_github_sa" {
-  description = "Create a service account for GitHub Actions (set to false if using existing)"
+  description = "Whether to create a service account for GitHub Actions"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "table_expiration_days" {
@@ -62,8 +56,8 @@ variable "enable_monitoring" {
   default     = true
 }
 
-variable "enable_legacy_modules" {
-  description = "Enable legacy Terraform modules (disable for clean deployment)"
+variable "enable_vpc_connector" {
+  description = "Enable VPC connector for serverless services"
   type        = bool
   default     = false
 }
@@ -71,8 +65,5 @@ variable "enable_legacy_modules" {
 variable "labels" {
   description = "Additional labels to apply to all resources"
   type        = map(string)
-  default = {
-    project     = "dulce-de-saigon"
-    managed_by  = "terraform"
-  }
+  default     = {}
 }

@@ -166,11 +166,12 @@ describe('Agent Task Flow Integration', () => {
   describe('Error Handling', () => {
     it('should return proper error response when Pub/Sub fails', async () => {
       // Mock a failing pub/sub call
-      const { getPubSub } = require('gcp-auth');
-      getPubSub.mockImplementation(() => ({
-        topic: () => ({
-          publishMessage: jest.fn().mockRejectedValue(new Error('Connection timeout'))
-        })
+      jest.mock('gcp-auth', () => ({
+        getPubSub: jest.fn(() => ({
+          topic: () => ({
+            publishMessage: jest.fn().mockRejectedValue(new Error('Connection timeout'))
+          })
+        }))
       }));
 
       const response = await app.inject({

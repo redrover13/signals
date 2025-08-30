@@ -15,54 +15,6 @@
   "nxJsonPlugins": [],
   "fileMap": {
     "projectFileMap": {
-      "api": [
-        {
-          "file": "apps/api/COPILOT_PROMPT.md",
-          "hash": "5987477266114574981"
-        },
-        {
-          "file": "apps/api/Dockerfile",
-          "hash": "17739130275617513335"
-        },
-        {
-          "file": "apps/api/project.json",
-          "hash": "2467180983720415709"
-        },
-        {
-          "file": "apps/api/src/main.ts",
-          "hash": "7605520943027391612",
-          "deps": [
-            "npm:fastify"
-          ]
-        },
-        {
-          "file": "apps/api/src/routes/agents.ts",
-          "hash": "13377605370302211977",
-          "deps": [
-            "npm:fastify",
-            "gcp"
-          ]
-        },
-        {
-          "file": "apps/api/src/routes/health.ts",
-          "hash": "9146242794792612734",
-          "deps": [
-            "npm:fastify"
-          ]
-        },
-        {
-          "file": "apps/api/src/routes/search.ts",
-          "hash": "16761429410381765836",
-          "deps": [
-            "npm:fastify",
-            "npm:lodash"
-          ]
-        },
-        {
-          "file": "apps/api/tsconfig.json",
-          "hash": "14641593147291263924"
-        }
-      ],
       "event-parser": [
         {
           "file": "apps/event-parser/index.js",
@@ -86,216 +38,6 @@
         {
           "file": "apps/event-parser/project.json",
           "hash": "5913538667647741326"
-        }
-      ],
-      "mcp": [
-        {
-          "file": "libs/mcp/README.md",
-          "hash": "4496346652772077061"
-        },
-        {
-          "file": "libs/mcp/performance-benchmark.ts",
-          "hash": "3689940058670617883"
-        },
-        {
-          "file": "libs/mcp/performance-validation.cjs",
-          "hash": "3149035436353912013"
-        },
-        {
-          "file": "libs/mcp/project.json",
-          "hash": "5568977903714663353"
-        },
-        {
-          "file": "libs/mcp/src/index.ts",
-          "hash": "4695245601398459807"
-        },
-        {
-          "file": "libs/mcp/src/lib/clients/mcp-client.service.ts",
-          "hash": "11843329754996180184"
-        },
-        {
-          "file": "libs/mcp/src/lib/clients/request-router.service.ts",
-          "hash": "9100222604662275576"
-        },
-        {
-          "file": "libs/mcp/src/lib/clients/server-health.service.ts",
-          "hash": "12682037362803371225"
-        },
-        {
-          "file": "libs/mcp/src/lib/config/environment-config.ts",
-          "hash": "8865878833108213536"
-        },
-        {
-          "file": "libs/mcp/src/lib/config/mcp-config.schema.ts",
-          "hash": "11762348952682604943"
-        },
-        {
-          "file": "libs/mcp/src/lib/config/server-registry.ts",
-          "hash": "13977203452203219380"
-        },
-        {
-          "file": "libs/mcp/src/lib/mcp.service.ts",
-          "hash": "8357983379484301074"
-        },
-        {
-          "file": "libs/mcp/src/lib/performance-optimization.spec.ts",
-          "hash": "6112957970334545656"
-        },
-        {
-          "file": "libs/mcp/src/lib/services/cache.service.ts",
-          "hash": "2043772835223532911"
-        },
-        {
-          "file": "libs/mcp/src/lib/services/connection-pool.service.ts",
-          "hash": "12693243702304295359"
-        },
-        {
-          "file": "libs/mcp/src/lib/services/performance-metrics.service.ts",
-          "hash": "17988357106333592141"
-        },
-        {
-          "file": "libs/mcp/src/lib/utils/mcp-utils.ts",
-          "hash": "17191469979326991522"
-        },
-        {
-          "file": "libs/mcp/tsconfig.json",
-          "hash": "4834719271918839137"
-        },
-        {
-          "file": "libs/mcp/tsconfig.lib.json",
-          "hash": "4312518675533582045"
-        }
-      ],
-      "agents": [
-        {
-          "file": "apps/agents/COPILOT_PROMPT.md",
-          "hash": "8284939958649031614"
-        },
-        {
-          "file": "apps/agents/Dockerfile",
-          "hash": "13481554108116628881"
-        },
-        {
-          "file": "apps/agents/README.md",
-          "hash": "16560707230609139321"
-        },
-        {
-          "file": "apps/agents/project.json",
-          "hash": "5764686364660039331"
-        },
-        {
-          "file": "apps/agents/src/main.ts",
-          "hash": "12334308586246898349",
-          "deps": [
-            "npm:fastify",
-            "agents-lib",
-            "api"
-          ]
-        },
-        {
-          "file": "apps/agents/tsconfig.json",
-          "hash": "1733962632352765753"
-        }
-      ],
-      "gcp": [
-        {
-          "file": "libs/gcp/README.md",
-          "hash": "17090715588258430041"
-        },
-        {
-          "file": "libs/gcp/ga4-client.ts",
-          "hash": "439894361220441425",
-          "deps": [
-            "npm:@google-analytics/data"
-          ]
-        },
-        {
-          "file": "libs/gcp/manual-data.ts",
-          "hash": "4614906744381935418"
-        },
-        {
-          "file": "libs/gcp/project.json",
-          "hash": "8723406835173922789"
-        },
-        {
-          "file": "libs/gcp/src/index.d.ts",
-          "hash": "12876032997637870925"
-        },
-        {
-          "file": "libs/gcp/src/index.js",
-          "hash": "12611208744080212336"
-        },
-        {
-          "file": "libs/gcp/src/index.js.map",
-          "hash": "4367282471376217120"
-        },
-        {
-          "file": "libs/gcp/src/index.ts",
-          "hash": "10336146786281506629",
-          "deps": [
-            "npm:@google-cloud/bigquery",
-            "npm:@google-cloud/storage",
-            "npm:@google-cloud/aiplatform",
-            "npm:google-auth-library",
-            "npm:lodash"
-          ]
-        },
-        {
-          "file": "libs/gcp/tsconfig.json",
-          "hash": "10430309696173710587"
-        },
-        {
-          "file": "libs/gcp/tsconfig.lib.json",
-          "hash": "13291289617200625598"
-        }
-      ],
-      "legacy-event-parser": [
-        {
-          "file": "apps/legacy_event_parser/index.js",
-          "hash": "8111006878647914647",
-          "deps": [
-            "npm:@google-cloud/pubsub",
-            "npm:@google-cloud/bigquery"
-          ]
-        },
-        {
-          "file": "apps/legacy_event_parser/package.json",
-          "hash": "4475964162858051640",
-          "deps": [
-            "npm:@google-cloud/functions-framework",
-            "npm:@google-cloud/pubsub",
-            "npm:@google-cloud/bigquery"
-          ]
-        },
-        {
-          "file": "apps/legacy_event_parser/project.json",
-          "hash": "12204104461009431540"
-        }
-      ],
-      "agents-lib": [
-        {
-          "file": "libs/agents/README.md",
-          "hash": "3757155501495552222"
-        },
-        {
-          "file": "libs/agents/project.json",
-          "hash": "12929525747964891097"
-        },
-        {
-          "file": "libs/agents/src/index.ts",
-          "hash": "13677317759222400303"
-        },
-        {
-          "file": "libs/agents/src/tools.ts",
-          "hash": "9078202335274891687"
-        },
-        {
-          "file": "libs/agents/tsconfig.json",
-          "hash": "16905144177106485730"
-        },
-        {
-          "file": "libs/agents/tsconfig.lib.json",
-          "hash": "15834690189997340113"
         }
       ],
       "web": [
@@ -362,6 +104,240 @@
         {
           "file": "apps/web/tsconfig.json",
           "hash": "15337167957341348420"
+        }
+      ],
+      "agents": [
+        {
+          "file": "apps/agents/COPILOT_PROMPT.md",
+          "hash": "8284939958649031614"
+        },
+        {
+          "file": "apps/agents/Dockerfile",
+          "hash": "13481554108116628881"
+        },
+        {
+          "file": "apps/agents/README.md",
+          "hash": "16560707230609139321"
+        },
+        {
+          "file": "apps/agents/project.json",
+          "hash": "5764686364660039331"
+        },
+        {
+          "file": "apps/agents/src/main.ts",
+          "hash": "12334308586246898349",
+          "deps": [
+            "npm:fastify",
+            "agents-lib",
+            "api"
+          ]
+        },
+        {
+          "file": "apps/agents/tsconfig.json",
+          "hash": "1733962632352765753"
+        }
+      ],
+      "legacy-event-parser": [
+        {
+          "file": "apps/legacy_event_parser/index.js",
+          "hash": "8111006878647914647",
+          "deps": [
+            "npm:@google-cloud/pubsub",
+            "npm:@google-cloud/bigquery"
+          ]
+        },
+        {
+          "file": "apps/legacy_event_parser/package.json",
+          "hash": "4475964162858051640",
+          "deps": [
+            "npm:@google-cloud/functions-framework",
+            "npm:@google-cloud/pubsub",
+            "npm:@google-cloud/bigquery"
+          ]
+        },
+        {
+          "file": "apps/legacy_event_parser/project.json",
+          "hash": "12204104461009431540"
+        }
+      ],
+      "gcp": [
+        {
+          "file": "libs/gcp/README.md",
+          "hash": "17090715588258430041"
+        },
+        {
+          "file": "libs/gcp/ga4-client.ts",
+          "hash": "439894361220441425",
+          "deps": [
+            "npm:@google-analytics/data"
+          ]
+        },
+        {
+          "file": "libs/gcp/manual-data.ts",
+          "hash": "4614906744381935418"
+        },
+        {
+          "file": "libs/gcp/project.json",
+          "hash": "8723406835173922789"
+        },
+        {
+          "file": "libs/gcp/src/index.d.ts",
+          "hash": "12876032997637870925"
+        },
+        {
+          "file": "libs/gcp/src/index.js",
+          "hash": "12611208744080212336"
+        },
+        {
+          "file": "libs/gcp/src/index.js.map",
+          "hash": "4367282471376217120"
+        },
+        {
+          "file": "libs/gcp/src/index.ts",
+          "hash": "10336146786281506629",
+          "deps": [
+            "npm:@google-cloud/bigquery",
+            "npm:@google-cloud/storage",
+            "npm:@google-cloud/aiplatform",
+            "npm:google-auth-library",
+            "npm:lodash"
+          ]
+        },
+        {
+          "file": "libs/gcp/tsconfig.json",
+          "hash": "10430309696173710587"
+        },
+        {
+          "file": "libs/gcp/tsconfig.lib.json",
+          "hash": "13291289617200625598"
+        }
+      ],
+      "api": [
+        {
+          "file": "apps/api/COPILOT_PROMPT.md",
+          "hash": "5987477266114574981"
+        },
+        {
+          "file": "apps/api/Dockerfile",
+          "hash": "17739130275617513335"
+        },
+        {
+          "file": "apps/api/project.json",
+          "hash": "2467180983720415709"
+        },
+        {
+          "file": "apps/api/src/main.ts",
+          "hash": "7605520943027391612",
+          "deps": [
+            "npm:fastify"
+          ]
+        },
+        {
+          "file": "apps/api/src/routes/agents.ts",
+          "hash": "13377605370302211977",
+          "deps": [
+            "npm:fastify",
+            "gcp"
+          ]
+        },
+        {
+          "file": "apps/api/src/routes/health.ts",
+          "hash": "9146242794792612734",
+          "deps": [
+            "npm:fastify"
+          ]
+        },
+        {
+          "file": "apps/api/src/routes/search.ts",
+          "hash": "16761429410381765836",
+          "deps": [
+            "npm:fastify",
+            "npm:lodash"
+          ]
+        },
+        {
+          "file": "apps/api/tsconfig.json",
+          "hash": "14641593147291263924"
+        }
+      ],
+      "agents-lib": [
+        {
+          "file": "libs/agents/README.md",
+          "hash": "3757155501495552222"
+        },
+        {
+          "file": "libs/agents/project.json",
+          "hash": "12929525747964891097"
+        },
+        {
+          "file": "libs/agents/src/index.ts",
+          "hash": "13677317759222400303"
+        },
+        {
+          "file": "libs/agents/src/tools.ts",
+          "hash": "9078202335274891687"
+        },
+        {
+          "file": "libs/agents/tsconfig.json",
+          "hash": "16905144177106485730"
+        },
+        {
+          "file": "libs/agents/tsconfig.lib.json",
+          "hash": "15834690189997340113"
+        }
+      ],
+      "mcp": [
+        {
+          "file": "libs/mcp/README.md",
+          "hash": "4496346652772077061"
+        },
+        {
+          "file": "libs/mcp/project.json",
+          "hash": "5568977903714663353"
+        },
+        {
+          "file": "libs/mcp/src/index.ts",
+          "hash": "361260212127963270"
+        },
+        {
+          "file": "libs/mcp/src/lib/clients/mcp-client.service.ts",
+          "hash": "15245971964113929811"
+        },
+        {
+          "file": "libs/mcp/src/lib/clients/request-router.service.ts",
+          "hash": "17581107217021995129"
+        },
+        {
+          "file": "libs/mcp/src/lib/clients/server-health.service.ts",
+          "hash": "12682037362803371225"
+        },
+        {
+          "file": "libs/mcp/src/lib/config/environment-config.ts",
+          "hash": "8865878833108213536"
+        },
+        {
+          "file": "libs/mcp/src/lib/config/mcp-config.schema.ts",
+          "hash": "11762348952682604943"
+        },
+        {
+          "file": "libs/mcp/src/lib/config/server-registry.ts",
+          "hash": "13977203452203219380"
+        },
+        {
+          "file": "libs/mcp/src/lib/mcp.service.ts",
+          "hash": "1474040779072228292"
+        },
+        {
+          "file": "libs/mcp/src/lib/utils/mcp-utils.ts",
+          "hash": "17191469979326991522"
+        },
+        {
+          "file": "libs/mcp/tsconfig.json",
+          "hash": "4834719271918839137"
+        },
+        {
+          "file": "libs/mcp/tsconfig.lib.json",
+          "hash": "4312518675533582045"
         }
       ]
     },

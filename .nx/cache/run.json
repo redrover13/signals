@@ -1,8 +1,8 @@
 {
   "run": {
-    "command": "nx build mcp",
-    "startTime": "2025-08-23T04:28:42.027Z",
-    "endTime": "2025-08-23T04:28:42.037Z",
+    "command": "nx run-many --target=build --all --parallel=false",
+    "startTime": "2025-08-23T04:19:36.473Z",
+    "endTime": "2025-08-23T04:19:36.492Z",
     "inner": false
   },
   "tasks": []

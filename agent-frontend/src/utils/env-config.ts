@@ -2,23 +2,26 @@
  * @fileoverview Environment configuration utility
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
- * Centralizes environment variable management.
+ * Delegates to centralized environment variable management.
  *
  * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
  */
 
-import { AgentConfig } from './types/firebase';
+import { getViteConfig } from '@dulce/env';
+import { AgentConfig } from '../types/firebase';
 
 /**
- * Gets environment variables with fallbacks
+ * Gets environment variables with fallbacks (deprecated - use getViteConfig instead)
  * @param key - Environment variable key
  * @param fallback - Fallback value if environment variable is not set
  * @returns The environment variable value or fallback
+ * @deprecated Use getViteConfig() from @dulce/env instead
  */
 export const getEnvVar = (key: string, fallback: string = ''): string => {
-  return import.meta.env[key] || process.env[key] || fallback;
+  const isVite = typeof import.meta !== 'undefined' && !!(import.meta as any).env;
+  return (isVite ? (import.meta as any).env?.[key] : undefined) ?? process.env[key] ?? fallback;
 };
 
 /**
@@ -26,16 +29,18 @@ export const getEnvVar = (key: string, fallback: string = ''): string => {
  * @returns Agent configuration object
  */
 export const getAgentConfig = (): AgentConfig => {
+  const config = getViteConfig();
+  
   return {
-    apiKey: getEnvVar('VITE_GEMINI_API_KEY', 'your-gemini-api-key'),
-    projectId: getEnvVar('VITE_GCP_PROJECT_ID', 'your-gcp-project'),
+    apiKey: config.VITE_GEMINI_API_KEY,
+    projectId: config.VITE_GCP_PROJECT_ID,
     firebaseConfig: {
-      apiKey: getEnvVar('VITE_FIREBASE_API_KEY', 'your-firebase-api-key'),
-      authDomain: getEnvVar('VITE_FIREBASE_AUTH_DOMAIN', 'your-project.firebaseapp.com'),
-      projectId: getEnvVar('VITE_FIREBASE_PROJECT_ID', 'your-firebase-project'),
-      storageBucket: getEnvVar('VITE_FIREBASE_STORAGE_BUCKET', 'your-project.appspot.com'),
-      messagingSenderId: getEnvVar('VITE_FIREBASE_MESSAGING_SENDER_ID', '123456789'),
-      appId: getEnvVar('VITE_FIREBASE_APP_ID', 'your-app-id')
+      apiKey: config.VITE_FIREBASE_API_KEY,
+      authDomain: config.VITE_FIREBASE_AUTH_DOMAIN,
+      projectId: config.VITE_FIREBASE_PROJECT_ID,
+      storageBucket: config.VITE_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: config.VITE_FIREBASE_MESSAGING_SENDER_ID,
+      appId: config.VITE_FIREBASE_APP_ID
     }
   };
 };
@@ -45,7 +50,7 @@ export const getAgentConfig = (): AgentConfig => {
  * @returns True if running in development mode
  */
 export const isDevelopment = (): boolean => {
-  return import.meta.env.DEV || process.env.NODE_ENV === 'development';
+  return import.meta.env?.DEV || process.env.NODE_ENV === 'development';
 };
 
 /**
@@ -53,5 +58,5 @@ export const isDevelopment = (): boolean => {
  * @returns True if running in production mode
  */
 export const isProduction = (): boolean => {
-  return import.meta.env.PROD || process.env.NODE_ENV === 'production';
+  return import.meta.env?.PROD || process.env.NODE_ENV === 'production';
 };

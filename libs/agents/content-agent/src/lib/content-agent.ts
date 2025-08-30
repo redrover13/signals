@@ -16,20 +16,7 @@ import {
   HttpRequestTool 
 } from '@nx-monorepo/adk';
 
-/**
- * Requirements interface for content generation
- */
-export interface Requirements {
-  [key: string]: unknown;
-}
-
-/**
- * Response interface for content generation
- */
-export interface ContentResponse {
-  content: string;
-  metadata?: Record<string, unknown>;
-}
+import { Requirements, ContentResponse } from '@nx-monorepo/data-models';
 
 /**
  * Content-specialized agent for generating F&B marketing content

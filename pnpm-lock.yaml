@@ -315,6 +315,28 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@24.3.0)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(less@4.4.1)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
 
+  apps/cloud-functions/rag-processor:
+    dependencies:
+      '@google-cloud/aiplatform':
+        specifier: ^5.5.0
+        version: 5.5.0
+      '@google-cloud/functions-framework':
+        specifier: ^3.3.0
+        version: 3.5.1
+      '@google-cloud/pubsub':
+        specifier: ^4.1.0
+        version: 4.11.0(encoding@0.1.13)
+      '@google-cloud/storage':
+        specifier: ^7.16.0
+        version: 7.16.0(encoding@0.1.13)
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.11
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.2
+
   apps/event-parser:
     dependencies:
       '@google-cloud/bigquery':
@@ -366,7 +388,7 @@ importers:
     devDependencies:
       '@nx/next':
         specifier: 21.4.0
-        version: 21.4.0(4b9525b2b28d06d565987ceba636c0fd)
+        version: 21.4.0(a788f243a4e00550e820118190594653)
       '@types/node':
         specifier: ^20
         version: 20.19.11
@@ -451,6 +473,8 @@ importers:
         specifier: ^2.3.0
         version: 2.8.1
 
+  libs/security: {}
+
   libs/utils/api-clients:
     dependencies:
       tslib:
@@ -468,6 +492,8 @@ importers:
       tslib:
         specifier: ^2.3.0
         version: 2.8.1
+
+  libs/utils/secrets-manager: {}
 
 packages:
 
@@ -4094,6 +4120,9 @@ packages:
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
+
+  '@types/trusted-types@2.0.7':
+    resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
 
   '@types/uuid@10.0.0':
     resolution: {integrity: sha512-7gqG38EyHgyP1S+7+xomFtL+ZNHcKv6DwNaCZmJmo1vgMugyF3TCnXVg4t1uk89mLNwnLtnY3TpOpCOyp1/xHQ==}
@@ -12595,14 +12624,14 @@ snapshots:
       '@jest/test-result': 30.0.5
       '@jest/transform': 30.0.5
       '@jest/types': 30.0.5
-      '@types/node': 24.3.0
+      '@types/node': 20.19.11
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       ci-info: 4.3.0
       exit-x: 0.2.2
       graceful-fs: 4.2.11
       jest-changed-files: 30.0.5
-      jest-config: 30.0.5(@types/node@24.3.0)(babel-plugin-macros@3.1.0)(esbuild-register@3.6.0(esbuild@0.25.9))(ts-node@10.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@types/node@24.3.0)(typescript@5.9.2))
+      jest-config: 30.0.5(@types/node@20.19.11)(babel-plugin-macros@3.1.0)(esbuild-register@3.6.0(esbuild@0.25.9))(ts-node@10.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@types/node@24.3.0)(typescript@5.9.2))
       jest-haste-map: 30.0.5
       jest-message-util: 30.0.5
       jest-regex-util: 30.0.1
@@ -12631,7 +12660,7 @@ snapshots:
       '@jest/fake-timers': 30.1.1
       '@jest/types': 30.0.5
       '@types/jsdom': 21.1.7
-      '@types/node': 24.3.0
+      '@types/node': 20.19.11
       jest-mock: 30.0.5
       jest-util: 30.0.5
       jsdom: 26.1.0
@@ -12640,14 +12669,14 @@ snapshots:
     dependencies:
       '@jest/fake-timers': 30.0.5
       '@jest/types': 30.0.5
-      '@types/node': 24.3.0
+      '@types/node': 20.19.11
       jest-mock: 30.0.5
 
   '@jest/environment@30.1.1':
     dependencies:
       '@jest/fake-timers': 30.1.1
       '@jest/types': 30.0.5
-      '@types/node': 24.3.0
+      '@types/node': 20.19.11
       jest-mock: 30.0.5
 
   '@jest/expect-utils@30.0.5':
@@ -12665,7 +12694,7 @@ snapshots:
     dependencies:
       '@jest/types': 30.0.5
       '@sinonjs/fake-timers': 13.0.5
-      '@types/node': 24.3.0
+      '@types/node': 20.19.11
       jest-message-util: 30.0.5
       jest-mock: 30.0.5
       jest-util: 30.0.5
@@ -12703,7 +12732,7 @@ snapshots:
       '@jest/transform': 30.0.5
       '@jest/types': 30.0.5
       '@jridgewell/trace-mapping': 0.3.30
-      '@types/node': 24.3.0
+      '@types/node': 20.19.11
       chalk: 4.1.2
       collect-v8-coverage: 1.0.2
       exit-x: 0.2.2
@@ -12793,7 +12822,7 @@ snapshots:
       '@jest/schemas': 30.0.5
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 24.3.0
+      '@types/node': 20.19.11
       '@types/yargs': 17.0.33
       chalk: 4.1.2
 
@@ -13625,19 +13654,19 @@ snapshots:
       - vue-tsc
       - webpack-cli
 
-  '@nx/next@21.4.0(4b9525b2b28d06d565987ceba636c0fd)':
+  '@nx/next@21.4.0(a788f243a4e00550e820118190594653)':
     dependencies:
       '@babel/plugin-proposal-decorators': 7.28.0(@babel/core@7.28.3)
       '@nx/devkit': 21.4.0(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))
       '@nx/eslint': 21.4.0(@babel/traverse@7.28.3)(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))(@zkochan/js-yaml@0.0.7)(eslint@9.33.0(jiti@2.4.2))(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))(verdaccio@6.1.6(encoding@0.1.13)(typanion@3.14.0))
       '@nx/js': 21.4.0(@babel/traverse@7.28.3)(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))(verdaccio@6.1.6(encoding@0.1.13)(typanion@3.14.0))
-      '@nx/react': 21.4.0(96da45df15e9cf55703cd51681c83ef2)
+      '@nx/react': 21.4.0(359d42253d57be7a990c659b1382fcbe)
       '@nx/web': 21.4.0(@babel/traverse@7.28.3)(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))(verdaccio@6.1.6(encoding@0.1.13)(typanion@3.14.0))
       '@nx/webpack': 21.4.0(@babel/traverse@7.28.3)(@rspack/core@1.4.11(@swc/helpers@0.5.17))(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9)(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))(typescript@5.9.2)(verdaccio@6.1.6(encoding@0.1.13)(typanion@3.14.0))
       '@phenomnomnominal/tsquery': 5.0.1(typescript@5.9.2)
       '@svgr/webpack': 8.1.0(typescript@5.9.2)
-      copy-webpack-plugin: 10.2.4(webpack@5.99.9(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
-      file-loader: 6.2.0(webpack@5.99.9(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
+      copy-webpack-plugin: 10.2.4(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
+      file-loader: 6.2.0(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
       ignore: 5.3.2
       next: 15.2.4(@babel/core@7.28.3)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.90.0)
       semver: 7.7.2
@@ -13820,7 +13849,7 @@ snapshots:
   '@nx/nx-win32-x64-msvc@21.4.1':
     optional: true
 
-  '@nx/react@21.4.0(96da45df15e9cf55703cd51681c83ef2)':
+  '@nx/react@21.4.0(359d42253d57be7a990c659b1382fcbe)':
     dependencies:
       '@nx/devkit': 21.4.0(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))
       '@nx/eslint': 21.4.0(@babel/traverse@7.28.3)(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))(@zkochan/js-yaml@0.0.7)(eslint@9.33.0(jiti@2.4.2))(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))(verdaccio@6.1.6(encoding@0.1.13)(typanion@3.14.0))
@@ -13832,7 +13861,7 @@ snapshots:
       '@phenomnomnominal/tsquery': 5.0.1(typescript@5.9.2)
       '@svgr/webpack': 8.1.0(typescript@5.9.2)
       express: 4.21.2
-      file-loader: 6.2.0(webpack@5.99.9(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
+      file-loader: 6.2.0(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
       http-proxy-middleware: 3.0.5
       minimatch: 9.0.3
       picocolors: 1.1.1
@@ -15736,7 +15765,7 @@ snapshots:
   '@types/body-parser@1.19.6':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 24.3.0
+      '@types/node': 20.19.11
 
   '@types/bonjour@3.5.13':
     dependencies:
@@ -15788,7 +15817,7 @@ snapshots:
 
   '@types/express-serve-static-core@5.0.7':
     dependencies:
-      '@types/node': 24.3.0
+      '@types/node': 20.19.11
       '@types/qs': 6.14.0
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.5
@@ -15840,7 +15869,7 @@ snapshots:
 
   '@types/jsdom@21.1.7':
     dependencies:
-      '@types/node': 24.3.0
+      '@types/node': 20.19.11
       '@types/tough-cookie': 4.0.5
       parse5: 7.3.0
 
@@ -15936,7 +15965,7 @@ snapshots:
   '@types/serve-static@1.15.8':
     dependencies:
       '@types/http-errors': 2.0.5
-      '@types/node': 24.3.0
+      '@types/node': 20.19.11
       '@types/send': 0.17.5
 
   '@types/sockjs@0.3.36':
@@ -15951,9 +15980,9 @@ snapshots:
 
   '@types/tough-cookie@4.0.5': {}
 
-  '@types/uuid@10.0.0': {}
-
   '@types/trusted-types@2.0.7': {}
+
+  '@types/uuid@10.0.0': {}
 
   '@types/ws@8.18.1':
     dependencies:
@@ -18605,12 +18634,6 @@ snapshots:
       schema-utils: 3.3.0
       webpack: 5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9)
 
-  file-loader@6.2.0(webpack@5.99.9(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9)):
-    dependencies:
-      loader-utils: 2.0.4
-      schema-utils: 3.3.0
-      webpack: 5.99.9(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9)
-
   file-type@20.5.0:
     dependencies:
       '@tokenizer/inflate': 0.2.7
@@ -19788,6 +19811,40 @@ snapshots:
       - supports-color
       - ts-node
 
+  jest-config@30.0.5(@types/node@20.19.11)(babel-plugin-macros@3.1.0)(esbuild-register@3.6.0(esbuild@0.25.9))(ts-node@10.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@types/node@24.3.0)(typescript@5.9.2)):
+    dependencies:
+      '@babel/core': 7.28.3
+      '@jest/get-type': 30.0.1
+      '@jest/pattern': 30.0.1
+      '@jest/test-sequencer': 30.0.5
+      '@jest/types': 30.0.5
+      babel-jest: 30.0.5(@babel/core@7.28.3)
+      chalk: 4.1.2
+      ci-info: 4.3.0
+      deepmerge: 4.3.1
+      glob: 10.4.5
+      graceful-fs: 4.2.11
+      jest-circus: 30.0.5(babel-plugin-macros@3.1.0)
+      jest-docblock: 30.0.1
+      jest-environment-node: 30.0.5
+      jest-regex-util: 30.0.1
+      jest-resolve: 30.0.5
+      jest-runner: 30.0.5
+      jest-util: 30.0.5
+      jest-validate: 30.0.5
+      micromatch: 4.0.8
+      parse-json: 5.2.0
+      pretty-format: 30.0.5
+      slash: 3.0.0
+      strip-json-comments: 3.1.1
+    optionalDependencies:
+      '@types/node': 20.19.11
+      esbuild-register: 3.6.0(esbuild@0.25.9)
+      ts-node: 10.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@types/node@24.3.0)(typescript@5.9.2)
+    transitivePeerDependencies:
+      - babel-plugin-macros
+      - supports-color
+
   jest-config@30.0.5(@types/node@24.3.0)(babel-plugin-macros@3.1.0)(esbuild-register@3.6.0(esbuild@0.25.9))(ts-node@10.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@types/node@24.3.0)(typescript@5.9.2)):
     dependencies:
       '@babel/core': 7.28.3
@@ -19846,7 +19903,7 @@ snapshots:
       '@jest/environment': 30.1.1
       '@jest/environment-jsdom-abstract': 30.1.1(jsdom@26.1.0)
       '@types/jsdom': 21.1.7
-      '@types/node': 24.3.0
+      '@types/node': 20.19.11
       jsdom: 26.1.0
     transitivePeerDependencies:
       - bufferutil
@@ -19858,7 +19915,7 @@ snapshots:
       '@jest/environment': 30.0.5
       '@jest/fake-timers': 30.0.5
       '@jest/types': 30.0.5
-      '@types/node': 24.3.0
+      '@types/node': 20.19.11
       jest-mock: 30.0.5
       jest-util: 30.0.5
       jest-validate: 30.0.5
@@ -19917,7 +19974,7 @@ snapshots:
   jest-mock@30.0.5:
     dependencies:
       '@jest/types': 30.0.5
-      '@types/node': 24.3.0
+      '@types/node': 20.19.11
       jest-util: 30.0.5
 
   jest-pnp-resolver@1.2.3(jest-resolve@30.0.5):
@@ -20036,7 +20093,7 @@ snapshots:
   jest-util@30.0.5:
     dependencies:
       '@jest/types': 30.0.5
-      '@types/node': 24.3.0
+      '@types/node': 20.19.11
       chalk: 4.1.2
       ci-info: 4.3.0
       graceful-fs: 4.2.11

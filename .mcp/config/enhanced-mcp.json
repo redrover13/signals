@@ -27,7 +27,29 @@
     },
     "terraform": {
       "command": "docker",
-      "args": ["run", "-i", "--rm", "hashicorp/terraform-mcp-server"]
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-v",
+        "/home/g_nelson/.config/gcloud:/home/g_nelson/.config/gcloud:ro",
+        "-e",
+        "GOOGLE_APPLICATION_CREDENTIALS=/root/.config/gcloud/application_default_credentials.json",
+        "-e",
+        "GOOGLE_CLOUD_PROJECT=saigon-signals",
+        "-e",
+        "GOOGLE_REGION=asia-southeast1",
+        "-w",
+        "/workspace",
+        "-v",
+        "/home/g_nelson/signals-1:/workspace:ro",
+        "hashicorp/terraform-mcp-server"
+      ],
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json",
+        "GOOGLE_CLOUD_PROJECT": "saigon-signals",
+        "GOOGLE_REGION": "asia-southeast1"
+      }
     },
     "sequentialthinking": {
       "command": "npx",
@@ -82,31 +104,42 @@
       "command": "npx",
       "args": ["-y", "@google/search-mcp@latest"],
       "env": {
-        "GOOGLE_API_KEY": "google-api-key",
-        "GOOGLE_CSE_ID": "google-cse-id"
+        "GOOGLE_API_KEY": "${GOOGLE_API_KEY}",
+        "GOOGLE_CSE_ID": "${GOOGLE_CSE_ID}"
       }
     },
     "google-drive": {
       "command": "npx",
       "args": ["-y", "@google/drive-mcp@latest"],
       "env": {
-        "GOOGLE_APPLICATION_CREDENTIALS": "google-service-account"
+        "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json"
       }
     },
     "google-cloud": {
       "command": "npx",
       "args": ["-y", "@google-cloud/mcp-server@latest"],
       "env": {
-        "GOOGLE_APPLICATION_CREDENTIALS": "google-service-account",
-        "GCP_PROJECT_ID": "gcp-project-id"
+        "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json",
+        "GCP_PROJECT_ID": "saigon-signals"
       }
     },
     "bigquery": {
       "command": "npx",
       "args": ["-y", "@google-cloud/bigquery-mcp@latest"],
       "env": {
-        "GOOGLE_APPLICATION_CREDENTIALS": "google-service-account",
-        "GCP_PROJECT_ID": "gcp-project-id"
+        "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json",
+        "GCP_PROJECT_ID": "saigon-signals"
+      }
+    },
+    "grafana": {
+      "command": "npx",
+      "args": ["-y", "grafana-mcp-analyzer@latest"],
+      "env": {
+        "CONFIG_PATH": "/home/g_nelson/signals-1/grafana-mcp-config.js",
+        "GRAFANA_URL": "https://grafana-service-871192566066.us-central1.run.app",
+        "GRAFANA_USERNAME": "admin",
+        "GRAFANA_PASSWORD": "${GRAFANA_ADMIN_PASSWORD}",
+        "GRAFANA_API_TOKEN": "${GRAFANA_API_TOKEN}"
       }
     },
     "postgres": {
@@ -196,6 +229,21 @@
       "description": "Google Custom Search Engine ID",
       "env": "GOOGLE_CSE_ID",
       "secretManager": "projects/${GCP_PROJECT_ID}/secrets/google-cse-id/versions/latest"
+    },
+    "grafana-url": {
+      "description": "Grafana Service URL",
+      "env": "GRAFANA_URL",
+      "secretManager": "projects/saigon-signals/secrets/grafana-url/versions/latest"
+    },
+    "grafana-api-token": {
+      "description": "Grafana API Token",
+      "env": "GRAFANA_API_TOKEN",
+      "secretManager": "projects/saigon-signals/secrets/grafana-api-token/versions/latest"
+    },
+    "grafana-admin-password": {
+      "description": "Grafana Admin Password",
+      "env": "GRAFANA_ADMIN_PASSWORD",
+      "secretManager": "projects/saigon-signals/secrets/grafana-admin-password/versions/latest"
     },
     "google-service-account": {
       "description": "Google Service Account Key",

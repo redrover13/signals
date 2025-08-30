@@ -13,6 +13,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai'; // Gemini SDK
 import { BigQuery } from '@google-cloud/bigquery';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, setDoc } from 'firebase/firestore'; // Example Firebase imports
+import { orchestratorInputSchema, orchestratorOutputSchema } from './schemas';
+import { z } from 'zod';
 
 // Sub-agent for BigQuery
 class BQSubAgent {
@@ -56,7 +58,8 @@ export class GeminiOrchestrator {
     };
   }
 
-  async orchestrate(query: string): Promise<any> {
+  async orchestrate(input: z.infer<typeof orchestratorInputSchema>): Promise<z.infer<typeof orchestratorOutputSchema>> {
+    const { query } = orchestratorInputSchema.parse(input);
     const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const result = await model.generateContent(query);
     const response = result.response.text();

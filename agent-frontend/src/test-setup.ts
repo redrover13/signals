@@ -10,6 +10,8 @@
  * @license MIT
  */
 
+import crypto from 'crypto';
+
 // Detect testing environment
 const isVitest = typeof vi !== 'undefined';
 
@@ -37,7 +39,7 @@ export const createMock = (implementation?: (...args: any[]) => any) => {
 };
 
 // Mock for requestAnimationFrame
-global.requestAnimationFrame = mock.fn(callback => {
+global.requestAnimationFrame = createMock(callback => {
   setTimeout(callback, 0);
   return 0;
 });
@@ -73,17 +75,17 @@ console.error = (...args) => {
 const localStorageMock = (function() {
   let store = {};
   return {
-    getItem: mock.fn(key => store[key] || null),
-    setItem: mock.fn((key, value) => {
+    getItem: createMock(key => store[key] || null),
+    setItem: createMock((key, value) => {
       store[key] = value.toString();
     }),
-    removeItem: mock.fn(key => {
+    removeItem: createMock(key => {
       delete store[key];
     }),
-    clear: mock.fn(() => {
+    clear: createMock(() => {
       store = {};
     }),
-    key: mock.fn(index => {
+    key: createMock(index => {
       return Object.keys(store)[index] || null;
     }),
     get length() {
@@ -105,7 +107,7 @@ if (isVitest) {
 } else {
   try {
     // Import Jest specific setup if needed
-    require('./jest-specific-setup');
+    import('./jest-specific-setup');
   } catch (e) {
     // This is OK if file doesn't exist
   }

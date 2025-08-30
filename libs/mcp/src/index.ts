@@ -34,8 +34,9 @@ export const mcpService = new Proxy({} as any, {
   get(target, prop) {
     if (!target._instance) {
       try {
-        const { MCPService } = require('./lib/mcp.service');
-        target._instance = MCPService.getInstance();
+        import('./lib/mcp.service').then(({ MCPService }) => {
+          target._instance = MCPService.getInstance();
+        });
       } catch (error) {
         console.warn('Failed to initialize MCP service:', error);
         target._instance = {

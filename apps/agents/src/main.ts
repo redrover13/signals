@@ -9,91 +9,82 @@
  * @license MIT
  */
 
-import Fastify from "fastify";
-import { runAgent } from "@dulce-de-saigon/agents-lib";
-import { agentsRoutes } from "../../api/src/routes/agents";
-import { healthRoutes } from "../../api/src/routes/health";
-import { VertexAIClient, VertexAIClientConfig } from "adk/services/vertex";
-import { registerSecurity, loadAppConfig } from "@dulce-de-saigon/security";
+import Fastify, { FastifyInstance, FastifyRequest } from 'fastify';
+import { VertexAIClient, VertexAIClientConfig } from '@dulce/adk';
+import { mcpService } from '@nx-monorepo/mcp';
+
+// Local route implementations for agents project
+async function healthRoutes(fastify: FastifyInstance) {
+  fastify.get('/health', async (request: FastifyRequest, reply) => {
+    return { status: 'ok', timestamp: new Date().toISOString() };
+  });
+}
+
+async function agentsRoutes(fastify: FastifyInstance) {
+  fastify.post('/start', async (request: FastifyRequest, reply) => {
+    const task = (request.body as any)?.task ?? 'default task';
+    return { ok: true, task, message: 'Agent task queued' };
+  });
+
+  fastify.post('/api/v1/agent-predict', async (request: FastifyRequest, reply) => {
+    try {
+      const instancePayload = request.body;
+      const predictions = await vertexClient.predict(instancePayload);
+
+      fastify.log.info({
+        message: 'Prediction successful',
+        endpointId: vertexAIConfig.endpointId,
+      });
+
+      return { success: true, predictions };
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.status(500).send({
+        success: false,
+        message: 'An error occurred during prediction.',
+        error: error instanceof Error ? error.name : 'UnknownError',
+      });
+    }
+  });
+}
 
 const fastify = Fastify({
   logger: true,
 });
 
-// Load configuration asynchronously
-let appConfig: Awaited<ReturnType<typeof loadAppConfig>>;
-
 // --- Vertex AI Integration ---
-// Configuration loaded securely from environment and Secret Manager
-async function initializeVertexAI() {
-  appConfig = await loadAppConfig();
-  
-  const vertexAIConfig: VertexAIClientConfig = {
-    project: appConfig.gcpProjectId,
-    location: appConfig.gcpLocation,
-    endpointId: appConfig.vertexAiEndpointId,
-  };
-
-  return new VertexAIClient(vertexAIConfig);
-}
-
-// Initialize security middleware
-async function initializeSecurity() {
-  await registerSecurity(fastify, {
-    authentication: process.env.NODE_ENV === 'production',
-    rateLimit: {
-      max: parseInt(process.env.RATE_LIMIT_MAX || '100'),
-      windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'),
-    },
-  });
-}
-
-// Example route demonstrating an inference call
-// Ví dụ về một route thực hiện lệnh gọi suy luận
-fastify.post("/api/v1/agent-predict", async (request, reply) => {
-  try {
-    const vertexClient = await initializeVertexAI();
-    const instancePayload = request.body; // Assume body contains the instance
-    const predictions = await vertexClient.predict(instancePayload);
-
-    // Log for compliance and analytics, respecting data privacy.
-    // Ghi nhật ký để tuân thủ và phân tích, tôn trọng quyền riêng tư dữ liệu.
-    fastify.log.info({
-      message: "Prediction successful",
-      endpointId: appConfig.vertexAiEndpointId,
-    });
-
-    return { success: true, predictions };
-  } catch (error) {
-    fastify.log.error(error); // The ADK client already logged details
-    reply.status(500).send({
-      success: false,
-      message: "An error occurred during prediction.",
-      error: error instanceof Error ? error.name : 'UnknownError', // e.g., 'PredictionAPIError'
-    });
-  }
-});
-
-console.log("AGENT LIB", runAgent);
-
-fastify.register(healthRoutes);
-fastify.register(agentsRoutes);
-
-/**
- * Run the server!
- */
-const start = async () => {
-  try {
-    // Initialize security first
-    await initializeSecurity();
-    
-    // Start the server
-    await fastify.listen({ port: 3000, host: '0.0.0.0' });
-    fastify.log.info('Server started successfully with security middleware enabled');
-  } catch (err) {
-    fastify.log.error(err);
-    process.exit(1); // Kết thúc tiến trình Node.js. 
-  }
+const vertexAIConfig: VertexAIClientConfig = {
+  project: process.env['GCP_PROJECT_ID'] || '324928471234',
+  location: process.env['GCP_LOCATION'] || 'us-central1',
+  endpointId: process.env['VERTEX_AI_ENDPOINT_ID'] || '839281723491823912',
 };
 
-start();
+const vertexClient = new VertexAIClient(vertexAIConfig);
+
+// Initialize MCP service and start server
+async function initializeApp() {
+  try {
+    console.log('Initializing MCP service...');
+    await mcpService.initialize();
+    console.log('✅ MCP service initialized successfully');
+    console.log('📊 Enabled servers:', mcpService.getEnabledServers());
+
+    // Register routes
+    await fastify.register(healthRoutes);
+    await fastify.register(agentsRoutes);
+
+    const PORT = process.env['PORT'] ? parseInt(process.env['PORT'], 10) : 3001;
+    fastify.listen({ port: PORT, host: '0.0.0.0' }, (err, address) => {
+      if (err) {
+        fastify.log.error(err);
+        process.exit(1);
+      }
+      fastify.log.info(`Agents server listening at ${address}`);
+    });
+  } catch (error) {
+    console.error('❌ Failed to initialize MCP service:', error);
+    process.exit(1);
+  }
+}
+
+initializeApp().catch(console.error);

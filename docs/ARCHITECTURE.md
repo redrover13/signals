@@ -1,174 +1,105 @@
-# Signals Architecture
+# Signals Monorepo Architecture
 
 ## Overview
 
-Signals is a platform for...
+This document outlines the architecture of the Signals monorepo, detailing its components, data flows, and key integrations. The system is designed to ingest data from various sources, process it, and leverage AI agents to provide insights and actions through a user-friendly frontend.
 
-## RAG Pipeline Architecture
-
-The RAG (Retrieval-Augmented Generation) pipeline provides AI-powered document processing and retrieval capabilities using Google Cloud Platform services.
-
-### System Architecture
+## Data Flow Diagram
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Document      │    │  Cloud Function │    │   BigQuery      │
-│   Upload        │───▶│  Processor      │───▶│   Data Store    │
-│                 │    │                 │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│ Cloud Storage   │    │   Pub/Sub       │    │   AI Model      │
-│ (Documents)     │    │   Events        │    │   Integration   │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
++-----------------+
+| Data Sources    |
+| (GA4, CRM,      |
+| Social, CMS)    |
++--------+--------+
+         |
+         v
++--------+--------+
+| Google Cloud    |
+| Pub/Sub         |
++--------+--------+
+         |
+         v
++--------+--------+
+| Cloud Functions |
+| (Social API,    |
+| CRM API,        |
+| CMS API,        |
+| Reviews API)    |
++--------+--------+
+         |
+         v
++--------+--------+
+| BigQuery        |
+| (Raw Data,      |
+| Transformed Data)|
++--------+--------+
+         |
+         v
++--------+--------+
+| dbt Models      |
+| (Transformations)|
++--------+--------+
+         |
+         v
++--------+--------+
+| AI Agents       |
+| (BQ Agent,      |
+| Looker Agent,   |
+| CRM Agent,      |
+| Content Agent,  |
+| Reviews Agent)  |
++--------+--------+
+         |
+         v
++--------+--------+
+| Gemini          |
+| Orchestrator    |
++--------+--------+
+         |
+         v
++--------+--------+
+| Frontend Agents |
+| (Next.js UI)    |
++--------+--------+
 ```
 
-### Components
+## System Components
 
-#### 1. Document Ingestion
-- **Cloud Storage Bucket**: `saigon-signals-rag-documents`
-- **Purpose**: Stores uploaded documents for processing
-- **Features**:
-  - Automatic lifecycle management (30-day retention)
-  - Uniform bucket-level access control
-  - Event triggers for processing
+### Data Ingestion
 
-#### 2. Document Processing
-- **Cloud Function**: `rag-document-processor`
-- **Runtime**: Node.js 18 with ES modules
-- **Capabilities**:
-  - Document parsing and text extraction
-  - Intelligent chunking algorithms
-  - Metadata extraction and enrichment
-  - Error handling and retry logic
+*   **GA4 Exports**: Data from Google Analytics 4 is exported to BigQuery.
+*   **CRM Systems**: Data from CRM platforms is ingested via dedicated APIs.
+*   **Social Media Platforms**: Data from social media is ingested via dedicated APIs.
+*   **CMS Platforms**: Data from Content Management Systems is ingested via dedicated APIs.
+*   **Google Cloud Pub/Sub**: Acts as a messaging backbone for event-driven ingestion and inter-service communication.
 
-#### 3. Data Storage
-- **BigQuery Dataset**: `rag_dataset`
-- **Table**: `document_chunks`
-- **Schema**:
-  ```sql
-  CREATE TABLE rag_dataset.document_chunks (
-    document_id STRING,
-    chunk_id INT64,
-    content STRING,
-    metadata JSON,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP
-  )
-  CLUSTER BY document_id
-  ```
-- **Features**:
-  - Optimized for analytical queries
-  - Clustered by document_id for efficient retrieval
-  - JSON metadata support for flexible attributes
+### Data Transformation
 
-#### 4. Event Messaging
-- **Pub/Sub Topic**: `rag-document-processing`
-- **Purpose**: Decouples processing components
-- **Features**:
-  - 24-hour message retention
-  - Dead letter queue for failed messages
-  - Scalable message throughput
+*   **BigQuery**: Central data warehouse for raw and transformed data.
+*   **dbt Models**: Used for defining and executing data transformations within BigQuery, ensuring data quality and consistency.
 
-#### 5. Chunk Storage
-- **Cloud Storage Bucket**: `saigon-signals-rag-chunks`
-- **Purpose**: Stores processed document chunks as JSON
-- **Features**:
-  - Optimized for retrieval operations
-  - Versioning for data integrity
-  - Cost-effective long-term storage
+### AI Agents & Orchestration
 
-### Security Architecture
+*   **BQ Agent**: Interacts with BigQuery for data retrieval and analysis.
+*   **Looker Agent**: Integrates with Looker for reporting and dashboarding.
+*   **CRM Agent**: Interacts with CRM systems for data updates and actions.
+*   **Content Agent**: Manages and interacts with content platforms.
+*   **Reviews Agent**: Handles and analyzes customer reviews.
+*   **Gemini Orchestrator**: Coordinates the execution and interaction of various AI agents, leveraging Google Gemini for advanced reasoning and decision-making.
 
-#### IAM & Access Control
-- **Service Account**: `rag-pipeline-sa@saigon-signals.iam.gserviceaccount.com`
-- **Permissions**:
-  - `roles/storage.admin` - Bucket management
-  - `roles/bigquery.user` - Data operations
-  - `roles/bigquery.dataEditor` - Table modifications
-  - `roles/cloudfunctions.admin` - Function management
-  - `roles/pubsub.publisher` - Event publishing
+### Frontend
 
-#### Data Security
-- **Encryption**: All data encrypted at rest and in transit
-- **Access Logging**: Comprehensive audit trails
-- **Network Security**: Private VPC configuration
-- **Compliance**: GDPR and Vietnamese data privacy compliant
+*   **Frontend Agents (Next.js)**: The user interface for interacting with the AI agents and visualizing insights.
 
-### Performance & Scalability
+### CI/CD & Operations
 
-#### Auto-scaling
-- **Cloud Functions**: Scales automatically based on load
-- **BigQuery**: Serverless scaling for analytical workloads
-- **Pub/Sub**: Handles variable message throughput
+*   **GitHub Actions / Google Cloud Build**: Automated pipelines for continuous integration and continuous deployment.
+*   **Terraform**: Infrastructure as Code for managing GCP resources (BigQuery, Cloud Functions, Vertex AI Agents, Looker).
+*   **Google Cloud Workflows**: Orchestrates complex sequences of microservices and API calls.
+*   **Google Secret Manager**: Securely stores and manages sensitive information like API keys and credentials.
+*   **Google IAM**: Manages access control and permissions across GCP resources.
 
-#### Performance Optimizations
-- **BigQuery Clustering**: Optimized query performance
-- **Storage Classes**: Cost-effective storage tiers
-- **Caching**: Intelligent caching strategies
+## Document Owner
 
-### Monitoring & Observability
-
-#### Logging
-- **Cloud Logging**: Centralized log aggregation
-- **Structured Logging**: JSON-formatted logs for analysis
-- **Log Retention**: Configurable retention policies
-
-#### Metrics
-- **Cloud Monitoring**: Real-time performance metrics
-- **Custom Metrics**: Application-specific KPIs
-- **Alerting**: Proactive issue detection
-
-#### Tracing
-- **Cloud Trace**: Request tracing and latency analysis
-- **Distributed Tracing**: End-to-end request visibility
-
-### Deployment Architecture
-
-#### Infrastructure as Code
-- **Terraform**: Declarative infrastructure management
-- **Version Control**: Git-based configuration management
-- **CI/CD**: Automated deployment pipelines
-
-#### Environment Management
-- **Development**: Isolated development environment
-- **Staging**: Pre-production testing environment
-- **Production**: Live production environment
-
-### Integration Points
-
-#### External Systems
-- **Vertex AI**: AI model integration for enhanced processing
-- **Document AI**: Advanced document understanding
-- **Translation AI**: Multi-language document support
-
-#### Internal Systems
-- **API Gateway**: Secure API access
-- **Authentication**: User identity management
-- **Authorization**: Fine-grained access control
-
-### Cost Optimization
-
-#### Resource Optimization
-- **Storage Lifecycle**: Automatic data tiering
-- **Query Optimization**: Efficient BigQuery usage
-- **Compute Optimization**: Right-sizing Cloud Functions
-
-#### Cost Monitoring
-- **Budget Alerts**: Proactive cost management
-- **Usage Analytics**: Detailed cost analysis
-- **Optimization Recommendations**: GCP cost optimization suggestions
-
-### Future Enhancements
-
-#### Planned Features
-- **Real-time Processing**: Streaming document processing
-- **Advanced Chunking**: Semantic chunking algorithms
-- **Multi-modal Support**: Image and video processing
-- **Federated Learning**: Distributed model training
-
-#### Scalability Improvements
-- **Global Distribution**: Multi-region deployment
-- **Edge Computing**: Reduced latency through edge deployment
-- **Advanced Caching**: Intelligent caching layers
+This document is owned by `garretnelson368@gmail.com`.

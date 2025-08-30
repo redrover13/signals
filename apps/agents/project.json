@@ -2,7 +2,7 @@
   "name": "agents",
   "sourceRoot": "apps/agents/src",
   "projectType": "application",
-  "implicitDependencies": ["gemini-orchestrator", "monitoring"],
+  "implicitDependencies": ["gemini-orchestrator", "monitoring", "gcp"],
   "targets": {
     "dev": {
       "executor": "nx:run-commands",
@@ -53,7 +53,8 @@
   },
   "tags": [
     "domain:agents",
-    "type:application"
+    "type:application",
+    "scope:server"
   ],
   "namedInputs": {
     "default": [

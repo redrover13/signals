@@ -6,7 +6,7 @@
 set -e
 
 PROJECT_ID="saigon-signals"
-REGION="us-central1"
+REGION="asia-southeast1"
 ENVIRONMENT="prod"
 
 echo "🚀 Setting up Terraform infrastructure for Saigon Signals..."

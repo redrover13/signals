@@ -5,7 +5,8 @@
   "projectType": "application",
   "tags": [
     "domain:frontend-agents",
-    "type:application"
+    "type:application",
+    "scope:client"
   ],
   "targets": {
     "build": {

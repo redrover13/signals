@@ -1,3 +1,5 @@
+#!/usr/bin/env ts-node
+
 /**
  * @fileoverview performance-benchmark module for the mcp component
  *
@@ -8,8 +10,6 @@
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
  */
-
-#!/usr/bin/env ts-node
 
 /**
  * Performance Benchmark Script

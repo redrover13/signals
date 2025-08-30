@@ -33,7 +33,8 @@
     "ts:build:project": "tsc -b",
     "ts:build:libs": "tsc -b libs/*/tsconfig.json",
     "ts:build:apps": "tsc -b apps/*/tsconfig.json",
-    "ts:refs:generate": "node scripts/generate-ts-references.js"
+    "ts:refs:generate": "node scripts/generate-ts-references.js",
+    "secretlint": "secretlint \"**/*\""
   },
   "devDependencies": {
     "@module-federation/nextjs-mf": "^8.8.38",

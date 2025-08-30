@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { validateInput } from "@dulce-de-saigon/security";
-import { z } from "zod";
-const fs = require('fs');
-const path = require('path');
-const _ = require('lodash');
-=======
 /**
  * @fileoverview search module for the routes component
  *
@@ -21,7 +13,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
->>>>>>> main
+import { z } from "zod";
 
 // Input validation schema for search requests
 const searchRequestSchema = z.object({
@@ -37,11 +29,8 @@ const searchRequestSchema = z.object({
 interface SearchRequest {
   tool: string;
   query: string;
-<<<<<<< HEAD
   repoOwner?: string;
   repoName?: string;
-=======
->>>>>>> main
 }
 
 interface SearchResult {
@@ -59,18 +48,6 @@ interface SearchResponse {
 
 export async function searchRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post(
-<<<<<<< HEAD
-    "/semantic-code-search",
-    {
-      preHandler: validateInput(searchRequestSchema),
-    },
-    async function (request: FastifyRequest, reply: FastifyReply) {
-      try {
-        const { query } = request.body as SearchRequest;
-        
-        const results = await performSemanticSearch(query);
-        
-=======
     '/semantic-code-search',
     async function (request: FastifyRequest, reply: FastifyReply) {
       try {
@@ -90,9 +67,8 @@ export async function searchRoutes(fastify: FastifyInstance): Promise<void> {
 
         const results = await performSemanticSearch(body.query);
 
->>>>>>> main
         const response: SearchResponse = {
-          query,
+          query: body.query,
           results,
           totalMatches: results.length,
         };

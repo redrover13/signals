@@ -1,81 +1,131 @@
-# Signals
+# Signals Monorepo
 
 This repository contains the source code for the Signals project, a platform for...
 
-## NX Monorepo
+## Overview
 
-This project is built as an NX monorepo, which provides several benefits:
+The Signals project is a comprehensive F&B data platform designed specifically for the Vietnamese market. It includes a high-performance API, an intelligent agent service, and a user-friendly web application.
 
-- **Caching**: Intelligent caching of build, test, and lint results
-- **Dependency Management**: Clear visualization and management of project dependencies
-- **Code Sharing**: Easy sharing of code between applications
-- **Consistency**: Consistent tools and configurations across projects
-
-### Project Structure
+## Project Structure
 
 The monorepo is organized into the following directories:
 
-- `apps/`: Contains application projects that are deployable
-- `libs/`: Contains library projects that are shared between applications
-- `tools/`: Contains utility scripts and tools for managing the monorepo
-- `infra/`: Contains infrastructure-related code (Terraform, etc.)
-- `docs/`: Contains documentation
+- `apps/`: Contains application projects that are deployable.
+  - `api`: Provides RESTful endpoints for the platform.
+  - `agents`: Orchestrates AI-powered tasks for restaurant operations, customer service, and data analysis.
+  - `frontend-agents`: A Next.js-based web application for interacting with the platform.
+  - `looker-dashboards`: A library for creating Looker dashboards.
+- `libs/`: Contains library projects that are shared between applications.
+  - `adk`: The Agent Development Kit, providing tools for building agents.
+  - `ui/components`: A library of shared UI components.
+- `tools/`: Contains utility scripts and tools for managing the monorepo.
+- `infra/`: Contains infrastructure-related code (Terraform, etc.).
+- `docs/`: Contains documentation.
 
-### Documentation
+## Environment Setup
 
-For more information about the NX configuration, see:
+### Prerequisites
 
-- [NX Configuration Guide](./docs/nx/configuration-guide.md)
-- [Dependency Management](./docs/nx/dependency-management.md)
-- [TypeScript and Linting Standards](./docs/nx/typescript-linting-standards.md)
+- Node.js 18+ or 22+
+- PNPM package manager
+- Google Cloud Platform account with Vertex AI enabled
+- Vietnamese fonts installed on system
+- Modern web browser with UTF-8 support
 
-### Optimization Tools
-
-The monorepo includes several tools for optimization:
+### Installation
 
 ```bash
-# Update project configurations with best practices
-npx ts-node tools/scripts/update-project-configs.ts
-
-# Check for TypeScript issues
-npx ts-node tools/scripts/check-typescript-issues.ts
-
-# Analyze dependencies for issues
-npx ts-node tools/scripts/analyze-dependencies.ts
-
-# Run all optimization tools
-./tools/scripts/run-nx-optimization.sh
+# Install dependencies (from root)
+pnpm install
 ```
 
-## RAG Pipeline Infrastructure
+### Configuration
 
-The Signals platform includes a production-ready RAG (Retrieval-Augmented Generation) pipeline deployed on Google Cloud Platform. This infrastructure enables AI-powered document processing and retrieval capabilities.
+Create a `.env` file in the root of the project and add the following environment variables:
 
-### Key Components
+```bash
+# Required
+PORT=3000
+AGENTS_TOPIC=dulce.agents
 
-- **Cloud Storage**: Document storage and processed chunk storage
-- **BigQuery**: Data warehouse for searchable document chunks
-- **Cloud Functions**: Serverless document processing
-- **Pub/Sub**: Event-driven messaging system
-- **IAM**: Secure service account management
+# Google Cloud (automatically detected if using gcloud auth)
+GOOGLE_APPLICATION_CREDENTIALS=path/to/credentials.json
+GOOGLE_CLOUD_PROJECT=your-project-id
 
-### Infrastructure Status
+# Next.js
+NEXT_PUBLIC_API_BASE=http://localhost:3000
+NEXT_PUBLIC_LOCALE=vi-VN
+NEXT_PUBLIC_CURRENCY=VND
+NEXT_PUBLIC_TIMEZONE=Asia/Ho_Chi_Minh
+NEXT_PUBLIC_GA_ID=GA4-MEASUREMENT-ID
+NEXT_PUBLIC_VIETNAMESE_ANALYTICS=true
+```
 
-✅ **Successfully Deployed**: All GCP resources are active and operational
-- Documents Bucket: `saigon-signals-rag-documents`
-- Chunks Bucket: `saigon-signals-rag-chunks`
-- BigQuery Dataset: `rag_dataset.document_chunks`
-- Cloud Function: `rag-document-processor`
-- Pub/Sub Topic: `rag-document-processing`
+## Development
 
-### Documentation
+### Running the applications
 
-For detailed information about the RAG pipeline:
+```bash
+# Start the API server
+pnpm nx serve api
 
+# Start the agents service
+pnpm nx serve agents
+
+# Start the frontend application
+pnpm nx serve frontend-agents
+```
+
+### Running tests
+
+```bash
+# Run all tests
+pnpm nx test
+
+# Run tests for a specific application
+pnpm nx test api
+```
+
+## Deployment
+
+### Building the applications
+
+```bash
+# Build all applications
+pnpm nx build
+
+# Build a specific application
+pnpm nx build api
+```
+
+### Deploying to Google Cloud
+
+```bash
+# Deploy the API to Cloud Run
+gcloud run deploy dulce-api \
+  --source . \
+  --region asia-southeast1 \
+  --platform managed \
+  --allow-unauthenticated
+
+# Deploy the agents service to Cloud Run
+gcloud run deploy dulce-agents \
+  --source . \
+  --region asia-southeast1 \
+  --platform managed \
+  --allow-unauthenticated
+
+# Deploy the frontend application to Vercel
+vercel
+```
+
+## Documentation
+
+For more detailed information, please refer to the documentation in the `docs/` directory:
+
+- [Architecture Overview](./docs/ARCHITECTURE.md)
+- [CI/CD Workflow](./docs/CI_CD_WORKFLOW.md)
+- [Deployment Guide](./docs/DEPLOYMENT.md)
 - [RAG Pipeline Deployment Guide](./docs/RAG_PIPELINE_DEPLOYMENT.md)
-- [Infrastructure Architecture](./docs/ARCHITECTURE.md)
-- [Deployment Procedures](./docs/DEPLOYMENT.md)
-
-### Usage
-
-Upload documents to the designated Cloud Storage bucket to trigger automatic processing and chunking for AI retrieval.
+- [Vietnamese Localization Guide](./docs/VIETNAMESE_LOCALIZATION.md)
+- [Troubleshooting Guide](./docs/TROUBLESHOOTING.md)

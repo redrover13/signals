@@ -64,18 +64,6 @@
     },
     {
       "path": "./libs/agents/bq-agent"
-    },
-    {
-      "path": "./apps/cloud-functions/social-api"
-    },
-    {
-      "path": "./apps/cloud-functions/reviews-api"
-    },
-    {
-      "path": "./apps/cloud-functions/crm-api"
-    },
-    {
-      "path": "./apps/cloud-functions/cms-api"
     }
   ],
   "exclude": [

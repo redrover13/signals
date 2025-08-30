@@ -320,15 +320,6 @@ export class RequestRouter {
     // Default to priority-based for Vietnamese market stability
     return { type: 'priority-based' };
   }
-        return this.selectByLeastConnections(rules);
-      
-      case 'random':
-        return this.selectByRandom(rules);
-      
-      default:
-        return rules[0]; // Fallback to first available
-    }
-  }
 
   /**
    * Select server by priority (highest first)

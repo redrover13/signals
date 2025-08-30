@@ -31,8 +31,6 @@
         "run",
         "-i",
         "--rm",
-        "-v",
-        "/home/g_nelson/.config/gcloud:/home/g_nelson/.config/gcloud:ro",
         "-e",
         "GOOGLE_APPLICATION_CREDENTIALS=/root/.config/gcloud/application_default_credentials.json",
         "-e",
@@ -177,6 +175,14 @@
     "everything": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-everything"]
+    },
+    "mcp-gemini-google-search": {
+      "command": "npx",
+      "args": ["-y", "mcp-gemini-google-search@latest"],
+      "env": {
+        "GOOGLE_API_KEY": "${GOOGLE_API_KEY}",
+        "GOOGLE_CSE_ID": "${GOOGLE_CSE_ID}"
+      }
     }
   },
   "secrets": {

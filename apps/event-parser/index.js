@@ -14,17 +14,17 @@
  */
 
 // GCP Client Libraries
-const {BigQuery} = require('@google-cloud/bigquery');
-const {Storage} = require('@google-cloud/storage');
-const {v4: uuidv4} = require('uuid');
+import { BigQuery } from '@google-cloud/bigquery';
+import { Storage } from '@google-cloud/storage';
+import { v4 as uuidv4 } from 'uuid';
 
 // OpenTelemetry imports
-const { 
+import { 
   initializeOpenTelemetry,
   withSpan,
   logEvent,
   instrument
-} = require('@nx-monorepo/utils/monitoring');
+} from '@nx-monorepo/utils/monitoring';
 
 // Initialize OpenTelemetry for Cloud Function
 initializeOpenTelemetry({
@@ -62,7 +62,7 @@ const validatePayload = instrument('validate-payload', (payload) => {
   }
 });
 
-exports.parseAgentEvent = async (pubSubMessage, context) => {
+export const parseAgentEvent = async (pubSubMessage, context) => {
   return withSpan('parse-agent-event', async (span) => {
     const eventId = context.eventId || uuidv4();
     const rawMessageBuffer = Buffer.from(pubSubMessage.data, 'base64');

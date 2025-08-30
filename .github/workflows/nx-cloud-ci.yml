@@ -1,0 +1,96 @@
+name: Nx Cloud CI
+
+on:
+  push:
+    branches: [main, develop, staging]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10.0.0'
+  NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+  NX_BRANCH: ${{ github.event.number || github.ref_name }}
+  NX_CLOUD_DISTRIBUTED_EXECUTION: 'true'
+
+jobs:
+  main:
+    name: Nx Cloud Main Job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Initialize Nx Cloud run
+        run: pnpm nx-cloud start-ci-run
+
+      - name: Run lint tasks
+        run: pnpm nx-cloud record -- pnpm nx run-many --target=lint --all --parallel=3
+
+      - name: Run build tasks
+        run: pnpm nx-cloud record -- pnpm nx run-many --target=build --all --parallel=3
+
+      - name: Report affected projects
+        id: affected
+        run: |
+          AFFECTED_APPS=$(pnpm nx show projects --affected --type=app)
+          AFFECTED_LIBS=$(pnpm nx show projects --affected --type=lib)
+          
+          echo "Affected apps: $AFFECTED_APPS"
+          echo "Affected libs: $AFFECTED_LIBS"
+          
+          echo "affected-apps=$(echo $AFFECTED_APPS | tr ' ' ',')" >> $GITHUB_OUTPUT
+          echo "affected-libs=$(echo $AFFECTED_LIBS | tr ' ' ',')" >> $GITHUB_OUTPUT
+
+      - name: Stop Nx Cloud run
+        if: always()
+        run: pnpm nx-cloud stop-all-agents
+
+  agents:
+    name: Nx Cloud Agent ${{ matrix.agent }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        agent: [1, 2, 3, 4]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b8c4212bc8178b24a6daf5e3da8ac9dd35e3bab9 # v4.0.2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start Nx Agent ${{ matrix.agent }}
+        run: pnpm nx-cloud start-agent
+        env:
+          NX_AGENT_NAME: ${{ matrix.agent }}

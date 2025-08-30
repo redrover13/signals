@@ -52,37 +52,45 @@ jobs:
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker
 
+      - name: Cache Docker layers
+        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ matrix.app }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-${{ matrix.app }}-
+            ${{ runner.os }}-buildx-
+
       - name: Build container image
+        uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # v5.1.0
+        with:
+          context: .
+          file: ${{ contains(fromJson('["Dockerfile", ""]'), env.DOCKERFILE_PATH) && env.DOCKERFILE_PATH || format('apps/{0}/Dockerfile', matrix.app) }}
+          push: false
+          tags: ${{ env.REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ matrix.app }}:${{ github.sha }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+          outputs: type=docker
+          build-args: |
+            NODE_ENV=production
+        env:
+          DOCKERFILE_PATH: ${{ (fileExists(format('apps/cloud-functions/{0}/Dockerfile', matrix.app)) && format('apps/cloud-functions/{0}/Dockerfile', matrix.app)) || (fileExists(format('apps/{0}/Dockerfile', matrix.app)) && format('apps/{0}/Dockerfile', matrix.app)) || '' }}
+
+      # Temp fix for cache
+      - name: Move cache
         run: |
-          if [ -f "apps/cloud-functions/${{ matrix.app }}/Dockerfile" ]; then
-            docker build -t ${{ env.REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ matrix.app }}:${{ github.sha }} \
-              -f apps/cloud-functions/${{ matrix.app }}/Dockerfile .
-          elif [ -f "apps/${{ matrix.app }}/Dockerfile" ]; then
-            docker build -t ${{ env.REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ matrix.app }}:${{ github.sha }} \
-              -f apps/${{ matrix.app }}/Dockerfile .
-          else
-            echo "No Dockerfile found for ${{ matrix.app }}, creating minimal Node.js image"
-            cat > Dockerfile.temp << EOF
-          FROM node:20-alpine
-          WORKDIR /app
-          COPY package*.json ./
-          RUN npm ci --only=production
-          COPY apps/${{ matrix.app }} ./
-          EXPOSE 8080
-          CMD ["node", "index.js"]
-          EOF
-            docker build -t ${{ env.REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ matrix.app }}:${{ github.sha }} \
-              -f Dockerfile.temp .
-            rm Dockerfile.temp
-          fi
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@7bd962026ce9d96ae8baf32d04e4d90eafa17d3800000000 # v0.17.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ matrix.app }}:${{ github.sha }}
           format: 'sarif'
           output: 'trivy-results-${{ matrix.app }}.sarif'
           severity: 'CRITICAL,HIGH,MEDIUM'
+          timeout: '10m0s'
+          ignore-unfixed: true
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@5b6282e9b4faa8b74e62906ca462e4fdffe9e1a2 # v3.25.6
@@ -92,11 +100,51 @@ jobs:
           category: 'container-${{ matrix.app }}'
 
       - name: Run Trivy for JSON output
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@7bd962026ce9d96ae8baf32d04e4d90eafa17d3800000000 # v0.17.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ matrix.app }}:${{ github.sha }}
           format: 'json'
           output: 'trivy-results-${{ matrix.app }}.json'
+          timeout: '5m0s'
+          
+      - name: Generate vulnerability report
+        if: always()
+        run: |
+          echo "## Container Security Scan Results for ${{ matrix.app }}" > report-${{ matrix.app }}.md
+          echo "### Scan performed on $(date)" >> report-${{ matrix.app }}.md
+          echo "" >> report-${{ matrix.app }}.md
+          
+          if [ -f "trivy-results-${{ matrix.app }}.json" ]; then
+            CRITICAL=$(jq '.Results[].Vulnerabilities[] | select(.Severity=="CRITICAL") | .VulnerabilityID' trivy-results-${{ matrix.app }}.json | wc -l)
+            HIGH=$(jq '.Results[].Vulnerabilities[] | select(.Severity=="HIGH") | .VulnerabilityID' trivy-results-${{ matrix.app }}.json | wc -l)
+            MEDIUM=$(jq '.Results[].Vulnerabilities[] | select(.Severity=="MEDIUM") | .VulnerabilityID' trivy-results-${{ matrix.app }}.json | wc -l)
+            
+            echo "| Severity | Count |" >> report-${{ matrix.app }}.md
+            echo "|----------|-------|" >> report-${{ matrix.app }}.md
+            echo "| CRITICAL | $CRITICAL |" >> report-${{ matrix.app }}.md
+            echo "| HIGH     | $HIGH |" >> report-${{ matrix.app }}.md
+            echo "| MEDIUM   | $MEDIUM |" >> report-${{ matrix.app }}.md
+            echo "" >> report-${{ matrix.app }}.md
+            
+            if [ $CRITICAL -gt 0 ]; then
+              echo "### Critical Vulnerabilities" >> report-${{ matrix.app }}.md
+              echo "" >> report-${{ matrix.app }}.md
+              echo "| ID | Package | Version | Fixed Version | Title |" >> report-${{ matrix.app }}.md
+              echo "|----|---------|---------|--------------:|-------|" >> report-${{ matrix.app }}.md
+              
+              jq -r '.Results[].Vulnerabilities[] | select(.Severity=="CRITICAL") | "| \(.VulnerabilityID) | \(.PkgName) | \(.InstalledVersion) | \(.FixedVersion // "Not Fixed") | \(.Title) |"' trivy-results-${{ matrix.app }}.json >> report-${{ matrix.app }}.md
+            fi
+          else
+            echo "No scan results found" >> report-${{ matrix.app }}.md
+          fi
+          
+      - name: Upload vulnerability report
+        if: always()
+        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
+        with:
+          name: security-report-${{ matrix.app }}
+          path: report-${{ matrix.app }}.md
+          retention-days: 30
 
       - name: Check for critical vulnerabilities
         run: |

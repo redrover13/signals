@@ -83,7 +83,7 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@7bd962026ce9d96ae8baf32d04e4d90eafa17d3800000000 # v0.17.0
+        uses: aquasecurity/trivy-action@7bd962026ce9d96ae8baf32d04e4d90eafa17d38 # v0.17.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ matrix.app }}:${{ github.sha }}
           format: 'sarif'
@@ -100,7 +100,7 @@ jobs:
           category: 'container-${{ matrix.app }}'
 
       - name: Run Trivy for JSON output
-        uses: aquasecurity/trivy-action@7bd962026ce9d96ae8baf32d04e4d90eafa17d3800000000 # v0.17.0
+        uses: aquasecurity/trivy-action@7bd962026ce9d96ae8baf32d04e4d90eafa17d38 # v0.17.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ matrix.app }}:${{ github.sha }}
           format: 'json'

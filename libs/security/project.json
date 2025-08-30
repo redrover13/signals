@@ -29,5 +29,6 @@
       }
     }
   },
-  "tags": ["type:util", "scope:security"]
+  "tags": ["type:util", "scope:security"],
+  "implicitDependencies": ["gcp-auth"]
 }

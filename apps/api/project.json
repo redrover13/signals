@@ -84,6 +84,9 @@
     "type:application",
     "scope:server"
   ],
+  "implicitDependencies": [
+    "gcp-auth"
+  ],
   "namedInputs": {
     "default": [
       "{projectRoot}/**/*",

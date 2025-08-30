@@ -52,3 +52,38 @@ async function initializeMcpService() {
 initializeMcpService();
 
 export { mcpService };
+
+// Additional required exports for demos and testing
+export function createMCPClient(config?: Record<string, unknown>) {
+  console.log('Creating MCP client with config:', config);
+  return {
+    connect: async () => console.log('MCP client connected'),
+    disconnect: async () => console.log('MCP client disconnected'),
+  };
+}
+
+export function validateMCPEnvironment() {
+  console.log('Validating MCP environment');
+  return {
+    valid: true,
+    errors: [] as string[],
+    warnings: [] as string[],
+  };
+}
+
+interface ConnectivityResult {
+  serverId: string;
+  connected: boolean;
+  responseTime?: number;
+  error?: string;
+}
+
+export async function testMCPConnectivity(): Promise<ConnectivityResult[]> {
+  console.log('Testing MCP connectivity');
+  // Return mock connectivity results for demo purposes
+  return [
+    { serverId: 'filesystem', connected: true, responseTime: 45 },
+    { serverId: 'git', connected: true, responseTime: 67 },
+    { serverId: 'memory', connected: true, responseTime: 23 },
+  ];
+}

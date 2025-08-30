@@ -35,4 +35,4 @@ const moduleFederationConfig = {
   },
 };
 
-export default moduleFederationConfig;
+module.exports = moduleFederationConfig;

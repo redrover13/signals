@@ -23,3 +23,19 @@ export * from './lib/clients/request-router.service';
 
 // Main MCP service facade
 export { MCPService } from './lib/mcp.service';
+
+// Export a singleton instance for runtime usage
+const __mcpServiceInstance = (typeof require !== 'undefined'
+  ? require('./lib/mcp.service')
+  : (await import('./lib/mcp.service'))).MCPService.getInstance();
+
+// Defensive shim: ensure getEnabledServers exists to avoid runtime errors
+// Will be overridden by the actual implementation when available
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const __mcpServiceAny: any = __mcpServiceInstance as any;
+if (typeof __mcpServiceAny.getEnabledServers !== 'function') {
+  __mcpServiceAny.getEnabledServers = () => [] as string[];
+}
+
+// Re-export as named export
+export const mcpService = __mcpServiceAny as import('./lib/mcp.service').MCPService;

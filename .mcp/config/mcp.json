@@ -21,7 +21,7 @@
       ],
       "type": "stdio",
       "env": {
-        "CODACY_ACCOUNT_TOKEN": "XGRPGPYzQLheHvDcCrUT"
+        "CODACY_ACCOUNT_TOKEN": "codacy-token"
       }
     },
     "playwright": {

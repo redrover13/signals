@@ -17,9 +17,23 @@ import {
 } from '@nx-monorepo/adk';
 
 /**
+ * Requirements interface for content generation
+ */
+export interface Requirements {
+  [key: string]: unknown;
+}
+
+/**
+ * Response interface for content generation
+ */
+export interface ContentResponse {
+  content: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
  * Content-specialized agent for generating F&B marketing content
  */
-export class ContentAgent extends DulceLlmAgent {
 export class ContentAgent extends DulceLlmAgent {
   constructor(cfg?: { model?: string; apiKey?: string; tools?: Array<unknown> }) {
     // Guard against missing API key (fail-fast)
@@ -47,21 +61,10 @@ export class ContentAgent extends DulceLlmAgent {
       tools,
     });
   }
-}
 
   /**
    * Generate Vietnamese F&B marketing content
    */
-  // Define in module scope (above class) or import from a shared types module
-  export interface Requirements {
-    [key: string]: unknown;
-  }
-
-  export interface ContentResponse {
-    content: string;
-    metadata?: Record<string, unknown>;
-  }
-
   public async generateContent(
     contentType: string,
     requirements: Requirements
@@ -86,6 +89,7 @@ export class ContentAgent extends DulceLlmAgent {
       messages: [{ role: 'user', content: prompt }],
     });
   }
+
   /**
    * Create social media content for Vietnamese restaurants
    */
@@ -140,7 +144,16 @@ Generate menu content that drives orders and reflects Vietnamese culinary cultur
 /**
  * Factory function to create a Content agent
  */
-export function createContentAgent(): ContentAgent {
+export function createContentAgent(config?: {
+  vertexClient?: any;
+  projectId?: string;
+  language?: string;
+  region?: string;
+  pubSubClient?: any;
+  topicName?: string;
+}): ContentAgent {
+  // For now, just return a new instance
+  // In the future, we can use the config parameters for initialization
   return new ContentAgent();
 }
 

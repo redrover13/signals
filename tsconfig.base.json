@@ -24,6 +24,7 @@
       "@nx-monorepo/utils/gcp-auth": ["libs/utils/gcp-auth/src/index.ts"],
       "@nx-monorepo/utils/monitoring": ["libs/utils/monitoring/src/index.ts"],
       "@nx-monorepo/utils/signals": ["libs/utils/signals/src/index.ts"],
+      "@nx-monorepo/utils/secrets-manager": ["libs/utils/secrets-manager/src/index.ts"],
       "@nx-monorepo/data-models/dbt-models": ["libs/data-models/dbt-models/src/index.ts"],
       "@nx-monorepo/data-models/schemas": ["libs/data-models/schemas/src/index.ts"],
       "@dulce-de-saigon/agents-lib": ["dist/libs/agents/src/index.d.ts"],

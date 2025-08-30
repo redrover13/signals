@@ -15,6 +15,7 @@
  */
 
 import { EventEmitter } from 'events';
+import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import { MCPServerConfig } from '../config/mcp-config.schema';
 import { getCurrentConfig, getCurrentEnvironment } from '../config/environment-config';
 import { ServerHealthService } from './server-health.service';
@@ -48,7 +49,7 @@ export interface MCPServerConnection {
   status: 'connecting' | 'connected' | 'disconnected' | 'error';
   lastConnected?: Date;
   lastError?: Error;
-  process?: NodeJS.Process; // Child process for stdio connections
+  process?: ChildProcessWithoutNullStreams; // Child process for stdio connections
   client?: Record<string, unknown>; // HTTP/WebSocket client
 }
 
@@ -88,11 +89,11 @@ export class MCPClientService extends EventEmitter {
       this.config = getCurrentConfig();
 
       // Initialize enabled servers
-      const enabledServers = this.config.servers.filter((server) => server.enabled);
+      const enabledServers = this.config.servers.filter((server: MCPServerConfig) => server.enabled);
       console.log(`Found ${enabledServers.length} enabled servers`);
 
       // Connect to servers in priority order
-      const sortedServers = enabledServers.sort((a, b) => b.priority - a.priority);
+      const sortedServers = enabledServers.sort((a: MCPServerConfig, b: MCPServerConfig) => b.priority - a.priority);
 
       for (const serverConfig of sortedServers) {
         try {
@@ -133,6 +134,15 @@ export class MCPClientService extends EventEmitter {
     this.connections.set(config.id, connection);
 
     try {
+      // Ensure connection configuration exists
+      if (!config.connection) {
+        config.connection = {
+          type: config.type,
+          endpoint: config.command ? `${config.command} ${(config.args || []).join(' ')}` : '',
+          timeout: config.timeout || 30000,
+        };
+      }
+
       switch (config.connection.type) {
         case 'stdio':
           await this.connectStdio(connection);
@@ -173,7 +183,7 @@ export class MCPClientService extends EventEmitter {
     const config = connection.config;
 
     // Parse command and arguments
-    const [command, ...args] = config.connection.endpoint.split(' ');
+    const [command, ...args] = (config.connection?.endpoint || config.command || '').split(' ');
 
     // Spawn the process
     const spawnedProcess = spawn(command, args, {
@@ -205,12 +215,12 @@ export class MCPClientService extends EventEmitter {
    */
   private async connectHttp(connection: MCPServerConnection): Promise<void> {
     const config = connection.config;
-    const baseURL = config.connection.endpoint;
+    const baseURL = config.connection?.endpoint || `http://${config.host || 'localhost'}:${config.port || 8080}`;
 
     // Create HTTP client (using fetch or axios)
     const client = {
       baseURL,
-      timeout: config.connection.timeout || 30000,
+      timeout: config.connection?.timeout || config.timeout || 30000,
       headers: this.getAuthHeaders(config),
     };
 
@@ -223,7 +233,7 @@ export class MCPClientService extends EventEmitter {
   /**
    * Connect via WebSocket
    */
-  private async connectWebSocket(/* connection: MCPServerConnection */): Promise<void> {
+  private async connectWebSocket(connection: MCPServerConnection): Promise<void> {
     // WebSocket implementation would go here
     throw new Error('WebSocket connections not yet implemented');
   }
@@ -231,7 +241,7 @@ export class MCPClientService extends EventEmitter {
   /**
    * Connect via TCP
    */
-  private async connectTcp(/* connection: MCPServerConnection */): Promise<void> {
+  private async connectTcp(connection: MCPServerConnection): Promise<void> {
     // TCP implementation would go here
     throw new Error('TCP connections not yet implemented');
   }
@@ -294,16 +304,16 @@ export class MCPClientService extends EventEmitter {
     request: MCPRequest,
   ): Promise<unknown> {
     const config = connection.config;
-    const timeout = request.timeout || config.connection.timeout || 30000;
+    const timeout = request.timeout || config.connection?.timeout || config.timeout || 30000;
 
-    switch (config.connection.type) {
+    switch (config.connection?.type || config.type) {
       case 'stdio':
         return this.sendStdioRequest(connection, request, timeout);
       case 'http':
         return this.sendHttpRequest();
       default:
         throw new Error(
-          `Request sending not implemented for connection type: ${config.connection.type}`,
+          `Request sending not implemented for connection type: ${config.connection?.type || config.type}`,
         );
     }
   }
@@ -452,7 +462,7 @@ export class MCPClientService extends EventEmitter {
         // Wait for graceful shutdown or force kill
         await new Promise<void>((resolve) => {
           const timeout = setTimeout(() => {
-            if (connection.process && !connection.process.killed) {
+            if (connection.process && connection.process.exitCode === null) {
               connection.process.kill('SIGKILL');
             }
             resolve();
@@ -522,14 +532,14 @@ export class MCPClientService extends EventEmitter {
     return headers;
   }
 
-  private async waitForConnection(/* connection: MCPServerConnection */): Promise<void> {
+  private async waitForConnection(connection: MCPServerConnection): Promise<void> {
     // Wait for initial handshake or connection confirmation
     return new Promise((resolve) => {
       setTimeout(resolve, 1000); // Simple timeout for now
     });
   }
 
-  private async testHttpConnection(/* connection: MCPServerConnection */): Promise<void> {
+  private async testHttpConnection(connection: MCPServerConnection): Promise<void> {
     // Test HTTP connection with a simple request
     // Implementation would depend on the specific HTTP client used
   }

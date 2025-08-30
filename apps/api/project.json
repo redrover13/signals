@@ -8,26 +8,68 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "node dist/apps/api/main.js",
-        "dependsOn": ["build"]
+        "dependsOn": [
+          "build"
+        ]
       }
     },
     "build": {
       "executor": "nx:run-commands",
       "options": {
         "command": "tsc -p apps/api/tsconfig.json && node -e 'require(\"fs\").cpSync(\"apps/api/src/routes\", \"dist/apps/api/routes\", { recursive: true })'"
-      }
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "generatePackageJson": true,
+          "sourceMap": false
+        },
+        "development": {
+          "optimization": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production",
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ]
     },
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "args": ["**/*.{ts,tsx,js,jsx}"]
-      }
+        "args": [
+          "**/*.{ts,tsx,js,jsx}"
+        ]
+      },
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json"
+      ],
+      "cache": true
     },
     "test": {
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'test placeholder'"
-      }
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      },
+      "inputs": [
+        "default",
+        "^default",
+        "{workspaceRoot}/jest.preset.js"
+      ],
+      "cache": true
     },
     "build-all": {
       "executor": "nx:run-commands",
@@ -37,5 +79,22 @@
       }
     }
   },
-  "tags": ["type:app", "scope:api"]
+  "tags": [
+    "domain:api",
+    "type:application"
+  ],
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/.eslintrc.json"
+    ],
+    "sharedGlobals": []
+  }
 }

@@ -14,4 +14,4 @@ export * from '@nx-monorepo/content-agent';
 export * from '@nx-monorepo/crm-agent';
 export * from '@nx-monorepo/looker-agent';
 export * from '@nx-monorepo/reviews-agent';
-// Note: gemini-orchestrator excluded to prevent circular dependencies
+// Note: gemini-orchestrator is not re-exported to avoid circular dependencies

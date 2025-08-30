@@ -24,7 +24,7 @@ export class GcpInitializationError extends Error {
 }
 
 const getProjectId = memoize((): string => {
-  const projectId = process.env.GCP_PROJECT_ID;
+  const projectId = process.env['GCP_PROJECT_ID'];
   if (!projectId) {
     throw new GcpInitializationError(
       'The GCP_PROJECT_ID environment variable is required but was not set. ' +

@@ -37,9 +37,12 @@ yarn-error.log*
 .env.*
 *.local
 
-# Lockfiles for other package managers
+# Lockfiles for other package managers (standardize on pnpm)
 package-lock.json
 yarn.lock
+npm-shrinkwrap.json
+.yarn/*
+.npm/*
 
 # Terraform
 infra/terraform/.terraform/

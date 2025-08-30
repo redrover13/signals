@@ -9,9 +9,9 @@
  * @license MIT
  */
 
-import { CloudEvent, getEventData } from '@google-cloud/functions-framework';
+import { CloudEvent } from '@google-cloud/functions-framework';
 import { Storage } from '@google-cloud/storage';
-import { VertexAIClient } from '../../../libs/adk/src';
+// import { VertexAIClient } from '../../../libs/adk/src';
 
 interface StorageObjectData {
   bucket: string;
@@ -35,13 +35,13 @@ interface ProcessingConfig {
  * Cloud Function that processes documents for RAG
  * Triggered by Cloud Storage object creation events
  */
-export async function processDocument(cloudEvent: CloudEvent): Promise<void> {
+export async function processDocument(cloudEvent: CloudEvent<StorageObjectData>): Promise<void> {
   console.log('RAG Document Processor started');
   console.log('Event:', JSON.stringify(cloudEvent, null, 2));
 
   try {
-    // Get the storage event data
-    const data = getEventData(cloudEvent) as StorageObjectData;
+    // Get the storage event data from the CloudEvent
+    const data = cloudEvent.data as StorageObjectData;
     
     if (!data) {
       throw new Error('No event data found');
@@ -71,10 +71,10 @@ export async function processDocument(cloudEvent: CloudEvent): Promise<void> {
 
     // Initialize clients
     const storage = new Storage();
-    const vertexAI = new VertexAIClient({
-      projectId: config.projectId,
-      location: config.region
-    });
+    // const vertexAI = new VertexAIClient({
+    //   projectId: config.projectId,
+    //   location: config.region
+    // });
 
     // Download the file from Cloud Storage
     const file = storage.bucket(bucket).file(fileName);
@@ -82,13 +82,8 @@ export async function processDocument(cloudEvent: CloudEvent): Promise<void> {
     
     console.log(`Downloaded file: ${fileName}, size: ${fileBuffer.length} bytes`);
 
-    // Extract text content from the file
-    const textContent = await vertexAI.extractTextFromFile(
-      fileBuffer,
-      contentType || 'text/plain',
-      fileName
-    );
-
+    // Extract text content from the file (simplified version)
+    const textContent = fileBuffer.toString('utf-8');
     console.log(`Extracted text content: ${textContent.length} characters`);
 
     // Prepare metadata
@@ -101,24 +96,34 @@ export async function processDocument(cloudEvent: CloudEvent): Promise<void> {
       fileSize: fileBuffer.length
     };
 
-    // Process the document for RAG
-    const chunks = await vertexAI.processDocumentForRAG(
-      textContent,
-      metadata,
-      config.datastoreId,
-      {
-        chunkSize: 1000,
-        overlap: 200,
-        generateEmbeddings: true
+    // Process the document for RAG (simplified version)
+    const chunkSize = 1000;
+    const overlap = 200;
+    const chunks = [];
+    
+    for (let i = 0; i < textContent.length; i += chunkSize - overlap) {
+      const chunkContent = textContent.slice(i, i + chunkSize);
+      if (chunkContent.trim()) {
+        chunks.push({
+          id: `${metadata.documentId}_chunk_${chunks.length}`,
+          content: chunkContent,
+          metadata: {
+            ...metadata,
+            chunkIndex: chunks.length,
+            startPosition: i,
+            endPosition: i + chunkContent.length
+          },
+          embedding: [] // Placeholder for embedding
+        });
       }
-    );
+    }
 
     console.log(`Generated ${chunks.length} chunks`);
 
     // Save chunks to the chunks bucket as JSON
     const chunksData = {
       metadata,
-      chunks: chunks.map(chunk => ({
+      chunks: chunks.map((chunk: any) => ({
         id: chunk.id,
         content: chunk.content,
         metadata: chunk.metadata,

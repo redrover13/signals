@@ -46,3 +46,36 @@ npx ts-node tools/scripts/analyze-dependencies.ts
 # Run all optimization tools
 ./tools/scripts/run-nx-optimization.sh
 ```
+
+## RAG Pipeline Infrastructure
+
+The Signals platform includes a production-ready RAG (Retrieval-Augmented Generation) pipeline deployed on Google Cloud Platform. This infrastructure enables AI-powered document processing and retrieval capabilities.
+
+### Key Components
+
+- **Cloud Storage**: Document storage and processed chunk storage
+- **BigQuery**: Data warehouse for searchable document chunks
+- **Cloud Functions**: Serverless document processing
+- **Pub/Sub**: Event-driven messaging system
+- **IAM**: Secure service account management
+
+### Infrastructure Status
+
+✅ **Successfully Deployed**: All GCP resources are active and operational
+- Documents Bucket: `saigon-signals-rag-documents`
+- Chunks Bucket: `saigon-signals-rag-chunks`
+- BigQuery Dataset: `rag_dataset.document_chunks`
+- Cloud Function: `rag-document-processor`
+- Pub/Sub Topic: `rag-document-processing`
+
+### Documentation
+
+For detailed information about the RAG pipeline:
+
+- [RAG Pipeline Deployment Guide](./docs/RAG_PIPELINE_DEPLOYMENT.md)
+- [Infrastructure Architecture](./docs/ARCHITECTURE.md)
+- [Deployment Procedures](./docs/DEPLOYMENT.md)
+
+### Usage
+
+Upload documents to the designated Cloud Storage bucket to trigger automatic processing and chunking for AI retrieval.

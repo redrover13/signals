@@ -16,18 +16,7 @@ import {
   HttpRequestTool
 } from '@nx-monorepo/adk';
 
-/**
- * Customer data interface
- */
-export interface CustomerData {
-  customerId: string;
-  name: string;
-  email?: string;
-  phone?: string;
-  preferences?: Record<string, any>;
-  orderHistory?: any[];
-  location?: string;
-}
+import { CustomerData } from '@nx-monorepo/data-models';
 
 /**
  * CRM-specialized agent for customer relationship management

@@ -54,11 +54,26 @@ initializeMcpService();
 export { mcpService };
 
 // Additional required exports for demos and testing
-export function createMCPClient(config?: Record<string, unknown>) {
-  console.log('Creating MCP client with config:', config);
+export type MCPClient = {
+  connect: () => Promise<void>;
+  disconnect: () => Promise<void>;
+};
+
+export function createMCPClient(config?: Record<string, unknown>): MCPClient {
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('Creating MCP client with config:', config);
+  }
   return {
-    connect: async () => console.log('MCP client connected'),
-    disconnect: async () => console.log('MCP client disconnected'),
+    connect: async () => {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('MCP client connected');
+      }
+    },
+    disconnect: async () => {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('MCP client disconnected');
+      }
+    },
   };
 }
 

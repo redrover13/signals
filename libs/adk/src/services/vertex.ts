@@ -2,126 +2,263 @@
  * @fileoverview vertex module for the services component
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
- * Contains implementation for TypeScript functionality using Google's ADK.
+ * Contains implementation for TypeScript functionality.
  *
  * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
  */
 
-import { GeminiLlm, BaseLlm, LlmRequest, LlmResponse } from '@waldzellai/adk-typescript';
+import { PredictionServiceClient } from '@google-cloud/aiplatform';
 
-/**
- * Configuration interface for Vertex AI client using ADK
- */
 export interface VertexAIClientConfig {
-  project?: string;
-  location?: string;
-  endpointId?: string;
-  model?: string;
-  apiKey?: string;
+  projectId: string;
+  location: string;
+  embeddingModel?: string;
+}
+
+export interface DocumentChunk {
+  id: string;
+  content: string;
+  metadata: Record<string, any>;
+  embedding?: number[];
+}
+
+export interface EmbeddingResponse {
+  embeddings: number[][];
+}
+
+export interface SearchResult {
+  id: string;
+  content: string;
+  metadata: Record<string, any>;
+  score: number;
+}
+
+export interface RAGSearchOptions {
+  query: string;
+  maxResults?: number;
+  filter?: Record<string, any>;
 }
 
 /**
- * Vertex AI client implementation using Google's ADK
- * Provides integration with Vertex AI through ADK's LLM abstraction
+ * Enhanced Vertex AI client with RAG capabilities
  */
 export class VertexAIClient {
-  private llm: BaseLlm;
-  private config: VertexAIClientConfig;
+  private predictionClient: PredictionServiceClient;
+  private projectId: string;
+  private location: string;
+  private embeddingModel: string;
 
-  constructor(config: VertexAIClientConfig = {}) {
-    this.config = {
-      project:    config.project    ?? process.env.GCP_PROJECT_ID ?? '',
-      location:   config.location   ?? process.env.GCP_LOCATION   ?? 'us-central1',
-      endpointId: config.endpointId ?? process.env.VERTEX_AI_ENDPOINT_ID,
-      model:      config.model      ?? 'gemini-1.5-pro',
-      apiKey:     config.apiKey     ?? process.env.GOOGLE_API_KEY,
-    };
-    if (!this.config.apiKey)   throw new Error('GOOGLE_API_KEY (apiKey) is required for VertexAIClient');
-    if (!this.config.project)  throw new Error('GCP_PROJECT_ID (project) is required for VertexAIClient');
-
-    // Initialize Gemini LLM using ADK
-    this.llm = new GeminiLlm({
-      apiKey: this.config.apiKey,
-      model:  this.config.model,
-    });
+  constructor(config: VertexAIClientConfig) {
+    this.projectId = config.projectId;
+    this.location = config.location;
+    this.embeddingModel = config.embeddingModel || 'textembedding-gecko@003';
+    
+    this.predictionClient = new PredictionServiceClient();
   }
 
   /**
-   * Make a prediction using the Vertex AI model
-   * @param instancePayload - The input data for prediction
-   * @returns Promise with prediction results
+   * Generate embeddings for text content
    */
-  public async predict(
-    instancePayload: unknown
-  ): Promise<{
-    predictions: string[];
-    metadata: { model?: string; project?: string; location?: string };
-  }> {
+  async generateEmbeddings(texts: string[]): Promise<EmbeddingResponse> {
+    // Use Vertex AI PredictionServiceClient to generate embeddings
+    console.log(`Generating embeddings for ${texts.length} texts`);
+
+    const endpoint = `projects/${this.projectId}/locations/${this.location}/publishers/google/models/${this.embeddingModel}`;
+
+    // Prepare the instances for the request
+    const instances = texts.map(text => ({ content: text }));
+
+    const request = {
+      endpoint,
+      instances,
+    };
+
     try {
-      const request: LlmRequest = {
-        messages: [
-          {
-            role: 'user',
-            content: JSON.stringify(instancePayload),
-          },
-        ],
-      };
-
-      const response: LlmResponse = await this.llm.invoke(request);
-
-      return {
-        predictions: [response.content as string],
-        metadata: {
-          model: this.config.model,
-          project: this.config.project,
-          location: this.config.location,
-        },
-      };
+      const [response] = await this.predictionClient.predict(request);
+      // The embeddings are typically in response.predictions
+      const embeddings: number[][] = response.predictions?.map((pred: any) => pred.embeddings || pred.values || []) || [];
+      return { embeddings };
     } catch (error) {
-      throw new Error(
-        `Vertex AI prediction failed: ${(error as Error)?.message ?? String(error)}`,
-        { cause: error as Error }
-      );
+      console.error('Error generating embeddings from Vertex AI:', error);
+      throw error;
     }
   }
 
   /**
-   * Generate text using the LLM
-   * @param prompt - Input prompt
-   * @param options - Additional generation options
-   * @returns Generated text response
+   * Index document chunks in Vertex AI Search
+   * Note: This is a placeholder implementation for discovery engine functionality
    */
-  async generateText(prompt: string, options?: { maxTokens?: number; temperature?: number }): Promise<string> {
-    const request: LlmRequest = {
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      ...(options?.maxTokens && { max_tokens: options.maxTokens }),
-      ...(options?.temperature && { temperature: options.temperature }),
-    };
-
-    const response = await this.llm.invoke(request);
-    return response.content || '';
+  async indexDocuments(
+    dataStoreId: string,
+    documents: DocumentChunk[]
+  ): Promise<void> {
+    // TODO: Implement with discovery engine client when available
+    console.log(`Indexing ${documents.length} documents to data store ${dataStoreId}`);
+    
+    // For now, log the documents that would be indexed
+    documents.forEach(doc => {
+      console.log(`Document ${doc.id}: ${doc.content.substring(0, 100)}...`);
+    });
   }
 
   /**
-   * Get the underlying LLM instance for advanced usage
-   * @returns The ADK LLM instance
+   * Search for relevant documents using Vertex AI Search
+   * Note: This is a placeholder implementation for discovery engine functionality
    */
-  getLlm(): BaseLlm {
-    return this.llm;
+  async searchDocuments(
+    searchEngineId: string,
+    options: RAGSearchOptions
+  ): Promise<SearchResult[]> {
+    // TODO: Implement with discovery engine client when available
+    console.log(`Searching in engine ${searchEngineId} for: ${options.query}`);
+    
+    // Return mock results for now
+    return [
+      {
+        id: 'mock_result_1',
+        content: `Mock search result for query: ${options.query}`,
+        metadata: { source: 'mock', query: options.query },
+        score: 0.95
+      }
+    ];
   }
 
   /**
-   * Get current configuration
-   * @returns Current client configuration
+   * Process and chunk a document for RAG
    */
-  getConfig(): VertexAIClientConfig {
-    return { ...this.config };
+  chunkDocument(
+    content: string,
+    metadata: Record<string, any> = {},
+    chunkSize = 1000,
+    overlap = 200
+  ): DocumentChunk[] {
+    const chunks: DocumentChunk[] = [];
+    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    
+    let currentChunk = '';
+    let chunkIndex = 0;
+    
+    for (let i = 0; i < sentences.length; i++) {
+      const sentence = sentences[i].trim() + '.';
+      
+      if (currentChunk.length + sentence.length <= chunkSize) {
+        currentChunk += (currentChunk ? ' ' : '') + sentence;
+      } else {
+        if (currentChunk) {
+          chunks.push({
+            id: `${metadata['documentId'] || 'doc'}_chunk_${chunkIndex}`,
+            content: currentChunk,
+            metadata: {
+              ...metadata,
+              chunkIndex,
+              originalLength: content.length
+            }
+          });
+          chunkIndex++;
+        }
+        
+        // Start new chunk with overlap
+        const overlapText = this.getOverlapText(currentChunk, overlap);
+        currentChunk = overlapText + (overlapText ? ' ' : '') + sentence;
+      }
+    }
+    
+    // Add the last chunk
+    if (currentChunk) {
+      chunks.push({
+        id: `${metadata['documentId'] || 'doc'}_chunk_${chunkIndex}`,
+        content: currentChunk,
+        metadata: {
+          ...metadata,
+          chunkIndex,
+          originalLength: content.length
+        }
+      });
+    }
+    
+    return chunks;
+  }
+
+  /**
+   * Get overlap text from the end of a chunk
+   */
+  private getOverlapText(text: string, overlap: number): string {
+    if (text.length <= overlap) return text;
+    
+    const overlapText = text.slice(-overlap);
+    const lastSpaceIndex = overlapText.lastIndexOf(' ');
+    
+    return lastSpaceIndex > 0 ? overlapText.slice(lastSpaceIndex + 1) : overlapText;
+  }
+
+  /**
+   * Extract text content from various file formats
+   */
+  async extractTextFromFile(
+    fileBuffer: Buffer,
+    mimeType: string,
+    fileName: string
+  ): Promise<string> {
+    try {
+      switch (mimeType) {
+        case 'text/plain':
+          return fileBuffer.toString('utf-8');
+        
+        case 'application/json':
+          const jsonData = JSON.parse(fileBuffer.toString('utf-8'));
+          return JSON.stringify(jsonData, null, 2);
+        
+        case 'text/markdown':
+        case 'text/x-markdown':
+          return fileBuffer.toString('utf-8');
+        
+        default:
+          // For unsupported formats, return basic text representation
+          console.warn(`Unsupported file type ${mimeType} for ${fileName}`);
+          return fileBuffer.toString('utf-8');
+      }
+    } catch (error) {
+      throw new Error(`Failed to extract text from ${fileName}: ${error}`);
+    }
+  }
+
+  /**
+   * Complete RAG pipeline: process document, chunk, embed, and index
+   */
+  async processDocumentForRAG(
+    content: string,
+    metadata: Record<string, any>,
+    dataStoreId: string,
+    options: {
+      chunkSize?: number;
+      overlap?: number;
+      generateEmbeddings?: boolean;
+    } = {}
+  ): Promise<DocumentChunk[]> {
+    const {
+      chunkSize = 1000,
+      overlap = 200,
+      generateEmbeddings = true
+    } = options;
+
+    // Chunk the document
+    const chunks = this.chunkDocument(content, metadata, chunkSize, overlap);
+
+    // Generate embeddings if requested
+    if (generateEmbeddings) {
+      const texts = chunks.map(chunk => chunk.content);
+      const embeddingResponse = await this.generateEmbeddings(texts);
+      
+      chunks.forEach((chunk, index) => {
+        chunk.embedding = embeddingResponse.embeddings[index];
+      });
+    }
+
+    // Index the chunks
+    await this.indexDocuments(dataStoreId, chunks);
+
+    return chunks;
   }
 }

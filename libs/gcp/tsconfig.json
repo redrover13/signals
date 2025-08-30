@@ -4,13 +4,19 @@
     "module": "commonjs"
   },
   "files": [],
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", "../gcp-core/src/**/*.ts"],
   "references": [
     {
       "path": "./tsconfig.lib.json"
     },
     {
       "path": "./tsconfig.spec.json"
+    },
+    {
+      "path": "../utils/gcp-auth"
+    },
+    {
+      "path": "../gcp-core"
     }
   ],
   "exclude": [

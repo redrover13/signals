@@ -48,11 +48,13 @@ export class VertexAIClient {
   private predictionClient: PredictionServiceClient;
   private projectId: string;
   private location: string;
+  private endpointId: string;
   private embeddingModel: string;
 
   constructor(config: VertexAIClientConfig) {
     this.projectId = config.projectId;
     this.location = config.location;
+    this.endpointId = config.endpointId;
     this.embeddingModel = config.embeddingModel || 'textembedding-gecko@003';
     
     this.predictionClient = new PredictionServiceClient();
@@ -260,5 +262,14 @@ export class VertexAIClient {
     await this.indexDocuments(dataStoreId, chunks);
 
     return chunks;
+  }
+
+  async predict(instancePayload: any): Promise<any> {
+    const endpoint = `projects/${this.projectId}/locations/${this.location}/endpoints/${this.endpointId}`;
+    const request = {
+      endpoint,
+      instances: [instancePayload],
+    };
+    return this.predictionClient.predict(request);
   }
 }

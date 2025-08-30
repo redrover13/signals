@@ -15,7 +15,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { MCPServerConfig, getCurrentConfig } from '@dulce/agents-sdk';
+import { MCPServerConfig, getCurrentConfig } from '../../../../agents/gemini-orchestrator/src/lib/config';
 import { MCPClientService, MCPServerConnection } from './mcp-client.service';
 
 export interface HealthCheckResult {
@@ -67,7 +67,7 @@ export class ServerHealthService extends EventEmitter {
 
     // Start monitoring for each enabled server
     const enabledServers = this.config.servers.filter(
-      (server) => server.enabled && server.healthCheck,
+      (server: any) => server.enabled && server.healthCheck,
     );
 
     for (const server of enabledServers) {
@@ -355,16 +355,16 @@ export class ServerHealthService extends EventEmitter {
   } {
     const stats = Array.from(this.healthStats.values());
     const totalServers = stats.length;
-    const healthyServers = stats.filter((s) => s.consecutiveFailures === 0).length;
+    const healthyServers = stats.filter((s: any) => s.consecutiveFailures === 0).length;
     const getThreshold = (id: string) =>
-      this.config.servers.find((s) => s.id === id)?.healthCheck?.failureThreshold ?? 3;
+      this.config.servers.find((s: any) => s.id === id)?.healthCheck?.failureThreshold ?? 3;
     const unhealthyServers = stats.filter(
-      (s) => s.consecutiveFailures > 0 && s.consecutiveFailures < getThreshold(s.serverId),
+      (s: any) => s.consecutiveFailures > 0 && s.consecutiveFailures < getThreshold(s.serverId),
     ).length;
     const criticalServers = stats.filter(
-      (s) => s.consecutiveFailures >= getThreshold(s.serverId),
+      (s: any) => s.consecutiveFailures >= getThreshold(s.serverId),
     ).length;
-    const averageUptime = stats.reduce((sum, s) => sum + s.uptime, 0) / totalServers || 0;
+    const averageUptime = stats.reduce((sum, s: any) => sum + s.uptime, 0) / totalServers || 0;
     return {
       totalServers,
       healthyServers,
@@ -378,7 +378,7 @@ export class ServerHealthService extends EventEmitter {
    * Force health check for a specific server
    */
   async forceHealthCheck(serverId: string): Promise<HealthCheckResult | null> {
-    const serverConfig = this.config.servers.find((s) => s.id === serverId);
+    const serverConfig = this.config.servers.find((s: any) => s.id === serverId);
     if (!serverConfig || !serverConfig.healthCheck) {
       return null;
     }

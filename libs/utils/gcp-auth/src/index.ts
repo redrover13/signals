@@ -15,24 +15,7 @@ import { PubSub } from '@google-cloud/pubsub';
 import { PredictionServiceClient, v1 } from '@google-cloud/aiplatform';
 import { GoogleAuth } from 'google-auth-library';
 import { memoize } from 'lodash';
-
-export class GcpInitializationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'GcpInitializationError';
-  }
-}
-
-const getProjectId = memoize((): string => {
-  const projectId = process.env['GCP_PROJECT_ID'];
-  if (!projectId) {
-    throw new GcpInitializationError(
-      'The GCP_PROJECT_ID environment variable is required but was not set. ' +
-        'Please ensure it is provided in the runtime environment.',
-    );
-  }
-  return projectId;
-});
+import { getProjectId, GcpInitializationError } from '@nx-monorepo/gcp-core';
 
 export async function getGoogleCloudCredentials(): Promise<{
   auth: GoogleAuth;

@@ -16,7 +16,7 @@
  */
 
 import { MCPRequest } from './mcp-client.service';
-import { getCurrentConfig, MCPServerConfig } from '@dulce/agents-sdk';
+import { getCurrentConfig, MCPServerConfig } from '../../../../agents/gemini-orchestrator/src/lib/config';
 
 export interface RoutingRule {
   pattern: string | RegExp;

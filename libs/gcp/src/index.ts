@@ -15,7 +15,7 @@
  */
 
 // Re-export core GCP authentication utilities
-export { getProjectId } from '@nx-monorepo/utils/gcp-auth';
+export { getProjectId } from '@nx-monorepo/gcp-core';
 
 /**
  * Query BigQuery
@@ -42,4 +42,3 @@ export async function uploadString(path: string, contents: string, contentType?:
   console.log('Cloud Storage upload:', path, contentType);
   return `gs://${path}`;
 }
-

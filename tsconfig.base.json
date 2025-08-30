@@ -31,6 +31,7 @@
       "@nx-monorepo/security": ["libs/security/src/index.ts"],
       "@nx-monorepo/ui/components": ["libs/ui/components/src/index.ts"],
       "@nx-monorepo/utils/secrets-manager": ["libs/utils/secrets-manager/src/index.ts"],
+      "@nx-monorepo/gcp-core": ["libs/gcp-core/src/index.ts"],
       "@dulce/gcp": ["libs/gcp/src/index.ts"],
       "@dulce-de-saigon/agents-lib": ["libs/agents/src/index.ts"],
       "@/gcp": ["libs/gcp/src/index.ts"]
@@ -54,6 +55,7 @@
   "exclude": ["node_modules", "tmp"],
   "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", "**/*.js"],
   "references": [
-    { "path": "./tsconfig.references.json" }
+    { "path": "./tsconfig.references.json" },
+    { "path": "./libs/gcp-core" }
   ]
 }

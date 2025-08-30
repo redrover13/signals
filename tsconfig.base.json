@@ -32,7 +32,8 @@
       "@nx-monorepo/ui/components": ["libs/ui/components/src/index.ts"],
       "@nx-monorepo/utils/secrets-manager": ["libs/utils/secrets-manager/src/index.ts"],
       "@dulce/gcp": ["libs/gcp/src/index.ts"],
-      "@dulce-de-saigon/agents-lib": ["libs/agents/src/index.ts"]
+      "@dulce-de-saigon/agents-lib": ["libs/agents/src/index.ts"],
+      "@/gcp": ["libs/gcp/src/index.ts"]
     },
     "outDir": "./dist/out-tsc",
     "moduleResolution": "node",

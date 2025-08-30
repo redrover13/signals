@@ -19,7 +19,7 @@ import {
   createMCPClient,
   validateMCPEnvironment,
   testMCPConnectivity,
-} from '@nx-monorepo/mcp';
+} from '../libs/mcp/src/index.js';
 
 async function runMCPDemo() {
   console.log('🚀 Starting MCP Integration Demo...\n');
@@ -51,15 +51,15 @@ async function runMCPDemo() {
     // 3. Test connectivity
     console.log('3. Testing Server Connectivity...');
     const connectivity = await testMCPConnectivity();
-    const connected = connectivity.filter((c) => c.connected);
-    const failed = connectivity.filter((c) => !c.connected);
+    const connected = connectivity.filter((c: any) => c.connected);
+    const failed = connectivity.filter((c: any) => !c.connected);
 
     console.log(`✅ Connected servers: ${connected.length}`);
-    connected.forEach((c) => console.log(`  - ${c.serverId}: ${c.responseTime}ms`));
+    connected.forEach((c: any) => console.log(`  - ${c.serverId}: ${c.responseTime}ms`));
 
     if (failed.length > 0) {
       console.log(`❌ Failed servers: ${failed.length}`);
-      failed.forEach((c) => console.log(`  - ${c.serverId}: ${c.error}`));
+      failed.forEach((c: any) => console.log(`  - ${c.serverId}: ${c.error}`));
     }
     console.log('');
 
@@ -74,7 +74,7 @@ async function runMCPDemo() {
         console.log(`✅ Read package.json: ${pkg.name} v${pkg.version}`);
       }
     } catch (error) {
-      console.log('⚠️  File system test skipped:', error.message);
+      console.log('⚠️  File system test skipped:', error instanceof Error ? error.message : String(error));
     }
 
     // Git operations
@@ -84,7 +84,10 @@ async function runMCPDemo() {
         console.log('✅ Git status retrieved successfully');
       }
     } catch (error) {
-      console.log('⚠️  Git test skipped:', error.message);
+      console.log(
+        '⚠️  Git test skipped:',
+        error instanceof Error ? error.message : String(error)
+      );
     }
 
     // Memory operations
@@ -99,7 +102,7 @@ async function runMCPDemo() {
         console.log('✅ Memory store/retrieve test passed');
       }
     } catch (error) {
-      console.log('⚠️  Memory test skipped:', error.message);
+      console.log('⚠️  Memory test skipped:', error instanceof Error ? error.message : String(error));
     }
 
     // Time operations
@@ -109,7 +112,7 @@ async function runMCPDemo() {
         console.log(`✅ Current time: ${currentTime.result}`);
       }
     } catch (error) {
-      console.log('⚠️  Time test skipped:', error.message);
+      console.log('⚠️  Time test skipped:', error instanceof Error ? error.message : String(error));
     }
 
     console.log('');
@@ -124,7 +127,7 @@ async function runMCPDemo() {
         console.log(`✅ Nx projects found: ${nxProjects.result?.length || 0}`);
       }
     } catch (error) {
-      console.log('⚠️  Nx test skipped:', error.message);
+      console.log('⚠️  Nx test skipped:', error instanceof Error ? error.message : String(error));
     }
 
     // Node.js operations
@@ -134,7 +137,7 @@ async function runMCPDemo() {
         console.log(`✅ Node.js version: ${nodeInfo.result}`);
       }
     } catch (error) {
-      console.log('⚠️  Node.js test skipped:', error.message);
+      console.log('⚠️  Node.js test skipped:', error instanceof Error ? error.message : String(error));
     }
 
     console.log('');
@@ -148,7 +151,7 @@ async function runMCPDemo() {
         console.log('✅ Database connection successful');
       }
     } catch (error) {
-      console.log('⚠️  Database test skipped:', error.message);
+      console.log('⚠️  Database test skipped:', error instanceof Error ? error.message : String(error));
     }
 
     console.log('');
@@ -162,7 +165,7 @@ async function runMCPDemo() {
         console.log(`✅ Web fetch test: ${fetchTest.result?.slice(0, 50)}...`);
       }
     } catch (error) {
-      console.log('⚠️  Web fetch test skipped:', error.message);
+      console.log('⚠️  Web fetch test skipped:', error instanceof Error ? error.message : String(error));
     }
 
     try {
@@ -171,7 +174,7 @@ async function runMCPDemo() {
         console.log(`✅ Search test: Found ${searchTest.result?.length || 0} results`);
       }
     } catch (error) {
-      console.log('⚠️  Search test skipped:', error.message);
+      console.log('⚠️  Search test skipped:', error instanceof Error ? error.message : String(error));
     }
 
     console.log('');
@@ -189,7 +192,7 @@ async function runMCPDemo() {
         console.log('💭 Thinking result preview:', thinkingTest.result?.slice(0, 100) + '...');
       }
     } catch (error) {
-      console.log('⚠️  Sequential thinking test skipped:', error.message);
+      console.log('⚠️  Sequential thinking test skipped:', error instanceof Error ? error.message : String(error));
     }
 
     console.log('');
@@ -234,7 +237,7 @@ async function runMCPDemo() {
 }
 
 // Run the demo
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   runMCPDemo().catch(console.error);
 }
 

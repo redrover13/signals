@@ -1,9 +1,8 @@
 {
-  "name": "gcp",
+  "name": "gcp-core",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/gcp/src",
+  "sourceRoot": "libs/gcp-core/src",
   "projectType": "library",
-  "implicitDependencies": ["gcp-auth"],
   "tags": [
     "domain:gcp",
     "type:library"
@@ -15,11 +14,11 @@
         "{options.outputPath}"
       ],
       "options": {
-        "outputPath": "dist/libs/gcp",
-        "main": "libs/gcp/src/index.ts",
-        "tsConfig": "libs/gcp/tsconfig.lib.json",
+        "outputPath": "dist/libs/gcp-core",
+        "main": "libs/gcp-core/src/index.ts",
+        "tsConfig": "libs/gcp-core/tsconfig.lib.json",
         "assets": [
-          "libs/gcp/*.md"
+          "libs/gcp-core/*.md"
         ]
       },
       "configurations": {
@@ -48,28 +47,9 @@
       "executor": "@nx/eslint:lint",
       "options": {
         "lintFilePatterns": [
-          "libs/gcp/**/*.{ts,tsx,js,jsx}"
+          "libs/gcp-core/**/*.ts"
         ]
-      },
-      "inputs": [
-        "default",
-        "{workspaceRoot}/.eslintrc.json"
-      ],
-      "cache": true
+      }
     }
-  },
-  "namedInputs": {
-    "default": [
-      "{projectRoot}/**/*",
-      "sharedGlobals"
-    ],
-    "production": [
-      "default",
-      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
-      "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/jest.config.[jt]s",
-      "!{projectRoot}/.eslintrc.json"
-    ],
-    "sharedGlobals": []
   }
 }

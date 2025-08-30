@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# Fix for JSON parsing error
-export CODACY_CLI_V2_VERSION="1.0.0-main.354.sha.642d8bf"
 
 
 set -e +o pipefail

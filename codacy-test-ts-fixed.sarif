@@ -1,0 +1,84 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "runs": [
+    {
+      "artifacts": [
+        {
+          "location": {
+            "uri": "file:///home/g_nelson/signals-1/libs/gcp-core/src/index.ts"
+          }
+        }
+      ],
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "toolConfigurationNotifications": [
+            {
+              "descriptor": {
+                "id": "ESL0999"
+              },
+              "level": "warning",
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "index": 0,
+                      "uri": "file:///home/g_nelson/signals-1/libs/gcp-core/src/index.ts"
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": "File ignored because of a matching ignore pattern. Use \"--no-ignore\" to disable file ignore settings or use \"--no-warn-ignored\" to suppress this warning."
+              }
+            }
+          ]
+        }
+      ],
+      "results": [],
+      "tool": {
+        "driver": {
+          "informationUri": "https://eslint.org",
+          "name": "ESLint",
+          "rules": null,
+          "version": "8.57.0"
+        }
+      }
+    },
+    {
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "toolExecutionNotifications": []
+        }
+      ],
+      "results": [],
+      "tool": {
+        "driver": {
+          "name": "Semgrep OSS",
+          "rules": null,
+          "semanticVersion": "1.78.0"
+        }
+      }
+    },
+    {
+      "columnKind": "utf16CodeUnits",
+      "originalUriBaseIds": {
+        "ROOTPATH": {
+          "uri": "file:///home/g_nelson/signals-1/libs/gcp-core/src/index.ts/"
+        }
+      },
+      "results": [],
+      "tool": {
+        "driver": {
+          "fullName": "Trivy Vulnerability Scanner",
+          "informationUri": "https://github.com/aquasecurity/trivy",
+          "name": "Trivy",
+          "rules": null,
+          "version": "0.65.0"
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}

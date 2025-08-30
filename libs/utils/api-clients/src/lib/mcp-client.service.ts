@@ -15,8 +15,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { MCPServerConfig } from '../config/mcp-config.schema';
-import { getCurrentConfig, getCurrentEnvironment } from '../config/environment-config';
+import { MCPServerConfig, MCPEnvironmentConfig, getCurrentConfig, getCurrentEnvironment } from '../../../../agents/gemini-orchestrator/src/lib/config';
 import { ServerHealthService } from './server-health.service';
 import { RequestRouter } from './request-router.service';
 

@@ -84,7 +84,10 @@ async function runMCPDemo() {
         console.log('✅ Git status retrieved successfully');
       }
     } catch (error) {
-      console.log('⚠️  Git test skipped:', error instanceof Error ? error instanceof Error ? error.message : String(error) : String(error));
+      console.log(
+        '⚠️  Git test skipped:',
+        error instanceof Error ? error.message : String(error)
+      );
     }
 
     // Memory operations

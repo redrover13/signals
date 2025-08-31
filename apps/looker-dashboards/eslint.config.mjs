@@ -1,20 +1,9 @@
-import baseConfig from '../../.eslintrc.json';
-import jsoncParser from 'jsonc-eslint-parser';
+import { readFileSync } from 'fs';
+
+// Read and parse JSON configuration
+const baseConfigStr = readFileSync('../../.eslintrc.json', 'utf8');
+const baseConfig = JSON.parse(baseConfigStr);
 
 export default [
-  ...baseConfig,
-  {
-    files: ['**/*.json'],
-    rules: {
-      '@nx/dependency-checks': [
-        'error',
-        {
-          ignoredFiles: ['{projectRoot}/eslint.config.{js,cjs,mjs,ts,cts,mts}'],
-        },
-      ],
-    },
-    languageOptions: {
-      parser: jsoncParser,
-    },
-  },
+    ...baseConfig
 ];

@@ -14,8 +14,17 @@
  * Provides common GCP service integrations
  */
 
-// Re-export core GCP authentication utilities
-export { getProjectId } from '@nx-monorepo/gcp-core';
+// Inline getProjectId function to avoid import issues
+export const getProjectId = (): string => {
+  const projectId = process.env['GCP_PROJECT_ID'];
+  if (!projectId) {
+    throw new Error(
+      'The GCP_PROJECT_ID environment variable is required but was not set. ' +
+        'Please ensure it is provided in the runtime environment.',
+    );
+  }
+  return projectId;
+};
 
 /**
  * Query BigQuery

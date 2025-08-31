@@ -159,7 +159,7 @@ jobs:
         run: |
           echo "🧪 Running unit tests..."
           set +e
-          pnpm nx test --parallel=3 --ci --skip-nx-cache
+          pnpm exec nx test --parallel=3 --ci --skip-nx-cache
           TEST_EXIT_CODE=$?
           set -e
           
@@ -175,7 +175,7 @@ jobs:
         run: |
           echo "🏗️ Building applications..."
           # Build only the applications that don't have config issues
-          pnpm nx build mcp || echo "MCP build skipped"
+          pnpm exec nx build mcp || echo "MCP build skipped"
           # Other builds can be added here as configs are fixed
 
       - name: Security scan

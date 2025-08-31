@@ -130,7 +130,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -140,7 +140,7 @@ jobs:
           version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
@@ -225,7 +225,7 @@ jobs:
       core-plan-id: ${{ steps.core-plan.outputs.plan-id }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
 
       - name: Authenticate to GCP
         uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
@@ -292,7 +292,7 @@ jobs:
       deployment-url: ${{ steps.deploy.outputs.deployment-url }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
 
       - name: Download build artifacts
         uses: actions/download-artifact@694a571876d6598ad8b4a2365a1d88cd1a5c6473 # v4.0.0
@@ -345,10 +345,10 @@ jobs:
     if: needs.determine-strategy.outputs.run-load-tests == 'true' && needs.determine-strategy.outputs.environment == 'staging'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
 
       - name: Setup Node.js for load testing
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -523,7 +523,7 @@ jobs:
     environment: production
     steps:
       - name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
 
       - name: Download build artifacts
         uses: actions/download-artifact@694a571876d6598ad8b4a2365a1d88cd1a5c6473 # v4.0.0

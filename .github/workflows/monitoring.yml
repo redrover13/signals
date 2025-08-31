@@ -62,7 +62,7 @@ jobs:
             project: saigon-signals-staging
     steps:
       - name: Checkout code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
         with:
@@ -226,12 +226,12 @@ jobs:
           - environment: production
             project: saigon-signals
       - name: Checkout code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
           - environment: staging
             project: saigon-signals-staging
     steps:
       - name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.1.0
@@ -240,7 +240,7 @@ jobs:
           run_install: false
 
       - name: Setup pnpm cache
-        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
+        uses: actions/cache@v4
         with:
           path: |
             ${{ env.STORE_PATH }}
@@ -249,7 +249,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
           
       - name: Setup Node.js
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -353,7 +353,7 @@ jobs:
   # SECURITY MONITORING
   # ============================================================================
       - name: Checkout code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
   security-monitoring:
     name: Security Monitoring
     runs-on: ubuntu-latest
@@ -362,7 +362,7 @@ jobs:
     if: github.event.schedule == '0 6 * * *' || inputs.check_type == 'security' || inputs.check_type == 'comprehensive'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.1.0
@@ -371,7 +371,7 @@ jobs:
           run_install: false
 
       - name: Setup pnpm cache
-        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
+        uses: actions/cache@v4
         with:
           path: |
             ${{ env.STORE_PATH }}
@@ -380,7 +380,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
           
       - name: Setup Node.js
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -496,7 +496,7 @@ jobs:
             project: saigon-signals-staging
     steps:
       - name: Checkout code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2

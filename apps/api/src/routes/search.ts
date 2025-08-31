@@ -12,7 +12,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import { z } from "zod";
 
 // Input validation schema for search requests

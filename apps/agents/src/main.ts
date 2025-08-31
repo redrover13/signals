@@ -15,6 +15,7 @@ import { registerSecurity, loadAppConfig } from "@dulce-de-saigon/security";
 import { VertexAIClient, VertexAIClientConfig } from "@nx-monorepo/adk";
 import { WebAnalyticsTracker } from "@nx-monorepo/adk";
 import { EventCategory } from "@nx-monorepo/adk";
+import { createConfigFromEnv } from "@nx-monorepo/adk";
 import { mcpService } from '@nx-monorepo/mcp';
 import { 
   initializeOpenTelemetry, 
@@ -35,9 +36,20 @@ initializeOpenTelemetry({
   enableBigQueryLogs: true,
 }).catch(console.error);
 
+// Initialize configuration from environment
+const config = createConfigFromEnv({
+  gcp: {
+    projectId: process.env.GCP_PROJECT_ID || "324928471234",
+    location: process.env.GCP_LOCATION || "us-central1"
+  },
+  agent: {
+    model: 'gemini-1.5-pro'
+  }
+});
+
 // Initialize the analytics tracker
 const analyticsTracker = new WebAnalyticsTracker({
-  projectId: process.env.GCP_PROJECT_ID || '324928471234',
+  projectId: config.get('gcp.projectId'),
   datasetId: process.env.BQ_DATASET_ID || 'analytics',
   tableId: process.env.BQ_TABLE_ID || 'events',
 });
@@ -51,8 +63,8 @@ const fastify = Fastify({
 // Configuration should come from environment variables, not be hardcoded.
 // Cấu hình nên được lấy từ biến môi trường.
 const vertexAIConfig: VertexAIClientConfig = {
-  project: process.env.GCP_PROJECT_ID || "324928471234",
-  location: process.env.GCP_LOCATION || "us-central1",
+  project: config.get('gcp.projectId'),
+  location: config.get('gcp.location'),
   endpointId: process.env.VERTEX_AI_ENDPOINT_ID || "839281723491823912",
 };
 

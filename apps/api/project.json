@@ -20,10 +20,9 @@
       ],
       "options": {
         "outputPath": "dist/apps/api",
-        "main": "apps/api/src/main.ts",
         "tsConfig": "apps/api/tsconfig.json",
         "assets": [
-          "apps/api/src/routes"
+          { "glob": "**/*", "input": "apps/api/src/routes", "output": "routes" }
         ]
       },
       "configurations": {

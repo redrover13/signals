@@ -4,10 +4,10 @@
     "noEmit": true
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js",
-    "**/*.jsx"
+    "libs/**/*.ts",
+    "tools/**/*.ts",
+    "scripts/**/*.ts",
+    "**/*.d.ts"
   ],
   "exclude": [
     "node_modules",
@@ -15,6 +15,10 @@
     "coverage",
     "*.generated.*",
     "**/*.spec.ts",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "apps/**/*",
+    "agent-frontend/**/*",
+    "**/*.tsx",
+    "**/*.jsx"
   ]
 }

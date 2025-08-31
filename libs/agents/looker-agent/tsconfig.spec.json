@@ -13,7 +13,9 @@
     "jest.config.ts",
     "src/**/*.test.ts",
     "src/**/*.spec.ts",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "**/*.spec.ts",
+    "**/*.test.ts"
   ],
   "exclude": [
     "node_modules",

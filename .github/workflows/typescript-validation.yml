@@ -44,9 +44,6 @@ jobs:
           npx tsc --noEmit --skipLibCheck
           echo "✅ TypeScript compilation successful"
 
-              echo "🔍 Building TypeScript project references..."
-              npx tsc -b tsconfig.references.json --listFilesOnly
-              echo "✅ TypeScript project references validation successful"
           npx tsc -b tsconfig.references.json --dry
           echo "✅ TypeScript project references validation successful"
 

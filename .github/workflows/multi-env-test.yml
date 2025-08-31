@@ -57,6 +57,35 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Create .env.local for CI
+        run: |
+          cat > .env.local << EOL
+          # API Environment Variables
+          API_PORT=3333
+          API_HOST=localhost
+          API_PREFIX=/api
+          API_CORS_ORIGIN=*
+
+          # Agents Environment Variables
+          AGENTS_PORT=3334
+          AGENTS_HOST=localhost
+          AGENTS_PREFIX=/agents
+          AGENTS_CORS_ORIGIN=*
+
+          # Web Environment Variables
+          NEXT_PUBLIC_API_BASE=http://localhost:3333/api
+
+          # Agent Frontend Environment Variables
+          VITE_GEMINI_API_KEY=dummy-key
+          VITE_GCP_PROJECT_ID=dummy-project
+          VITE_FIREBASE_API_KEY=dummy-firebase-key
+          VITE_FIREBASE_AUTH_DOMAIN=dummy-auth-domain
+          VITE_FIREBASE_PROJECT_ID=dummy-project
+          VITE_FIREBASE_STORAGE_BUCKET=dummy-storage
+          VITE_FIREBASE_MESSAGING_SENDER_ID=dummy-sender
+          VITE_FIREBASE_APP_ID=dummy-app-id
+          EOL
+
       - name: Run type checking
         run: pnpm nx run-many -t type-check --all --parallel=3
 
@@ -87,7 +116,7 @@ jobs:
           }
 
       - name: Upload test results
-        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results-${{ matrix.os }}-node${{ matrix.node-version }}

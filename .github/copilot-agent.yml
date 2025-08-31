@@ -1,0 +1,9 @@
+name: Copilot Agent Configuration
+
+# Configure allowed connections for the Copilot coding agent
+allowlist:
+  # Allow connections to Nx Cloud services for distributed execution and caching
+  hosts:
+    - "cloud.nx.app"
+    - "nx.app"
+    - "*.nx.app"

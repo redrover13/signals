@@ -38,7 +38,7 @@ jobs:
           echo "affected_projects=$AFFECTED_PROJECTS" >> $GITHUB_OUTPUT
 
       - name: Label based on affected projects
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffb3087d91ff2b # v7.0.1
+        uses: actions/github-script@v7.0.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |

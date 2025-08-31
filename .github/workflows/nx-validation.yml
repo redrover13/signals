@@ -60,7 +60,7 @@ jobs:
           npx nx affected --target=build
       
       - name: Upload validation reports
-        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
+        uses: actions/upload-artifact@v4.3.0
         with:
           name: validation-reports
           path: |

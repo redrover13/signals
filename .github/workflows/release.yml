@@ -275,7 +275,7 @@ jobs:
       # Upload breaking changes artifact
       - name: Upload breaking changes
         if: hashFiles('breaking-changes.txt') != ''
-        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
+        uses: actions/upload-artifact@v4.3.0
         with:
           name: breaking-changes
           path: breaking-changes.txt
@@ -390,7 +390,7 @@ jobs:
 
       # Download breaking changes artifact
       - name: Download breaking changes
-        uses: actions/download-artifact@694a571876d6598ad8b4a2365a1d88cd1a5c6473 # v4.0.0
+        uses: actions/download-artifact@v4.0.0
         with:
           name: breaking-changes
           path: .
@@ -399,7 +399,7 @@ jobs:
       # Create GitHub release
       - name: Create GitHub Release
         id: release
-        uses: actions/create-release@5b78d9bfd51970a06a83574aaea8d585d1fe8fd1 # v1.1.4
+        uses: actions/create-release@v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -476,7 +476,7 @@ jobs:
 
       # Create release announcement
       - name: Create release announcement
-        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
+        uses: actions/github-script@v7.0.1
         with:
           script: |
             const title = `🎉 Release v${{ needs.prepare-release.outputs.next-version }} is now available!`;
@@ -518,7 +518,7 @@ jobs:
 
       # Update project boards or issues
       - name: Update project management
-        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
+        uses: actions/github-script@v7.0.1
         with:
           script: |
             // Close issues that are fixed in this release
@@ -605,7 +605,7 @@ jobs:
       # Alert on validation failure
       - name: Alert on validation failure
         if: failure()
-        uses: actions/github-script@60a0d83039c74a4aee543508d9ffb3087d91ff2b # v7.0.1
+        uses: actions/github-script@v7.0.1
         with:
           script: |
             const title = `🚨 Release Validation Failed - v${{ needs.prepare-release.outputs.next-version }}`;

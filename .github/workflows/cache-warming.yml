@@ -70,7 +70,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@2b51285786e4a1181b7a0b3a6f50d8390f18b788 # v3.2.0
+        uses: docker/setup-buildx-action@v3.2.0
 
       - name: Cache Docker layers
         uses: actions/cache@v4
@@ -82,7 +82,7 @@ jobs:
             ${{ runner.os }}-buildx-
 
       - name: Build image for cache
-        uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # v5.1.0
+        uses: docker/build-push-action@v5.1.0
         with:
           context: .
           file: ${{ contains(fromJson('["Dockerfile", ""]'), env.DOCKERFILE_PATH) && env.DOCKERFILE_PATH || format('apps/{0}/Dockerfile', matrix.app) }}

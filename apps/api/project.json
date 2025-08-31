@@ -14,9 +14,17 @@
       }
     },
     "build": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
-        "command": "tsc -p apps/api/tsconfig.json && node -e 'require(\"fs\").cpSync(\"apps/api/src/routes\", \"dist/apps/api/routes\", { recursive: true })'"
+        "outputPath": "dist/apps/api",
+        "main": "apps/api/src/main.ts",
+        "tsConfig": "apps/api/tsconfig.json",
+        "assets": [
+          "apps/api/src/routes"
+        ]
       },
       "configurations": {
         "production": {

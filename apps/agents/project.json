@@ -11,9 +11,14 @@
       }
     },
     "build": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
-        "command": "tsc -p apps/agents/tsconfig.json"
+        "outputPath": "dist/apps/agents",
+        "main": "apps/agents/src/main.ts",
+        "tsConfig": "apps/agents/tsconfig.json"
       },
       "configurations": {
         "production": {

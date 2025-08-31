@@ -3,9 +3,15 @@
   "compilerOptions": {
     "declaration": true,
     "outDir": "../../../dist/out-tsc",
-    "types": ["node"]
+    "types": [
+      "node"
+    ],
+    "composite": true,
+    "declarationMap": true
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*"
+  ],
   "exclude": [
     "jest.config.ts",
     "src/**/*.spec.ts",

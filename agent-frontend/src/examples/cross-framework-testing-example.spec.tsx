@@ -67,6 +67,8 @@ describe('ExampleButton', () => {
   });
 });
 
+// Example test with lifecycle hooks
+describe('Test lifecycle', () => {
   // Example of using beforeEach and afterEach (works in both Jest and Vitest)
   beforeEach(() => {
     // Setup code
@@ -75,6 +77,10 @@ describe('ExampleButton', () => {
 
   afterEach(() => {
     // Cleanup code
+  });
+
+  it('runs lifecycle hooks properly', () => {
+    expect(true).toBe(true);
   });
 });
 

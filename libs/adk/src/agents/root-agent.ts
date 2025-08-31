@@ -9,8 +9,8 @@
  * @license MIT
  */
 
-import { DulceLlmAgent, DulceBaseAgent } from './base-agent';
-import { GeminiLlm } from '@waldzellai/adk-typescript';
+import { DulceLlmAgent } from './base-agent';
+import { GeminiLlm, InvocationContext } from '@waldzellai/adk-typescript';
 import { GCP_TOOLS } from '../tools/gcp-tools';
 
 /**
@@ -35,13 +35,13 @@ export interface SubAgentStatus {
 /**
  * Root agent class for coordinating multiple specialized agents
  */
-export class RootAgent {
-  private subAgents: Map<string, DulceLlmAgent>;
+export class RootAgent extends DulceLlmAgent {
+  private registeredAgents: Map<string, DulceLlmAgent>;
 
   constructor() {
     const llm = new GeminiLlm({
       model: 'gemini-1.5-pro',
-      apiKey: process.env.GOOGLE_API_KEY,
+      apiKey: process.env['GOOGLE_API_KEY'] || 'default-key',
     });
 
     super({
@@ -51,21 +51,21 @@ export class RootAgent {
       tools: GCP_TOOLS,
     });
 
-    this.subAgents = new Map();
+    this.registeredAgents = new Map();
   }
 
   /**
    * Register a sub-agent
    */
   registerSubAgent(name: string, agent: DulceLlmAgent): void {
-    this.subAgents.set(name, agent);
+    this.registeredAgents.set(name, agent);
   }
 
   /**
    * Get list of available sub-agents
    */
   getAvailableAgents(): string[] {
-    return Array.from(this.subAgents.keys());
+    return Array.from(this.registeredAgents.keys());
   }
 
   /**
@@ -99,10 +99,11 @@ Consider Vietnamese F&B market specifics and data privacy regulations.
 Available tools: ${GCP_TOOLS.map(tool => tool.name).join(', ')}
     `;
 
-    return this.invoke({
-      messages: [{ role: 'user', content: prompt }],
-      context: { task, originalContext: context },
-    });
+    return this.runAsync({
+      userContent: { role: 'user', parts: [{ text: prompt }] },
+      session: null,
+      invocationId: `task_${Date.now()}`,
+    } as InvocationContext);
   }
 
   /**
@@ -130,14 +131,15 @@ Available tools: ${GCP_TOOLS.map(tool => tool.name).join(', ')}
         if (step.agentName === 'root') {
           result = await this.routeTask(step.task, resolvedContext);
         } else {
-          const agent = this.subAgents.get(step.agentName);
+          const agent = this.registeredAgents.get(step.agentName);
           if (!agent) {
             throw new Error(`Agent '${step.agentName}' not found`);
           }
-          result = await agent.invoke({
-            messages: [{ role: 'user', content: step.task }],
-            context: resolvedContext,
-          });
+          result = await agent.runAsync({
+            userContent: { role: 'user', parts: [{ text: step.task }] },
+            session: null,
+            invocationId: `step_${Date.now()}`,
+          } as InvocationContext);
         }
 
         results.push({
@@ -176,7 +178,7 @@ Available tools: ${GCP_TOOLS.map(tool => tool.name).join(', ')}
    * Get agent status and health
    */
   public async getStatus(): Promise<RootAgentStatus> {
-    const subAgentStatuses: SubAgentStatus[] = Array.from(this.subAgents.entries()).map(([name, agent]) => ({
+    const subAgentStatuses: SubAgentStatus[] = Array.from(this.registeredAgents.entries()).map(([name, agent]) => ({
       name,
       description: agent.getDescription(),
       status: 'active',

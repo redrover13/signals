@@ -53,7 +53,7 @@ jobs:
       - name: TypeScript strict checks
         run: |
           echo "🔍 Running strict TypeScript checks..."
-          npx tsc --noEmit --strict --noImplicitAny --noImplicitReturns --noFallthroughCasesInSwitch
+          npx tsc -p tsconfig.json --noEmit --strict --noImplicitAny --noImplicitReturns --noFallthroughCasesInSwitch
           echo "✅ Strict TypeScript checks passed"
 
       - name: Check for TypeScript issues

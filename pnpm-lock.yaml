@@ -149,27 +149,6 @@ importers:
       '@nx/workspace':
         specifier: 21.4.1
         version: 21.4.1(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))
-      '@opentelemetry/api':
-        specifier: ^1.9.0
-        version: 1.9.0
-      '@opentelemetry/auto-instrumentations-node':
-        specifier: ^0.62.1
-        version: 0.62.1(@opentelemetry/api@1.9.0)(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(encoding@0.1.13)
-      '@opentelemetry/core':
-        specifier: ^2.0.1
-        version: 2.0.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/resources':
-        specifier: ^2.0.1
-        version: 2.0.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/sdk-node':
-        specifier: ^0.203.0
-        version: 0.203.0(@opentelemetry/api@1.9.0)
-      '@opentelemetry/sdk-trace-base':
-        specifier: ^2.0.1
-        version: 2.0.1(@opentelemetry/api@1.9.0)
-      '@opentelemetry/semantic-conventions':
-        specifier: ^1.36.0
-        version: 1.36.0
       '@secretlint/secretlint-rule-preset-recommend':
         specifier: ^11.0.2
         version: 11.0.2
@@ -233,9 +212,6 @@ importers:
       '@vitest/ui':
         specifier: ^3.0.0
         version: 3.2.4(vitest@3.2.4)
-      '@waldzellai/adk-typescript':
-        specifier: ^0.1.0
-        version: 0.1.0(encoding@0.1.13)(ws@8.18.0)(zod@4.1.5)
       babel-jest:
         specifier: ^30.0.2
         version: 30.0.5(@babel/core@7.28.3)
@@ -326,9 +302,6 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
-      uuid:
-        specifier: ^9.0.0
-        version: 9.0.1
       verdaccio:
         specifier: ^6.0.5
         version: 6.1.6(encoding@0.1.13)(typanion@3.14.0)
@@ -425,7 +398,7 @@ importers:
     devDependencies:
       '@nx/next':
         specifier: 21.4.0
-        version: 21.4.0(b71b4c18410a994a1f003429381d5144)
+        version: 21.4.0(3058b5f8cb2bbf4fb69b97ba2409ad14)
       '@types/node':
         specifier: ^20
         version: 20.19.11
@@ -14147,19 +14120,19 @@ snapshots:
       - vue-tsc
       - webpack-cli
 
-  '@nx/next@21.4.0(b71b4c18410a994a1f003429381d5144)':
+  '@nx/next@21.4.0(3058b5f8cb2bbf4fb69b97ba2409ad14)':
     dependencies:
       '@babel/plugin-proposal-decorators': 7.28.0(@babel/core@7.28.3)
       '@nx/devkit': 21.4.0(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))
       '@nx/eslint': 21.4.0(@babel/traverse@7.28.3)(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))(@zkochan/js-yaml@0.0.7)(eslint@9.34.0(jiti@2.4.2))(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))(verdaccio@6.1.6(encoding@0.1.13)(typanion@3.14.0))
       '@nx/js': 21.4.0(@babel/traverse@7.28.3)(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))(verdaccio@6.1.6(encoding@0.1.13)(typanion@3.14.0))
-      '@nx/react': 21.4.0(2be67843455e6b3d9fda9275c8defd20)
+      '@nx/react': 21.4.0(fc3a0aef54c2e1fa10cda75c132a8ec9)
       '@nx/web': 21.4.0(@babel/traverse@7.28.3)(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))(verdaccio@6.1.6(encoding@0.1.13)(typanion@3.14.0))
       '@nx/webpack': 21.4.0(@babel/traverse@7.28.3)(@rspack/core@1.4.11(@swc/helpers@0.5.17))(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9)(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))(typescript@5.9.2)(verdaccio@6.1.6(encoding@0.1.13)(typanion@3.14.0))
       '@phenomnomnominal/tsquery': 5.0.1(typescript@5.9.2)
       '@svgr/webpack': 8.1.0(typescript@5.9.2)
-      copy-webpack-plugin: 10.2.4(webpack@5.99.9(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
-      file-loader: 6.2.0(webpack@5.99.9(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
+      copy-webpack-plugin: 10.2.4(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
+      file-loader: 6.2.0(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
       ignore: 5.3.2
       next: 15.4.7(@babel/core@7.28.3)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.90.0)
       semver: 7.7.2
@@ -14342,7 +14315,7 @@ snapshots:
   '@nx/nx-win32-x64-msvc@21.4.1':
     optional: true
 
-  '@nx/react@21.4.0(2be67843455e6b3d9fda9275c8defd20)':
+  '@nx/react@21.4.0(fc3a0aef54c2e1fa10cda75c132a8ec9)':
     dependencies:
       '@nx/devkit': 21.4.0(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))
       '@nx/eslint': 21.4.0(@babel/traverse@7.28.3)(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))(@zkochan/js-yaml@0.0.7)(eslint@9.34.0(jiti@2.4.2))(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))(verdaccio@6.1.6(encoding@0.1.13)(typanion@3.14.0))
@@ -14354,7 +14327,7 @@ snapshots:
       '@phenomnomnominal/tsquery': 5.0.1(typescript@5.9.2)
       '@svgr/webpack': 8.1.0(typescript@5.9.2)
       express: 4.21.2
-      file-loader: 6.2.0(webpack@5.99.9(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
+      file-loader: 6.2.0(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
       http-proxy-middleware: 3.0.5
       minimatch: 9.0.3
       picocolors: 1.1.1
@@ -16925,7 +16898,7 @@ snapshots:
       sirv: 3.0.1
       tinyglobby: 0.2.14
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@24.3.0)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(less@4.4.1)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(tsx@4.20.5)(yaml@2.8.1)
+      vitest: 3.2.4(@types/node@20.19.11)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@26.1.0)(less@4.4.1)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(tsx@4.20.5)(yaml@2.8.1)
 
   '@vitest/utils@3.2.4':
     dependencies:
@@ -19238,12 +19211,6 @@ snapshots:
       loader-utils: 2.0.4
       schema-utils: 3.3.0
       webpack: 5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9)
-
-  file-loader@6.2.0(webpack@5.99.9(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9)):
-    dependencies:
-      loader-utils: 2.0.4
-      schema-utils: 3.3.0
-      webpack: 5.99.9(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9)
 
   file-type@20.5.0:
     dependencies:

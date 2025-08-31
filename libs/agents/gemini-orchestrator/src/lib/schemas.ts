@@ -1,6 +1,9 @@
 /**
  * @fileoverview This file contains the schemas for the Gemini Orchestrator.
  *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Defines schemas for input/output validation in the Gemini orchestrator.
+ *
  * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
@@ -8,13 +11,175 @@
 import { z } from 'zod';
 
 /**
- * The schema for the orchestrator input.
+ * Sub-agent types
  */
-export const orchestratorInputSchema = z.object({
-  query: z.string(),
+export enum SubAgentType {
+  BIGQUERY = 'BIGQUERY',
+  FIREBASE = 'FIREBASE',
+  TOOL = 'TOOL'
+}
+
+/**
+ * Cache options schema
+ */
+export const cacheOptionsSchema = z.object({
+  ttlSeconds: z.number().positive().default(300),
+  refreshOnRead: z.boolean().default(false)
 });
 
 /**
- * The schema for the orchestrator output.
+ * Orchestrator options schema
  */
-export const orchestratorOutputSchema = z.any();
+export const orchestratorOptionsSchema = z.object({
+  streaming: z.boolean().default(false),
+  timeout: z.number().positive().optional(),
+  cacheResults: z.boolean().default(false),
+  cache: cacheOptionsSchema.optional(),
+  mcpServerId: z.string().optional()
+});
+
+/**
+ * The schema for the orchestrator input.
+ */
+export const orchestratorInputSchema = z.object({
+  query: z.string().min(1, "Query cannot be empty"),
+  context: z.record(z.unknown()).optional().default({}),
+  options: orchestratorOptionsSchema.optional().default({})
+});
+
+/**
+ * The schema for BigQuery results
+ */
+export const bigQueryResultSchema = z.object({
+  type: z.literal('bigquery_result'),
+  sql: z.string(),
+  rows: z.array(z.record(z.unknown())),
+  rowCount: z.number()
+});
+
+/**
+ * The schema for Firebase query results
+ */
+export const firebaseQueryResultSchema = z.object({
+  type: z.literal('firebase_query_result'),
+  collection: z.string(),
+  documents: z.array(z.record(z.unknown())),
+  documentCount: z.number()
+});
+
+/**
+ * The schema for Firebase document result
+ */
+export const firebaseDocumentSchema = z.object({
+  type: z.literal('firebase_document'),
+  collection: z.string(),
+  id: z.string(),
+  document: z.record(z.unknown()).nullable()
+});
+
+/**
+ * The schema for Firebase write result
+ */
+export const firebaseWriteResultSchema = z.object({
+  type: z.literal('firebase_write_result'),
+  collection: z.string(),
+  id: z.string(),
+  success: z.boolean()
+});
+
+/**
+ * The schema for Firebase delete result
+ */
+export const firebaseDeleteResultSchema = z.object({
+  type: z.literal('firebase_delete_result'),
+  collection: z.string(),
+  id: z.string(),
+  success: z.boolean()
+});
+
+/**
+ * The schema for tool results
+ */
+export const toolResultsSchema = z.object({
+  type: z.literal('tool_results'),
+  results: z.array(z.object({
+    tool: z.string(),
+    input: z.record(z.unknown()),
+    result: z.unknown()
+  })),
+  text: z.string().optional()
+});
+
+/**
+ * The schema for text response
+ */
+export const textResponseSchema = z.object({
+  type: z.literal('text_response'),
+  text: z.string()
+});
+
+/**
+ * The schema for orchestrator output data
+ */
+export const orchestratorOutputDataSchema = z.union([
+  bigQueryResultSchema,
+  firebaseQueryResultSchema,
+  firebaseDocumentSchema,
+  firebaseWriteResultSchema,
+  firebaseDeleteResultSchema,
+  toolResultsSchema,
+  textResponseSchema,
+  z.record(z.string(), z.unknown())
+]);
+
+/**
+ * The schema for orchestrator output metadata.
+ */
+export const orchestratorMetadataSchema = z.object({
+  model: z.string(),
+  processTime: z.number(),
+  subAgent: z.nativeEnum(SubAgentType),
+  timestamp: z.string()
+});
+
+/**
+ * The schema for orchestrator output.
+ */
+export const orchestratorOutputSchema = z.object({
+  success: z.boolean(),
+  data: orchestratorOutputDataSchema,
+  error: z.string().optional(),
+  fromCache: z.boolean().optional().default(false),
+  metadata: orchestratorMetadataSchema.optional()
+});
+
+/**
+ * The schema for streaming orchestrator output.
+ */
+export const orchestratorStreamOutputSchema = z.object({
+  success: z.boolean(),
+  content: z.string().optional(),
+  data: orchestratorOutputDataSchema.optional(),
+  error: z.string().optional(),
+  done: z.boolean(),
+  metadata: orchestratorMetadataSchema.optional(),
+  chunkIndex: z.number().optional()
+});
+
+/**
+ * Type definitions for the schemas
+ */
+export type OrchestratorInput = z.infer<typeof orchestratorInputSchema>;
+export type OrchestratorOutput = z.infer<typeof orchestratorOutputSchema>;
+export type OrchestratorStreamOutput = z.infer<typeof orchestratorStreamOutputSchema>;
+export type OrchestratorOptions = z.infer<typeof orchestratorOptionsSchema>;
+export type OrchestratorMetadata = z.infer<typeof orchestratorMetadataSchema>;
+export type CacheOptions = z.infer<typeof cacheOptionsSchema>;
+export type BigQueryResult = z.infer<typeof bigQueryResultSchema>;
+export type FirebaseQueryResult = z.infer<typeof firebaseQueryResultSchema>;
+export type FirebaseDocument = z.infer<typeof firebaseDocumentSchema>;
+export type FirebaseWriteResult = z.infer<typeof firebaseWriteResultSchema>;
+export type FirebaseDeleteResult = z.infer<typeof firebaseDeleteResultSchema>;
+export type ToolResults = z.infer<typeof toolResultsSchema>;
+export type TextResponse = z.infer<typeof textResponseSchema>;
+export type OrchestratorOutputData = z.infer<typeof orchestratorOutputDataSchema>;

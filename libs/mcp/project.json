@@ -3,10 +3,6 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/mcp/src",
   "projectType": "library",
-  "implicitDependencies": [
-    "gemini-orchestrator",
-    "monitoring"
-  ],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",

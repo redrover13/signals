@@ -58,15 +58,19 @@ async function bigQueryInsert(args: Record<string, unknown>, _toolContext?: Tool
  * Google Cloud Storage upload tool function
  */
 async function gcsUpload(args: Record<string, unknown>, _toolContext?: ToolContext): Promise<any> {
-  const { path, contents, contentType } = args;
+  const { bucket, filename, content, contentType } = args;
   
   try {
-    const gsPath = await uploadString(path as string, contents as string, contentType as string);
+    // Construct the full GCS path from bucket and filename
+    const path = `${bucket}/${filename}`;
+    const gsPath = await uploadString(path, content as string, contentType as string);
     return {
       success: true,
       message: `Content uploaded successfully`,
       gsPath,
-      size: (contents as string).length,
+      size: (content as string).length,
+      bucket: bucket as string,
+      filename: filename as string,
     };
   } catch (error) {
     return {
@@ -192,6 +196,11 @@ export const GCP_TOOLS: BaseTool[] = [
           type: 'string',
           description: 'The content to upload',
           minLength: 1
+        },
+        contentType: {
+          type: 'string',
+          description: 'MIME type of the content (optional)',
+          default: 'text/plain'
         }
       },
       required: ['bucket', 'filename', 'content'],
@@ -247,4 +256,141 @@ export function getToolByName(name: string): BaseTool | undefined {
  */
 export function getToolNames(): string[] {
   return GCP_TOOLS.map(tool => (tool as any).name);
+}
+
+/**
+ * Convenience tool classes for easier usage in agents
+ */
+export class BigQueryQueryTool extends FunctionTool {
+  constructor() {
+    super({
+      name: 'bigquery_query',
+      description: 'Execute a BigQuery SQL query and return results',
+      func: bigQueryQuery,
+      parameters: {
+        type: 'object',
+        properties: {
+          sql: {
+            type: 'string',
+            description: 'The SQL query to execute',
+            minLength: 1
+          },
+          params: {
+            type: 'object',
+            description: 'Optional query parameters',
+            additionalProperties: true
+          }
+        },
+        required: ['sql'],
+        additionalProperties: false
+      }
+    });
+  }
+}
+
+export class BigQueryInsertTool extends FunctionTool {
+  constructor() {
+    super({
+      name: 'bigquery_insert', 
+      description: 'Insert rows into a BigQuery table',
+      func: bigQueryInsert,
+      parameters: {
+        type: 'object',
+        properties: {
+          table: {
+            type: 'string',
+            description: 'The table name in format dataset.table',
+            minLength: 1
+          },
+          rows: {
+            type: 'array',
+            description: 'Array of rows to insert',
+            items: {
+              type: 'object'
+            },
+            minItems: 1
+          }
+        },
+        required: ['table', 'rows'],
+        additionalProperties: false
+      }
+    });
+  }
+}
+
+export class GCSUploadTool extends FunctionTool {
+  constructor() {
+    super({
+      name: 'gcs_upload',
+      description: 'Upload content to Google Cloud Storage',
+      func: gcsUpload,
+      parameters: {
+        type: 'object',
+        properties: {
+          bucket: {
+            type: 'string',
+            description: 'The GCS bucket name',
+            minLength: 1
+          },
+          filename: {
+            type: 'string',
+            description: 'The filename/path in GCS',
+            minLength: 1
+          },
+          content: {
+            type: 'string',
+            description: 'The content to upload',
+            minLength: 1
+          },
+          contentType: {
+            type: 'string',
+            description: 'MIME type of the content (optional)',
+            default: 'text/plain'
+          }
+        },
+        required: ['bucket', 'filename', 'content'],
+        additionalProperties: false
+      }
+    });
+  }
+}
+
+export class HttpRequestTool extends FunctionTool {
+  constructor() {
+    super({
+      name: 'http_request',
+      description: 'Make HTTP requests to external APIs',
+      func: httpRequest,
+      parameters: {
+        type: 'object',
+        properties: {
+          url: {
+            type: 'string',
+            description: 'The URL to make the request to',
+            format: 'uri',
+            minLength: 1
+          },
+          method: {
+            type: 'string',
+            description: 'HTTP method',
+            enum: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+            default: 'GET'
+          },
+          headers: {
+            type: 'object',
+            description: 'HTTP headers',
+            additionalProperties: {
+              type: 'string'
+            }
+          },
+          body: {
+            type: 'string',
+            description: 'Request body for POST/PUT/PATCH'
+          }
+        },
+        required: ['url'],
+        additionalProperties: false
+      }
+    });
+  }
 }

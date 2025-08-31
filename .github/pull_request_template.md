@@ -1,48 +1,31 @@
-# NX Monorepo Optimization PR
-
 ## Description
 
-This PR implements a comprehensive review and optimization of the NX monorepo setup, addressing TypeScript issues, linting rules, and dependency management across all projects.
+Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context.
 
-## Changes
+Fixes # (issue)
 
-### Project Configuration Enhancements
-- Added proper build configurations (production/development) to all projects
-- Implemented enhanced caching strategies with named inputs
-- Added proper tagging for module boundaries and architecture constraints
-- Configured CI-specific test runners with code coverage
+## Type of change
 
-### TypeScript Improvements
-- Standardized TypeScript configuration across projects
-- Fixed type errors and inconsistencies
-- Enhanced path mappings for internal dependencies
-- Added strict type checking where appropriate
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New feature (non-breaking change which adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] This change requires a documentation update
 
-### Dependency Management
-- Resolved circular dependencies
-- Updated implicit dependency declarations
-- Optimized build order through proper dependency configuration
+## How Has This Been Tested?
 
-### Linting Enhancements
-- Standardized ESLint configurations
-- Added custom rules for project-specific needs
-- Fixed existing linting issues
+Please describe the tests that you ran to verify your changes.
 
-## Testing
+## Checklist:
 
-The following checks have been performed:
-- All builds complete successfully
-- All tests pass
-- ESLint reports no errors
-- The dependency graph shows no circular dependencies
+- [ ] My code follows the style guidelines of this project
+- [ ] I have performed a self-review of my own code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation
+- [ ] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] New and existing unit tests pass locally with my changes
 
-## Documentation
-
-Added new utility scripts to:
-- Update project configurations
-- Check for TypeScript issues
-- Analyze dependencies
-
-## Screenshots
-
-[Include a screenshot of the NX dependency graph if relevant]
+## AI Review Requested:
+- [ ] @github-copilot
+- [ ] @gemini
+- [ ] @CodeRabbit

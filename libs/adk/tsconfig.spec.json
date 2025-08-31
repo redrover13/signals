@@ -21,6 +21,8 @@
     "src/**/*.spec.jsx",
     "src/**/*.d.ts",
     "../../libs/gcp/src/**/*.ts",
-    "../../libs/gcp-core/src/**/*.ts"
+    "../../libs/gcp-core/src/**/*.ts",
+    "**/*.spec.ts",
+    "**/*.test.ts"
   ]
 }

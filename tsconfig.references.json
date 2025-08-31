@@ -9,6 +9,9 @@
       "path": "./libs/gcp"
     },
     {
+      "path": "./libs/gcp-core"
+    },
+    {
       "path": "./libs/build-tools"
     },
     {
@@ -16,6 +19,12 @@
     },
     {
       "path": "./libs/adk"
+    },
+    {
+      "path": "./libs/env"
+    },
+    {
+      "path": "./libs/security"
     },
     {
       "path": "./apps/looker-dashboards"
@@ -42,6 +51,9 @@
       "path": "./libs/utils/api-clients"
     },
     {
+      "path": "./libs/utils/secrets-manager"
+    },
+    {
       "path": "./libs/data-models/schemas"
     },
     {
@@ -64,6 +76,15 @@
     },
     {
       "path": "./libs/agents/bq-agent"
+    },
+    {
+      "path": "./libs/ui/components"
+    },
+    {
+      "path": "./infra/workflows/cloud-workflows"
+    },
+    {
+      "path": "./infra/workflows/pubsub-workflows"
     }
   ],
   "exclude": [

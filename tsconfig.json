@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [
+    "libs/**/*.ts",
+    "tools/**/*.ts",
+    "scripts/**/*.ts",
+    "**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "*.generated.*",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "apps/**/*",
+    "agent-frontend/**/*",
+    "**/*.tsx",
+    "**/*.jsx"
+  ]
+}

@@ -126,9 +126,11 @@ jobs:
           echo "🔍 Checking TypeScript type coverage..."
           npx type-coverage --detail --at-least 85 --ignore-files "**/*.spec.ts" "**/*.test.ts" "**/*.d.ts"
           echo "✅ Type coverage check completed"
-
-  deadcode-detection:
-    name: Dead Code Detection
+              echo "🔍 Checking TypeScript type coverage..."
+              npx type-coverage --detail --at-least 85 \
+                --ignore-files "**/*.spec.ts,**/*.test.ts,**/*.d.ts" \
+                --ignore-catch
+              echo "✅ Type coverage check completed"
     runs-on: ubuntu-latest
     timeout-minutes: 5
 

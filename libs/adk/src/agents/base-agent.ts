@@ -45,8 +45,6 @@ export class DulceBaseAgent extends AdkBaseAgent {
       name: config.name,
       description: config.description || '',
     });
-    this.name = config.name;
-    this.description = config.description || '';
     this.maxIterations = config.maxIterations || 10;
   }
 

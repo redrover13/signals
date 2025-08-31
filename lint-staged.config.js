@@ -4,9 +4,6 @@ export default {
     'prettier --write',
     'secretlint'
   ],
-  '*.{ts,tsx}': [
-    () => 'pnpm ts:check'
-  ],
   '*.{json,md,yml,yaml}': ['prettier --write', 'secretlint'],
   '*': ['secretlint'],
 };

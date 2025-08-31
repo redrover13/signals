@@ -124,6 +124,7 @@ export default defineConfig(async ({ mode }) => {
           manualChunks: {
             vendor: ['react', 'react-dom'],
             signals: ['@nx-monorepo/utils/signals'],
+            lodash: ['lodash-es'],
           },
         },
       },
@@ -168,8 +169,10 @@ export default defineConfig(async ({ mode }) => {
     
     // Optimize dependencies
     optimizeDeps: {
-      include: ['react', 'react-dom'],
+      include: ['react', 'react-dom', 'lodash-es'],
       exclude: ['@nx-monorepo/utils/signals'],
+      // Enable dependency pre-bundling
+      force: mode === 'development',
     },
   };
 });

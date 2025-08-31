@@ -14,7 +14,7 @@ import { Storage } from '@google-cloud/storage';
 import { PubSub } from '@google-cloud/pubsub';
 import { PredictionServiceClient, v1 } from '@google-cloud/aiplatform';
 import { GoogleAuth } from 'google-auth-library';
-import { memoize } from 'lodash';
+import memoize from 'lodash-es/memoize';
 import { getProjectId, GcpInitializationError } from '@nx-monorepo/gcp-core';
 
 export async function getGoogleCloudCredentials(): Promise<{

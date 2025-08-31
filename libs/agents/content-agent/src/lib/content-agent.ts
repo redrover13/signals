@@ -10,10 +10,11 @@
  */
 
 import { 
-  DulceLlmAgent, 
+  LlmAgent, 
   GeminiLlm, 
   GCSUploadTool, 
-  HttpRequestTool 
+  HttpRequestTool,
+  InvocationContext
 } from '@nx-monorepo/adk';
 
 import { Requirements, ContentResponse } from '@nx-monorepo/data-models';
@@ -21,7 +22,10 @@ import { Requirements, ContentResponse } from '@nx-monorepo/data-models';
 /**
  * Content-specialized agent for generating F&B marketing content
  */
-export class ContentAgent extends DulceLlmAgent {
+export class ContentAgent extends LlmAgent {
+  public readonly name: string;
+  public readonly description: string;
+
   constructor(cfg?: { model?: string; apiKey?: string; tools?: Array<unknown> }) {
     // Guard against missing API key (fail-fast)
     const apiKey = cfg?.apiKey ?? process.env.GOOGLE_API_KEY;
@@ -44,9 +48,26 @@ export class ContentAgent extends DulceLlmAgent {
     super({
       name: 'Content Agent',
       description: 'Specialized agent for Vietnamese F&B content generation and marketing',
-      llm,
+      model: llm,
       tools,
     });
+
+    this.name = 'Content Agent';
+    this.description = 'Specialized agent for Vietnamese F&B content generation and marketing';
+  }
+
+  /**
+   * Get agent name
+   */
+  getName(): string {
+    return this.name;
+  }
+
+  /**
+   * Get agent description  
+   */
+  getDescription(): string {
+    return this.description;
   }
 
   /**
@@ -72,9 +93,11 @@ export class ContentAgent extends DulceLlmAgent {
   Generate engaging, culturally appropriate content for the Vietnamese market.
       `;
 
-    return this.invoke<ContentResponse>({
-      messages: [{ role: 'user', content: prompt }],
-    });
+    return this.runAsync({
+      userContent: { role: 'user', parts: [{ text: prompt }] },
+      session: null,
+      invocationId: `content_generation_${Date.now()}`,
+    } as InvocationContext) as Promise<ContentResponse>;
   }
 
   /**
@@ -96,9 +119,11 @@ Please:
 Create content that resonates with Vietnamese food lovers.
     `;
 
-    return this.invoke({
-      messages: [{ role: 'user', content: prompt }],
-    });
+    return this.runAsync({
+      userContent: { role: 'user', parts: [{ text: prompt }] },
+      session: null,
+      invocationId: `social_content_${Date.now()}`,
+    } as InvocationContext);
   }
 
   /**
@@ -122,9 +147,11 @@ Please:
 Generate menu content that drives orders and reflects Vietnamese culinary culture.
     `;
 
-    return this.invoke({
-      messages: [{ role: 'user', content: prompt }],
-    });
+    return this.runAsync({
+      userContent: { role: 'user', parts: [{ text: prompt }] },
+      session: null,
+      invocationId: `menu_content_${Date.now()}`,
+    } as InvocationContext);
   }
 }
 

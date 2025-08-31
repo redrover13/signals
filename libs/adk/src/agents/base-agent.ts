@@ -84,6 +84,7 @@ export class DulceBaseAgent extends AdkBaseAgent {
 
 /**
  * LLM-based agent for conversational tasks
+ * @deprecated Use LlmAgent directly from '@waldzellai/adk-typescript' instead
  */
 export class DulceLlmAgent extends LlmAgent {
   public override readonly name: string;

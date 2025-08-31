@@ -9,8 +9,7 @@
  * @license MIT
  */
 
-import { DulceLlmAgent } from './base-agent';
-import { GeminiLlm, InvocationContext } from '@waldzellai/adk-typescript';
+import { LlmAgent, GeminiLlm, InvocationContext } from '@waldzellai/adk-typescript';
 import { GCP_TOOLS } from '../tools/gcp-tools';
 
 /**
@@ -35,8 +34,10 @@ export interface SubAgentStatus {
 /**
  * Root agent class for coordinating multiple specialized agents
  */
-export class RootAgent extends DulceLlmAgent {
-  private registeredAgents: Map<string, DulceLlmAgent>;
+export class RootAgent extends LlmAgent {
+  private registeredAgents: Map<string, LlmAgent>;
+  public readonly name: string;
+  public readonly description: string;
 
   constructor() {
     const llm = new GeminiLlm({
@@ -47,17 +48,33 @@ export class RootAgent extends DulceLlmAgent {
     super({
       name: 'Root Orchestrator Agent',
       description: 'Main orchestrator for all Dulce de Saigon F&B platform agents',
-      llm,
+      model: llm,
       tools: GCP_TOOLS,
     });
 
+    this.name = 'Root Orchestrator Agent';
+    this.description = 'Main orchestrator for all Dulce de Saigon F&B platform agents';
     this.registeredAgents = new Map();
+  }
+
+  /**
+   * Get agent name
+   */
+  getName(): string {
+    return this.name;
+  }
+
+  /**
+   * Get agent description  
+   */
+  getDescription(): string {
+    return this.description;
   }
 
   /**
    * Register a sub-agent
    */
-  registerSubAgent(name: string, agent: DulceLlmAgent): void {
+  registerSubAgent(name: string, agent: LlmAgent): void {
     this.registeredAgents.set(name, agent);
   }
 

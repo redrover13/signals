@@ -15,8 +15,9 @@ import {
   SequentialAgent,
   ParallelAgent,
   BaseLlm,
-  AgentTool,
-  InvocationContext 
+  BaseTool,
+  InvocationContext,
+  Event
 } from '@waldzellai/adk-typescript';
 
 /**
@@ -26,7 +27,7 @@ export interface AgentConfig {
   name: string;
   description?: string;
   llm?: BaseLlm;
-  tools?: AgentTool[];
+  tools?: BaseTool[];
   maxIterations?: number;
 }
 
@@ -35,14 +36,15 @@ export interface AgentConfig {
  * Extends ADK's BaseAgent with platform-specific functionality
  */
 export class DulceBaseAgent extends AdkBaseAgent {
-  protected name: string;
-  protected description: string;
+  public override readonly name: string;
+  public override readonly description: string;
   protected maxIterations: number;
 
   constructor(config: AgentConfig) {
-    super();
-    this.name = config.name;
-    this.description = config.description || '';
+    super({
+      name: config.name,
+      description: config.description || '',
+    });
     this.maxIterations = config.maxIterations || 10;
   }
 
@@ -61,25 +63,22 @@ export class DulceBaseAgent extends AdkBaseAgent {
   }
 
   /**
-   * Execute agent with context
+   * Core logic to run this agent via text-based conversation
    */
-  public async invoke(context: InvocationContext): Promise<unknown> {
+  protected async *runAsyncImpl(ctx: InvocationContext): AsyncGenerator<Event, void, unknown> {
     console.log(`Executing agent: ${this.name}`);
     
-    // Add platform-specific logging and monitoring
-    const startTime = Date.now();
-    
-    try {
-      const result = await super.invoke(context);
-      
-      const duration = Date.now() - startTime;
-      console.log(`Agent ${this.name} completed in ${duration}ms`);
-      
-      return result;
-    } catch (error) {
-      console.error(`Agent ${this.name} failed:`, error);
-      throw error;
-    }
+    // Basic implementation - yield a simple event
+    yield new Event({
+      id: Event.newId(),
+      invocationId: ctx.invocationId || '',
+      author: this.name,
+      branch: ctx.branch,
+      content: {
+        role: this.name,
+        parts: [{ text: `Hello from ${this.name}` }]
+      }
+    });
   }
 }
 
@@ -87,11 +86,16 @@ export class DulceBaseAgent extends AdkBaseAgent {
  * LLM-based agent for conversational tasks
  */
 export class DulceLlmAgent extends LlmAgent {
-  private name: string;
-  private description: string;
+  public override readonly name: string;
+  public override readonly description: string;
 
   constructor(config: AgentConfig & { llm: BaseLlm }) {
-    super(config.llm, config.tools);
+    super({
+      name: config.name,
+      description: config.description || '',
+      model: config.llm,
+      tools: config.tools || [],
+    });
     this.name = config.name;
     this.description = config.description || '';
   }
@@ -109,11 +113,15 @@ export class DulceLlmAgent extends LlmAgent {
  * Sequential agent that executes tasks in order
  */
 export class DulceSequentialAgent extends SequentialAgent {
-  private name: string;
-  private description: string;
+  public override readonly name: string;
+  public override readonly description: string;
 
   constructor(config: AgentConfig & { agents: AdkBaseAgent[] }) {
-    super(config.agents);
+    super({
+      name: config.name,
+      description: config.description || '',
+      subAgents: config.agents,
+    });
     this.name = config.name;
     this.description = config.description || '';
   }
@@ -131,11 +139,15 @@ export class DulceSequentialAgent extends SequentialAgent {
  * Parallel agent that executes tasks concurrently
  */
 export class DulceParallelAgent extends ParallelAgent {
-  private name: string;
-  private description: string;
+  public override readonly name: string;
+  public override readonly description: string;
 
   constructor(config: AgentConfig & { agents: AdkBaseAgent[] }) {
-    super(config.agents);
+    super({
+      name: config.name,
+      description: config.description || '',
+      subAgents: config.agents,
+    });
     this.name = config.name;
     this.description = config.description || '';
   }

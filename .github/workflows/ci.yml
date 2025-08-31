@@ -50,6 +50,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check environment configuration
+        run: pnpm env:check
+
       - name: Fix CodeQL and code standard issues
         run: pnpm codeql:fix
 

@@ -170,6 +170,9 @@ The following Model Context Protocol (MCP) servers are configured:
 
 - **Codacy:** Provides code quality analysis integration
 - **Nx:** Provides Nx monorepo tooling integration
+- **Gemini:** Acts as an orchestrator for the MCP protocol, coordinating various AI agents and tool interactions
+- **Google genai-toolbox:** Deployed on Cloud Run, provides access to BigQuery, AlloyDB, and other database tools via MCP
+- **Cloud Run MCP:** Hosting pattern for deploying custom MCP servers on Google Cloud Run
 
 ## Related Documentation
 

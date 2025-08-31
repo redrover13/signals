@@ -145,13 +145,13 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
       - name: Authenticate to GCP
-        uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
+        uses: google-github-actions/auth@v2.1.2
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@1132c5212dd6f3331b4d72c86604f49a5d53b2e8 # v3.0.0
+        uses: hashicorp/setup-terraform@v3.0.0
         with:
           terraform_version: 1.x
 
@@ -170,7 +170,7 @@ jobs:
           cd ../looker && terraform plan -out=tfplan_looker
 
       - name: Upload Terraform Plan Artifacts
-        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
+        uses: actions/upload-artifact@v4.3.0
         with:
           name: terraform-plans
           path: |
@@ -196,18 +196,18 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
       - name: Authenticate to GCP
-        uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
+        uses: google-github-actions/auth@v2.1.2
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@1132c5212dd6f3331b4d72c86604f49a5d53b2e8 # v3.0.0
+        uses: hashicorp/setup-terraform@v3.0.0
         with:
           terraform_version: 1.x
 
       - name: Download Terraform Plan Artifacts
-        uses: actions/download-artifact@694a571876d6598ad8b4a2365a1d88cd1a5c6473 # v4.0.0
+        uses: actions/download-artifact@v4.0.0
         with:
           name: terraform-plans
           path: .
@@ -258,13 +258,13 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Authenticate to GCP
-        uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
+        uses: google-github-actions/auth@v2.1.2
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Deploy Social API Function
-        uses: google-github-actions/deploy-cloudfunctions@e9c908f92a2374208c315607f51f2285c59ca4eb # v2.1.2
+        uses: google-github-actions/deploy-cloudfunctions@v2.1.2
         with:
           name: social-api
           runtime: nodejs20
@@ -274,7 +274,7 @@ jobs:
           region: ${{ env.GCP_REGION }}
 
       - name: Deploy CRM API Function
-        uses: google-github-actions/deploy-cloudfunctions@e9c908f92a2374208c315607f51f2285c59ca4eb # v2.1.2
+        uses: google-github-actions/deploy-cloudfunctions@v2.1.2
         with:
           name: crm-api
           runtime: nodejs20
@@ -284,7 +284,7 @@ jobs:
           region: ${{ env.GCP_REGION }}
 
       - name: Deploy CMS API Function
-        uses: google-github-actions/deploy-cloudfunctions@e9c908f92a2374208c315607f51f2285c59ca4eb # v2.1.2
+        uses: google-github-actions/deploy-cloudfunctions@v2.1.2
         with:
           name: cms-api
           runtime: nodejs20
@@ -294,7 +294,7 @@ jobs:
           region: ${{ env.GCP_REGION }}
 
       - name: Deploy Reviews API Function
-        uses: google-github-actions/deploy-cloudfunctions@e9c908f92a2374208c315607f51f2285c59ca4eb # v2.1.2
+        uses: google-github-actions/deploy-cloudfunctions@v2.1.2
         with:
           name: reviews-api
           runtime: nodejs20
@@ -345,16 +345,16 @@ jobs:
         run: pnpm nx build frontend-agents
 
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@988b5a0280414f521da01fcc63a27aeeb4b104db # v3.0.0
+        uses: docker/setup-buildx-action@v3.0.0
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
+        uses: google-github-actions/auth@v2.1.2
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@98ddc00a17442afd5cc98e3bc12d837f362fca33 # v2.1.0
+        uses: google-github-actions/setup-gcloud@v2.1.0
 
       - name: Configure Docker
         run: gcloud auth configure-docker --quiet
@@ -368,7 +368,7 @@ jobs:
           docker push gcr.io/${{ env.GCP_PROJECT_ID }}/frontend-agents:latest
 
       - name: Deploy to Google Cloud Run
-        uses: google-github-actions/deploy-cloudrun@97a9e1c83a2a3d2476a25be6bd83aefa1ee8ade5 # v2.1.0
+        uses: google-github-actions/deploy-cloudrun@v2.1.0
         with:
           service: frontend-agents
           image: gcr.io/${{ env.GCP_PROJECT_ID }}/frontend-agents:${{ github.sha }}
@@ -414,7 +414,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Authenticate to GCP
-        uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
+        uses: google-github-actions/auth@v2.1.2
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}

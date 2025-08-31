@@ -39,7 +39,7 @@ jobs:
           pnpm nx run api:generate-docs
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@bae45bd7c0cd6f338596808adca97f47cf91dfac # v3.9.3
+        uses: peaceiris/actions-gh-pages@v3.9.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/api

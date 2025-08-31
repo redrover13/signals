@@ -21,12 +21,12 @@ jobs:
 
       - name: Get Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@a4e8458f2ab22bb64eaf76c405ac512a8290428a # v2
+        uses: dependabot/fetch-metadata@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Wait for CI checks
-        uses: fountainhead/action-wait-for-check@2b3d73762755cd85a72a8c8de76ca84df5bf7a6d # v1.2.0.2.0
+        uses: fountainhead/action-wait-for-check@v1.2.0.2.0
         id: wait-for-ci
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -36,7 +36,7 @@ jobs:
           intervalSeconds: 30
 
       - name: Wait for CodeQL
-        uses: fountainhead/action-wait-for-check@2b3d73762755cd85a72a8c8de76ca84df5bf7a6d # v1.2.0.2.0
+        uses: fountainhead/action-wait-for-check@v1.2.0.2.0
         id: wait-for-codeql
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

@@ -41,10 +41,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@2b51285786e4a1181b7a0b3a6f50d8390f18b788 # v3.2.0
+        uses: docker/setup-buildx-action@v3.2.0
 
       - name: Authenticate to GCP
-        uses: google-github-actions/auth@55bd3a7c6e2ae7e6884bfe4c7bf685fe519a5a36 # v2.1.2
+        uses: google-github-actions/auth@v2.1.2
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
@@ -62,7 +62,7 @@ jobs:
             ${{ runner.os }}-buildx-
 
       - name: Build container image
-        uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56 # v5.1.0
+        uses: docker/build-push-action@v5.1.0
         with:
           context: .
           file: ${{ contains(fromJson('["Dockerfile", ""]'), env.DOCKERFILE_PATH) && env.DOCKERFILE_PATH || format('apps/{0}/Dockerfile', matrix.app) }}
@@ -83,7 +83,7 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@7bd962026ce9d96ae8baf32d04e4d90eafa17d38 # v0.17.0
+        uses: aquasecurity/trivy-action@v0.17.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ matrix.app }}:${{ github.sha }}
           format: 'sarif'
@@ -100,7 +100,7 @@ jobs:
           category: 'container-${{ matrix.app }}'
 
       - name: Run Trivy for JSON output
-        uses: aquasecurity/trivy-action@7bd962026ce9d96ae8baf32d04e4d90eafa17d38 # v0.17.0
+        uses: aquasecurity/trivy-action@v0.17.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.GCP_PROJECT_ID }}/${{ matrix.app }}:${{ github.sha }}
           format: 'json'
@@ -140,7 +140,7 @@ jobs:
           
       - name: Upload vulnerability report
         if: always()
-        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
+        uses: actions/upload-artifact@v4.3.0
         with:
           name: security-report-${{ matrix.app }}
           path: report-${{ matrix.app }}.md
@@ -168,7 +168,7 @@ jobs:
           echo "✅ Container security scan passed for ${{ matrix.app }}"
 
       - name: Upload scan results
-        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
+        uses: actions/upload-artifact@v4.3.0
         if: always()
         with:
           name: trivy-results-${{ matrix.app }}
@@ -183,7 +183,7 @@ jobs:
     if: always()
     steps:
       - name: Download all scan results
-        uses: actions/download-artifact@694a571876d6598ad8b4a2365a1d88cd1a5c6473 # v4.0.0
+        uses: actions/download-artifact@v4.0.0
         with:
           path: scan-results
 
@@ -211,7 +211,7 @@ jobs:
           done
 
       - name: Upload security summary
-        uses: actions/upload-artifact@0ad4c6ed3e171a3811d54af8513112f386372766 # v4.3.0
+        uses: actions/upload-artifact@v4.3.0
         with:
           name: security-summary
           path: security-summary.md

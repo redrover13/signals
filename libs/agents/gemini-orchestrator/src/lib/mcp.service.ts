@@ -261,9 +261,48 @@ export class MCPService {
   /**
    * Orchestrate with Gemini for agent routing
    */
-  async orchestrateWithGemini(query: string, config: { apiKey: string; projectId: string; firebaseConfig: any }): Promise<any> {
-    const orchestrator = new GeminiOrchestrator(config.apiKey, config.projectId, config.firebaseConfig);
-    return orchestrator.orchestrate({ query });
+  async orchestrateWithGemini(
+    query: string, 
+    context?: Record<string, unknown>,
+    options?: {
+      streaming?: boolean;
+      timeout?: number;
+      cacheResults?: boolean;
+    }
+  ): Promise<Record<string, unknown>> {
+    if (!this.isInitialized) {
+      await this.initialize();
+    }
+
+    return this.errorHandler.withRetry(
+      async () => {
+        const config = getCurrentConfig();
+        const orchestrator = new GeminiOrchestrator();
+        
+        // Configure the orchestrator
+        await orchestrator.initialize();
+        
+        // Execute orchestration
+        const result = await orchestrator.orchestrate({
+          query,
+          context: context || {},
+          options: {
+            streaming: options?.streaming || false,
+            timeout: options?.timeout || 30000,
+            cacheResults: options?.cacheResults || false
+          }
+        });
+        
+        return result;
+      },
+      'orchestrateWithGemini',
+      { query, context, options },
+      {
+        maxRetries: 2,
+        retryDelay: 1000,
+        exponentialBackoff: true,
+      }
+    );
   }
 
   /**

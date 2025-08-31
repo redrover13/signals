@@ -175,7 +175,7 @@ export class CloudTraceExporter implements SpanExporter {
     };
 
     // Log for development/debugging
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env['NODE_ENV'] === 'development') {
       console.log('☁️  Cloud Trace export:', JSON.stringify(traceData, null, 2));
     }
 

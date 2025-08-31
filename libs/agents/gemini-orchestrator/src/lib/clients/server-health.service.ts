@@ -15,10 +15,10 @@ export interface HealthCheckResult {}
 export interface ServerHealthStats {}
 
 export class ServerHealthService {
-  constructor(clientService: MCPClientService) {}
-  getServerHealthStats(serverId: string): ServerHealthStats { return {}; }
+  constructor(_clientService: MCPClientService) {}
+  getServerHealthStats(_serverId: string): ServerHealthStats { return {}; }
   getAllHealthStats(): Map<string, ServerHealthStats> { return new Map(); }
   getSystemHealth(): any { return {}; }
-  async forceHealthCheck(serverId: string): Promise<HealthCheckResult> { return {}; }
+  async forceHealthCheck(_serverId: string): Promise<HealthCheckResult> { return {}; }
   async forceHealthCheckAll(): Promise<HealthCheckResult[]> { return []; }
 }

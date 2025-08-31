@@ -64,7 +64,7 @@ export function createSignal<T>(initialValue: T): Signal<T> {
  * @param derivationFn - Function that calculates the derived value
  * @returns A read-only signal
  */
-export function derivedSignal<T, D extends Array<Signal<any>>>(
+export function derivedSignal<T, D extends Array<Signal<unknown>>>(
   dependencies: D,
   derivationFn: (...values: { [K in keyof D]: D[K] extends Signal<infer U> ? U : never }) => T
 ): Omit<Signal<T>, 'set'> {
@@ -74,7 +74,8 @@ export function derivedSignal<T, D extends Array<Signal<any>>>(
   );
   
   // Subscribe to all dependencies
-  const unsubscribes = dependencies.map((dep, index) => 
+  // This creates unsubscribe functions that could be used for cleanup if needed
+  dependencies.map((dep) => 
     dep.subscribe(() => {
       const values = dependencies.map(d => d.get());
       derivedValue.set(derivationFn(...(values as any)));
@@ -179,14 +180,14 @@ export function fromPromise<T>(
   });
   
   promise
-    .then(result => {
+    .then((result: T) => {
       signal.set({
         loading: false,
         data: result,
         error: undefined
       });
     })
-    .catch(error => {
+    .catch((error: unknown) => {
       signal.set({
         loading: false,
         data: undefined,

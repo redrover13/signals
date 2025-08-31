@@ -22,7 +22,7 @@ import {
 } from './clients/server-health.service';
 import { RequestRouter } from './clients/request-router.service';
 import { getCurrentConfig, getCurrentEnvironment } from './config/environment-config';
-import { createServiceErrorHandler, ErrorCategory, ErrorSeverity } from './utils/error-handler';
+import { createServiceErrorHandler } from './utils/error-handler';
 import { GeminiOrchestrator } from './gemini-orchestrator'; // Import the orchestrator
 
 /**
@@ -98,10 +98,10 @@ export class MCPService {
     const request: MCPRequest = {
       id: `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       method,
-      params,
-      serverId: options?.serverId,
-      timeout: options?.timeout,
-      retries: options?.retries,
+      params: params || {},
+      serverId: options?.serverId || '',
+      timeout: options?.timeout || 30000,
+      retries: options?.retries || 0,
     };
 
     return this.errorHandler.withRetry(

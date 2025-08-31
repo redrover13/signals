@@ -23,12 +23,12 @@ import { CustomerData } from '@nx-monorepo/data-models';
  * CRM-specialized agent for customer relationship management
  */
 export class CrmAgent extends LlmAgent {
-  public readonly name: string;
-  public readonly description: string;
+  public override readonly name: string;
+  public override readonly description: string;
 
   constructor(cfg?: { model?: string; apiKey?: string; tools?: Array<unknown> }) {
     // Require an API key, whether passed in or via env, to avoid silent misconfig
-    const apiKey = cfg?.apiKey ?? process.env.GOOGLE_API_KEY;
+    const apiKey = cfg?.apiKey ?? process.env['GOOGLE_API_KEY'];
     if (!apiKey) {
       throw new Error('GOOGLE_API_KEY is required to initialize CrmAgent');
     }
@@ -40,7 +40,7 @@ export class CrmAgent extends LlmAgent {
     });
 
     // Permit injecting custom tools, else use the CRM defaults
-    const tools = cfg?.tools ?? [
+    const tools = cfg?.tools as any[] ?? [
       new BigQueryQueryTool(),
       new HttpRequestTool(),
     ];
@@ -73,7 +73,7 @@ export class CrmAgent extends LlmAgent {
   /**
    * Analyze customer behavior and preferences
    */
-  async analyzeCustomerBehavior(customerId: string, context?: string): Promise<any> {
+  async analyzeCustomerBehavior(customerId: string, context?: string): Promise<Record<string, unknown>> {
     const prompt = `
 You are a CRM analyst for the Dulce de Saigon F&B platform.
 
@@ -90,17 +90,17 @@ Please:
 Focus on insights that can improve customer satisfaction and retention.
     `;
 
-    return this.runAsync({
+    return (await this.runAsync({
       userContent: { role: 'user', parts: [{ text: prompt }] },
       session: null,
       invocationId: `analyze_customer_${Date.now()}`,
-    } as InvocationContext);
+    } as InvocationContext)) as unknown as Record<string, unknown>;
   }
 
   /**
    * Generate personalized recommendations
    */
-  async generateRecommendations(customerData: CustomerData): Promise<any> {
+  async generateRecommendations(customerData: CustomerData): Promise<Record<string, unknown>> {
     const prompt = `
 Generate personalized recommendations for Vietnamese F&B customer.
 
@@ -116,17 +116,17 @@ Please:
 Ensure recommendations are culturally appropriate and appealing to Vietnamese customers.
     `;
 
-    return this.runAsync({
+    return (await this.runAsync({
       userContent: { role: 'user', parts: [{ text: prompt }] },
       session: null,
       invocationId: `recommendations_${Date.now()}`,
-    } as InvocationContext);
+    } as InvocationContext)) as unknown as Record<string, unknown>;
   }
 
   /**
    * Handle customer feedback and sentiment analysis
    */
-  async processFeedback(feedback: string, customerId?: string): Promise<any> {
+  async processFeedback(feedback: string, customerId?: string): Promise<Record<string, unknown>> {
     const prompt = `
 Process customer feedback for the Dulce de Saigon platform.
 
@@ -143,18 +143,18 @@ Please:
 Provide actionable insights for improving customer experience.
     `;
 
-    return this.runAsync({
+    return (await this.runAsync({
       userContent: { role: 'user', parts: [{ text: prompt }] },
       session: null,
       invocationId: `feedback_${Date.now()}`,
-    } as InvocationContext);
+    } as InvocationContext)) as unknown as Record<string, unknown>;
   }
 }
 
 /**
  * Factory function to create a CRM agent
  */
-export function createCrmAgent(config?: {
+export function createCrmAgent(_config?: {
   vertexClient?: any;
   projectId?: string;
   datasetId?: string;

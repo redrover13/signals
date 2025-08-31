@@ -11,14 +11,21 @@
 
 import { MCPEnvironmentConfig } from '../config/environment-config';
 
-export interface MCPRequest { id?: string; method?: string; params?: Record<string, unknown>; serverId?: string; timeout?: number; retries?: number; }
+export interface MCPRequest { 
+  id: string; 
+  method: string; 
+  params: Record<string, unknown>; 
+  serverId?: string; 
+  timeout?: number; 
+  retries?: number; 
+}
 export interface MCPResponse {}
 
 export class MCPClientService {
-  constructor(config: MCPEnvironmentConfig) {}
+  constructor(_config: MCPEnvironmentConfig) {}
   async initialize(): Promise<void> {}
-  async sendRequest(request: MCPRequest): Promise<MCPResponse> { return {}; }
+  async sendRequest(_request: MCPRequest): Promise<MCPResponse> { return {}; }
   async disconnect(): Promise<void> {}
-  getServerStatus(serverId: string): any {}
+  getServerStatus(_serverId: string): any {}
   getAllServerStatuses(): any {}
 }

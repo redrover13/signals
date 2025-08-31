@@ -102,17 +102,17 @@ export class MainAgent {
         return await this.subAgents.bq.execute(sql);
       } else if (response.startsWith('FIREBASE:')) {
         const parts = response.replace('FIREBASE:', '').trim().split('|');
-        const path = parts[0];
+        const path = parts[0] || '';
         const data = JSON.parse(parts[1] || '{}');
         return await this.subAgents.firebase.execute({ path, value: data });
       } else if (response.startsWith('F&B_ANALYTICS:')) {
-        const restaurantId = response.replace('F&B_ANALYTICS:', '').trim() || context?.restaurantId;
-        return await this.getFBAnalytics(restaurantId, context?.dateRange);
+        const restaurantId = response.replace('F&B_ANALYTICS:', '').trim() || context?.['restaurantId'];
+        return await this.getFBAnalytics(restaurantId, context?.['dateRange']);
       } else if (response.startsWith('CUSTOMER_INSIGHTS:')) {
-        const customerId = response.replace('CUSTOMER_INSIGHTS:', '').trim() || context?.customerId;
+        const customerId = response.replace('CUSTOMER_INSIGHTS:', '').trim() || context?.['customerId'];
         return await this.getCustomerInsights(customerId);
       } else if (response.startsWith('MENU_PERFORMANCE:')) {
-        const restaurantId = response.replace('MENU_PERFORMANCE:', '').trim() || context?.restaurantId;
+        const restaurantId = response.replace('MENU_PERFORMANCE:', '').trim() || context?.['restaurantId'];
         return await this.getMenuPerformance(restaurantId);
       } else {
         return { success: false, error: 'No suitable sub-agent found for query' };

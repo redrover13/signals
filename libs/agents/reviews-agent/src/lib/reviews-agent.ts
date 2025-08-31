@@ -80,15 +80,16 @@ export interface ReviewsResult<T = any> {
  * Reviews Agent for processing customer reviews and sentiment analysis
  */
 export class ReviewsAgent {
-  private config: ReviewsConfig;
+  private _config: ReviewsConfig;
   private genAI?: GoogleGenerativeAI;
 
   constructor(config: ReviewsConfig = {}) {
-    this.config = {
+    this._config = {
       timeout: 30000,
       ...config
     };
-
+    
+    // Initialize the Gemini AI client if API key is provided
     if (config.geminiApiKey) {
       this.genAI = new GoogleGenerativeAI(config.geminiApiKey);
     }
@@ -104,7 +105,11 @@ export class ReviewsAgent {
         return this.simpleSentimentAnalysis(review.content);
       }
 
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = this.genAI.getGenerativeModel({ 
+        model: 'gemini-1.5-flash',
+        generationConfig: { maxOutputTokens: 1024 },
+        safetySettings: [],
+      });
       
       const prompt = `
         Analyze the sentiment of this restaurant review and provide a detailed analysis:
@@ -155,7 +160,7 @@ export class ReviewsAgent {
   /**
    * Simple sentiment analysis fallback
    */
-  private async simpleSentimentAnalysis(content: string): Promise<ReviewsResult<SentimentAnalysis>> {
+  private simpleSentimentAnalysis(content: string): Promise<ReviewsResult<SentimentAnalysis>> {
     const positiveWords = ['good', 'great', 'excellent', 'amazing', 'delicious', 'wonderful', 'fantastic', 'love', 'perfect'];
     const negativeWords = ['bad', 'terrible', 'awful', 'horrible', 'disgusting', 'hate', 'worst', 'disappointing'];
     
@@ -176,6 +181,14 @@ export class ReviewsAgent {
       score = (positiveCount - negativeCount) / totalSentimentWords;
       label = score > 0.1 ? 'positive' : score < -0.1 ? 'negative' : 'neutral';
     }
+    
+    return {
+      data: {
+        score,
+        label,
+        magnitude: Math.abs(score)
+      }
+    };
 
     return {
       success: true,
@@ -250,7 +263,10 @@ export class ReviewsAgent {
     try {
       const processedResults = await this.processReviewsBatch(reviews);
       if (!processedResults.success || !processedResults.data) {
-        return processedResults;
+        return {
+          success: false,
+          error: processedResults.error || 'Failed to process reviews'
+        };
       }
 
       const totalReviews = reviews.length;
@@ -414,7 +430,10 @@ export class ReviewsAgent {
     try {
       const sentimentResult = await this.analyzeSentiment(review);
       if (!sentimentResult.success) {
-        return sentimentResult;
+        return {
+          success: false,
+          error: sentimentResult.error || 'Failed to analyze sentiment'
+        };
       }
 
       const sentiment = sentimentResult.data!;
@@ -468,22 +487,26 @@ export class ReviewsAgent {
         
         switch (timeframe) {
           case 'daily':
-            period = date.toISOString().split('T')[0];
+            period = date.toISOString().split('T')[0] || '';
             break;
           case 'weekly':
             const weekStart = new Date(date);
             weekStart.setDate(date.getDate() - date.getDay());
-            period = weekStart.toISOString().split('T')[0];
+            period = weekStart.toISOString().split('T')[0] || '';
             break;
           case 'monthly':
             period = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
             break;
         }
         
+        if (!period) {
+          period = 'unknown';
+        }
+        
         if (!groupedReviews[period]) {
           groupedReviews[period] = [];
         }
-        groupedReviews[period].push(review);
+        groupedReviews[period]?.push(review);
       });
 
       const trends = await Promise.all(
@@ -538,6 +561,10 @@ export class ReviewsAgent {
 
     const latest = trends[trends.length - 1];
     const previous = trends[trends.length - 2];
+    
+    if (!latest || !previous) {
+      return ['Incomplete trend data available'];
+    }
 
     // Rating trend
     const ratingChange = latest.averageRating - previous.averageRating;

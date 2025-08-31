@@ -6,12 +6,7 @@
     "moduleResolution": "Bundler"
   },
   "include": [
-    "src/**/*.ts",
-    "../../libs/adk/src/**/*.ts",
-    "../../libs/mcp/src/**/*.ts",
-    "../../libs/utils/monitoring/src/**/*.ts",
-    "../../libs/gcp/src/**/*.ts",
-    "../../libs/gcp-core/src/**/*.ts"
+    "src/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

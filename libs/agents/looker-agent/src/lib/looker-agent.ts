@@ -48,7 +48,7 @@ export interface LookerQuery {
 export interface Report {
   id: string;
   title: string;
-  data: any[];
+  data: any;
   generatedAt: string;
   format: 'json' | 'csv' | 'pdf' | 'excel';
 }
@@ -130,7 +130,7 @@ export class LookerAgent {
       const response = await fetch(url, {
         method,
         headers,
-        body: data ? JSON.stringify(data) : undefined,
+        body: data ? JSON.stringify(data) : null,
         signal: controller.signal
       });
 
@@ -365,8 +365,7 @@ export class LookerAgent {
     if (result.success) {
       return {
         success: true,
-        data: { downloadUrl: result.data!.url },
-        url: result.data!.url
+        data: { downloadUrl: result.data!.url }
       };
     }
 

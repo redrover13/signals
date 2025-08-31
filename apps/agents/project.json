@@ -11,9 +11,13 @@
       }
     },
     "build": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
       "options": {
-        "command": "tsc -p apps/agents/tsconfig.json"
+        "outputPath": "dist/apps/agents",
+        "main": "apps/agents/src/main.ts",
+        "tsConfig": "apps/agents/tsconfig.app.json",
+        "assets": ["apps/agents/src/assets"]
       },
       "configurations": {
         "production": {
@@ -21,21 +25,9 @@
           "extractLicenses": true,
           "generatePackageJson": true,
           "sourceMap": false
-        },
-        "development": {
-          "optimization": false,
-          "sourceMap": true
         }
       },
-      "defaultConfiguration": "production",
-      "cache": true,
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "production",
-        "^production"
-      ]
+      "defaultConfiguration": "production"
     },
     "lint": {
       "executor": "@nx/eslint:lint",

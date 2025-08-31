@@ -1,6 +1,6 @@
 {
   "name": "@dulce-de-saigon/security",
   "version": "1.0.0",
-  "type": "module",
+  
   "main": "./dist/main.js"
 }

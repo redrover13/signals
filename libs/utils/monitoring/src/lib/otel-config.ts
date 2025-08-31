@@ -17,7 +17,7 @@ import {
   SEMRESATTRS_SERVICE_VERSION,
   SEMRESATTRS_DEPLOYMENT_ENVIRONMENT
 } from '@opentelemetry/semantic-conventions';
-import { trace, context, SpanKind, SpanStatusCode } from '@opentelemetry/api';
+import { trace, SpanKind, SpanStatusCode } from '@opentelemetry/api';
 import { CloudTraceExporter } from './cloud-trace-exporter';
 import { BigQueryLogger } from './bigquery-logger';
 
@@ -40,8 +40,8 @@ export interface OtelConfig {
 const DEFAULT_CONFIG: Required<OtelConfig> = {
   serviceName: 'dulce-de-saigon-agent',
   serviceVersion: '1.0.0',
-  environment: process.env.NODE_ENV || 'development',
-  gcpProjectId: process.env.GCP_PROJECT_ID || '',
+  environment: process.env['NODE_ENV'] || 'development',
+  gcpProjectId: process.env['GCP_PROJECT_ID'] || '',
   enableAutoInstrumentation: true,
   enableCustomExporter: true,
   enableBigQueryLogs: true,
@@ -74,8 +74,8 @@ export async function initializeOpenTelemetry(config: Partial<OtelConfig> = {}):
   if (finalConfig.enableBigQueryLogs && finalConfig.gcpProjectId) {
     bigQueryLogger = new BigQueryLogger({
       projectId: finalConfig.gcpProjectId,
-      datasetId: process.env.BIGQUERY_LOGS_DATASET || 'agent_logs',
-      tableId: process.env.BIGQUERY_LOGS_TABLE || 'trace_logs',
+      datasetId: process.env['BIGQUERY_LOGS_DATASET'] || 'agent_logs',
+      tableId: process.env['BIGQUERY_LOGS_TABLE'] || 'trace_logs',
     });
     await bigQueryLogger.initialize();
   }
@@ -101,7 +101,7 @@ export async function initializeOpenTelemetry(config: Partial<OtelConfig> = {}):
   if (finalConfig.enableCustomExporter && finalConfig.gcpProjectId) {
     const customExporter = new CloudTraceExporter({
       projectId: finalConfig.gcpProjectId,
-      bucketName: process.env.GCS_TRACES_BUCKET || `${finalConfig.gcpProjectId}-agent-traces`,
+      bucketName: process.env['GCS_TRACES_BUCKET'] || `${finalConfig.gcpProjectId}-agent-traces`,
     });
     
     sdkOptions.traceExporter = customExporter;
@@ -228,7 +228,7 @@ export async function logEvent(
   }
 
   // Console logging for development
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env['NODE_ENV'] === 'development') {
     console.log('📝 Agent Event:', logEntry);
   }
 }

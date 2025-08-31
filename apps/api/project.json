@@ -14,9 +14,13 @@
       }
     },
     "build": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
       "options": {
-        "command": "tsc -p apps/api/tsconfig.json && node -e 'require(\"fs\").cpSync(\"apps/api/src/routes\", \"dist/apps/api/routes\", { recursive: true })'"
+        "outputPath": "dist/apps/api",
+        "main": "apps/api/src/main.ts",
+        "tsConfig": "apps/api/tsconfig.app.json",
+        "assets": ["apps/api/src/routes"]
       },
       "configurations": {
         "production": {
@@ -24,21 +28,9 @@
           "extractLicenses": true,
           "generatePackageJson": true,
           "sourceMap": false
-        },
-        "development": {
-          "optimization": false,
-          "sourceMap": true
         }
       },
-      "defaultConfiguration": "production",
-      "cache": true,
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "production",
-        "^production"
-      ]
+      "defaultConfiguration": "production"
     },
     "lint": {
       "executor": "@nx/eslint:lint",

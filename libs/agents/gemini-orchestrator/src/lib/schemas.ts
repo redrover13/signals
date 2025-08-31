@@ -16,8 +16,24 @@ import { z } from 'zod';
 export enum SubAgentType {
   BIGQUERY = 'BIGQUERY',
   FIREBASE = 'FIREBASE',
-  TOOL = 'TOOL'
+  TOOL = 'TOOL',
+  RAG = 'RAG'
 }
+
+/**
+ * RAG options schema
+ */
+export const ragOptionsSchema = z.object({
+  dataStoreId: z.string().optional(),
+  searchEngineId: z.string().optional(),
+  maxResults: z.number().positive().default(5),
+  filter: z.record(z.any()).optional(),
+  chunkSize: z.number().positive().default(1000),
+  overlap: z.number().positive().default(200),
+  generateEmbeddings: z.boolean().default(true)
+});
+
+export type RAGOptions = z.infer<typeof ragOptionsSchema>;
 
 /**
  * Cache options schema

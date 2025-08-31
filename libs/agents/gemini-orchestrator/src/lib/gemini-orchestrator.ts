@@ -24,7 +24,8 @@ import {
   CacheOptions,
   OrchestratorInput,
   OrchestratorStreamOutput,
-  OrchestratorMetadata
+  OrchestratorMetadata,
+  RAGOptions
 } from './schemas';
 import { 
   executeQuery as executeBigQueryQuery
@@ -39,7 +40,9 @@ import {
   getToolFunctionDeclarations, 
   executeTool 
 } from './tools';
-import { createGeminiErrorHandler, mapGeminiError } from './utils/error-handler';
+import { RAGClient } from './clients/rag.client';
+import { DefaultRAGClient } from './clients/default-rag.client';
+import { createGeminiErrorHandler, mapGeminiError, GeminiErrorCategory } from './utils/error-handler';
 import { loadGeminiConfig, loadMCPConfig } from './config/config.service';
 import { ErrorCategory, ErrorSeverity, createError } from '@nx-monorepo/utils/monitoring';
 import { MCPServerConfig, MCPServerCategory } from './config/mcp-config.schema';
@@ -241,13 +244,16 @@ export class GeminiOrchestrator {
   private cache = new Map<string, { result: any; timestamp: number; serverId?: string }>();
   private mcpServerManager: MCPServerManager;
   private startTime: number = 0;
+  private ragClient: RAGClient | null = null;
   
   /**
    * Constructor
    * @param mcpServerManager - Optional custom MCP server manager
+   * @param ragClient - Optional custom RAG client
    */
-  constructor(mcpServerManager?: MCPServerManager) {
+  constructor(mcpServerManager?: MCPServerManager, ragClient?: RAGClient) {
     this.mcpServerManager = mcpServerManager || new DefaultMCPServerManager();
+    this.ragClient = ragClient || null;
   }
   
   /**
@@ -288,6 +294,18 @@ export class GeminiOrchestrator {
       
       // Get tool declarations
       this.toolDeclarations = getToolFunctionDeclarations();
+      
+      // Initialize RAG client if not already provided
+      if (!this.ragClient) {
+        const ragConfig = {
+          projectId: this.config.projectId || process.env.GCP_PROJECT_ID,
+          location: this.config.location || 'us-central1',
+          dataStoreId: this.config.ragDataStoreId || process.env.RAG_DATASTORE_ID,
+          searchEngineId: this.config.ragSearchEngineId || process.env.RAG_SEARCH_ENGINE_ID
+        };
+        this.ragClient = new RAGClient(ragConfig);
+        await this.ragClient.initialize();
+      }
       
       this.isInitialized = true;
     } catch (error) {
@@ -487,6 +505,9 @@ export class GeminiOrchestrator {
               break;
             case SubAgentType.TOOL:
               yield* this.streamFromTool(query, context, mcpServerId, chunkIndex);
+              break;
+            case SubAgentType.RAG:
+              yield* this.streamFromRAG(query, context, mcpServerId, chunkIndex);
               break;
             default:
               throw new Error(`Unknown sub-agent type: ${subAgentType}`);
@@ -904,6 +925,177 @@ export class GeminiOrchestrator {
       });
     }
   }
+  
+  /**
+   * Stream from RAG sub-agent
+   * @param query - User query
+   * @param context - Additional context
+   * @param mcpServerId - MCP server ID
+   * @param startChunkIndex - Starting chunk index
+   * @returns Stream of outputs
+   */
+  private async *streamFromRAG(
+    query: string,
+    context: Record<string, unknown>,
+    mcpServerId?: string,
+    startChunkIndex: number = 0
+  ): AsyncGenerator<OrchestratorStreamOutput, void, unknown> {
+    let chunkIndex = startChunkIndex;
+    
+    try {
+      if (!this.ragClient) {
+        throw new Error('RAG client not initialized');
+      }
+      
+      // Retrieve relevant documents
+      yield {
+        success: true,
+        content: 'Searching for relevant documents...',
+        done: false,
+        chunkIndex: chunkIndex++
+      };
+      
+      // Extract RAG-specific options from context
+      const ragOptions = context.ragOptions || {};
+      
+      // Search for relevant documents
+      const searchResults = await this.ragClient.searchDocuments(query, ragOptions);
+      
+      if (!searchResults || searchResults.length === 0) {
+        yield {
+          success: true,
+          content: 'No relevant documents found for your query.',
+          done: true,
+          chunkIndex: chunkIndex++
+        };
+        return;
+      }
+      
+      yield {
+        success: true,
+        content: `Found ${searchResults.length} relevant documents.`,
+        done: false,
+        chunkIndex: chunkIndex++
+      };
+      
+      // Extract relevant content from search results
+      const relevantContent = searchResults.map(result => {
+        return {
+          content: result.document?.content || result.content || '',
+          metadata: result.document?.metadata || result.metadata || {},
+          score: result.score || 0
+        };
+      });
+      
+      // Generate response using Gemini model
+      yield {
+        success: true,
+        content: 'Generating response based on retrieved documents...',
+        done: false,
+        chunkIndex: chunkIndex++
+      };
+      
+      if (!this.model) {
+        throw new Error('Model not initialized');
+      }
+      
+      // Construct context-aware prompt with retrieved documents
+      const contextContent = relevantContent.map(doc => doc.content).join('\n\n');
+      
+      const result = await this.model.generateContent({
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              {
+                text: `
+                I need you to answer a question based on the provided context documents.
+                
+                Question: ${query}
+                
+                Context documents:
+                ${contextContent}
+                
+                Please provide a comprehensive answer based only on the information in the context documents.
+                If the context doesn't contain enough information to answer the question fully, acknowledge that limitation.
+                Include relevant citations by referring to specific parts of the documents.
+                `
+              }
+            ]
+          }
+        ]
+      });
+      
+      // Final response
+      yield {
+        success: true,
+        content: result.response.text(),
+        sources: relevantContent.map(doc => ({
+          content: doc.content.substring(0, 200) + '...',
+          metadata: doc.metadata,
+          score: doc.score
+        })),
+        done: true,
+        chunkIndex: chunkIndex++
+      };
+    } catch (error) {
+      throw errorHandler(mapGeminiError(error), { 
+        action: 'streamFromRAG',
+        query,
+        mcpServerId
+      });
+    }
+  }
+  
+  /**
+   * Analyze query to determine appropriate sub-agent
+   * @param query - User query
+   * @param context - Additional context
+   * @returns The determined sub-agent type
+   */
+  private async analyzeQueryForRouting(
+    query: string,
+    context: Record<string, unknown>
+  ): Promise<SubAgentType> {
+    try {
+      // If context explicitly specifies a subAgentType, use that
+      if (context.subAgentType && Object.values(SubAgentType).includes(context.subAgentType as SubAgentType)) {
+        return context.subAgentType as SubAgentType;
+      }
+      
+      // If context includes RAG options, use RAG
+      if (context.ragOptions || query.toLowerCase().includes('document') || query.toLowerCase().includes('knowledge base')) {
+        return SubAgentType.RAG;
+      }
+      
+      // Check for BigQuery keywords
+      if (
+        query.toLowerCase().includes('sql') ||
+        query.toLowerCase().includes('database') ||
+        query.toLowerCase().includes('query') ||
+        query.toLowerCase().includes('data analysis')
+      ) {
+        return SubAgentType.BIGQUERY;
+      }
+      
+      // Check for Firebase keywords
+      if (
+        query.toLowerCase().includes('firebase') ||
+        query.toLowerCase().includes('document') ||
+        query.toLowerCase().includes('collection')
+      ) {
+        return SubAgentType.FIREBASE;
+      }
+      
+      // Default to tool for general requests
+      return SubAgentType.TOOL;
+    } catch (error) {
+      console.error('Error in analyzeQueryForRouting:', error);
+      // Default to tool if analysis fails
+      return SubAgentType.TOOL;
+    }
+  }
+  
   /**
    * Route request to appropriate sub-agent
    * @param subAgentType - Sub-agent type
@@ -932,6 +1124,8 @@ export class GeminiOrchestrator {
           return await this.handleFirebaseRequest(query, context);
         case SubAgentType.TOOL:
           return await this.handleToolRequest(query, context);
+        case SubAgentType.RAG:
+          return await this.routeThroughRAG(query, context);
         default:
           throw new Error(`Unknown sub-agent type: ${subAgentType}`);
       }
@@ -1052,6 +1246,8 @@ export class GeminiOrchestrator {
         return 'platforms';
       case SubAgentType.TOOL:
         return 'specialized';
+      case SubAgentType.RAG:
+        return 'knowledge';
       default:
         return 'core';
     }
@@ -1305,6 +1501,87 @@ export class GeminiOrchestrator {
   }
   
   /**
+   * Route through RAG
+   * @param query - User query
+   * @param context - Additional context
+   * @returns Result from RAG
+   */
+  private async routeThroughRAG(query: string, context: Record<string, unknown>): Promise<Record<string, unknown>> {
+    try {
+      if (!this.ragClient) {
+        throw new Error('RAG client not initialized');
+      }
+      
+      // Extract RAG-specific options from context
+      const ragOptions = context.ragOptions || {};
+      
+      // Search for relevant documents
+      const searchResults = await this.ragClient.searchDocuments(query, ragOptions);
+      
+      if (!searchResults || searchResults.length === 0) {
+        return {
+          success: true,
+          message: 'No relevant documents found for your query.',
+          results: []
+        };
+      }
+      
+      // Extract relevant content from search results
+      const relevantContent = searchResults.map(result => {
+        return {
+          content: result.document?.content || result.content || '',
+          metadata: result.document?.metadata || result.metadata || {},
+          score: result.score || 0
+        };
+      });
+      
+      // Generate response using Gemini model
+      if (!this.model) {
+        throw new Error('Model not initialized');
+      }
+      
+      // Construct context-aware prompt with retrieved documents
+      const contextContent = relevantContent.map(doc => doc.content).join('\n\n');
+      
+      const result = await this.model.generateContent({
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              {
+                text: `
+                I need you to answer a question based on the provided context documents.
+                
+                Question: ${query}
+                
+                Context documents:
+                ${contextContent}
+                
+                Please provide a comprehensive answer based only on the information in the context documents.
+                If the context doesn't contain enough information to answer the question fully, acknowledge that limitation.
+                Include relevant citations by referring to specific parts of the documents.
+                `
+              }
+            ]
+          }
+        ]
+      });
+      
+      return {
+        success: true,
+        answer: result.response.text(),
+        sources: relevantContent.map(doc => ({
+          content: doc.content.substring(0, 200) + '...',
+          metadata: doc.metadata,
+          score: doc.score
+        }))
+      };
+    } catch (error) {
+      throw errorHandler(mapGeminiError(error), { action: 'routeThroughRAG', query });
+    }
+  }
+  
+  /**
    * Get MCP server category based on sub-agent type
    * @param subAgentType - Type of sub-agent
    * @returns Corresponding MCP server category
@@ -1317,6 +1594,8 @@ export class GeminiOrchestrator {
         return MCPServerCategory.DATA;
       case SubAgentType.TOOL:
         return MCPServerCategory.CORE;
+      case SubAgentType.RAG:
+        return MCPServerCategory.DATA;
       default:
         return MCPServerCategory.CORE;
     }

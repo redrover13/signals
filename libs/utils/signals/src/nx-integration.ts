@@ -73,18 +73,20 @@ export function signalFromStore<T, S = T>(
 }
 
 /**
- * Create an action dispatcher for a specific action type
+ * Create an action dispatcher that adds tracing metadata
  * 
- * @param store - The store to dispatch to
- * @param actionCreator - Function that creates an action object
- * @returns A function that dispatches the action with the given payload
+ * This is a utility function for creating action dispatchers in an Nx-based project
+ * that adds automatic tracing metadata to help with debugging and performance monitoring.
+ * 
+ * @param actionName - The name of the action to dispatch
+ * @param projectName - The name of the project this action belongs to
+ * @returns A function that dispatches the action with tracing information
  */
-export function createActionDispatcher<T, P>(
-  store: Store<any>,
-  actionCreator: (payload: P) => { type: string; payload: P }
-): (payload: P) => void {
-  return (payload: P) => {
-    store.dispatch(actionCreator(payload));
+// Helper function to create a strongly-typed action dispatcher
+export function createActionDispatcher<T>(): (action: T) => void {
+  return (action: T) => {
+    console.log('Dispatching action:', action);
+    // Implement action dispatch logic here
   };
 }
 

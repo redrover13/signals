@@ -8,39 +8,27 @@
     "declarationMap": true,
     "sourceMap": true,
     "paths": {
-      "@dulce/gcp": ["libs/gcp/src/index.ts"],
-      "@dulce-de-saigon/security": ["libs/security/src/index.ts"],
-      "@nx-monorepo/*": ["libs/*"],
-      "@nx-monorepo/adk": ["libs/adk/src/index.ts"],
-      "@nx-monorepo/agents": ["libs/agents/src/index.ts"],
-      "@nx-monorepo/agents/gemini-orchestrator": ["libs/agents/gemini-orchestrator/src/index.ts"],
-      "@nx-monorepo/bq-agent": ["libs/agents/bq-agent/src/index.ts"],
-      "@nx-monorepo/content-agent": ["libs/agents/content-agent/src/index.ts"],
-      "@nx-monorepo/crm-agent": ["libs/agents/crm-agent/src/index.ts"],
-      "@nx-monorepo/looker-agent": ["libs/agents/looker-agent/src/index.ts"],
-      "@nx-monorepo/reviews-agent": ["libs/agents/reviews-agent/src/index.ts"],
-      "@nx-monorepo/agents/bq-agent": ["libs/agents/bq-agent/src/index.ts"],
-      "@nx-monorepo/agents/content-agent": ["libs/agents/content-agent/src/index.ts"],
-      "@nx-monorepo/agents/crm-agent": ["libs/agents/crm-agent/src/index.ts"],
-      "@nx-monorepo/agents/looker-agent": ["libs/agents/looker-agent/src/index.ts"],
-      "@nx-monorepo/agents/reviews-agent": ["libs/agents/reviews-agent/src/index.ts"],
-      "@nx-monorepo/agents-sdk": ["libs/agents-sdk/src/index.ts"],
-      "@nx-monorepo/build-tools": ["libs/build-tools/src/index.ts"],
-      "@nx-monorepo/gcp": ["libs/gcp/src/index.ts"],
-      "@nx-monorepo/gcp/*": ["libs/gcp/src/*"],
-      "@nx-monorepo/mcp": ["libs/mcp/src/index.ts"],
-      "@nx-monorepo/utils/api-clients": ["libs/utils/api-clients/src/index.ts"],
-      "@nx-monorepo/utils/gcp-auth": ["libs/utils/gcp-auth/src/index.ts"],
-      "@nx-monorepo/utils/monitoring": ["libs/utils/monitoring/src/index.ts"],
-      "@nx-monorepo/utils/signals": ["libs/utils/signals/src/index.ts"],
-      "@nx-monorepo/data-models": ["libs/data-models/schemas/src/index.ts"],
-      "@nx-monorepo/data-models/dbt-models": ["libs/data-models/dbt-models/src/index.ts"],
-      "@nx-monorepo/data-models/schemas": ["libs/data-models/schemas/src/index.ts"],
-      "@nx-monorepo/env": ["libs/env/src/index.ts"],
-      "@nx-monorepo/security": ["libs/security/src/index.ts"],
-      "@nx-monorepo/ui/components": ["libs/ui/components/src/index.ts"],
-      "@nx-monorepo/utils/secrets-manager": ["libs/utils/secrets-manager/src/index.ts"],
-      "@nx-monorepo/gcp-core": ["libs/gcp-core/src/index.ts"]
+      "@nx-monorepo/*": [
+        "libs/*"
+      ],
+      "@nx-monorepo/adk": [
+        "libs/adk/src/index.ts"
+      ],
+      "@nx-monorepo/agents-sdk": [
+        "libs/agents-sdk/src/index.ts"
+      ],
+      "@nx-monorepo/gcp": [
+        "libs/gcp/src/index.ts"
+      ],
+      "@nx-monorepo/utils/signals": [
+        "libs/utils/signals/src/index.ts"
+      ],
+      "@nx-monorepo/utils/common-types": [
+        "libs/utils/common-types/src/index.ts"
+      ],
+      "@nx-monorepo/security": [
+        "libs/security/src/index.ts"
+      ]
     },
     "outDir": "./dist/out-tsc",
     "moduleResolution": "node",

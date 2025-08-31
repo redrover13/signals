@@ -14,7 +14,7 @@ import { Storage } from '@google-cloud/storage';
 import { PubSub } from '@google-cloud/pubsub';
 import { PredictionServiceClient, v1 } from '@google-cloud/aiplatform';
 import { GoogleAuth } from 'google-auth-library';
-import { memoize } from 'lodash';
+import memoize from 'lodash/memoize';
 import { getProjectId, GcpInitializationError } from '@nx-monorepo/gcp-core';
 
 export async function getGoogleCloudCredentials(): Promise<{
@@ -58,7 +58,7 @@ export const getStorageClient = memoize((): Storage => {
 
 export async function query(sql: string, params?: Record<string, unknown>) {
   const bigquery = getBigQueryClient();
-  const [rows] = await bigquery.query({ query: sql, params });
+  const [rows] = await bigquery.query({ query: sql, params: params as any });
   return rows;
 }
 
@@ -72,8 +72,8 @@ export async function insertRows(datasetTable: string, rows: Array<Record<string
     datasetName = parts.join('.');
   } else if (datasetTable.includes('/')) {
     const parts = datasetTable.split('/');
-    datasetName = parts[0];
-    tableName = parts[1];
+    datasetName = parts[0] as string;
+    tableName = parts[1] as string;
   } else {
     throw new Error('insertRows expects dataset.table or dataset/table');
   }
@@ -94,7 +94,7 @@ export async function uploadString(path: string, contents: string | Buffer, cont
   const bucketName = path.slice(0, firstSlash);
   const objectName = path.slice(firstSlash + 1);
   const file = storage.bucket(bucketName).file(objectName);
-  await file.save(typeof contents === 'string' ? Buffer.from(contents) : contents, { contentType });
+  await file.save(typeof contents === 'string' ? Buffer.from(contents) : contents, { contentType: contentType as any });
   return `gs://${bucketName}/${objectName}`;
 }
 

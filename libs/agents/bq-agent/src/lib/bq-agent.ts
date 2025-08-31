@@ -9,7 +9,7 @@
  * @license MIT
  */
 
-import { BigQuery, Job } from '@google-cloud/bigquery';
+import { BigQuery } from '@google-cloud/bigquery';
 
 export interface BQAgentConfig {
   projectId: string;
@@ -64,7 +64,7 @@ export class BQAgent {
       return {
         success: true,
         data: rows,
-        jobId: job.id,
+        jobId: job.id || '',  // Ensure jobId is always a string
         totalRows: rows.length
       };
     } catch (error) {
@@ -185,7 +185,7 @@ export class BQAgent {
   async createTable(datasetId: string, tableId: string, schema: any[]): Promise<boolean> {
     try {
       const dataset = this.bigquery.dataset(datasetId);
-      const [table] = await dataset.createTable(tableId, { schema });
+      await dataset.createTable(tableId, { schema });
       return true;
     } catch (error) {
       throw new Error(`Failed to create table: ${error instanceof Error ? error.message : 'Unknown error'}`);

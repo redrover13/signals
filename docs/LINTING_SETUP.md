@@ -12,6 +12,7 @@ The Signals project uses ESLint within an Nx monorepo architecture. Linting is m
    - `.eslintrc.json` - Contains the base rules and extends configurations
    - Defines specialized overrides for different file types (TS, JS, test files)
    - Sets up module boundary rules through the `@nx/enforce-module-boundaries` rule
+   - Uses a dedicated `tsconfig.eslint.json` for TypeScript linting that is compatible with project references
 
 2. **Nx Integration**:
    - ESLint is integrated through `@nx/eslint/plugin` in the `nx.json` file
@@ -102,6 +103,22 @@ If you encounter linting issues:
 2. Check for errors in your ESLint configuration files
 3. Verify that all necessary ESLint plugins are installed
 4. Clear the Nx cache if needed: `nx reset`
+
+### Common Issues
+
+#### TypeScript Project References
+
+If you see errors like:
+
+```
+ESLint was configured to run on files using `parserOptions.project` but that file isn't included in the "project" reference
+```
+
+This is because ESLint's `parserOptions.project` has limitations with TypeScript project references. Our solution is:
+
+1. We use a dedicated `tsconfig.eslint.json` that extends the base config but doesn't use project references
+2. ESLint is configured to use this file instead of directly using `tsconfig.base.json`
+3. This approach allows ESLint to properly type-check files without the limitations of project references
 
 ## Best Practices
 

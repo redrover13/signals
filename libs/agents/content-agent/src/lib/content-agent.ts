@@ -23,12 +23,12 @@ import { Requirements, ContentResponse } from '@nx-monorepo/data-models';
  * Content-specialized agent for generating F&B marketing content
  */
 export class ContentAgent extends LlmAgent {
-  public readonly name: string;
-  public readonly description: string;
+  public override readonly name: string;
+  public override readonly description: string;
 
   constructor(cfg?: { model?: string; apiKey?: string; tools?: Array<unknown> }) {
     // Guard against missing API key (fail-fast)
-    const apiKey = cfg?.apiKey ?? process.env.GOOGLE_API_KEY;
+    const apiKey = cfg?.apiKey ?? process.env['GOOGLE_API_KEY'];
     if (!apiKey) {
       throw new Error('GOOGLE_API_KEY is required to initialize ContentAgent');
     }
@@ -40,7 +40,7 @@ export class ContentAgent extends LlmAgent {
     });
 
     // Allow injecting custom tools, defaulting to GCS upload + HTTP request
-    const tools = cfg?.tools ?? [
+    const tools = cfg?.tools as any[] ?? [
       new GCSUploadTool(),
       new HttpRequestTool(),
     ];
@@ -93,11 +93,11 @@ export class ContentAgent extends LlmAgent {
   Generate engaging, culturally appropriate content for the Vietnamese market.
       `;
 
-    return this.runAsync({
+    return (await this.runAsync({
       userContent: { role: 'user', parts: [{ text: prompt }] },
       session: null,
       invocationId: `content_generation_${Date.now()}`,
-    } as InvocationContext) as Promise<ContentResponse>;
+    } as InvocationContext)) as unknown as Promise<ContentResponse>;
   }
 
   /**
@@ -158,7 +158,7 @@ Generate menu content that drives orders and reflects Vietnamese culinary cultur
 /**
  * Factory function to create a Content agent
  */
-export function createContentAgent(config?: {
+export function createContentAgent(_config?: {
   vertexClient?: any;
   projectId?: string;
   language?: string;

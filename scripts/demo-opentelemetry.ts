@@ -31,7 +31,7 @@ async function demoBasicInstrumentation() {
   await initializeOpenTelemetry({
     serviceName: 'demo-agent',
     serviceVersion: '1.0.0',
-    gcpProjectId: process.env.GCP_PROJECT_ID || 'demo-project',
+    gcpProjectId: process.env['GCP_PROJECT_ID'] || 'demo-project',
     enableAutoInstrumentation: true,
     enableCustomExporter: false, // Disable for demo
     enableBigQueryLogs: false,   // Disable for demo
@@ -151,13 +151,13 @@ async function demoFnBUseCases() {
 async function demoBigQueryLogging() {
   console.log('\n📊 Demo: BigQuery Logging');
 
-  if (!process.env.GCP_PROJECT_ID) {
+  if (!process.env['GCP_PROJECT_ID']) {
     console.log('⚠️  Skipping BigQuery demo - GCP_PROJECT_ID not set');
     return;
   }
 
   const logger = new BigQueryLogger({
-    projectId: process.env.GCP_PROJECT_ID,
+    projectId: process.env['GCP_PROJECT_ID'],
     datasetId: 'demo_logs',
     tableId: 'demo_trace_logs',
   });

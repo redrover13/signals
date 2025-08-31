@@ -74,7 +74,7 @@ export function derivedSignal<T, D extends Array<Signal<any>>>(
   );
   
   // Subscribe to all dependencies
-  const unsubscribes = dependencies.map((dep, index) => 
+  dependencies.forEach(dep => 
     dep.subscribe(() => {
       const values = dependencies.map(d => d.get());
       derivedValue.set(derivationFn(...(values as any)));

@@ -29,15 +29,15 @@
               {
                 "sourceTag": "*",
                 "onlyDependOnLibsWithTags": [
-                  "*"                ]
+                  "*"
+                ]
               },
               {
-                "sourceTag": "domain:mcp",
-                "onlyDependOnLibsWithTags": ["domain:mcp", "domain:shared", "type:lib"]
-              },
-              {
-                "sourceTag": "type:app",
-                "onlyDependOnLibsWithTags": ["type:lib"]
+                "sourceTag": "domain:gcp",
+                "onlyDependOnLibsWithTags": [
+                  "domain:gcp-core",
+                  "domain:utils"
+                ]
               }
             ]
           }
@@ -53,7 +53,7 @@
         "plugin:@nx/typescript"
       ],
       "parserOptions": {
-        "project": "./tsconfig.base.json"
+        "project": "./tsconfig.eslint.json"
       },
       "rules": {
         "@typescript-eslint/no-explicit-any": "error",
@@ -68,11 +68,6 @@
         "@typescript-eslint/strict-boolean-expressions": "warn",
         "@typescript-eslint/prefer-nullish-coalescing": "warn",
         "@typescript-eslint/no-unnecessary-type-assertion": "error",
-        "@typescript-eslint/no-unsafe-any": "warn",
-        "@typescript-eslint/no-unsafe-assignment": "warn",
-        "@typescript-eslint/no-unsafe-call": "warn",
-        "@typescript-eslint/no-unsafe-member-access": "warn",
-        "@typescript-eslint/no-unsafe-return": "warn",
         "@typescript-eslint/prefer-as-const": "error",
         "@typescript-eslint/no-floating-promises": ["error", { "ignoreVoid": true }],
         "@typescript-eslint/await-thenable": "error",

@@ -38,11 +38,11 @@ export interface SecurityConfig {
  */
 const DEFAULT_SECURITY_CONFIG: SecurityConfig = {
   rateLimit: {
-    max: parseInt(process.env.RATE_LIMIT_MAX || '100'),
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15 minutes
+    max: parseInt(process.env['RATE_LIMIT_MAX'] || '100'),
+    windowMs: parseInt(process.env['RATE_LIMIT_WINDOW_MS'] || '900000'), // 15 minutes
   },
   cors: {
-    origin: process.env.NODE_ENV === 'production' ? false : true,
+    origin: process.env['NODE_ENV'] === 'production' ? false : true,
     credentials: true,
   },
   helmet: true,
@@ -104,7 +104,7 @@ export async function authenticateRequest(
   
   // In production, validate against Google Cloud IAM tokens
   // For now, validate against the API key from environment
-  const expectedApiKey = process.env.DULCE_API_KEY;
+  const expectedApiKey = process.env['DULCE_API_KEY'];
   if (!expectedApiKey) {
     reply.code(500).send({
       error: 'Internal Server Error',
@@ -166,7 +166,7 @@ export async function validateVietnameseCompliance(
   request.log.info({
     timestamp: new Date().toISOString(),
     action: 'data_access',
-    endpoint: request.routeConfig.url,
+    endpoint: request.url,
     method: request.method,
     ip: request.ip,
     userAgent: request.headers['user-agent'],

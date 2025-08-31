@@ -24,7 +24,7 @@ class BQSubAgent {
     this.bigquery = new BigQuery({ projectId });
   }
 
-  async execute(sql: string): Promise<any> {
+  async execute(sql: string): Promise<unknown[]> {
     const [rows] = await this.bigquery.query({ query: sql });
     return rows;
   }
@@ -68,11 +68,13 @@ export class GeminiOrchestrator {
     if (response.toLowerCase().includes('query data')) {
       // Example: Extract SQL from response or query
       const sql = 'SELECT * FROM dataset.table LIMIT 10'; // Placeholder
-      return this.subAgents.bq.execute(sql);
+      const data = await this.subAgents.bq.execute(sql);
+      return orchestratorOutputSchema.parse({ success: true, data });
     } else if (response.toLowerCase().includes('update realtime')) {
       // Example: Extract data from response
       const data = { path: 'users/1', value: { name: 'Updated' } }; // Placeholder
-      return this.subAgents.firebase.execute(data);
+      await this.subAgents.firebase.execute(data);
+      return orchestratorOutputSchema.parse({ success: true, data: { updated: true } });
     }
 
     throw new Error('No matching sub-agent for query');

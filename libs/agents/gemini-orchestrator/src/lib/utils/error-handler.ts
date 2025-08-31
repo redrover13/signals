@@ -11,4 +11,4 @@
 
 export enum ErrorCategory {}
 export enum ErrorSeverity {}
-export function createServiceErrorHandler(serviceName: string, fileName: string): any { return {}; }
+export function createServiceErrorHandler(_serviceName: string, _fileName: string): any { return {}; }

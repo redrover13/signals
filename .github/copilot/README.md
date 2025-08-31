@@ -1,6 +1,6 @@
 # GitHub Copilot Configuration
 
-This directory contains configuration files for GitHub Copilot coding agent.
+This directory contains configuration files for GitHub Copilot coding agent. For comprehensive project instructions, please refer to the [agents.md](/agents.md) file at the root of this repository.
 
 ## Files
 
@@ -30,3 +30,5 @@ You may need to add the relevant hosts to this configuration file. See [GitHub C
 ## Related Files
 
 - `/.github/copilot-agent.yml` - Contains additional configuration for the GitHub Copilot agent
+- `/agents.md` - The comprehensive instruction document for AI assistants (main source of truth)
+- `/.github/instructions/` - Directory containing legacy domain-specific instructions (being transitioned to agents.md)

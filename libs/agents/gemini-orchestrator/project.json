@@ -9,7 +9,8 @@
   ],
   "implicitDependencies": [
     "gcp",
-    "gcp-auth"
+    "gcp-auth",
+    "gcp"
   ],
   "targets": {
     "build": {

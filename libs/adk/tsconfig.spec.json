@@ -10,6 +10,7 @@
   },
   "include": [
     "jest.config.ts",
+    "src/**/*.ts",
     "src/**/*.test.ts",
     "src/**/*.spec.ts",
     "src/**/*.test.tsx",
@@ -18,6 +19,8 @@
     "src/**/*.spec.js",
     "src/**/*.test.jsx",
     "src/**/*.spec.jsx",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "../../libs/gcp/src/**/*.ts",
+    "../../libs/gcp-core/src/**/*.ts"
   ]
 }

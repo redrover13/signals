@@ -25,7 +25,7 @@ interface StorageUploadInput {
   contentType?: string;
 }
 
-import { query, insertRows, uploadString } from '@dulce/gcp';
+import { query, insertRows, uploadString } from '@nx-monorepo/gcp';
 
 export const tools = {
   'bq.query': {

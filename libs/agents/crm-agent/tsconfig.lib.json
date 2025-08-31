@@ -10,7 +10,10 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*"
+    "src/**/*",
+    "../../../libs/adk/src/**/*.ts",
+    "../../../libs/gcp/src/**/*.ts",
+    "../../../libs/gcp-core/src/**/*.ts"
   ],
   "exclude": [
     "jest.config.ts",

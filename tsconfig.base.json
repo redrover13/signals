@@ -20,6 +20,7 @@
       "@nx-monorepo/agents-sdk": ["libs/agents-sdk/src/index.ts"],
       "@nx-monorepo/build-tools": ["libs/build-tools/src/index.ts"],
       "@nx-monorepo/gcp": ["libs/gcp/src/index.ts"],
+      "@nx-monorepo/gcp/*": ["libs/gcp/src/*"],
       "@nx-monorepo/mcp": ["libs/mcp/src/index.ts"],
       "@nx-monorepo/utils/api-clients": ["libs/utils/api-clients/src/index.ts"],
       "@nx-monorepo/utils/gcp-auth": ["libs/utils/gcp-auth/src/index.ts"],

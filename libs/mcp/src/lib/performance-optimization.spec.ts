@@ -3,10 +3,7 @@
  * Tests for caching, connection pooling, and query optimization
  */
 
-import { MCPService } from '../src/lib/mcp.service';
-import { CacheService } from '../src/lib/services/cache.service';
-import { PerformanceMetricsService } from '../src/lib/services/performance-metrics.service';
-import { ConnectionPoolService } from '../src/lib/services/connection-pool.service';
+import { MCPService, CacheService, PerformanceMetricsService, ConnectionPoolService } from '@nx-monorepo/mcp';
 
 describe('Performance Optimizations', () => {
   let mcpService: MCPService;
@@ -158,7 +155,7 @@ describe('Performance Optimizations', () => {
         id: serverId,
         name: 'Test Server',
         category: 'test',
-        type: 'test',
+        type: 'test' as const,
         enabled: true,
         priority: 5,
         connection: {
@@ -191,7 +188,7 @@ describe('Performance Optimizations', () => {
         id: serverId,
         name: 'Reuse Test Server',
         category: 'test',
-        type: 'test',
+        type: 'test' as const,
         enabled: true,
         priority: 5,
         connection: {

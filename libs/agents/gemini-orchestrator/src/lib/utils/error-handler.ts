@@ -29,6 +29,11 @@ export enum GeminiErrorCategory {
   MCP_SERVER_UNAVAILABLE = 'mcp_server_unavailable',
   MCP_SERVER_ERROR = 'mcp_server_error',
   MCP_REQUEST_ERROR = 'mcp_request_error',
+  RAG_SEARCH_ERROR = 'rag_search_error',
+  RAG_PROCESSING_ERROR = 'rag_processing_error',
+  RAG_EXTRACTION_ERROR = 'rag_extraction_error',
+  RAG_EMBEDDING_ERROR = 'rag_embedding_error',
+  RAG_INTEGRATION_ERROR = 'rag_integration_error',
 }
 
 /**
@@ -136,6 +141,16 @@ function getVietnameseErrorMessage(
       return 'Lỗi máy chủ MCP. Đội ngũ kỹ thuật đã được thông báo.';
     case GeminiErrorCategory.MCP_REQUEST_ERROR:
       return 'Lỗi yêu cầu MCP. Vui lòng kiểm tra dữ liệu đầu vào và thử lại.';
+    case GeminiErrorCategory.RAG_SEARCH_ERROR:
+      return 'Lỗi tìm kiếm RAG. Vui lòng kiểm tra thông số tìm kiếm và thử lại.';
+    case GeminiErrorCategory.RAG_PROCESSING_ERROR:
+      return 'Lỗi xử lý tài liệu RAG. Vui lòng kiểm tra định dạng tài liệu và thử lại.';
+    case GeminiErrorCategory.RAG_EXTRACTION_ERROR:
+      return 'Lỗi trích xuất văn bản RAG. Định dạng tệp không được hỗ trợ hoặc bị hỏng.';
+    case GeminiErrorCategory.RAG_EMBEDDING_ERROR:
+      return 'Lỗi tạo embedding RAG. Vui lòng kiểm tra cấu hình Vertex AI và thử lại.';
+    case GeminiErrorCategory.RAG_INTEGRATION_ERROR:
+      return 'Lỗi tích hợp RAG. Vui lòng kiểm tra cấu hình và kết nối dịch vụ.';
     default:
       return `Đã xảy ra lỗi: ${originalMessage}`;
   }

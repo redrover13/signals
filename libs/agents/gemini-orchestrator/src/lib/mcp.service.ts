@@ -263,7 +263,7 @@ export class MCPService {
    */
   async orchestrateWithGemini(query: string, config: { apiKey: string; projectId: string; firebaseConfig: any }): Promise<any> {
     const orchestrator = new GeminiOrchestrator(config.apiKey, config.projectId, config.firebaseConfig);
-    return orchestrator.orchestrate(query);
+    return orchestrator.orchestrate({ query });
   }
 
   /**

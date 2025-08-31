@@ -10,9 +10,7 @@
     "noFallthroughCasesInSwitch": true,
     "noPropertyAccessFromIndexSignature": true,
     "paths": {
-      "@dulce/gcp": [
-        "../../../libs/gcp/src/index.ts"
-      ]
+      "@nx-monorepo/gcp": ["../../../libs/gcp/src/index.ts"]
     }
   },
   "files": [],

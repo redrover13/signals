@@ -11,7 +11,8 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*"
+    "src/**/*",
+    "../../gcp-core/src/**/*.ts"
   ],
   "exclude": [
     "jest.config.ts",

@@ -1,8 +1,19 @@
 {
-  "cli": {
-    "wrapper": "./cli-wrapper.sh",
-    "env": {
-      "CODACY_CLI_V2_VERSION": "1.0.0-main.354.sha.642d8bf"
+  "port": 23336,
+  "log": {
+    "level": "info",
+    "file": "/home/g_nelson/signals-1/.codacy/logs/mcp-server.log"
+  },
+  "tools": [
+    {
+      "name": "codacy_cli_analyze",
+      "command": "cd /home/g_nelson/signals-1 && pnpm run codacy:analyze {{file}} --tool {{tool}} --format sarif",
+      "cwd": "/home/g_nelson/signals-1"
+    },
+    {
+      "name": "codacy_list_repository_issues",
+      "command": "cd /home/g_nelson/signals-1 && pnpm run codacy:analyze --format json",
+      "cwd": "/home/g_nelson/signals-1"
     }
-  }
+  ]
 }

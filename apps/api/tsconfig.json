@@ -9,6 +9,13 @@
     "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["src/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "../../libs/mcp/src/**/*.ts",
+    "../../libs/adk/src/**/*.ts",
+    "../../libs/utils/monitoring/src/**/*.ts",
+    "../../libs/gcp/src/**/*.ts",
+    "../../libs/gcp-core/src/**/*.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

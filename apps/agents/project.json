@@ -17,7 +17,6 @@
       ],
       "options": {
         "outputPath": "dist/apps/agents",
-        "main": "apps/agents/src/main.ts",
         "tsConfig": "apps/agents/tsconfig.json"
       },
       "configurations": {

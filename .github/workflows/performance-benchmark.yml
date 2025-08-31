@@ -14,7 +14,7 @@ jobs:
       STORE_PATH: ""
     steps:
       - name: Checkout code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v4
         
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.1.0
@@ -28,7 +28,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
       - name: Setup pnpm cache
-        uses: actions/cache@13aacd865c20de90d75de3b17b4d668cea53b85f # v4.0.0
+        uses: actions/cache@v4
         with:
           path: ${{ env.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -36,7 +36,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
           
       - name: Setup Node.js
-        uses: actions/setup-node@c4c9e84c7b9465a335b762113626741ec8e95c00 # v4.0.1
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: pnpm

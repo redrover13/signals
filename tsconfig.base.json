@@ -34,7 +34,7 @@
       "@nx-monorepo/gcp-core": ["libs/gcp-core/src/index.ts"]
     },
     "outDir": "./dist/out-tsc",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "ES2022",

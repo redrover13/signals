@@ -37,6 +37,7 @@
     "secretlint": "secretlint \"**/*\""
   },
   "devDependencies": {
+    "@jest/types": "^30.0.5",
     "@module-federation/nextjs-mf": "^8.8.38",
     "@module-federation/vite": "^1.7.2",
     "@nx/esbuild": "21.4.1",

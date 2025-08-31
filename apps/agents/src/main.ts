@@ -182,7 +182,7 @@ const start = async () => {
 };
 
 // Start the server if this file is executed directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   start();
 }
 

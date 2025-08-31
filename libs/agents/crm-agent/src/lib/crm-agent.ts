@@ -10,10 +10,11 @@
  */
 
 import {
-  DulceLlmAgent,
+  LlmAgent,
   GeminiLlm,
   BigQueryQueryTool,
-  HttpRequestTool
+  HttpRequestTool,
+  InvocationContext
 } from '@nx-monorepo/adk';
 
 import { CustomerData } from '@nx-monorepo/data-models';
@@ -21,7 +22,10 @@ import { CustomerData } from '@nx-monorepo/data-models';
 /**
  * CRM-specialized agent for customer relationship management
  */
-export class CrmAgent extends DulceLlmAgent {
+export class CrmAgent extends LlmAgent {
+  public readonly name: string;
+  public readonly description: string;
+
   constructor(cfg?: { model?: string; apiKey?: string; tools?: Array<unknown> }) {
     // Require an API key, whether passed in or via env, to avoid silent misconfig
     const apiKey = cfg?.apiKey ?? process.env.GOOGLE_API_KEY;
@@ -44,9 +48,26 @@ export class CrmAgent extends DulceLlmAgent {
     super({
       name: 'CRM Agent',
       description: 'Specialized agent for Vietnamese F&B customer relationship management',
-      llm,
+      model: llm,
       tools,
     });
+
+    this.name = 'CRM Agent';
+    this.description = 'Specialized agent for Vietnamese F&B customer relationship management';
+  }
+
+  /**
+   * Get agent name
+   */
+  getName(): string {
+    return this.name;
+  }
+
+  /**
+   * Get agent description  
+   */
+  getDescription(): string {
+    return this.description;
   }
 
   /**
@@ -69,9 +90,11 @@ Please:
 Focus on insights that can improve customer satisfaction and retention.
     `;
 
-    return this.invoke({
-      messages: [{ role: 'user', content: prompt }],
-    });
+    return this.runAsync({
+      userContent: { role: 'user', parts: [{ text: prompt }] },
+      session: null,
+      invocationId: `analyze_customer_${Date.now()}`,
+    } as InvocationContext);
   }
 
   /**
@@ -93,9 +116,11 @@ Please:
 Ensure recommendations are culturally appropriate and appealing to Vietnamese customers.
     `;
 
-    return this.invoke({
-      messages: [{ role: 'user', content: prompt }],
-    });
+    return this.runAsync({
+      userContent: { role: 'user', parts: [{ text: prompt }] },
+      session: null,
+      invocationId: `recommendations_${Date.now()}`,
+    } as InvocationContext);
   }
 
   /**
@@ -118,9 +143,11 @@ Please:
 Provide actionable insights for improving customer experience.
     `;
 
-    return this.invoke({
-      messages: [{ role: 'user', content: prompt }],
-    });
+    return this.runAsync({
+      userContent: { role: 'user', parts: [{ text: prompt }] },
+      session: null,
+      invocationId: `feedback_${Date.now()}`,
+    } as InvocationContext);
   }
 }
 

@@ -9,7 +9,7 @@
  * @license MIT
  */
 
-import { DulceBaseAgent, DulceLlmAgent, AgentConfig } from '../agents/base-agent';
+import { DulceBaseAgent, AgentConfig } from '../agents/base-agent';
 import { RootAgent, createRootAgent } from '../agents/root-agent';
 
 // Mock the ADK dependencies

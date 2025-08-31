@@ -10,6 +10,7 @@
  */
 
 import { query as bqQuery, insertRows, uploadString } from '@nx-monorepo/gcp';
+import { BaseTool, FunctionTool, ToolContext } from '@waldzellai/adk-typescript';
 
 /**
  * BigQuery query tool function
@@ -123,10 +124,115 @@ async function httpRequest(args: Record<string, unknown>, _toolContext?: ToolCon
  * Registry of all available GCP tools
  */
 export const GCP_TOOLS: BaseTool[] = [
-  new FunctionTool(bigQueryQuery, 'bigquery_query', 'Execute a BigQuery SQL query and return results'),
-  new FunctionTool(bigQueryInsert, 'bigquery_insert', 'Insert rows into a BigQuery table'),
-  new FunctionTool(gcsUpload, 'gcs_upload', 'Upload content to Google Cloud Storage'),
-  new FunctionTool(httpRequest, 'http_request', 'Make HTTP requests to external APIs'),
+  new FunctionTool({
+    name: 'bigquery_query',
+    description: 'Execute a BigQuery SQL query and return results',
+    func: bigQueryQuery,
+    parameters: {
+      type: 'object',
+      properties: {
+        sql: {
+          type: 'string',
+          description: 'The SQL query to execute',
+          minLength: 1
+        },
+        params: {
+          type: 'object',
+          description: 'Optional query parameters',
+          additionalProperties: true
+        }
+      },
+      required: ['sql'],
+      additionalProperties: false
+    }
+  }),
+  new FunctionTool({
+    name: 'bigquery_insert', 
+    description: 'Insert rows into a BigQuery table',
+    func: bigQueryInsert,
+    parameters: {
+      type: 'object',
+      properties: {
+        table: {
+          type: 'string',
+          description: 'The table name in format dataset.table',
+          minLength: 1
+        },
+        rows: {
+          type: 'array',
+          description: 'Array of rows to insert',
+          items: {
+            type: 'object'
+          },
+          minItems: 1
+        }
+      },
+      required: ['table', 'rows'],
+      additionalProperties: false
+    }
+  }),
+  new FunctionTool({
+    name: 'gcs_upload',
+    description: 'Upload content to Google Cloud Storage',
+    func: gcsUpload,
+    parameters: {
+      type: 'object',
+      properties: {
+        bucket: {
+          type: 'string',
+          description: 'The GCS bucket name',
+          minLength: 1
+        },
+        filename: {
+          type: 'string',
+          description: 'The filename/path in GCS',
+          minLength: 1
+        },
+        content: {
+          type: 'string',
+          description: 'The content to upload',
+          minLength: 1
+        }
+      },
+      required: ['bucket', 'filename', 'content'],
+      additionalProperties: false
+    }
+  }),
+  new FunctionTool({
+    name: 'http_request',
+    description: 'Make HTTP requests to external APIs',
+    func: httpRequest,
+    parameters: {
+      type: 'object',
+      properties: {
+        url: {
+          type: 'string',
+          description: 'The URL to make the request to',
+          format: 'uri',
+          minLength: 1
+        },
+        method: {
+          type: 'string',
+          description: 'HTTP method',
+          enum: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+          default: 'GET'
+        },
+        headers: {
+          type: 'object',
+          description: 'HTTP headers',
+          additionalProperties: {
+            type: 'string'
+          }
+        },
+        body: {
+          type: 'string',
+          description: 'Request body for POST/PUT/PATCH'
+        }
+      },
+      required: ['url'],
+      additionalProperties: false
+    }
+  })
 ];
 
 /**

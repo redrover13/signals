@@ -19,6 +19,9 @@ export * from './agents/root-agent';
 // GCP Tools
 export * from './tools/gcp-tools';
 
+// Configuration utilities
+export * from './utilities/configuration';
+
 // Analytics - minimal implementation for compatibility
 export interface AnalyticsEvent {
   category: EventCategory;

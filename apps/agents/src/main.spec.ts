@@ -29,7 +29,7 @@ jest.mock('@nx-monorepo/mcp', () => ({
 }));
 
 // Mock Vertex AI client
-jest.mock('@nx-monorepo/adk/services/vertex', () => ({
+jest.mock('@nx-monorepo/adk', () => ({
   VertexAIClient: jest.fn().mockImplementation(() => ({
     predict: jest.fn().mockResolvedValue('mock prediction')
   })),

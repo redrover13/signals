@@ -19,7 +19,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+import { execSync, execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -986,7 +986,7 @@ function applyFixes() {
     console.log(`\nApplying fix for TS${fix.errorCode}: ${fix.description}`);
     
     try {
-      execSync(`node ${path.join(ROOT_DIR, fix.fixPath)}`, { 
+      execFileSync('node', [path.join(ROOT_DIR, fix.fixPath)], { 
         stdio: 'inherit',
         cwd: ROOT_DIR
       });

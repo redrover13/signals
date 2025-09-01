@@ -159,7 +159,7 @@ export const GCP_TOOLS: BaseTool[] = [
       properties: {
         table: {
           type: 'string',
-          description: 'The table name in format dataset && dataset.table',
+          description: 'The table name in format dataset.table',
           minLength: 1
         },
         rows: {

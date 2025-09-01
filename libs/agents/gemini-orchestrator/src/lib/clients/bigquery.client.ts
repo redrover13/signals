@@ -18,7 +18,7 @@ let bigQueryInstance: BigQuery | null = null;
 // Error handler for BigQuery client
 const errorHandler = createGeminiErrorHandler(
   'BigQueryClient',
-  'bigquery.client && bigquery.client.ts'
+  'bigquery.client.ts'
 );
 
 /**

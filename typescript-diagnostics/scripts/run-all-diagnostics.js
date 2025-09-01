@@ -15,7 +15,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -40,7 +40,7 @@ function runScript(scriptName, args = []) {
   console.log(`\n🚀 Running ${scriptName}...`);
   
   try {
-    execSync(`node ${scriptPath} ${args.join(' ')}`, { 
+    execFileSync('node', [scriptPath, ...args], { 
       stdio: 'inherit',
       cwd: ROOT_DIR
     });

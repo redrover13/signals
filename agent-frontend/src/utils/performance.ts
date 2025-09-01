@@ -59,7 +59,7 @@ export const trackInteraction = <T extends (...args: any[]) => any>(
     
     // If the result is a promise, measure its completion time
     if (result instanceof Promise) {
-      result?.finally(() => {
+      result.finally(() => {
         const end = performance.now();
         console.log(`[Performance] Interaction "${name}" took ${(end - start).toFixed(2)}ms to complete`);
       });

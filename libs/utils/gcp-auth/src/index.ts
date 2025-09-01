@@ -143,7 +143,7 @@ export function getPubSub() {
       publishMessage: async (msg: unknown) => {
         const topic = pubsub.topic(name);
         const data = Buffer.from(JSON.stringify(msg));
-        const [messageId] = await topic.publishMessage({ data });
+        const messageId = await topic.publishMessage({ data });
         return { messageId, name };
       },
     }),

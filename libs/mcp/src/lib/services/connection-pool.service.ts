@@ -10,215 +10,222 @@
  */
 
 /**
- * Connection Pool Service for MCP Servers
- * Manages connection pooling, reuse, and lifecycle for optimal resource utilization
+ * Connection Pool Service for MCP
+ * 
+ * Manages a pool of connections to MCP servers.
  */
-
-import { EventEmitter } from 'events';
+import { Injectable } from '@angular/core';
 import { MCPServerConfig } from '../config/mcp-config.schema';
-
-export interface PooledConnection {
-  id: string;
-  serverId: string;
-  status: 'idle' | 'active' | 'error' | 'disposed';
-  createdAt: number;
-  lastUsed: number;
-  useCount: number;
-  connection: unknown; // The actual connection object
-  error?: Error;
-}
-
-export interface ConnectionPoolStats {
-  totalConnections: number;
-  activeConnections: number;
-  idleConnections: number;
-  errorConnections: number;
-  waitingRequests: number;
-  poolUtilization: number;
-}
 
 export interface PoolOptions {
   maxConnections?: number;
   minConnections?: number;
-  maxIdleTime?: number;
-  maxConnectionAge?: number;
   connectionTimeout?: number;
+  maxIdle?: number;
+  maxLifetime?: number;
   acquireTimeout?: number;
   maxWaitingRequests?: number;
+  cleanupInterval?: number;
 }
 
-/**
- * Connection Pool for MCP Servers
- */
-export class ConnectionPoolService extends EventEmitter {
-  private pools = new Map<string, PooledConnection[]>();
-  private waitingQueues = new Map<string, Array<{
-    resolve: (connection: PooledConnection) => void;
-    reject: (error: Error) => void;
-    timeout: NodeJS.Timeout;
-  }>>();
+export interface PooledConnection {
+  id: string;
+  serverId?: string;
+  connection: unknown;
+  createdAt: number;
+  lastUsed: number;
+  usageCount: number;
+  busy: boolean;
+}
 
-  private readonly defaultOptions: Required<PoolOptions> = {
+interface ConnectionRequest {
+  resolve: (connection: PooledConnection) => void;
+  reject: (error: Error) => void;
+  timestamp: number;
+}
+
+export interface ConnectionPoolStats {
+  serverId: string;
+  activeConnections: number;
+  idleConnections: number;
+  waitingRequests: number;
+  totalCreated: number;
+  totalAcquired: number;
+  totalReleased: number;
+  totalDestroyed: number;
+  acquireSuccessRate: number;
+  averageAcquireTime: number;
+  averageIdleTime: number;
+  maxAcquireTime: number;
+  averageLifetime: number;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ConnectionPoolService {
+  private pools = new Map<string, PooledConnection[]>();
+  private waitingQueues = new Map<string, ConnectionRequest[]>();
+  private stats = new Map<string, ConnectionPoolStats>();
+  private cleanupInterval: NodeJS.Timeout | null = null;
+  
+  private defaultOptions: Required<PoolOptions> = {
     maxConnections: 10,
     minConnections: 2,
-    maxIdleTime: 300000, // 5 minutes
-    maxConnectionAge: 1800000, // 30 minutes
-    connectionTimeout: 30000, // 30 seconds
-    acquireTimeout: 10000, // 10 seconds
-    maxWaitingRequests: 50
+    connectionTimeout: 10000,
+    maxIdle: 30000,
+    maxLifetime: 60000,
+    acquireTimeout: 5000,
+    maxWaitingRequests: 20,
+    cleanupInterval: 30000
   };
-
-  private cleanupInterval: NodeJS.Timeout | null = null;
-  private stats = new Map<string, {
-    created: number;
-    acquired: number;
-    released: number;
-    disposed: number;
-    errors: number;
-  }>();
-
-  constructor(private options: PoolOptions = {}) {
-    super();
-    
-    // Start cleanup interval
-    this.cleanupInterval = setInterval(() => {
-      this.cleanup();
-    }, 60000); // 1 minute
+  
+  private options: Partial<PoolOptions> = {};
+  private acquisitionTimes: number[] = [];
+  private idleTimes: number[] = [];
+  private lifetimes: number[] = [];
+  
+  constructor() {
+    this.startCleanupInterval();
   }
-
+  
   /**
-   * Acquire a connection from the pool
+   * Configure connection pool options
    */
-  async acquireConnection(serverId: string, serverConfig: MCPServerConfig): Promise<PooledConnection> {
-    const options = { ...this.defaultOptions, ...this.options };
+  configure(options: PoolOptions): void {
+    this.options = { ...options };
     
-    // Get or create pool for server
-    let pool = this.pools.get(serverId);
-    if (!pool) {
-      pool = [];
-      this.pools.set(serverId, pool);
-      this.stats.set(serverId, {
-        created: 0,
-        acquired: 0,
-        released: 0,
-        disposed: 0,
-        errors: 0
-      });
+    // Update cleanup interval if specified
+    if (options.cleanupInterval !== undefined && this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.startCleanupInterval();
     }
-
-    // Try to find an idle connection
-    const idleConnection = pool.find(conn => 
-      conn.status === 'idle' && 
-      !this.isConnectionExpired(conn, options)
-    );
-
-    if (idleConnection) {
-      idleConnection.status = 'active';
-      idleConnection.lastUsed = Date.now();
-      idleConnection.useCount++;
+  }
+  
+  /**
+   * Get a connection from the pool
+   */
+  async getConnection(serverId: string, serverConfig: MCPServerConfig): Promise<PooledConnection> {
+    const options = { ...this.defaultOptions, ...this.options };
+    const pool = this.pools.get(serverId) || [];
+    
+    // Initialize stats for this server if needed
+    if (!this.stats.has(serverId)) {
+      this.initializeStats(serverId);
+    }
+    
+    // Try to get an idle connection
+    for (let i = 0; i < pool.length; i++) {
+      const connection = pool[i];
       
-      this.getStats(serverId).acquired++;
-      return idleConnection;
-    }
-
-    // If pool has space, create new connection
-    const activeConnections = pool.filter(conn => conn.status === 'active' || conn.status === 'idle').length;
-    if (activeConnections < options.maxConnections) {
-      try {
-        const newConnection = await this.createConnection(serverId, serverConfig, options);
-        pool.push(newConnection);
+      if (!connection.busy) {
+        // Check if the connection is expired
+        if (this.isConnectionExpired(connection, options)) {
+          // Remove and destroy this connection
+          pool.splice(i, 1);
+          this.updateStats(serverId, 'totalDestroyed', 1);
+          continue;
+        }
         
-        this.getStats(serverId).created++;
-        this.getStats(serverId).acquired++;
-        return newConnection;
-      } catch (error) {
-        this.getStats(serverId).errors++;
-        throw error;
+        // Connection is valid, mark as busy and return
+        connection.busy = true;
+        connection.lastUsed = Date.now();
+        connection.usageCount++;
+        
+        const idleTime = connection.lastUsed - connection.createdAt;
+        this.idleTimes.push(idleTime);
+        this.updateStats(serverId, 'totalAcquired', 1);
+        
+        return connection;
       }
     }
-
-    // Pool is full, wait for available connection
+    
+    // No idle connection available, check if we can create a new one
+    if (pool.length < options.maxConnections) {
+      try {
+        const newConnection = await this.createConnection(serverId, serverConfig, options);
+        
+        // Add to the pool
+        pool.push(newConnection);
+        this.pools.set(serverId, pool);
+        
+        this.updateStats(serverId, 'totalCreated', 1);
+        this.updateStats(serverId, 'totalAcquired', 1);
+        
+        return newConnection;
+      } catch (error) {
+        // Creation failed, try waiting for a connection
+        return this.waitForConnection(serverId, options);
+      }
+    }
+    
+    // Pool is at capacity, wait for a connection
     return this.waitForConnection(serverId, options);
   }
-
+  
   /**
    * Release a connection back to the pool
    */
   releaseConnection(connection: PooledConnection): void {
-    if (connection.status !== 'active') {
-      return; // Connection not active, ignore
-    }
-
-    connection.status = 'idle';
-    connection.lastUsed = Date.now();
+    const serverId = connection.serverId;
+    if (!serverId) return;
     
-    this.getStats(connection.serverId).released++;
-
+    const pool = this.pools.get(serverId);
+    if (!pool) return;
+    
+    // Find the connection in the pool
+    const pooledConnection = pool.find(conn => conn.id === connection.id);
+    if (!pooledConnection) return;
+    
+    // Mark as no longer busy
+    pooledConnection.busy = false;
+    pooledConnection.lastUsed = Date.now();
+    
+    this.updateStats(serverId, 'totalReleased', 1);
+    
     // Check if there are waiting requests
-    const waitingQueue = this.waitingQueues.get(connection.serverId);
+    const waitingQueue = this.waitingQueues.get(serverId);
     if (waitingQueue && waitingQueue.length > 0) {
-      const waiter = waitingQueue.shift();
-      if (waiter) {
-        clearTimeout(waiter.timeout);
-        connection.status = 'active';
-        connection.useCount++;
-        this.getStats(connection.serverId).acquired++;
-        waiter.resolve(connection);
+      // Get the next waiting request
+      const request = waitingQueue.shift();
+      if (request) {
+        pooledConnection.busy = true;
+        pooledConnection.lastUsed = Date.now();
+        pooledConnection.usageCount++;
+        
+        const acquireTime = Date.now() - request.timestamp;
+        this.acquisitionTimes.push(acquireTime);
+        
+        this.updateStats(serverId, 'totalAcquired', 1);
+        
+        request.resolve(pooledConnection);
       }
     }
-
-    this.emit('connectionReleased', connection);
   }
-
+  
   /**
-   * Dispose of a connection (mark as unusable)
-   */
-  disposeConnection(connection: PooledConnection, error?: Error): void {
-    connection.status = 'error';
-    connection.error = error;
-    
-    this.getStats(connection.serverId).disposed++;
-
-    // Remove from pool
-    const pool = this.pools.get(connection.serverId);
-    if (pool) {
-      const index = pool.indexOf(connection);
-      if (index !== -1) {
-        pool.splice(index, 1);
-      }
-    }
-
-    this.emit('connectionDisposed', connection, error);
-  }
-
-  /**
-   * Get pool statistics for a server
+   * Get statistics for a specific server pool
    */
   getPoolStats(serverId: string): ConnectionPoolStats {
-    const pool = this.pools.get(serverId) || [];
-    const waitingQueue = this.waitingQueues.get(serverId) || [];
-    
-    const totalConnections = pool.length;
-    const activeConnections = pool.filter(conn => conn.status === 'active').length;
-    const idleConnections = pool.filter(conn => conn.status === 'idle').length;
-    const errorConnections = pool.filter(conn => conn.status === 'error').length;
-    const waitingRequests = waitingQueue.length;
-    
-    const options = { ...this.defaultOptions, ...this.options };
-    const poolUtilization = totalConnections > 0 ? activeConnections / options.maxConnections : 0;
-
-    return {
-      totalConnections,
-      activeConnections,
-      idleConnections,
-      errorConnections,
-      waitingRequests,
-      poolUtilization: Math.round(poolUtilization * 100) / 100
+    return this.stats.get(serverId) || {
+      serverId,
+      activeConnections: 0,
+      idleConnections: 0,
+      waitingRequests: 0,
+      totalCreated: 0,
+      totalAcquired: 0,
+      totalReleased: 0,
+      totalDestroyed: 0,
+      acquireSuccessRate: 0,
+      averageAcquireTime: 0,
+      averageIdleTime: 0,
+      maxAcquireTime: 0,
+      averageLifetime: 0
     };
   }
-
+  
   /**
-   * Get all pool statistics
+   * Get statistics for all connection pools
    */
   getAllPoolStats(): Map<string, ConnectionPoolStats> {
     const allStats = new Map<string, ConnectionPoolStats>();
@@ -229,205 +236,289 @@ export class ConnectionPoolService extends EventEmitter {
     
     return allStats;
   }
-
+  
   /**
-   * Drain and close all connections in a pool
+   * Drain a connection pool
    */
   async drainPool(serverId: string): Promise<void> {
     const pool = this.pools.get(serverId);
     if (!pool) return;
-
-    // Wait for active connections to become idle
+    
+    // Mark the pool as draining
     const maxWait = 30000; // 30 seconds
     const startTime = Date.now();
     
     while (Date.now() - startTime < maxWait) {
-      const activeConnections = pool.filter(conn => conn.status === 'active');
-      if (activeConnections.length === 0) break;
+      // Count busy connections
+      const busyConnections = pool.filter(conn => conn.busy).length;
       
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
-    // Force close remaining connections
-    for (const connection of pool) {
-      this.disposeConnection(connection);
-    }
-
-    this.pools.delete(serverId);
-    this.stats.delete(serverId);
-    
-    // Reject waiting requests
-    const waitingQueue = this.waitingQueues.get(serverId);
-    if (waitingQueue) {
-      for (const waiter of waitingQueue) {
-        clearTimeout(waiter.timeout);
-        waiter.reject(new Error(`Pool for server ${serverId} was drained`));
+      if (busyConnections === 0) {
+        // All connections are idle, destroy them
+        pool.forEach(conn => {
+          this.updateStats(serverId, 'totalDestroyed', 1);
+        });
+        
+        // Clear the pool
+        this.pools.delete(serverId);
+        
+        // Reject any waiting requests
+        const waitingQueue = this.waitingQueues.get(serverId);
+        if (waitingQueue) {
+          waitingQueue.forEach(request => {
+            request.reject(new Error('Connection pool has been drained'));
+          });
+          this.waitingQueues.delete(serverId);
+        }
+        
+        return;
       }
-      this.waitingQueues.delete(serverId);
+      
+      // Wait a bit before checking again
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
+    
+    // Timeout reached, force destroy all connections
+    this.pools.delete(serverId);
+    this.waitingQueues.delete(serverId);
   }
-
+  
   /**
-   * Shutdown all pools
+   * Shutdown all connection pools
    */
   async shutdown(): Promise<void> {
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;
     }
-
+    
     // Drain all pools
-    const drainPromises = Array.from(this.pools.keys()).map(serverId => 
-      this.drainPool(serverId)
+    const serverIds = [...this.pools.keys()];
+    
+    await Promise.all(
+      serverIds.map(serverId => this.drainPool(serverId))
     );
     
-    await Promise.all(drainPromises);
+    this.pools.clear();
+    this.waitingQueues.clear();
+    this.stats.clear();
   }
-
+  
   /**
-   * Create a new connection
+   * Create a new connection to a server
    */
   private async createConnection(
-    serverId: string, 
+    serverId: string | undefined,
     serverConfig: MCPServerConfig,
     options: Required<PoolOptions>
   ): Promise<PooledConnection> {
-    const connectionId = `${serverId}-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+    const connectionId = `${serverId}-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
     
-    // Create connection based on server config
-    let connection: unknown;
+    // Create the connection
+    let connection: unknown | undefined;
     
     try {
-      // This would be implemented based on the actual connection type
+      // Attempt to create the actual connection
       connection = await this.createActualConnection(serverConfig, options.connectionTimeout);
       
       const pooledConnection: PooledConnection = {
         id: connectionId,
         serverId,
-        status: 'active',
+        connection,
         createdAt: Date.now(),
         lastUsed: Date.now(),
-        useCount: 1,
-        connection
+        usageCount: 0,
+        busy: true
       };
       
       return pooledConnection;
     } catch (error) {
-      throw new Error(`Failed to create connection for ${serverId}: ${error}`);
+      throw new Error(`Failed to create connection to server ${serverId}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
-
+  
   /**
-   * Create actual connection (placeholder - would be implemented with real connection logic)
+   * Create the actual connection object
    */
   private async createActualConnection(serverConfig: MCPServerConfig, timeout: number): Promise<unknown> {
-    // This is a placeholder - actual implementation would depend on connection type
+    // Mock implementation - in a real service, this would create the actual connection
     return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        reject(new Error('Connection timeout'));
-      }, timeout);
-      
-      // Simulate connection creation
+      // Simulate connection creation delay
       setTimeout(() => {
-        clearTimeout(timer);
-        resolve({ 
-          type: serverConfig.connection?.type || serverConfig.type, 
-          endpoint: serverConfig.connection?.endpoint || `${serverConfig.command} ${(serverConfig.args || []).join(' ')}` 
-        });
-      }, 100);
+        // 90% success rate for simulation
+        if (Math.random() < 0.9) {
+          resolve({
+            // Mock connection object
+            url: serverConfig.url,
+            connect: () => Promise.resolve(),
+            disconnect: () => Promise.resolve()
+          });
+        } else {
+          reject(new Error('Failed to connect to server'));
+        }
+      }, Math.random() * 100); // Random delay between 0-100ms
     });
   }
-
+  
   /**
-   * Wait for an available connection
+   * Wait for a connection to become available
    */
-  private async waitForConnection(serverId: string, options: Required<PoolOptions>): Promise<PooledConnection> {
+  private async waitForConnection(serverId: string | undefined, options: Required<PoolOptions>): Promise<PooledConnection> {
     let waitingQueue = this.waitingQueues.get(serverId);
     if (!waitingQueue) {
       waitingQueue = [];
       this.waitingQueues.set(serverId, waitingQueue);
     }
-
+    
+    // Check if we're exceeding max waiting requests
     if (waitingQueue.length >= options.maxWaitingRequests) {
-      throw new Error(`Too many waiting requests for server ${serverId}`);
+      throw new Error(`Connection pool for server ${serverId} has too many waiting requests`);
     }
-
+    
+    // Add to waiting queue
     return new Promise<PooledConnection>((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        // Remove from queue
-        const index = waitingQueue!.findIndex(w => w.resolve === resolve);
+      const request: ConnectionRequest = {
+        resolve,
+        reject,
+        timestamp: Date.now()
+      };
+      
+      waitingQueue!.push(request);
+      this.waitingQueues.set(serverId, waitingQueue!);
+      
+      // Set a timeout to reject the request if it takes too long
+      setTimeout(() => {
+        const index = waitingQueue!.indexOf(request);
         if (index !== -1) {
           waitingQueue!.splice(index, 1);
+          reject(new Error(`Timed out waiting for connection to server ${serverId}`));
         }
-        reject(new Error(`Acquire timeout for server ${serverId}`));
       }, options.acquireTimeout);
-
-      waitingQueue!.push({ resolve, reject, timeout });
     });
   }
-
+  
   /**
-   * Check if connection is expired
+   * Check if a connection is expired (idle too long or lived too long)
    */
   private isConnectionExpired(connection: PooledConnection, options: Required<PoolOptions>): boolean {
     const now = Date.now();
-    const ageExpired = now - connection.createdAt > options.maxConnectionAge;
-    const idleExpired = now - connection.lastUsed > options.maxIdleTime;
+    const idleTime = now - connection.lastUsed;
+    const lifetime = now - connection.createdAt;
     
-    return ageExpired || idleExpired;
+    // Check if connection has been idle too long
+    if (idleTime > options.maxIdle) {
+      return true;
+    }
+    
+    // Check if connection has lived too long
+    if (lifetime > options.maxLifetime) {
+      return true;
+    }
+    
+    return false;
   }
-
+  
   /**
-   * Get or create stats for server
+   * Get or initialize stats for a server
    */
   private getStats(serverId: string) {
     let serverStats = this.stats.get(serverId);
+    
     if (!serverStats) {
       serverStats = {
-        created: 0,
-        acquired: 0,
-        released: 0,
-        disposed: 0,
-        errors: 0
+        serverId,
+        activeConnections: 0,
+        idleConnections: 0,
+        waitingRequests: 0,
+        totalCreated: 0,
+        totalAcquired: 0,
+        totalReleased: 0,
+        totalDestroyed: 0,
+        acquireSuccessRate: 0,
+        averageAcquireTime: 0,
+        averageIdleTime: 0,
+        maxAcquireTime: 0,
+        averageLifetime: 0
       };
+      
       this.stats.set(serverId, serverStats);
     }
+    
     return serverStats;
   }
-
+  
   /**
-   * Cleanup expired connections
+   * Initialize stats for a server
+   */
+  private initializeStats(serverId: string): void {
+    this.getStats(serverId);
+  }
+  
+  /**
+   * Clean up idle and expired connections
    */
   private cleanup(): void {
     const options = { ...this.defaultOptions, ...this.options };
     
     for (const [serverId, pool] of this.pools.entries()) {
-      const toDispose: PooledConnection[] = [];
+      // Update stats
+      const activeConnections = pool.filter(conn => conn.busy).length;
+      const idleConnections = pool.length - activeConnections;
       
-      // Find expired idle connections
-      for (const connection of pool) {
-        if (connection.status === 'idle' && this.isConnectionExpired(connection, options)) {
-          toDispose.push(connection);
+      const stats = this.getStats(serverId);
+      stats.activeConnections = activeConnections;
+      stats.idleConnections = idleConnections;
+      stats.waitingRequests = this.waitingQueues.get(serverId)?.length || 0;
+      
+      // Calculate performance metrics
+      if (this.acquisitionTimes.length > 0) {
+        stats.averageAcquireTime = this.acquisitionTimes.reduce((sum, time) => sum + time, 0) / this.acquisitionTimes.length;
+        stats.maxAcquireTime = Math.max(...this.acquisitionTimes);
+      }
+      
+      if (this.idleTimes.length > 0) {
+        stats.averageIdleTime = this.idleTimes.reduce((sum, time) => sum + time, 0) / this.idleTimes.length;
+      }
+      
+      if (this.lifetimes.length > 0) {
+        stats.averageLifetime = this.lifetimes.reduce((sum, time) => sum + time, 0) / this.lifetimes.length;
+      }
+      
+      if (stats.totalAcquired > 0) {
+        stats.acquireSuccessRate = (stats.totalAcquired / (stats.totalAcquired + stats.waitingRequests)) * 100;
+      }
+      
+      // Remove expired connections
+      for (let i = pool.length - 1; i >= 0; i--) {
+        const connection = pool[i];
+        
+        if (!connection.busy && this.isConnectionExpired(connection, options)) {
+          pool.splice(i, 1);
+          this.updateStats(serverId, 'totalDestroyed', 1);
         }
-      }
-      
-      // Dispose expired connections
-      for (const connection of toDispose) {
-        this.disposeConnection(connection);
-      }
-      
-      // Ensure minimum connections
-      const activeConnections = pool.filter(conn => 
-        conn.status === 'active' || conn.status === 'idle'
-      ).length;
-      
-      if (activeConnections < options.minConnections) {
-        // Would need server config to create connections, this is handled elsewhere
-        this.emit('poolBelowMinimum', serverId, activeConnections, options.minConnections);
       }
     }
   }
+  
+  /**
+   * Update statistics for a server
+   */
+  private updateStats(serverId: string | undefined, statName: keyof ConnectionPoolStats, value: number): void {
+    if (!serverId) return;
+    
+    const stats = this.getStats(serverId);
+    if (typeof stats[statName] === 'number') {
+      (stats[statName] as number) += value;
+    }
+  }
+  
+  /**
+   * Start the cleanup interval
+   */
+  private startCleanupInterval(): void {
+    const interval = this.options.cleanupInterval || this.defaultOptions.cleanupInterval;
+    
+    this.cleanupInterval = setInterval(() => {
+      this.cleanup();
+    }, interval);
+  }
 }
-
-// Export singleton instance
-export const connectionPoolService = new ConnectionPoolService();

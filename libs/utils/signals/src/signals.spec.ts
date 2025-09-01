@@ -1,5 +1,5 @@
 import { 
-  createSignal, 
+  createSignal,
   derivedSignal, 
   batch,
   persistentSignal,
@@ -12,21 +12,21 @@ describe('Signal Library', () => {
   describe('createSignal', () => {
     it('should create a signal with the initial value', () => {
       const signal = createSignal(10);
-      expect(signal.get()).toBe(10);
+      expect(signal?.get()).toBe(10);
     });
 
     it('should update the value with set', () => {
       const signal = createSignal('hello');
-      signal.set('world');
-      expect(signal.get()).toBe('world');
+      signal?.set('world');
+      expect(signal?.get()).toBe('world');
     });
 
     it('should notify subscribers when value changes', () => {
       const signal = createSignal(0);
       const mockCallback = jest.fn();
       
-      signal.subscribe(mockCallback);
-      signal.set(5);
+      signal?.subscribe(mockCallback);
+      signal?.set(5);
       
       expect(mockCallback).toHaveBeenCalledWith(5);
     });
@@ -35,9 +35,9 @@ describe('Signal Library', () => {
       const signal = createSignal(0);
       const mockCallback = jest.fn();
       
-      const unsubscribe = signal.subscribe(mockCallback);
-      unsubscribe();
-      signal.set(5);
+      const unsubscribe = signal?.subscribe(mockCallback);
+      unsubscribe?.();
+      signal?.set(5);
       
       expect(mockCallback).not.toHaveBeenCalled();
     });
@@ -53,7 +53,7 @@ describe('Signal Library', () => {
         (first, last) => `${first} ${last}`
       );
       
-      expect(fullName.get()).toBe('John Doe');
+      expect(fullName?.get()).toBe('John Doe');
     });
 
     it('should update when dependencies change', () => {
@@ -65,13 +65,13 @@ describe('Signal Library', () => {
         (w, h) => w * h
       );
       
-      expect(area.get()).toBe(50);
+      expect(area?.get()).toBe(50);
       
-      width.set(7);
-      expect(area.get()).toBe(70);
+      width?.set(7);
+      expect(area?.get()).toBe(70);
       
-      height.set(8);
-      expect(area.get()).toBe(56);
+      height?.set(8);
+      expect(area?.get()).toBe(56);
     });
 
     it('should notify subscribers when derived value changes', () => {
@@ -79,9 +79,9 @@ describe('Signal Library', () => {
       const doubled = derivedSignal([count], (c) => c * 2);
       
       const mockCallback = jest.fn();
-      doubled.subscribe(mockCallback);
+      doubled?.subscribe(mockCallback);
       
-      count.set(2);
+      count?.set(2);
       
       expect(mockCallback).toHaveBeenCalledWith(4);
     });
@@ -103,7 +103,7 @@ describe('Signal Library', () => {
       const { result } = renderHook(() => useSignal(count));
       
       act(() => {
-        count.set(5);
+        count?.set(5);
       });
       
       expect(result.current[0]).toBe(5);
@@ -118,7 +118,7 @@ describe('Signal Library', () => {
         result.current[1](10);
       });
       
-      expect(count.get()).toBe(10);
+      expect(count?.get()).toBe(10);
     });
   });
 
@@ -127,18 +127,18 @@ describe('Signal Library', () => {
       const count = createSignal(0);
       const mockCallback = jest.fn();
       
-      count.subscribe(mockCallback);
+      count?.subscribe(mockCallback);
       
       batch(() => {
-        count.set(1);
-        count.set(2);
-        count.set(3);
+        count?.set(1);
+        count?.set(2);
+        count?.set(3);
       });
       
       // In a more sophisticated implementation, this would be 1
       // But our simple implementation doesn't queue updates
-      expect(mockCallback.mock.calls.length).toBe(3);
-      expect(count.get()).toBe(3);
+      expect(mockCallback.mock.calls?.length).toBe(3);
+      expect(count?.get()).toBe(3);
     });
   });
 
@@ -150,7 +150,9 @@ describe('Signal Library', () => {
         return {
           getItem: jest.fn((key: string) => store[key] || null),
           setItem: jest.fn((key: string, value: string) => {
-            store[key] = value.toString();
+            if (key) {
+              store[key] = value?.toString();
+            }
           }),
           clear: jest.fn(() => {
             store = {};
@@ -166,14 +168,14 @@ describe('Signal Library', () => {
 
     it('should use initial value when nothing in storage', () => {
       const signal = persistentSignal('test-key', 'initial');
-      expect(signal.get()).toBe('initial');
+      expect(signal?.get()).toBe('initial');
     });
 
     it('should persist value to localStorage when set', () => {
       const signal = persistentSignal('test-key', 'initial');
-      signal.set('updated');
+      signal?.set('updated');
       
-      expect(window.localStorage.setItem).toHaveBeenCalledWith(
+      expect(window.localStorage?.setItem).toHaveBeenCalledWith(
         'test-key', 
         JSON.stringify('updated')
       );
@@ -186,9 +188,9 @@ describe('Signal Library', () => {
         setTimeout(() => resolve('data'), 100);
       });
       
-      const signal = fromPromise(promise);
+      const signal = fromPromise(promise, undefined);
       
-      expect(signal.get()).toEqual({
+      expect(signal?.get()).toEqual({
         loading: true,
         data: undefined,
         error: undefined
@@ -197,7 +199,7 @@ describe('Signal Library', () => {
 
     it('should update with data when promise resolves', async () => {
       const promise = Promise.resolve('success');
-      const signal = fromPromise(promise);
+      const signal = fromPromise(promise, undefined);
       
       // Wait for the promise to resolve
       await promise;
@@ -205,7 +207,7 @@ describe('Signal Library', () => {
       // Need a small delay for the signal to update
       await new Promise(resolve => setTimeout(resolve, 0));
       
-      expect(signal.get()).toEqual({
+      expect(signal?.get()).toEqual({
         loading: false,
         data: 'success',
         error: undefined
@@ -215,15 +217,17 @@ describe('Signal Library', () => {
     it('should update with error when promise rejects', async () => {
       const error = new Error('Failed');
       const promise = Promise.reject(error);
-      const signal = fromPromise(promise);
+      const signal = fromPromise(promise, undefined);
       
       // Suppress unhandled rejection warning
-      await promise.catch(() => {});
+      await promise.catch((err: Error): void => {
+        console.error("Suppressing error:", err.message);
+      });
       
       // Need a small delay for the signal to update
       await new Promise(resolve => setTimeout(resolve, 0));
       
-      expect(signal.get()).toEqual({
+      expect(signal?.get()).toEqual({
         loading: false,
         data: undefined,
         error: error
@@ -237,7 +241,7 @@ describe('Signal Library', () => {
       
       const signal = fromPromise(promise, 'initial');
       
-      expect(signal.get()).toEqual({
+      expect(signal?.get()).toEqual({
         loading: true,
         data: 'initial',
         error: undefined

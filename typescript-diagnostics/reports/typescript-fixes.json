@@ -1,0 +1,1279 @@
+{
+  "timestamp": "2025-09-01T03:40:20.988Z",
+  "errors": {
+    "total": 601,
+    "byCode": {
+      "2304": {
+        "count": 1,
+        "message": "Cannot find name '...'.",
+        "examples": [
+          {
+            "file": "libs/adk/src/services/vertex.ts",
+            "line": 228,
+            "column": 33,
+            "message": "Cannot find name 'dataStoreId'."
+          }
+        ]
+      },
+      "2305": {
+        "count": 19,
+        "message": "Module '...' has no exported member '...'.",
+        "examples": [
+          {
+            "file": "libs/adk/src/services/vertex.ts",
+            "line": 13,
+            "column": 10,
+            "message": "Module '\"@google/generative-ai\"' has no exported member 'GenModel'."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+            "line": 13,
+            "column": 26,
+            "message": "Module '\"@nx-monorepo/adk\"' has no exported member 'DocumentChunk'."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+            "line": 13,
+            "column": 41,
+            "message": "Module '\"@nx-monorepo/adk\"' has no exported member 'RAGSearchOptions'."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+            "line": 14,
+            "column": 10,
+            "message": "Module '\"../utils/error-handler\"' has no exported member 'errorHandler'."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/rag.client.ts",
+            "line": 12,
+            "column": 26,
+            "message": "Module '\"@nx-monorepo/adk\"' has no exported member 'DocumentChunk'."
+          }
+        ]
+      },
+      "2307": {
+        "count": 83,
+        "message": "Cannot find module '...' or its corresponding type declarations.",
+        "examples": [
+          {
+            "file": "libs/adk/src/services/vertex.ts",
+            "line": 12,
+            "column": 26,
+            "message": "Cannot find module '@google-cloud/vertexai' or its corresponding type declarations."
+          },
+          {
+            "file": "libs/adk/src/services/vertex.ts",
+            "line": 14,
+            "column": 76,
+            "message": "Cannot find module '../utilities/gemini' or its corresponding type declarations."
+          },
+          {
+            "file": "libs/adk/src/services/vertex.ts",
+            "line": 15,
+            "column": 31,
+            "message": "Cannot find module './vertex-indexer' or its corresponding type declarations."
+          },
+          {
+            "file": "libs/adk/src/services/vertex.ts",
+            "line": 16,
+            "column": 32,
+            "message": "Cannot find module './vertex-embedder' or its corresponding type declarations."
+          },
+          {
+            "file": "libs/adk/src/services/vertex.ts",
+            "line": 17,
+            "column": 33,
+            "message": "Cannot find module '../interfaces/embedding-config' or its corresponding type declarations."
+          }
+        ]
+      },
+      "2322": {
+        "count": 40,
+        "message": "Type '...' is not assignable to type '...'.",
+        "examples": [
+          {
+            "file": "libs/adk/src/agents/base-agent.ts",
+            "line": 45,
+            "column": 7,
+            "message": "Type 'string | undefined' is not assignable to type 'string'."
+          },
+          {
+            "file": "libs/adk/src/agents/base-agent.ts",
+            "line": 55,
+            "column": 5,
+            "message": "Type 'string | undefined' is not assignable to type 'string'."
+          },
+          {
+            "file": "libs/adk/src/agents/base-agent.ts",
+            "line": 62,
+            "column": 5,
+            "message": "Type 'string | undefined' is not assignable to type 'string'."
+          },
+          {
+            "file": "libs/adk/src/agents/base-agent.ts",
+            "line": 75,
+            "column": 7,
+            "message": "Type 'string | undefined' is not assignable to type 'string'."
+          },
+          {
+            "file": "libs/adk/src/agents/base-agent.ts",
+            "line": 95,
+            "column": 7,
+            "message": "Type 'string | undefined' is not assignable to type 'string'."
+          }
+        ]
+      },
+      "2339": {
+        "count": 80,
+        "message": "Property '...' does not exist on type '...'.",
+        "examples": [
+          {
+            "file": "libs/adk/src/agents/root-agent.ts",
+            "line": 190,
+            "column": 109,
+            "message": "Property 'error' does not exist on type 'never'."
+          },
+          {
+            "file": "libs/adk/src/tools/gcp-tools.ts",
+            "line": 19,
+            "column": 11,
+            "message": "Property 'sql' does not exist on type 'Record<string, unknown> | undefined'."
+          },
+          {
+            "file": "libs/adk/src/tools/gcp-tools.ts",
+            "line": 19,
+            "column": 16,
+            "message": "Property 'params' does not exist on type 'Record<string, unknown> | undefined'."
+          },
+          {
+            "file": "libs/adk/src/tools/gcp-tools.ts",
+            "line": 40,
+            "column": 11,
+            "message": "Property 'table' does not exist on type 'Record<string, unknown> | undefined'."
+          },
+          {
+            "file": "libs/adk/src/tools/gcp-tools.ts",
+            "line": 40,
+            "column": 18,
+            "message": "Property 'rows' does not exist on type 'Record<string, unknown> | undefined'."
+          }
+        ]
+      },
+      "2345": {
+        "count": 71,
+        "message": "Argument of type '...' is not assignable to parameter of type '...'.",
+        "examples": [
+          {
+            "file": "libs/adk/src/agents/root-agent.ts",
+            "line": 78,
+            "column": 56,
+            "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+          },
+          {
+            "file": "libs/adk/src/agents/root-agent.ts",
+            "line": 143,
+            "column": 96,
+            "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+          },
+          {
+            "file": "libs/adk/src/agents/root-agent.ts",
+            "line": 151,
+            "column": 76,
+            "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+          },
+          {
+            "file": "libs/adk/src/utilities/performance.ts",
+            "line": 75,
+            "column": 42,
+            "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+          },
+          {
+            "file": "libs/adk/src/utilities/performance.ts",
+            "line": 82,
+            "column": 38,
+            "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+          }
+        ]
+      },
+      "2347": {
+        "count": 2,
+        "message": "Untyped function calls may not accept type arguments.",
+        "examples": [
+          {
+            "file": "libs/utils/signals/src/nx-integration.ts",
+            "line": 29,
+            "column": 18,
+            "message": "Untyped function calls may not accept type arguments."
+          },
+          {
+            "file": "libs/utils/signals/src/nx-integration.ts",
+            "line": 55,
+            "column": 18,
+            "message": "Untyped function calls may not accept type arguments."
+          }
+        ]
+      },
+      "2349": {
+        "count": 1,
+        "message": "This expression is not callable.",
+        "examples": [
+          {
+            "file": "libs/utils/monitoring/src/lib/cloud-trace-exporter.ts",
+            "line": 92,
+            "column": 23,
+            "message": "This expression is not callable."
+          }
+        ]
+      },
+      "2352": {
+        "count": 2,
+        "message": "Conversion of type '...' to type '...' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to '...' first.",
+        "examples": [
+          {
+            "file": "libs/utils/api-clients/src/lib/mcp-client.service.ts",
+            "line": 401,
+            "column": 21,
+            "message": "Conversion of type 'Process | undefined' to type 'ChildProcess' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first."
+          },
+          {
+            "file": "libs/utils/api-clients/src/lib/mcp-client.service.ts",
+            "line": 490,
+            "column": 25,
+            "message": "Conversion of type 'Process | undefined' to type 'ChildProcess' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first."
+          }
+        ]
+      },
+      "2353": {
+        "count": 11,
+        "message": "Object literal may only specify known properties, and '...' does not exist in type '...'.",
+        "examples": [
+          {
+            "file": "libs/adk/src/tools/gcp-tools.ts",
+            "line": 132,
+            "column": 5,
+            "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+          },
+          {
+            "file": "libs/adk/src/tools/gcp-tools.ts",
+            "line": 154,
+            "column": 5,
+            "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+          },
+          {
+            "file": "libs/adk/src/tools/gcp-tools.ts",
+            "line": 179,
+            "column": 5,
+            "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+          },
+          {
+            "file": "libs/adk/src/tools/gcp-tools.ts",
+            "line": 211,
+            "column": 5,
+            "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+          },
+          {
+            "file": "libs/adk/src/tools/gcp-tools.ts",
+            "line": 267,
+            "column": 7,
+            "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+          }
+        ]
+      },
+      "2363": {
+        "count": 18,
+        "message": "The right-hand side of an arithmetic operation must be of type '...', '...', '...' or an enum type.",
+        "examples": [
+          {
+            "file": "libs/adk/src/utilities/security.ts",
+            "line": 232,
+            "column": 44,
+            "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+          },
+          {
+            "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+            "line": 297,
+            "column": 40,
+            "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+          },
+          {
+            "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+            "line": 404,
+            "column": 73,
+            "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+          },
+          {
+            "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+            "line": 494,
+            "column": 69,
+            "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+          },
+          {
+            "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+            "line": 514,
+            "column": 109,
+            "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+          }
+        ]
+      },
+      "2365": {
+        "count": 7,
+        "message": "Operator '...' cannot be applied to types '...' and '...'.",
+        "examples": [
+          {
+            "file": "libs/adk/src/utilities/configuration.ts",
+            "line": 141,
+            "column": 21,
+            "message": "Operator '<' cannot be applied to types 'number' and 'string | string[]'."
+          },
+          {
+            "file": "libs/adk/src/utilities/configuration.ts",
+            "line": 272,
+            "column": 23,
+            "message": "Operator '<' cannot be applied to types 'number' and 'string | string[]'."
+          },
+          {
+            "file": "libs/adk/src/utilities/security.ts",
+            "line": 171,
+            "column": 48,
+            "message": "Operator '>' cannot be applied to types 'number' and '{ allowHtml: boolean | undefined; maxLength?: number | undefined; stripNumbers: boolean | undefined; }'."
+          },
+          {
+            "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+            "line": 273,
+            "column": 72,
+            "message": "Operator '+' cannot be applied to types 'number' and 'Review'."
+          },
+          {
+            "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+            "line": 514,
+            "column": 83,
+            "message": "Operator '+' cannot be applied to types 'number' and 'Review'."
+          }
+        ]
+      },
+      "2367": {
+        "count": 2,
+        "message": "This comparison appears to be unintentional because the types '...' and '...' have no overlap.",
+        "examples": [
+          {
+            "file": "libs/adk/src/utilities/security.ts",
+            "line": 190,
+            "column": 14,
+            "message": "This comparison appears to be unintentional because the types 'number' and 'string' have no overlap."
+          },
+          {
+            "file": "libs/mcp/src/lib/clients/request-router.service.ts",
+            "line": 418,
+            "column": 32,
+            "message": "This comparison appears to be unintentional because the types 'string' and 'RegExp' have no overlap."
+          }
+        ]
+      },
+      "2375": {
+        "count": 4,
+        "message": "Type '...' is not assignable to type '...' with '...'. Consider adding '...' to the types of the target's properties.",
+        "examples": [
+          {
+            "file": "libs/adk/src/agents/base-agent.ts",
+            "line": 77,
+            "column": 7,
+            "message": "Type '{ role: string | undefined; parts: { text: string; }[]; }' is not assignable to type 'Content' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+          },
+          {
+            "file": "libs/mcp/src/lib/services/connection-pool.service.ts",
+            "line": 323,
+            "column": 13,
+            "message": "Type '{ id: string; serverId: string | undefined; connection: unknown; createdAt: number; lastUsed: number; usageCount: number; busy: true; }' is not assignable to type 'PooledConnection' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+          },
+          {
+            "file": "libs/mcp/src/lib/services/performance-metrics.service.ts",
+            "line": 76,
+            "column": 11,
+            "message": "Type '{ id: string; url: string; method: string; startTime: number; endTime: number; duration: number; success: false; serverId: string | undefined; }' is not assignable to type 'RequestMetrics' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+          },
+          {
+            "file": "libs/mcp/src/lib/utils/logging.ts",
+            "line": 244,
+            "column": 11,
+            "message": "Type '{ timestamp: Date; level: LogLevel; category: string; message: string; data: unknown; error: Error | undefined; }' is not assignable to type 'LogEntry' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+          }
+        ]
+      },
+      "2379": {
+        "count": 7,
+        "message": "Argument of type '...' is not assignable to parameter of type '...' with '...'. Consider adding '...' to the types of the target's properties.",
+        "examples": [
+          {
+            "file": "libs/agents/bq-agent/src/lib/bq-agent.ts",
+            "line": 43,
+            "column": 34,
+            "message": "Argument of type '{ projectId: string | undefined; location: string; }' is not assignable to parameter of type 'BigQueryOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+          },
+          {
+            "file": "libs/utils/gcp-auth/src/index.ts",
+            "line": 71,
+            "column": 31,
+            "message": "Argument of type '{ projectId: string | undefined; }' is not assignable to parameter of type 'BigQueryOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+          },
+          {
+            "file": "libs/utils/gcp-auth/src/index.ts",
+            "line": 87,
+            "column": 30,
+            "message": "Argument of type '{ projectId: string | undefined; }' is not assignable to parameter of type 'StorageOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+          },
+          {
+            "file": "libs/utils/gcp-auth/src/index.ts",
+            "line": 103,
+            "column": 29,
+            "message": "Argument of type '{ projectId: string | undefined; }' is not assignable to parameter of type 'ClientConfig' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+          },
+          {
+            "file": "libs/utils/monitoring/src/lib/bigquery-logger.ts",
+            "line": 57,
+            "column": 34,
+            "message": "Argument of type '{ projectId: string | undefined; }' is not assignable to parameter of type 'BigQueryOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+          }
+        ]
+      },
+      "2412": {
+        "count": 3,
+        "message": "Type '...' is not assignable to type '...' with '...'. Consider adding '...' to the type of the target.",
+        "examples": [
+          {
+            "file": "libs/mcp/src/lib/services/performance-metrics.service.ts",
+            "line": 98,
+            "column": 5,
+            "message": "Type 'number | undefined' is not assignable to type 'number' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target."
+          },
+          {
+            "file": "libs/utils/monitoring/src/lib/cloud-trace-exporter.ts",
+            "line": 39,
+            "column": 5,
+            "message": "Type 'string | undefined' is not assignable to type 'string' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target."
+          },
+          {
+            "file": "libs/utils/monitoring/src/lib/error-handler.ts",
+            "line": 102,
+            "column": 5,
+            "message": "Type 'Error | undefined' is not assignable to type 'Error' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target."
+          }
+        ]
+      },
+      "2416": {
+        "count": 14,
+        "message": "Property '...' in type '...' is not assignable to the same property in base type '...'.",
+        "examples": [
+          {
+            "file": "libs/adk/src/agents/base-agent.ts",
+            "line": 39,
+            "column": 28,
+            "message": "Property 'name' in type 'DulceBaseAgent' is not assignable to the same property in base type 'BaseAgent'."
+          },
+          {
+            "file": "libs/adk/src/agents/base-agent.ts",
+            "line": 40,
+            "column": 28,
+            "message": "Property 'description' in type 'DulceBaseAgent' is not assignable to the same property in base type 'BaseAgent'."
+          },
+          {
+            "file": "libs/adk/src/agents/base-agent.ts",
+            "line": 90,
+            "column": 28,
+            "message": "Property 'name' in type 'DulceLlmAgent' is not assignable to the same property in base type 'LlmAgent'."
+          },
+          {
+            "file": "libs/adk/src/agents/base-agent.ts",
+            "line": 91,
+            "column": 28,
+            "message": "Property 'description' in type 'DulceLlmAgent' is not assignable to the same property in base type 'LlmAgent'."
+          },
+          {
+            "file": "libs/adk/src/agents/base-agent.ts",
+            "line": 117,
+            "column": 28,
+            "message": "Property 'name' in type 'DulceSequentialAgent' is not assignable to the same property in base type 'SequentialAgent'."
+          }
+        ]
+      },
+      "2448": {
+        "count": 2,
+        "message": "Block-scoped variable '...' used before its declaration.",
+        "examples": [
+          {
+            "file": "libs/utils/signals/src/nx-integration.ts",
+            "line": 29,
+            "column": 18,
+            "message": "Block-scoped variable 'signal' used before its declaration."
+          },
+          {
+            "file": "libs/utils/signals/src/nx-integration.ts",
+            "line": 55,
+            "column": 18,
+            "message": "Block-scoped variable 'signal' used before its declaration."
+          }
+        ]
+      },
+      "2459": {
+        "count": 3,
+        "message": "Module '...' declares '...' locally, but it is not exported.",
+        "examples": [
+          {
+            "file": "libs/mcp/src/lib/clients/request-router.service.ts",
+            "line": 17,
+            "column": 10,
+            "message": "Module '\"./mcp-client.service\"' declares 'MCPRequest' locally, but it is not exported."
+          },
+          {
+            "file": "libs/mcp/src/lib/mcp.service.ts",
+            "line": 12,
+            "column": 28,
+            "message": "Module '\"./clients/mcp-client.service\"' declares 'MCPRequest' locally, but it is not exported."
+          },
+          {
+            "file": "libs/mcp/src/lib/mcp.service.ts",
+            "line": 12,
+            "column": 40,
+            "message": "Module '\"./clients/mcp-client.service\"' declares 'MCPResponse' locally, but it is not exported."
+          }
+        ]
+      },
+      "2488": {
+        "count": 8,
+        "message": "Type '...' must have a '...' method that returns an iterator.",
+        "examples": [
+          {
+            "file": "libs/agents-sdk/src/lib/main-agent.ts",
+            "line": 27,
+            "column": 13,
+            "message": "Type 'Promise<SimpleQueryRowsResponse> | undefined' must have a '[Symbol.iterator]()' method that returns an iterator."
+          },
+          {
+            "file": "libs/agents/bq-agent/src/lib/bq-agent.ts",
+            "line": 61,
+            "column": 13,
+            "message": "Type '(Promise<JobResponse> & void) | undefined' must have a '[Symbol.iterator]()' method that returns an iterator."
+          },
+          {
+            "file": "libs/agents/bq-agent/src/lib/bq-agent.ts",
+            "line": 164,
+            "column": 13,
+            "message": "Type 'Promise<DatasetsResponse> | undefined' must have a '[Symbol.iterator]()' method that returns an iterator."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/bigquery.client.ts",
+            "line": 74,
+            "column": 11,
+            "message": "Type 'Promise<SimpleQueryRowsResponse>' must have a '[Symbol.iterator]()' method that returns an iterator."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/bigquery.client.ts",
+            "line": 109,
+            "column": 11,
+            "message": "Type 'Promise<InsertRowsResponse>' must have a '[Symbol.iterator]()' method that returns an iterator."
+          }
+        ]
+      },
+      "2532": {
+        "count": 22,
+        "message": "Object is possibly '...'.",
+        "examples": [
+          {
+            "file": "libs/adk/src/utilities/security.ts",
+            "line": 232,
+            "column": 27,
+            "message": "Object is possibly 'undefined'."
+          },
+          {
+            "file": "libs/agents-sdk/src/lib/main-agent.ts",
+            "line": 27,
+            "column": 45,
+            "message": "Object is possibly 'undefined'."
+          },
+          {
+            "file": "libs/agents-sdk/src/lib/main-agent.ts",
+            "line": 102,
+            "column": 43,
+            "message": "Object is possibly 'undefined'."
+          },
+          {
+            "file": "libs/agents-sdk/src/lib/main-agent.ts",
+            "line": 129,
+            "column": 39,
+            "message": "Object is possibly 'undefined'."
+          },
+          {
+            "file": "libs/agents-sdk/src/lib/main-agent.ts",
+            "line": 163,
+            "column": 39,
+            "message": "Object is possibly 'undefined'."
+          }
+        ]
+      },
+      "2538": {
+        "count": 9,
+        "message": "Type '...' cannot be used as an index type.",
+        "examples": [
+          {
+            "file": "libs/adk/src/utilities/configuration.ts",
+            "line": 143,
+            "column": 48,
+            "message": "Type 'undefined' cannot be used as an index type."
+          },
+          {
+            "file": "libs/adk/src/utilities/configuration.ts",
+            "line": 144,
+            "column": 17,
+            "message": "Type 'undefined' cannot be used as an index type."
+          },
+          {
+            "file": "libs/adk/src/utilities/configuration.ts",
+            "line": 146,
+            "column": 25,
+            "message": "Type 'undefined' cannot be used as an index type."
+          },
+          {
+            "file": "libs/adk/src/utilities/configuration.ts",
+            "line": 149,
+            "column": 28,
+            "message": "Type 'undefined' cannot be used as an index type."
+          },
+          {
+            "file": "libs/adk/src/utilities/configuration.ts",
+            "line": 275,
+            "column": 19,
+            "message": "Type 'undefined' cannot be used as an index type."
+          }
+        ]
+      },
+      "2551": {
+        "count": 1,
+        "message": "Property '...' does not exist on type '...'. Did you mean '...'?",
+        "examples": [
+          {
+            "file": "libs/adk/src/agents/root-agent.ts",
+            "line": 200,
+            "column": 35,
+            "message": "Property 'getDescription' does not exist on type 'LlmAgent'. Did you mean 'description'?"
+          }
+        ]
+      },
+      "2554": {
+        "count": 10,
+        "message": "Expected 2-3 arguments, but got 1.",
+        "examples": [
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/schemas.ts",
+            "line": 30,
+            "column": 13,
+            "message": "Expected 2-3 arguments, but got 1."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/schemas.ts",
+            "line": 62,
+            "column": 14,
+            "message": "Expected 2-3 arguments, but got 1."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/schemas.ts",
+            "line": 72,
+            "column": 19,
+            "message": "Expected 2-3 arguments, but got 1."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/schemas.ts",
+            "line": 82,
+            "column": 24,
+            "message": "Expected 2-3 arguments, but got 1."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/schemas.ts",
+            "line": 93,
+            "column": 15,
+            "message": "Expected 2-3 arguments, but got 1."
+          }
+        ]
+      },
+      "2578": {
+        "count": 1,
+        "message": "Unused '...' directive.",
+        "examples": [
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/firebase.client.ts",
+            "line": 116,
+            "column": 9,
+            "message": "Unused '@ts-expect-error' directive."
+          }
+        ]
+      },
+      "2612": {
+        "count": 2,
+        "message": "Property '...' will overwrite the base property in '...'. If this is intentional, add an initializer. Otherwise, add a '...' modifier or remove the redundant declaration.",
+        "examples": [
+          {
+            "file": "libs/adk/src/agents/base-agent.ts",
+            "line": 39,
+            "column": 28,
+            "message": "Property 'name' will overwrite the base property in 'BaseAgent'. If this is intentional, add an initializer. Otherwise, add a 'declare' modifier or remove the redundant declaration."
+          },
+          {
+            "file": "libs/adk/src/agents/base-agent.ts",
+            "line": 40,
+            "column": 28,
+            "message": "Property 'description' will overwrite the base property in 'BaseAgent'. If this is intentional, add an initializer. Otherwise, add a 'declare' modifier or remove the redundant declaration."
+          }
+        ]
+      },
+      "2693": {
+        "count": 1,
+        "message": "'...' only refers to a type, but is being used as a value here.",
+        "examples": [
+          {
+            "file": "libs/utils/monitoring/src/lib/otel-config.ts",
+            "line": 64,
+            "column": 24,
+            "message": "'Resource' only refers to a type, but is being used as a value here."
+          }
+        ]
+      },
+      "2722": {
+        "count": 1,
+        "message": "Cannot invoke an object which is possibly '...'.",
+        "examples": [
+          {
+            "file": "libs/utils/monitoring/src/lib/cloud-trace-exporter.ts",
+            "line": 92,
+            "column": 7,
+            "message": "Cannot invoke an object which is possibly 'undefined'."
+          }
+        ]
+      },
+      "2724": {
+        "count": 4,
+        "message": "'...' has no exported member named '...'. Did you mean '...'?",
+        "examples": [
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+            "line": 13,
+            "column": 10,
+            "message": "'\"@nx-monorepo/adk\"' has no exported member named 'VertexAIClient'. Did you mean 'VertexClient'?"
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/rag.client.ts",
+            "line": 12,
+            "column": 10,
+            "message": "'\"@nx-monorepo/adk\"' has no exported member named 'VertexAIClient'. Did you mean 'VertexClient'?"
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/mcp.service.ts",
+            "line": 25,
+            "column": 10,
+            "message": "'\"./utils/error-handler\"' has no exported member named 'createServiceErrorHandler'. Did you mean 'createGeminiErrorHandler'?"
+          },
+          {
+            "file": "libs/mcp/src/lib/mcp.service.ts",
+            "line": 18,
+            "column": 37,
+            "message": "'\"./services/performance-metrics.service\"' has no exported member named 'performanceMetricsService'. Did you mean 'PerformanceMetricsService'?"
+          }
+        ]
+      },
+      "2740": {
+        "count": 2,
+        "message": "Type '...' is missing the following properties from type '...': length, pop, push, concat, and 29 more.",
+        "examples": [
+          {
+            "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+            "line": 249,
+            "column": 9,
+            "message": "Type 'Promise<{ review: Review; sentiment: SentimentAnalysis; }[]>' is missing the following properties from type '{ review: Review | undefined; sentiment: SentimentAnalysis; }[]': length, pop, push, concat, and 29 more."
+          },
+          {
+            "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+            "line": 540,
+            "column": 11,
+            "message": "Type 'Promise<{ period: string; averageRating: number; reviewCount: number; sentimentScore: any; }[]>' is missing the following properties from type '{ period: string | undefined; averageRating: number | undefined; reviewCount: number | undefined; sentimentScore: number | undefined; }[]': length, pop, push, concat, and 29 more."
+          }
+        ]
+      },
+      "2741": {
+        "count": 1,
+        "message": "Property '...' is missing in type '...' but required in type '...'.",
+        "examples": [
+          {
+            "file": "libs/utils/monitoring/src/lib/bigquery-logger.ts",
+            "line": 91,
+            "column": 7,
+            "message": "Property 'message' is missing in type '{ serviceContext: { service?: string; version?: string; } | undefined; timestamp: string; severity: string; }' but required in type 'LogEntry'."
+          }
+        ]
+      },
+      "2769": {
+        "count": 15,
+        "message": "No overload matches this call.",
+        "examples": [
+          {
+            "file": "apps/looker-dashboards/src/lib/dashboard-templates.ts",
+            "line": 385,
+            "column": 33,
+            "message": "No overload matches this call."
+          },
+          {
+            "file": "apps/looker-dashboards/src/lib/dashboard-templates.ts",
+            "line": 386,
+            "column": 39,
+            "message": "No overload matches this call."
+          },
+          {
+            "file": "apps/looker-dashboards/src/lib/dashboard-templates.ts",
+            "line": 387,
+            "column": 41,
+            "message": "No overload matches this call."
+          },
+          {
+            "file": "apps/looker-dashboards/src/lib/dashboard-templates.ts",
+            "line": 388,
+            "column": 39,
+            "message": "No overload matches this call."
+          },
+          {
+            "file": "libs/adk/src/agents/root-agent.ts",
+            "line": 85,
+            "column": 32,
+            "message": "No overload matches this call."
+          }
+        ]
+      },
+      "2779": {
+        "count": 15,
+        "message": "The left-hand side of an assignment expression may not be an optional property access.",
+        "examples": [
+          {
+            "file": "libs/mcp/src/lib/config/environment-config.ts",
+            "line": 173,
+            "column": 7,
+            "message": "The left-hand side of an assignment expression may not be an optional property access."
+          },
+          {
+            "file": "libs/mcp/src/lib/config/environment-config.ts",
+            "line": 174,
+            "column": 7,
+            "message": "The left-hand side of an assignment expression may not be an optional property access."
+          },
+          {
+            "file": "libs/mcp/src/lib/config/environment-config.ts",
+            "line": 175,
+            "column": 7,
+            "message": "The left-hand side of an assignment expression may not be an optional property access."
+          },
+          {
+            "file": "libs/mcp/src/lib/config/environment-config.ts",
+            "line": 179,
+            "column": 7,
+            "message": "The left-hand side of an assignment expression may not be an optional property access."
+          },
+          {
+            "file": "libs/mcp/src/lib/config/environment-config.ts",
+            "line": 180,
+            "column": 7,
+            "message": "The left-hand side of an assignment expression may not be an optional property access."
+          }
+        ]
+      },
+      "4111": {
+        "count": 6,
+        "message": "Property '...' comes from an index signature, so it must be accessed with ['...'].",
+        "examples": [
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/bigquery.client.ts",
+            "line": 70,
+            "column": 30,
+            "message": "Property 'params' comes from an index signature, so it must be accessed with ['params']."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+            "line": 38,
+            "column": 71,
+            "message": "Property 'GCP_PROJECT_ID' comes from an index signature, so it must be accessed with ['GCP_PROJECT_ID']."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+            "line": 39,
+            "column": 69,
+            "message": "Property 'GCP_LOCATION' comes from an index signature, so it must be accessed with ['GCP_LOCATION']."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+            "line": 50,
+            "column": 81,
+            "message": "Property 'RAG_DATASTORE_ID' comes from an index signature, so it must be accessed with ['RAG_DATASTORE_ID']."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+            "line": 51,
+            "column": 87,
+            "message": "Property 'RAG_SEARCH_ENGINE_ID' comes from an index signature, so it must be accessed with ['RAG_SEARCH_ENGINE_ID']."
+          }
+        ]
+      },
+      "4114": {
+        "count": 2,
+        "message": "This member must have an '...' modifier because it overrides a member in the base class '...'.",
+        "examples": [
+          {
+            "file": "libs/adk/src/agents/root-agent.ts",
+            "line": 39,
+            "column": 19,
+            "message": "This member must have an 'override' modifier because it overrides a member in the base class 'LlmAgent'."
+          },
+          {
+            "file": "libs/adk/src/agents/root-agent.ts",
+            "line": 40,
+            "column": 19,
+            "message": "This member must have an 'override' modifier because it overrides a member in the base class 'LlmAgent'."
+          }
+        ]
+      },
+      "5076": {
+        "count": 3,
+        "message": "'...' and '...' operations cannot be mixed without parentheses.",
+        "examples": [
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/config/environment-config.ts",
+            "line": 57,
+            "column": 38,
+            "message": "'&&' and '??' operations cannot be mixed without parentheses."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/config/environment-config.ts",
+            "line": 144,
+            "column": 38,
+            "message": "'&&' and '??' operations cannot be mixed without parentheses."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/config/environment-config.ts",
+            "line": 145,
+            "column": 46,
+            "message": "'&&' and '??' operations cannot be mixed without parentheses."
+          }
+        ]
+      },
+      "6133": {
+        "count": 38,
+        "message": "'...' is declared but its value is never read.",
+        "examples": [
+          {
+            "file": "libs/adk/src/services/vertex.ts",
+            "line": 13,
+            "column": 1,
+            "message": "'GenModel' is declared but its value is never read."
+          },
+          {
+            "file": "libs/adk/src/services/vertex.ts",
+            "line": 19,
+            "column": 1,
+            "message": "'Buffer' is declared but its value is never read."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/bigquery.client.ts",
+            "line": 109,
+            "column": 12,
+            "message": "'apiResponse' is declared but its value is never read."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/clients/bigquery.client.ts",
+            "line": 146,
+            "column": 12,
+            "message": "'table' is declared but its value is never read."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/mcp.service.ts",
+            "line": 279,
+            "column": 15,
+            "message": "'config' is declared but its value is never read."
+          }
+        ]
+      },
+      "6142": {
+        "count": 1,
+        "message": "Module '...' was resolved to '...', but '...' is not set.",
+        "examples": [
+          {
+            "file": "libs/ui/components/src/index.ts",
+            "line": 12,
+            "column": 15,
+            "message": "Module './lib/ui-components' was resolved to '/home/g_nelson/signals-1/libs/ui/components/src/lib/ui-components.tsx', but '--jsx' is not set."
+          }
+        ]
+      },
+      "6192": {
+        "count": 2,
+        "message": "All imports in import declaration are unused.",
+        "examples": [
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/gemini-orchestrator.ts",
+            "line": 13,
+            "column": 1,
+            "message": "All imports in import declaration are unused."
+          },
+          {
+            "file": "libs/utils/monitoring/src/lib/otel-config.ts",
+            "line": 20,
+            "column": 1,
+            "message": "All imports in import declaration are unused."
+          }
+        ]
+      },
+      "6307": {
+        "count": 2,
+        "message": "File '...' is not listed within the file list of project '...'. Projects must list all files or use an '...' pattern.",
+        "examples": [
+          {
+            "file": "scripts/demo-opentelemetry.ts",
+            "line": 21,
+            "column": 43,
+            "message": "File '/home/g_nelson/signals-1/apps/looker-dashboards/src/lib/dashboard-templates.ts' is not listed within the file list of project '/home/g_nelson/signals-1/tsconfig.json'. Projects must list all files or use an 'include' pattern."
+          },
+          {
+            "file": "scripts/demo-opentelemetry.ts",
+            "line": 22,
+            "column": 41,
+            "message": "File '/home/g_nelson/signals-1/apps/looker-dashboards/src/lib/monitoring-queries.ts' is not listed within the file list of project '/home/g_nelson/signals-1/tsconfig.json'. Projects must list all files or use an 'include' pattern."
+          }
+        ]
+      },
+      "7006": {
+        "count": 36,
+        "message": "Parameter '...' implicitly has an '...' type.",
+        "examples": [
+          {
+            "file": "libs/agents/bq-agent/src/lib/bq-agent.ts",
+            "line": 172,
+            "column": 40,
+            "message": "Parameter 'table' implicitly has an 'any' type."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/config/environment-config.ts",
+            "line": 266,
+            "column": 30,
+            "message": "Parameter 'server' implicitly has an 'any' type."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/config/environment-config.ts",
+            "line": 266,
+            "column": 38,
+            "message": "Parameter 'index' implicitly has an 'any' type."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/config/environment-config.ts",
+            "line": 305,
+            "column": 14,
+            "message": "Parameter 'server' implicitly has an 'any' type."
+          },
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/config/environment-config.ts",
+            "line": 306,
+            "column": 12,
+            "message": "Parameter 'a' implicitly has an 'any' type."
+          }
+        ]
+      },
+      "7015": {
+        "count": 1,
+        "message": "Element implicitly has an '...' type because index expression is not of type '...'.",
+        "examples": [
+          {
+            "file": "libs/adk/src/utilities/configuration.ts",
+            "line": 280,
+            "column": 30,
+            "message": "Element implicitly has an 'any' type because index expression is not of type 'number'."
+          }
+        ]
+      },
+      "7022": {
+        "count": 2,
+        "message": "'...' implicitly has type '...' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.",
+        "examples": [
+          {
+            "file": "libs/utils/signals/src/nx-integration.ts",
+            "line": 29,
+            "column": 9,
+            "message": "'signal' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer."
+          },
+          {
+            "file": "libs/utils/signals/src/nx-integration.ts",
+            "line": 55,
+            "column": 9,
+            "message": "'signal' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer."
+          }
+        ]
+      },
+      "7027": {
+        "count": 1,
+        "message": "Unreachable code detected.",
+        "examples": [
+          {
+            "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+            "line": 193,
+            "column": 5,
+            "message": "Unreachable code detected."
+          }
+        ]
+      },
+      "7031": {
+        "count": 2,
+        "message": "Binding element '...' implicitly has an '...' type.",
+        "examples": [
+          {
+            "file": "libs/security/src/secret-manager.ts",
+            "line": 75,
+            "column": 46,
+            "message": "Binding element 'name' implicitly has an 'any' type."
+          },
+          {
+            "file": "libs/security/src/secret-manager.ts",
+            "line": 75,
+            "column": 52,
+            "message": "Binding element 'value' implicitly has an 'any' type."
+          }
+        ]
+      },
+      "7053": {
+        "count": 1,
+        "message": "Element implicitly has an '...' type because expression of type '...' can'...'Console'.",
+        "examples": [
+          {
+            "file": "libs/utils/monitoring/src/lib/error-handler.ts",
+            "line": 114,
+            "column": 3,
+            "message": "Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Console'."
+          }
+        ]
+      },
+      "18004": {
+        "count": 1,
+        "message": "No value exists in scope for the shorthand property '...'. Either declare one or provide an initializer.",
+        "examples": [
+          {
+            "file": "libs/agents/gemini-orchestrator/src/lib/config/config.service.ts",
+            "line": 306,
+            "column": 7,
+            "message": "No value exists in scope for the shorthand property 'mcpServers'. Either declare one or provide an initializer."
+          }
+        ]
+      },
+      "18046": {
+        "count": 3,
+        "message": "'...' is of type '...'.",
+        "examples": [
+          {
+            "file": "libs/utils/api-clients/src/lib/mcp-client.service.ts",
+            "line": 377,
+            "column": 40,
+            "message": "'error' is of type 'unknown'."
+          },
+          {
+            "file": "libs/utils/api-clients/src/lib/mcp-client.service.ts",
+            "line": 378,
+            "column": 39,
+            "message": "'error' is of type 'unknown'."
+          },
+          {
+            "file": "libs/utils/api-clients/src/lib/mcp-client.service.ts",
+            "line": 378,
+            "column": 65,
+            "message": "'error' is of type 'unknown'."
+          }
+        ]
+      },
+      "18047": {
+        "count": 2,
+        "message": "'...' is possibly '...'.",
+        "examples": [
+          {
+            "file": "libs/utils/api-clients/src/lib/mcp-client.service.ts",
+            "line": 441,
+            "column": 7,
+            "message": "'process.stdout' is possibly 'null'."
+          },
+          {
+            "file": "libs/utils/api-clients/src/lib/mcp-client.service.ts",
+            "line": 444,
+            "column": 7,
+            "message": "'process.stdin' is possibly 'null'."
+          }
+        ]
+      },
+      "18048": {
+        "count": 36,
+        "message": "'...' is possibly '...'.",
+        "examples": [
+          {
+            "file": "libs/adk/src/utilities/configuration.ts",
+            "line": 123,
+            "column": 24,
+            "message": "'parts' is possibly 'undefined'."
+          },
+          {
+            "file": "libs/adk/src/utilities/configuration.ts",
+            "line": 141,
+            "column": 25,
+            "message": "'parts' is possibly 'undefined'."
+          },
+          {
+            "file": "libs/adk/src/utilities/configuration.ts",
+            "line": 141,
+            "column": 34,
+            "message": "'parts' is possibly 'undefined'."
+          },
+          {
+            "file": "libs/adk/src/utilities/configuration.ts",
+            "line": 142,
+            "column": 20,
+            "message": "'parts' is possibly 'undefined'."
+          },
+          {
+            "file": "libs/adk/src/utilities/configuration.ts",
+            "line": 143,
+            "column": 13,
+            "message": "'part' is possibly 'undefined'."
+          }
+        ]
+      }
+    }
+  },
+  "fixes": {
+    "created": [
+      {
+        "errorCode": "2304",
+        "fixName": "fix-name-not-found",
+        "fixPath": "typescript-diagnostics/scripts/fixes/fix-name-not-found.js",
+        "description": "Fixes name not found errors by adding missing imports and declarations"
+      },
+      {
+        "errorCode": "2307",
+        "fixName": "fix-module-not-found",
+        "fixPath": "typescript-diagnostics/scripts/fixes/fix-module-not-found.js",
+        "description": "Fixes module not found errors by installing missing dependencies and updating import paths"
+      },
+      {
+        "errorCode": "2322",
+        "fixName": "fix-type-assignability",
+        "fixPath": "typescript-diagnostics/scripts/fixes/fix-type-assignability.js",
+        "description": "Fixes type assignability errors by adding type assertions and guards"
+      },
+      {
+        "errorCode": "2339",
+        "fixName": "fix-property-not-found",
+        "fixPath": "typescript-diagnostics/scripts/fixes/fix-property-not-found.js",
+        "description": "Fixes property not found errors by adding optional chaining and type assertions"
+      },
+      {
+        "errorCode": "2532",
+        "fixName": "fix-null-checks",
+        "fixPath": "typescript-diagnostics/scripts/fixes/fix-null-checks.js",
+        "description": "Fixes null/undefined check errors by adding optional chaining and nullish coalescing"
+      }
+    ],
+    "applied": []
+  }
+}

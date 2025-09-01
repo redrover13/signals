@@ -15,20 +15,20 @@ import { BaseTool, FunctionTool, ToolContext } from '@waldzellai/adk-typescript'
 /**
  * BigQuery query tool function
  */
-async function bigQueryQuery(args: Record<string, unknown>, _toolContext?: ToolContext): Promise<any> {
+async function bigQueryQuery(args: Record<string, unknown> | undefined, _toolContext?: ToolContext): Promise<any> {
   const { sql, params } = args;
   
   try {
-    const rows = await bqQuery(sql as string, params as Record<string, unknown> | undefined);
+    const rows = await bqQuery(sql as string, params as Record<string, unknown> | undefined | undefined);
     return {
       success: true,
       rows,
-      count: rows.length,
+      count: rows && rows.length,
     };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error && error.message : 'Unknown error',
     };
   }
 }
@@ -36,7 +36,7 @@ async function bigQueryQuery(args: Record<string, unknown>, _toolContext?: ToolC
 /**
  * BigQuery insert tool function
  */
-async function bigQueryInsert(args: Record<string, unknown>, _toolContext?: ToolContext): Promise<any> {
+async function bigQueryInsert(args: Record<string, unknown> | undefined, _toolContext?: ToolContext): Promise<any> {
   const { table, rows } = args;
   
   try {
@@ -49,7 +49,7 @@ async function bigQueryInsert(args: Record<string, unknown>, _toolContext?: Tool
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error && error.message : 'Unknown error',
     };
   }
 }
@@ -57,7 +57,7 @@ async function bigQueryInsert(args: Record<string, unknown>, _toolContext?: Tool
 /**
  * Google Cloud Storage upload tool function
  */
-async function gcsUpload(args: Record<string, unknown>, _toolContext?: ToolContext): Promise<any> {
+async function gcsUpload(args: Record<string, unknown> | undefined, _toolContext?: ToolContext): Promise<any> {
   const { bucket, filename, content, contentType } = args;
   
   try {
@@ -75,7 +75,7 @@ async function gcsUpload(args: Record<string, unknown>, _toolContext?: ToolConte
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error && error.message : 'Unknown error',
     };
   }
 }
@@ -83,7 +83,7 @@ async function gcsUpload(args: Record<string, unknown>, _toolContext?: ToolConte
 /**
  * HTTP request tool function
  */
-async function httpRequest(args: Record<string, unknown>, _toolContext?: ToolContext): Promise<any> {
+async function httpRequest(args: Record<string, unknown> | undefined, _toolContext?: ToolContext): Promise<any> {
   const { url, method, headers, body } = args;
   
   try {
@@ -96,7 +96,7 @@ async function httpRequest(args: Record<string, unknown>, _toolContext?: ToolCon
     };
 
     if (body && ['POST', 'PUT', 'PATCH'].includes(method as string)) {
-      fetchOptions.body = body as string;
+      if (fetchOptions) { fetchOptions.body = body as string; }
     }
 
     const response = await fetch(url as string, fetchOptions);
@@ -104,7 +104,7 @@ async function httpRequest(args: Record<string, unknown>, _toolContext?: ToolCon
     
     let responseData;
     try {
-      responseData = JSON.parse(responseText);
+      responseData = JSON && JSON.parse(responseText);
     } catch {
       responseData = responseText;
     }
@@ -114,12 +114,12 @@ async function httpRequest(args: Record<string, unknown>, _toolContext?: ToolCon
       status: response.status,
       statusText: response.statusText,
       data: responseData,
-      headers: Object.fromEntries(response.headers.entries()),
+      headers: Object && Object.fromEntries(response.headers && response.headers.entries()),
     };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error && error.message : 'Unknown error',
     };
   }
 }
@@ -248,14 +248,14 @@ export const GCP_TOOLS: BaseTool[] = [
  * Get tools by name
  */
 export function getToolByName(name: string): BaseTool | undefined {
-  return GCP_TOOLS.find(tool => (tool as any).name === name);
+  return GCP_TOOLS && GCP_TOOLS.find(tool => (tool as any).name === name);
 }
 
 /**
  * Get all tool names
  */
 export function getToolNames(): string[] {
-  return GCP_TOOLS.map(tool => (tool as any).name);
+  return GCP_TOOLS && GCP_TOOLS.map(tool => (tool as any).name);
 }
 
 /**
@@ -299,7 +299,7 @@ export class BigQueryInsertTool extends FunctionTool {
         properties: {
           table: {
             type: 'string',
-            description: 'The table name in format dataset.table',
+            description: 'The table name in format dataset && dataset.table',
             minLength: 1
           },
           rows: {

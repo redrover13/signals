@@ -15,15 +15,12 @@
     },
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/api",
-        "tsConfig": "apps/api/tsconfig.json",
-        "assets": [
-          { "glob": "**/*", "input": "apps/api/src/routes", "output": "routes" }
-        ]
+        "main": "apps/api/src/main.ts",
+        "tsConfig": "apps/api/tsconfig.app.json",
+        "assets": ["apps/api/src/routes"]
       },
       "configurations": {
         "production": {
@@ -31,21 +28,9 @@
           "extractLicenses": true,
           "generatePackageJson": true,
           "sourceMap": false
-        },
-        "development": {
-          "optimization": false,
-          "sourceMap": true
         }
       },
-      "defaultConfiguration": "production",
-      "cache": true,
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "production",
-        "^production"
-      ]
+      "defaultConfiguration": "production"
     },
     "lint": {
       "executor": "@nx/eslint:lint",

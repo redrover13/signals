@@ -12,7 +12,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as _ from 'lodash';
+import * as _ from 'lodash-es';
 import { z } from "zod";
 
 // Input validation schema for search requests
@@ -27,23 +27,23 @@ const searchRequestSchema = z.object({
 });
 
 interface SearchRequest {
-  tool: string;
-  query: string;
-  repoOwner?: string;
-  repoName?: string;
+  tool: string | undefined;
+  query: string | undefined;
+  repoOwner?: string | undefined;
+  repoName?: string | undefined;
 }
 
 interface SearchResult {
-  file: string;
-  content: string;
-  relevance: number;
+  file: string | undefined;
+  content: string | undefined;
+  relevance: number | undefined;
   matches: string[];
 }
 
 interface SearchResponse {
-  query: string;
+  query: string | undefined;
   results: SearchResult[];
-  totalMatches: number;
+  totalMatches: number | undefined;
 }
 
 export async function searchRoutes(fastify: FastifyInstance): Promise<void> {
@@ -131,10 +131,11 @@ async function performSemanticSearch(query: string): Promise<SearchResult[]> {
 }
 
 async function searchInFile(
-  filePath: string,
-  query: string,
+  filePath: string | undefined,
+  query: string | undefined,
   ciTerms: string[],
 ): Promise<SearchResult | null> {
+  if (!filePath || !query) return null;
   try {
     const content = fs.readFileSync(filePath, 'utf-8');
     const lines = content.split('\n');

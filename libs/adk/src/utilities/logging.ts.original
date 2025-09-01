@@ -142,7 +142,7 @@ export class Logger {
     }
     
     const timestamp = new Date().toISOString();
-    const correlationId = this.correlationIdFn ? this.correlationIdFn() : undefined | undefined;
+    const correlationId = this.correlationIdFn ? this.correlationIdFn() : undefined;
     
     const logEntry: LogEntry = {
       timestamp,

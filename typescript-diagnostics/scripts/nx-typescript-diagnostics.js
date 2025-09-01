@@ -17,7 +17,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -187,8 +187,9 @@ function runDiagnosticsOnFiles(files, project) {
     
     // Run TypeScript compiler
     try {
-      const tscOutput = execSync(
-        `npx tsc --project ${tempTsConfigPath} 2>&1 || true`, 
+      const tscOutput = execFileSync(
+        'npx',
+        ['tsc', '--project', tempTsConfigPath],
         { encoding: 'utf8', cwd: ROOT_DIR, maxBuffer: 10 * 1024 * 1024 }
       );
       

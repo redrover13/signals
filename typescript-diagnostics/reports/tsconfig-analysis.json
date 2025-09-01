@@ -1,0 +1,3054 @@
+{
+  "timestamp": "2025-09-01T03:40:20.948Z",
+  "totalConfigs": 103,
+  "configs": [
+    {
+      "path": "agent-frontend/tsconfig.app.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../dist/out-tsc",
+        "types": [
+          "node",
+          "@nx/react/typings/cssmodule.d.ts",
+          "@nx/react/typings/image.d.ts",
+          "vite/client"
+        ]
+      },
+      "include": [
+        "src/**/*.js",
+        "src/**/*.jsx",
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "exclude": [
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.tsx",
+        "src/**/*.test.tsx",
+        "src/**/*.spec.js",
+        "src/**/*.test.js",
+        "src/**/*.spec.jsx",
+        "src/**/*.test.jsx",
+        "jest.config.ts",
+        "**/*.stories.ts",
+        "**/*.stories.js",
+        "**/*.stories.jsx",
+        "**/*.stories.tsx"
+      ]
+    },
+    {
+      "path": "agent-frontend/tsconfig.json",
+      "extends": "../tsconfig.base.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "jsx": "react-jsx",
+        "allowJs": false,
+        "esModuleInterop": false,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "types": [
+          "vite/client"
+        ]
+      },
+      "include": [],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.app.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        },
+        {
+          "path": "./tsconfig.storybook.json"
+        }
+      ]
+    },
+    {
+      "path": "agent-frontend/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "node10",
+        "jsx": "react-jsx",
+        "types": [
+          "jest",
+          "node",
+          "@nx/react/typings/cssmodule.d.ts",
+          "@nx/react/typings/image.d.ts"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.tsx",
+        "src/**/*.spec.tsx",
+        "src/**/*.test.js",
+        "src/**/*.spec.js",
+        "src/**/*.test.jsx",
+        "src/**/*.spec.jsx",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "agent-frontend/tsconfig.storybook.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "emitDecoratorMetadata": true,
+        "outDir": ""
+      },
+      "include": [
+        "src/**/*.stories.ts",
+        "src/**/*.stories.js",
+        "src/**/*.stories.jsx",
+        "src/**/*.stories.tsx",
+        "src/**/*.stories.mdx",
+        ".storybook/*.js",
+        ".storybook/*.ts"
+      ],
+      "exclude": [
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.js",
+        "src/**/*.test.js",
+        "src/**/*.spec.tsx",
+        "src/**/*.test.tsx",
+        "src/**/*.spec.jsx",
+        "src/**/*.test.js"
+      ]
+    },
+    {
+      "path": "apps/agents/tsconfig.app.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "module": "commonjs",
+        "types": [
+          "node"
+        ]
+      },
+      "include": [
+        "src/**/*.ts"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "apps/agents/tsconfig.json",
+      "extends": "../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "outDir": "../../dist/apps/agents",
+        "module": "ESNext",
+        "moduleResolution": "Bundler"
+      },
+      "include": [
+        "src/**/*.ts"
+      ],
+      "exclude": [
+        "node_modules"
+      ]
+    },
+    {
+      "path": "apps/api/tsconfig.app.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "module": "commonjs",
+        "types": [
+          "node"
+        ]
+      },
+      "include": [
+        "src/**/*.ts"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "apps/api/tsconfig.json",
+      "extends": "../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "outDir": "../../dist/apps/api",
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true,
+        "types": [
+          "node"
+        ]
+      },
+      "include": [
+        "src/**/*.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "dist"
+      ]
+    },
+    {
+      "path": "apps/cloud-functions/cms-api/tsconfig.app.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "node"
+        ]
+      },
+      "include": [
+        "src/**/*.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "apps/cloud-functions/cms-api/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "esModuleInterop": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.app.json"
+        }
+      ]
+    },
+    {
+      "path": "apps/cloud-functions/crm-api/tsconfig.app.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "node"
+        ]
+      },
+      "include": [
+        "src/**/*.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "apps/cloud-functions/crm-api/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "esModuleInterop": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.app.json"
+        }
+      ]
+    },
+    {
+      "path": "apps/cloud-functions/rag-processor/tsconfig.json",
+      "compilerOptions": {
+        "target": "ES2020",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "declaration": true,
+        "outDir": "./dist",
+        "rootDir": "./src"
+      },
+      "include": [
+        "src/**/*"
+      ],
+      "exclude": [
+        "node_modules",
+        "dist"
+      ]
+    },
+    {
+      "path": "apps/cloud-functions/reviews-api/tsconfig.app.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "node"
+        ]
+      },
+      "include": [
+        "src/**/*.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "apps/cloud-functions/reviews-api/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "esModuleInterop": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.app.json"
+        }
+      ]
+    },
+    {
+      "path": "apps/cloud-functions/social-api/tsconfig.app.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "node"
+        ]
+      },
+      "include": [
+        "src/**/*.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "apps/cloud-functions/social-api/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "esModuleInterop": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.app.json"
+        }
+      ]
+    },
+    {
+      "path": "apps/frontend-agents/tsconfig.json",
+      "extends": "../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "jsx": "preserve",
+        "strict": true,
+        "composite": true,
+        "declarationMap": true,
+        "emitDeclarationOnly": false,
+        "esModuleInterop": true,
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "lib": [
+          "dom",
+          "dom.iterable",
+          "esnext"
+        ],
+        "allowJs": true,
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
+        "incremental": true,
+        "plugins": [
+          {
+            "name": "next"
+          }
+        ]
+      },
+      "include": [
+        "**/*.js",
+        "**/*.jsx",
+        "**/*.ts",
+        "**/*.tsx",
+        "../../apps/frontend-agents/.next/types/**/*.ts",
+        "../../dist/apps/frontend-agents/.next/types/**/*.ts",
+        "next-env.d.ts",
+        ".next/types/**/*.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "jest.config.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "references": [
+        {
+          "path": "../../libs/gcp"
+        }
+      ]
+    },
+    {
+      "path": "apps/looker-dashboards/tsconfig.json",
+      "extends": "../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "apps/looker-dashboards/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "apps/looker-dashboards/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "infra/workflows/cloud-workflows/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "infra/workflows/cloud-workflows/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "infra/workflows/cloud-workflows/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "infra/workflows/pubsub-workflows/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "infra/workflows/pubsub-workflows/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "infra/workflows/pubsub-workflows/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "libs/adk/tsconfig.json",
+      "extends": "../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "Node"
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/adk/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*",
+        "../../libs/gcp/src/**/*.ts"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/adk/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.tsx",
+        "src/**/*.spec.tsx",
+        "src/**/*.test.js",
+        "src/**/*.spec.js",
+        "src/**/*.test.jsx",
+        "src/**/*.spec.jsx",
+        "src/**/*.d.ts",
+        "../../libs/gcp/src/**/*.ts",
+        "../../libs/gcp-core/src/**/*.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/agents/bq-agent/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/agents/bq-agent/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/agents/bq-agent/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "libs/agents/content-agent/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/agents/content-agent/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*",
+        "../../../libs/adk/src/**/*.ts",
+        "../../../libs/gcp/src/**/*.ts",
+        "../../../libs/gcp-core/src/**/*.ts"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/agents/content-agent/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "../../../libs/adk/src/**/*.ts",
+        "../../../libs/gcp/src/**/*.ts",
+        "../../../libs/gcp-core/src/**/*.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "libs/agents/crm-agent/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/agents/crm-agent/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*",
+        "../../../libs/adk/src/**/*.ts",
+        "../../../libs/gcp/src/**/*.ts",
+        "../../../libs/gcp-core/src/**/*.ts"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/agents/crm-agent/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "../../../libs/adk/src/**/*.ts",
+        "../../../libs/gcp/src/**/*.ts",
+        "../../../libs/gcp-core/src/**/*.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "libs/agents/gemini-orchestrator/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "paths": {
+          "@nx-monorepo/gcp": [
+            "../../../libs/gcp/src/index.ts"
+          ]
+        }
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/agents/gemini-orchestrator/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ],
+      "references": [
+        {
+          "path": "../../gcp/tsconfig.lib.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/agents/gemini-orchestrator/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "libs/agents/looker-agent/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/agents/looker-agent/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/agents/looker-agent/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "libs/agents/reviews-agent/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/agents/reviews-agent/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/agents/reviews-agent/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "libs/agents/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/agents-sdk/tsconfig.json",
+      "extends": "../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/agents-sdk/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/agents-sdk/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "libs/build-tools/tsconfig.json",
+      "extends": "../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/build-tools/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node",
+          "vite/client"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/build-tools/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "libs/data-models/dbt-models/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/data-models/dbt-models/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/data-models/dbt-models/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "libs/data-models/schemas/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/data-models/schemas/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/data-models/schemas/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "libs/env/tsconfig.json",
+      "extends": "../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ES2022",
+        "target": "ES2022",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/env/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "module": "ES2022",
+        "moduleResolution": "node",
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/env/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "module": "ES2022",
+        "moduleResolution": "node",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/gcp/tsconfig.json",
+      "extends": "../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext"
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx",
+        "../gcp-core/src/**/*.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        },
+        {
+          "path": "../utils/gcp-auth"
+        },
+        {
+          "path": "../gcp-core"
+        }
+      ]
+    },
+    {
+      "path": "libs/gcp/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*",
+        "../gcp-core/src/**/*.ts"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/gcp/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.tsx",
+        "src/**/*.spec.tsx",
+        "src/**/*.test.js",
+        "src/**/*.spec.js",
+        "src/**/*.test.jsx",
+        "src/**/*.spec.jsx",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/gcp-core/tsconfig.json",
+      "extends": "../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "NodeNext",
+        "moduleResolution": "nodenext"
+      },
+      "include": [
+        "**/*.ts"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/gcp-core/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/mcp/tsconfig.json",
+      "extends": "../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noImplicitOverride": true,
+        "noPropertyAccessFromIndexSignature": false,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/mcp/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node",
+          "jest"
+        ],
+        "target": "es2022",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noImplicitOverride": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "**/*.ts",
+        "src/**/*"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts",
+        "test-setup.ts",
+        "jest.setup.ts"
+      ]
+    },
+    {
+      "path": "libs/mcp/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ],
+        "esModuleInterop": true
+      },
+      "include": [
+        "jest.config.ts",
+        "jest.setup.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.tsx",
+        "src/**/*.spec.tsx",
+        "src/**/*.test.js",
+        "src/**/*.spec.js",
+        "src/**/*.test.jsx",
+        "src/**/*.spec.jsx",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "libs/security/tsconfig.json",
+      "extends": "../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noImplicitOverride": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/security/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/security/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/ui/components/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "jsx": "react-jsx",
+        "allowJs": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noImplicitOverride": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/ui/components/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/ui/components/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.tsx",
+        "src/**/*.spec.tsx",
+        "src/**/*.test.js",
+        "src/**/*.spec.js",
+        "src/**/*.test.jsx",
+        "src/**/*.spec.jsx",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/utils/api-clients/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/utils/api-clients/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/utils/api-clients/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "libs/utils/common-types/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "NodeNext",
+        "moduleResolution": "nodenext",
+        "outDir": "../../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictPropertyInitialization": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "noUncheckedIndexedAccess": true,
+        "exactOptionalPropertyTypes": true
+      },
+      "include": [],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/utils/common-types/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ]
+      },
+      "include": [
+        "src/**/*.ts"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/utils/common-types/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "commonjs",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.tsx",
+        "src/**/*.spec.tsx",
+        "src/**/*.test.js",
+        "src/**/*.spec.js",
+        "src/**/*.test.jsx",
+        "src/**/*.spec.jsx",
+        "src/**/*.d.ts"
+      ]
+    },
+    {
+      "path": "libs/utils/gcp-auth/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "composite": true,
+        "declaration": true,
+        "module": "NodeNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        },
+        {
+          "path": "../../gcp-core"
+        },
+        {
+          "path": "../../common-types"
+        }
+      ]
+    },
+    {
+      "path": "libs/utils/gcp-auth/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*",
+        "../../gcp-core/src/**/*.ts"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/utils/gcp-auth/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "libs/utils/monitoring/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "importHelpers": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        },
+        {
+          "path": "../../agents/gemini-orchestrator/tsconfig.lib.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/utils/monitoring/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "declaration": true,
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/utils/monitoring/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "src/**/*.ts",
+        "src/**/*.test.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "libs/utils/secrets-manager/tsconfig.lib.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "declaration": true,
+        "outDir": "../../../dist/out-tsc",
+        "types": [
+          "node"
+        ],
+        "composite": true,
+        "declarationMap": true
+      },
+      "include": [
+        "src/**/*"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.test.ts",
+        "src/**/*.stories.ts"
+      ]
+    },
+    {
+      "path": "libs/utils/signals/tsconfig.json",
+      "extends": "../../../tsconfig.base.json",
+      "hasExtendsRoot": false,
+      "compilerOptions": {
+        "jsx": "react-jsx",
+        "allowJs": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noImplicitOverride": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.lib.json"
+        },
+        {
+          "path": "./tsconfig.spec.json"
+        }
+      ]
+    },
+    {
+      "path": "libs/utils/signals/tsconfig.lib.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "declaration": true,
+        "declarationMap": true,
+        "composite": true,
+        "types": [
+          "node"
+        ]
+      },
+      "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "index.ts"
+      ],
+      "exclude": [
+        "jest.config.ts",
+        "**/*.spec.ts",
+        "**/*.test.ts"
+      ]
+    },
+    {
+      "path": "libs/utils/signals/tsconfig.spec.json",
+      "extends": "./tsconfig.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "../../../dist/out-tsc",
+        "module": "ESNext",
+        "moduleResolution": "nodenext",
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "jest.config.ts",
+        "**/*.test.ts",
+        "**/*.spec.ts",
+        "**/*.d.ts",
+        "index.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist"
+      ]
+    },
+    {
+      "path": "tsconfig.base.json",
+      "compilerOptions": {
+        "rootDir": ".",
+        "baseUrl": ".",
+        "composite": true,
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "paths": {
+          "@nx-monorepo/*": [
+            "libs/*"
+          ],
+          "@nx-monorepo/adk": [
+            "libs/adk/src/index.ts"
+          ],
+          "@nx-monorepo/agents-sdk": [
+            "libs/agents-sdk/src/index.ts"
+          ],
+          "@nx-monorepo/gcp": [
+            "libs/gcp/src/index.ts"
+          ],
+          "@nx-monorepo/utils/signals": [
+            "libs/utils/signals/src/index.ts"
+          ],
+          "@nx-monorepo/utils/common-types": [
+            "libs/utils/common-types/src/index.ts"
+          ],
+          "@nx-monorepo/security": [
+            "libs/security/src/index.ts"
+          ]
+        },
+        "outDir": "./dist/out-tsc",
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "target": "ES2022",
+        "module": "ESNext",
+        "lib": [
+          "ES2022",
+          "dom"
+        ],
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noImplicitOverride": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedIndexedAccess": true,
+        "exactOptionalPropertyTypes": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictBindCallApply": true,
+        "strictPropertyInitialization": true,
+        "noImplicitThis": true,
+        "useUnknownInCatchVariables": true,
+        "alwaysStrict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "allowUnreachableCode": false,
+        "allowUnusedLabels": false
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.d.ts",
+        "**/*.js"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp"
+      ],
+      "references": [
+        {
+          "path": "./tsconfig.references.json"
+        },
+        {
+          "path": "./libs/gcp-core"
+        }
+      ]
+    },
+    {
+      "path": "tsconfig.eslint.json",
+      "extends": "./tsconfig.base.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "types": [
+          "node",
+          "jest"
+        ]
+      },
+      "include": [
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.js",
+        "**/*.jsx"
+      ],
+      "exclude": [
+        "node_modules",
+        "tmp",
+        "dist",
+        ".nx"
+      ]
+    },
+    {
+      "path": "tsconfig.json",
+      "extends": "./tsconfig.base.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "noEmit": true
+      },
+      "include": [
+        "libs/**/*.ts",
+        "tools/**/*.ts",
+        "scripts/**/*.ts",
+        "**/*.d.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "dist",
+        "coverage",
+        "*.generated.*",
+        "**/*.spec.ts",
+        "**/*.test.ts",
+        "apps/**/*",
+        "agent-frontend/**/*",
+        "**/*.tsx",
+        "**/*.jsx"
+      ]
+    },
+    {
+      "path": "typescript-diagnostics/configs/tsconfig.app.template.json",
+      "extends": "./tsconfig.base.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "./dist",
+        "types": [
+          "node"
+        ]
+      },
+      "include": [
+        "src/**/*"
+      ],
+      "exclude": [
+        "node_modules",
+        "dist",
+        "test",
+        "**/*.spec.ts"
+      ]
+    },
+    {
+      "path": "typescript-diagnostics/configs/tsconfig.base.template.json",
+      "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "NodeNext",
+        "esModuleInterop": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "noImplicitReturns": true,
+        "forceConsistentCasingInFileNames": true,
+        "allowSyntheticDefaultImports": true,
+        "paths": {
+          "@nx-monorepo/*": [
+            "libs/*"
+          ],
+          "@nx-monorepo/adk": [
+            "libs/adk/src/index.ts"
+          ],
+          "@nx-monorepo/agents-sdk": [
+            "libs/agents-sdk/src/index.ts"
+          ],
+          "@nx-monorepo/gcp": [
+            "libs/gcp/src/index.ts"
+          ],
+          "@nx-monorepo/utils/signals": [
+            "libs/utils/signals/src/index.ts"
+          ],
+          "@nx-monorepo/utils/common-types": [
+            "libs/utils/common-types/src/index.ts"
+          ],
+          "@nx-monorepo/security": [
+            "libs/security/src/index.ts"
+          ]
+        }
+      }
+    },
+    {
+      "path": "typescript-diagnostics/configs/tsconfig.lib.template.json",
+      "extends": "./tsconfig.base.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "outDir": "./dist",
+        "declaration": true
+      },
+      "include": [
+        "src/**/*"
+      ],
+      "exclude": [
+        "node_modules",
+        "dist",
+        "test",
+        "**/*.spec.ts"
+      ]
+    },
+    {
+      "path": "typescript-diagnostics/configs/tsconfig.test.template.json",
+      "extends": "./tsconfig.base.json",
+      "hasExtendsRoot": true,
+      "compilerOptions": {
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "test/**/*",
+        "**/*.spec.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "dist"
+      ]
+    },
+    {
+      "path": "typescript-diagnostics/reports/tsconfig-analysis.json",
+      "compilerOptions": {}
+    }
+  ],
+  "commonSettings": {
+    "module": {
+      "value": "ESNext",
+      "count": 3,
+      "consistent": true
+    },
+    "esModuleInterop": {
+      "value": true,
+      "count": 3,
+      "consistent": true
+    },
+    "allowSyntheticDefaultImports": {
+      "value": true,
+      "count": 3,
+      "consistent": true
+    },
+    "strict": {
+      "value": true,
+      "count": 3,
+      "consistent": true
+    },
+    "skipLibCheck": {
+      "value": true,
+      "count": 3,
+      "consistent": true
+    },
+    "forceConsistentCasingInFileNames": {
+      "value": true,
+      "count": 3,
+      "consistent": true
+    },
+    "declaration": {
+      "value": true,
+      "count": 3,
+      "consistent": true
+    },
+    "declarationMap": {
+      "value": true,
+      "count": 2,
+      "consistent": true
+    },
+    "sourceMap": {
+      "value": true,
+      "count": 2,
+      "consistent": true
+    },
+    "paths": {
+      "value": {
+        "@nx-monorepo/*": [
+          "libs/*"
+        ],
+        "@nx-monorepo/adk": [
+          "libs/adk/src/index.ts"
+        ],
+        "@nx-monorepo/agents-sdk": [
+          "libs/agents-sdk/src/index.ts"
+        ],
+        "@nx-monorepo/gcp": [
+          "libs/gcp/src/index.ts"
+        ],
+        "@nx-monorepo/utils/signals": [
+          "libs/utils/signals/src/index.ts"
+        ],
+        "@nx-monorepo/utils/common-types": [
+          "libs/utils/common-types/src/index.ts"
+        ],
+        "@nx-monorepo/security": [
+          "libs/security/src/index.ts"
+        ]
+      },
+      "count": 2,
+      "consistent": true
+    },
+    "noImplicitReturns": {
+      "value": true,
+      "count": 2,
+      "consistent": true
+    }
+  },
+  "inconsistentSettings": {
+    "target": {
+      "values": [
+        {
+          "value": "ES2020",
+          "count": 1,
+          "configs": [
+            "apps/cloud-functions/rag-processor/tsconfig.json"
+          ]
+        },
+        {
+          "value": "ES2022",
+          "count": 1,
+          "configs": [
+            "tsconfig.base.json"
+          ]
+        },
+        {
+          "value": "ESNext",
+          "count": 1,
+          "configs": [
+            "typescript-diagnostics/configs/tsconfig.base.template.json"
+          ]
+        }
+      ],
+      "consistent": false
+    },
+    "moduleResolution": {
+      "values": [
+        {
+          "value": "node",
+          "count": 2,
+          "configs": [
+            "apps/cloud-functions/rag-processor/tsconfig.json",
+            "tsconfig.base.json"
+          ]
+        },
+        {
+          "value": "NodeNext",
+          "count": 1,
+          "configs": [
+            "typescript-diagnostics/configs/tsconfig.base.template.json"
+          ]
+        }
+      ],
+      "consistent": false
+    },
+    "outDir": {
+      "values": [
+        {
+          "value": "./dist",
+          "count": 1,
+          "configs": [
+            "apps/cloud-functions/rag-processor/tsconfig.json"
+          ]
+        },
+        {
+          "value": "./dist/out-tsc",
+          "count": 1,
+          "configs": [
+            "tsconfig.base.json"
+          ]
+        }
+      ],
+      "consistent": false
+    },
+    "rootDir": {
+      "values": [
+        {
+          "value": "./src",
+          "count": 1,
+          "configs": [
+            "apps/cloud-functions/rag-processor/tsconfig.json"
+          ]
+        },
+        {
+          "value": ".",
+          "count": 1,
+          "configs": [
+            "tsconfig.base.json"
+          ]
+        }
+      ],
+      "consistent": false
+    }
+  },
+  "recommendations": {
+    "baseConfig": {
+      "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "NodeNext",
+        "esModuleInterop": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "noImplicitReturns": true,
+        "forceConsistentCasingInFileNames": true,
+        "allowSyntheticDefaultImports": true,
+        "paths": {
+          "@nx-monorepo/*": [
+            "libs/*"
+          ],
+          "@nx-monorepo/adk": [
+            "libs/adk/src/index.ts"
+          ],
+          "@nx-monorepo/agents-sdk": [
+            "libs/agents-sdk/src/index.ts"
+          ],
+          "@nx-monorepo/gcp": [
+            "libs/gcp/src/index.ts"
+          ],
+          "@nx-monorepo/utils/signals": [
+            "libs/utils/signals/src/index.ts"
+          ],
+          "@nx-monorepo/utils/common-types": [
+            "libs/utils/common-types/src/index.ts"
+          ],
+          "@nx-monorepo/security": [
+            "libs/security/src/index.ts"
+          ]
+        }
+      }
+    },
+    "appConfig": {
+      "extends": "./tsconfig.base.json",
+      "compilerOptions": {
+        "outDir": "./dist",
+        "types": [
+          "node"
+        ]
+      },
+      "include": [
+        "src/**/*"
+      ],
+      "exclude": [
+        "node_modules",
+        "dist",
+        "test",
+        "**/*.spec.ts"
+      ]
+    },
+    "libConfig": {
+      "extends": "./tsconfig.base.json",
+      "compilerOptions": {
+        "outDir": "./dist",
+        "declaration": true
+      },
+      "include": [
+        "src/**/*"
+      ],
+      "exclude": [
+        "node_modules",
+        "dist",
+        "test",
+        "**/*.spec.ts"
+      ]
+    },
+    "testConfig": {
+      "extends": "./tsconfig.base.json",
+      "compilerOptions": {
+        "types": [
+          "jest",
+          "node"
+        ]
+      },
+      "include": [
+        "test/**/*",
+        "**/*.spec.ts"
+      ],
+      "exclude": [
+        "node_modules",
+        "dist"
+      ]
+    }
+  },
+  "appliedChanges": []
+}

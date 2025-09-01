@@ -55,4 +55,10 @@ export default defineConfig(() => ({
       external: [],
     },
   },
+  
+  // Optimize dependencies for better build performance
+  optimizeDeps: {
+    include: ['lodash-es'],
+    force: false,
+  },
 }));

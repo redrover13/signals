@@ -95,7 +95,7 @@ export class MainAgent {
         - "ERROR: <REASON>" if the query cannot be processed
       `);
       
-      const response = result?.response?.text();
+      const response = result?.response?.candidates?.[0]?.content || '';
 
       if (response.startsWith('BIGQUERY:')) {
         const sql = response.replace('BIGQUERY:', '').trim();

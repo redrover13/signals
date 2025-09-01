@@ -19,7 +19,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // Import the module federation config
-import moduleFederationConfig from './module-federation.config?.js';
+import moduleFederationConfig from './module-federation.config.js';
 
 export default defineConfig(async ({ mode }) => {
   // Load environment variables
@@ -121,10 +121,27 @@ export default defineConfig(async ({ mode }) => {
       // Optimize chunks
       rollupOptions: {
         output: {
-          manualChunks: {
-            vendor: ['react', 'react-dom'],
-            signals: ['@nx-monorepo/utils/signals'],
+          manualChunks: (id) => {
+            // Create vendor chunks for better caching
+            if (id.includes('node_modules')) {
+              if (id.includes('react') || id.includes('react-dom')) {
+                return 'vendor-react';
+              }
+              if (id.includes('@nx-monorepo/utils/signals')) {
+                return 'signals';
+              }
+              // Group other dependencies by their top-level module
+              const match = id.match(/node_modules\/(@[^/]+\/[^/]+|[^/]+)/);
+              if (match) {
+                return `vendor-${match[1].replace('@', '')}`;
+              }
+              return 'vendor';
+            }
           },
+          // Optimize chunk loading
+          chunkFileNames: 'assets/[name]-[hash].js',
+          entryFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash].[ext]',
         },
       },
       commonjsOptions: {
@@ -133,7 +150,7 @@ export default defineConfig(async ({ mode }) => {
       // Enable source maps in development
       sourcemap: mode !== 'production',
       // Minimize in production
-      minify: mode === 'production',
+      minify: mode === 'production' ? 'esbuild' : false,
       // Configure CSS optimization
       cssMinify: mode === 'production',
     },
@@ -168,8 +185,20 @@ export default defineConfig(async ({ mode }) => {
     
     // Optimize dependencies
     optimizeDeps: {
-      include: ['react', 'react-dom'],
+      include: [
+        'react', 
+        'react-dom',
+        'lodash-es',
+        '@testing-library/react',
+        '@testing-library/user-event',
+      ],
       exclude: ['@nx-monorepo/utils/signals'],
+      esbuildOptions: {
+        target: 'esnext',
+        supported: { 
+          'top-level-await': true 
+        },
+      }
     },
   };
 });

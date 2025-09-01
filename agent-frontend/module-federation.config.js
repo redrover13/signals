@@ -28,10 +28,16 @@ const moduleFederationConfig = {
         eager: true,
         requiredVersion: false,
       },
+      'lodash-es': {
+        singleton: true,
+        eager: false,
+        requiredVersion: false,
+      }
     };
 
     return sharedLibs[name] || config.default;
   },
 };
 
+module.exports = moduleFederationConfig;
 export default moduleFederationConfig;

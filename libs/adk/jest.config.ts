@@ -5,7 +5,7 @@ export default {
   testEnvironment: 'node',
   transform: {
     '^.+\\.[tj]s$': ['ts-jest', { 
-      tsconfig: '<rootDir>/tsconfig?.spec && .spec.json',
+      tsconfig: '<rootDir>/tsconfig.spec.json',
       useESM: true
     }],
   },

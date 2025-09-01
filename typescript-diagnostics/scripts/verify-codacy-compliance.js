@@ -15,7 +15,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+import { execSync, execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -101,8 +101,14 @@ async function verifyCodacyCompliance() {
     
     try {
       // Run Codacy CLI analyze
-      const codacyOutput = execSync(
-        `codacy-analysis-cli analyze --directory ${ROOT_DIR} --files ${relativeFilePath} --format json`,
+      const codacyOutput = execFileSync(
+        'codacy-analysis-cli',
+        [
+          'analyze',
+          '--directory', ROOT_DIR,
+          '--files', relativeFilePath,
+          '--format', 'json'
+        ],
         { encoding: 'utf8', cwd: ROOT_DIR, stdio: ['pipe', 'pipe', 'pipe'] }
       );
       

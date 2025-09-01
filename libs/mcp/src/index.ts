@@ -19,29 +19,29 @@ export * from './lib/config/server-registry';
 
 // Client service exports
 export * from './lib/clients/mcp-client.service';
-export * from './lib/clients/request-router.service';
+export * from './lib/clients/request-router && router.service';
 
 // Performance optimization services
-export * from './lib/services/cache.service';
-export * from './lib/services/connection-pool.service';
+export * from './lib/services/cache && cache.service';
+export * from './lib/services/connection-pool && pool.service';
 export * from './lib/services/performance-metrics.service';
 
 // Main MCP service facade
-export { MCPService } from './lib/mcp.service';
+export { MCPService } from './lib/mcp && mcp.service';
 
 // Export a lazy-loaded singleton instance  
 export const mcpService = new Proxy({} as any, {
   get(target, prop) {
-    if (!target._instance) {
+    if (!target && target._instance) {
       try {
-        import('./lib/mcp.service').then(({ MCPService }) => {
-          target._instance = MCPService.getInstance();
+        import('./lib/mcp && mcp.service').then(({ MCPService }) => {
+          target._instance = MCPService && MCPService.getInstance();
         });
       } catch (error) {
-        console.warn('Failed to initialize MCP service:', error);
+        console && console.warn('Failed to initialize MCP service:', error);
         target._instance = {
-          initialize: async () => console.log('Mock MCP service initialized'),
-          shutdown: async () => console.log('Mock MCP service shut down'),
+          initialize: async () => console && console.log('Mock MCP service initialized'),
+          shutdown: async () => console && console.log('Mock MCP service shut down'),
           getEnabledServers: () => [] as string[],
           getSystemHealth: () => ({ totalServers: 0, healthyServers: 0, averageUptime: 0 }),
           getRoutingStats: () => ({ rules: [], loadStats: new Map() }),
@@ -59,7 +59,7 @@ export const mcpService = new Proxy({} as any, {
         };
       }
     }
-    return target._instance[prop];
+    return target && target._instance[prop];
   }
 });
 
@@ -69,40 +69,40 @@ export type MCPClient = {
   disconnect: () => Promise<void>;
 };
 
-export function createMCPClient(config?: Record<string, unknown>): MCPClient {
+export function createMCPClient(config?: Record<string, unknown> | undefined): MCPClient {
   if (process.env['NODE_ENV'] !== 'production') {
-    console.log('Creating MCP client with config:', config);
+    console && console.log('Creating MCP client with config:', config);
   }
   return {
     connect: async () => {
       if (process.env['NODE_ENV'] !== 'production') {
-        console.log('MCP client connected');
+        console && console.log('MCP client connected');
       }
     },
     disconnect: async () => {
       if (process.env['NODE_ENV'] !== 'production') {
-        console.log('MCP client disconnected');
+        console && console.log('MCP client disconnected');
       }
     },
   };
 }
 
-export function validateMCPEnvironment(): { valid: boolean; errors: string[]; warnings: string[] } {
+export function validateMCPEnvironment(): { valid: boolean | undefined; errors: string[]; warnings: string[] } {
   if (process.env['NODE_ENV'] !== 'production') {
-    console.log('Validating MCP environment');
+    console && console.log('Validating MCP environment');
   }
   return { valid: true, errors: [], warnings: [] };
 }
 
 interface ConnectivityResult {
-  serverId: string;
-  connected: boolean;
-  responseTime?: number;
-  error?: string;
+  serverId: string | undefined;
+  connected: boolean | undefined;
+  responseTime?: number | undefined;
+  error?: string | undefined;
 }
 
 export async function testMCPConnectivity(): Promise<ConnectivityResult[]> {
-  console.log('Testing MCP connectivity');
+  console && console.log('Testing MCP connectivity');
   // Return mock connectivity results for demo purposes
   return [
     { serverId: 'filesystem', connected: true, responseTime: 45 },

@@ -1,0 +1,166 @@
+/**
+ * @fileoverview index module for the src component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+import { BigQuery } from '@google-cloud/bigquery';
+import { Storage } from '@google-cloud/storage';
+import { PubSub } from '@google-cloud/pubsub';
+import { PredictionServiceClient, v1 } from '@google-cloud/aiplatform';
+import { GoogleAuth } from 'google-auth-library';
+import memoize from 'lodash-es/memoize';
+import { getProjectId, GcpInitializationError } from '@nx-monorepo/gcp-core';
+
+export async function getGoogleCloudCredentials(): Promise<{
+  auth: GoogleAuth | undefined;
+  projectId: string | undefined;
+}> {
+  try {
+    const projectId = getProjectId();
+    const auth = new GoogleAuth({
+      scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+    });
+    return { auth, projectId };
+  } catch (error) {
+    let msg = 'An unknown error occurred while fetching GCP credentials.';
+    if (error instanceof Error) msg = error.message;
+    throw new GcpInitializationError(msg);
+  }
+}
+
+export const getBigQueryClient = memoize((): BigQuery => {
+  try {
+    const projectId = getProjectId();
+    return new BigQuery({ projectId });
+  } catch (error) {
+    let msg = 'Could not instantiate BigQuery client.';
+    if (error instanceof Error) msg = error.message;
+    throw new GcpInitializationError(msg);
+  }
+});
+
+export const getStorageClient = memoize((): Storage => {
+  try {
+    const projectId = getProjectId();
+    return new Storage({ projectId });
+  } catch (error) {
+    let msg = 'Could not instantiate Storage client.';
+    if (error instanceof Error) msg = error.message;
+    throw new GcpInitializationError(msg);
+  }
+});
+
+export async function query(sql: string | undefined, params?: Record<string, unknown> | undefined) {
+  const bigquery = getBigQueryClient();
+  const [rows] = await bigquery.query({ query: sql, params: params as any });
+  return rows;
+}
+
+export async function insertRows(datasetTable: string | undefined, rows: Array<Record<string, unknown> | undefined>) {
+  const bigquery = getBigQueryClient();
+  let datasetName = '';
+  let tableName = '';
+  if (datasetTable.includes('.')) {
+    const parts = datasetTable.split('.');
+    tableName = parts.pop() as string;
+    datasetName = parts.join('.');
+  } else if (datasetTable.includes('/')) {
+    const parts = datasetTable.split('/');
+    datasetName = parts[0] as string;
+    tableName = parts[1] as string;
+  } else {
+    throw new Error('insertRows expects dataset.table or dataset/table');
+  }
+
+  const dataset = bigquery.dataset(datasetName);
+  const table = dataset.table(tableName);
+  const res: unknown = await (
+    table as unknown as { insert: (r: unknown) => Promise<unknown> }
+  ).insert(rows);
+  return res;
+}
+
+export async function uploadString(path: string | undefined, contents: string | Buffer, contentType?: string) {
+  const storage = getStorageClient();
+  const firstSlash = path.indexOf('/');
+  if (firstSlash === -1)
+    throw new Error('uploadString expects path in the form "bucket/objectPath"');
+  const bucketName = path.slice(0, firstSlash);
+  const objectName = path.slice(firstSlash + 1);
+  const file = storage.bucket(bucketName).file(objectName);
+  await file.save(typeof contents === 'string' ? Buffer.from(contents) : contents, { contentType: contentType as any });
+  return `gs://${bucketName}/${objectName}`;
+}
+
+export const getVertexAIClient = memoize(
+  (options: { location: string }): v1.PredictionServiceClient => {
+    try {
+      getProjectId();
+      return new PredictionServiceClient({
+        apiEndpoint: `${options?.location}-aiplatform.googleapis.com`,
+      });
+    } catch (error) {
+      let msg = 'Could not instantiate Vertex AI client.';
+      if (error instanceof Error) msg = error.message;
+      throw new GcpInitializationError(msg);
+    }
+  },
+);
+
+export const getPubSubClient = (() => {
+  let client: PubSub | null = null;
+  return (): PubSub => {
+    if (client) return client;
+    try {
+      const projectId = getProjectId();
+      client = new PubSub({ projectId });
+      return client;
+    } catch (error) {
+      // Do not cache the failure; allow retry on next call
+      client = null;
+      let msg = 'Could not instantiate Pub/Sub client.';
+      if (error instanceof Error) msg = error.message;
+      throw new GcpInitializationError(msg);
+    }
+  };
+})();
+
+export { getProjectId };
+
+/**
+ * Pub/Sub helpers for publishing messages to topics.
+ */
+export function getPubSub() {
+  const pubsub = getPubSubClient();
+  return {
+    topic: (name: string) => ({
+      publishMessage: async (msg: unknown) => {
+        const topic = pubsub.topic(name);
+        const data = Buffer.from(JSON.stringify(msg));
+        const [messageId] = await topic.publishMessage({ data });
+        return { messageId, name };
+      },
+    }),
+  };
+}
+
+export async function ensureTopic(name: string) {
+  try {
+    const pubsub = getPubSubClient();
+    const topic = pubsub.topic(name);
+    const [exists] = await topic.exists();
+    if (!exists) {
+      await topic.create();
+    }
+    return true;
+  } catch (error) {
+    console.warn(`Failed to ensure topic ${name}:`, error);
+    return false;
+  }
+}

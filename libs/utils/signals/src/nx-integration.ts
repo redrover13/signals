@@ -9,133 +9,56 @@
  * @license MIT
  */
 
-/**
- * Nx Signal Store Integration
- * 
- * This module provides utilities to integrate signals with NgRx or other
- * state management libraries used within the Nx ecosystem.
- */
-
-import { createSignal, Signal, derivedSignal } from '../index';
+import { Store } from '@ngrx/store';
+import { signal, Signal } from '@angular/core';
 
 /**
- * State store interface
+ * Creates a signal from a Redux-like store and selector
+ * @param store Redux-like store with getState() method
+ * @param selector Function to select portion of state
+ * @returns Signal containing the selected state
  */
-export interface Store<T> {
-  /** Get current state */
-  getState(): T;
-  /** Subscribe to state changes */
-  subscribe(listener: () => void): () => void;
-  /** Dispatch an action */
-  dispatch(action: any): void;
-}
-
-/**
- * Create a signal from a Redux/NgRx store
- * 
- * @param store - The store to connect to
- * @param selector - Optional selector function to get a slice of state
- * @returns A read-only signal that updates when the store changes
- */
-export function signalFromStore<T, S = T>(
-  store: Store<T>,
-  selector: (state: T) => S = (state: T) => state as unknown as S
-): Omit<Signal<S>, 'set'> {
-  const signal = createSignal<S>(selector(store.getState()));
+export function signalFromStore<T>(
+  store: Store<any> | { getState: () => any },
+  selector: (state: any) => T
+): Signal<T> {
+  // Initial value from store
+  const initialValue = selector(store.getState());
   
+  // Create signal with selected state
+  const signal = signal<T>(initialValue as T);
+
+  // Subscribe to store changes
   const unsubscribe = store.subscribe(() => {
-    signal.set(selector(store.getState()));
-  });
-  
-  // Add a cleanup method to prevent memory leaks
-  const originalSubscribe = signal.subscribe;
-  let subscriberCount = 0;
-  
-  signal.subscribe = (callback) => {
-    subscriberCount++;
-    const unsubscribeSignal = originalSubscribe(callback);
-    
-    return () => {
-      unsubscribeSignal();
-      subscriberCount--;
-      
-      // If no more subscribers, unsubscribe from the store
-      if (subscriberCount === 0) {
-        unsubscribe();
-      }
-    };
-  };
-  
-  return {
-    get: signal.get,
-    subscribe: signal.subscribe
-  };
-}
-
-/**
- * Create an action dispatcher that adds tracing metadata
- * 
- * This is a utility function for creating action dispatchers in an Nx-based project
- * that adds automatic tracing metadata to help with debugging and performance monitoring.
- * 
- * @param actionName - The name of the action to dispatch
- * @param projectName - The name of the project this action belongs to
- * @returns A function that dispatches the action with tracing information
- */
-// Helper function to create a strongly-typed action dispatcher
-export function createActionDispatcher<T>(): (action: T) => void {
-  return (action: T) => {
-    console.log('Dispatching action:', action);
-    // Implement action dispatch logic here
-  };
-}
-
-/**
- * Connect a signal to a store for two-way binding
- * 
- * @param store - The store to connect to
- * @param selector - Selector function to get a slice of state
- * @param actionCreator - Function that creates an action to update the state
- * @returns A signal that reads from and writes to the store
- */
-export function connectSignalToStore<T, S>(
-  store: Store<T>,
-  selector: (state: T) => S,
-  actionCreator: (payload: S) => { type: string; payload: S }
-): Signal<S> {
-  const storeSignal = signalFromStore(store, selector);
-  
-  return {
-    get: storeSignal.get,
-    set: (newValue: S) => {
-      store.dispatch(actionCreator(newValue));
-    },
-    subscribe: storeSignal.subscribe
-  };
-}
-
-/**
- * Create a signal that maps to a specific property path in an object
- * 
- * @param source - Source signal containing an object
- * @param path - Property path (dot notation)
- * @returns A signal for the nested property
- */
-export function propertySignal<T, K extends keyof T>(
-  source: Signal<T>,
-  property: K
-): Signal<T[K]> {
-  const derived = derivedSignal([source], (sourceValue) => sourceValue[property]);
-  
-  return {
-    get: derived.get,
-    subscribe: derived.subscribe,
-    set: (newValue: T[K]) => {
-      const current = source.get();
-      source.set({
-        ...current,
-        [property]: newValue
-      });
+    const newValue = selector(store.getState());
+    if (newValue !== undefined) {
+      signal.set(newValue as T);
     }
-  };
+  });
+
+  // Return cleanup function
+  return signal;
+}
+
+/**
+ * Creates a signal from a selector function over a store's state.
+ * Allows mapping to a different type.
+ */
+export function signalFromSelector<S, T = S>(
+  store: Store<any> | { getState: () => any },
+  selector: (state: any) => S,
+  mapper?: (selected: S) => T
+): Signal<T> {
+  const selected = selector(store.getState());
+  const initialValue = mapper ? mapper(selected) : selected as unknown as T;
+  
+  const signal = signal<T>(initialValue);
+
+  const unsubscribe = store.subscribe(() => {
+    const newSelected = selector(store.getState());
+    const newValue = mapper ? mapper(newSelected) : newSelected as unknown as T;
+    signal.set(newValue);
+  });
+
+  return signal;
 }

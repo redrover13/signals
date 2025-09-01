@@ -1,260 +1,126 @@
 /**
- * @fileoverview secrets-manager utility
+ * @fileoverview index module for the src component
  *
- * TypeScript utility for managing Google Cloud Secret Manager secrets
- * Provides programmatic access to secrets with proper error handling
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
  *
  * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
  */
 
-import { DulceSecretManager, getSecretManager } from '@dulce-de-saigon/security';
-
 /**
- * Secret configuration interface
+ * Secrets Manager for Dulce Saigon
  */
-export interface SecretConfig {
-  name: string;
-  description: string;
-  envVar: string;
-  required: boolean;
-  defaultValue?: string;
-}
+import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
+import { DulceSecretManager } from './lib/gcp-secret-manager';
+import { DULCE_SECRETS } from './lib/secrets-config';
 
-/**
- * Predefined secrets configuration for Dulce de Saigon platform
- */
-export const DULCE_SECRETS: SecretConfig[] = [
-  {
-    name: 'github-token',
-    description: 'GitHub Personal Access Token',
-    envVar: 'GITHUB_TOKEN',
-    required: true,
-  },
-  {
-    name: 'codacy-token',
-    description: 'Codacy API Token',
-    envVar: 'CODACY_API_TOKEN',
-    required: true,
-  },
-  {
-    name: 'codacy-account-token',
-    description: 'Codacy Account Token',
-    envVar: 'CODACY_ACCOUNT_TOKEN',
-    required: true,
-  },
-  {
-    name: 'nx-cloud-token',
-    description: 'NX Cloud Access Token',
-    envVar: 'NX_CLOUD_ACCESS_TOKEN',
-    required: false,
-  },
-  {
-    name: 'sentry-token',
-    description: 'Sentry Auth Token',
-    envVar: 'SENTRY_AUTH_TOKEN',
-    required: true,
-  },
-  {
-    name: 'tavily-api-key',
-    description: 'Tavily AI Search API Key',
-    envVar: 'TAVILY_API_KEY',
-    required: true,
-  },
-  {
-    name: 'qdrant-api-key',
-    description: 'Qdrant Vector Database API Key',
-    envVar: 'QDRANT_API_KEY',
-    required: true,
-  },
-  {
-    name: 'qdrant-url',
-    description: 'Qdrant Vector Database URL',
-    envVar: 'QDRANT_URL',
-    required: true,
-  },
-  {
-    name: 'dictl-dop-token',
-    description: 'DigitalOcean Personal Access Token',
-    envVar: 'DIGITALOCEAN_ACCESS_TOKEN',
-    required: false,
-  },
-  {
-    name: 'gitguardian-token',
-    description: 'GitGuardian API Token',
-    envVar: 'GITGUARDIAN_API_TOKEN',
-    required: false,
-  },
-  {
-    name: 'smither-token',
-    description: 'Smither API Token',
-    envVar: 'SMITHER_API_TOKEN',
-    required: false,
-  },
-  {
-    name: 'google-api-key',
-    description: 'Google API Key',
-    envVar: 'GOOGLE_API_KEY',
-    required: false,
-  },
-  {
-    name: 'google-cse-id',
-    description: 'Google Custom Search Engine ID',
-    envVar: 'GOOGLE_CSE_ID',
-    required: false,
-  },
-  {
-    name: 'brave-api-key',
-    description: 'Brave Search API Key',
-    envVar: 'BRAVE_API_KEY',
-    required: false,
-  },
-  {
-    name: 'gcp-project-id',
-    description: 'GCP Project ID',
-    envVar: 'GCP_PROJECT_ID',
-    required: true,
-  },
-  {
-    name: 'postgres-connection',
-    description: 'PostgreSQL Connection String',
-    envVar: 'POSTGRES_CONNECTION_STRING',
-    required: false,
-  },
-  {
-    name: 'jwt-secret',
-    description: 'JWT Secret for token signing',
-    envVar: 'JWT_SECRET',
-    required: true,
-  },
-  {
-    name: 'dulce-api-key',
-    description: 'Dulce de Saigon API Key',
-    envVar: 'DULCE_API_KEY',
-    required: true,
-  },
-];
+// Environment variables
+const PROJECT_ID = process.env['GOOGLE_CLOUD_PROJECT'] || '';
+const ENVIRONMENT = process.env['NODE_ENV'] || 'development';
 
-/**
- * Secrets manager utility class
- */
-export class SecretsManager {
-  private secretManager: DulceSecretManager;
-
-  constructor() {
-    this.secretManager = getSecretManager();
-  }
+class SecretsManager {
+  private secretManager: DulceSecretManager | null = null;
+  private cachedSecrets: Record<string, string> = {};
+  private initialized = false;
 
   /**
-   * Get a secret value by name
+   * Initialize the secrets manager
    */
-  async getSecret(name: string): Promise<string> {
-    return this.secretManager.getSecret(name);
-  }
-
-  /**
-   * Get multiple secrets in parallel
-   */
-  async getSecrets(names: string[]): Promise<Record<string, string>> {
-    return this.secretManager.getSecrets(names);
-  }
-
-  /**
-   * Get all required secrets
-   */
-  async getAllRequiredSecrets(): Promise<Record<string, string>> {
-    const requiredSecrets = DULCE_SECRETS.filter(s => s.required).map(s => s.name);
-    return this.getSecrets(requiredSecrets);
-  }
-
-  /**
-   * Get secret with fallback to environment variable
-   */
-  async getSecretWithFallback(secretName: string, envVar: string): Promise<string> {
-    // First try environment variable
-    const envValue = process.env[envVar];
-    if (envValue) {
-      return envValue;
+  async initialize(): Promise<void> {
+    if (this.initialized) {
+      return;
     }
-
-    // Fall back to Secret Manager
-    return this.getSecret(secretName);
+    
+    try {
+      if (!PROJECT_ID) {
+        console.warn('GOOGLE_CLOUD_PROJECT environment variable not set');
+      }
+      
+      if (this) {
+        this.secretManager = new DulceSecretManager(PROJECT_ID);
+      }
+      
+      // Load required secrets
+      await this.loadRequiredSecrets();
+      
+      this.initialized = true;
+      console.log('Secrets Manager initialized successfully');
+    } catch (error) {
+      console.error('Failed to initialize Secrets Manager:', error);
+      throw error;
+    }
   }
 
   /**
-   * Validate that all required secrets are available
+   * Load all required secrets
    */
-  async validateRequiredSecrets(): Promise<{ valid: boolean; missing: string[] }> {
-    const missing: string[] = [];
-
-    for (const secret of DULCE_SECRETS.filter(s => s.required)) {
+  private async loadRequiredSecrets(): Promise<void> {
+    if (!this.secretManager) {
+      throw new Error('Secret Manager not initialized');
+    }
+    
+    for (const secretConfig of DULCE_SECRETS) {
+      const { name, required } = secretConfig;
+      
       try {
-        // Check if environment variable is set
-        if (process.env[secret.envVar]) {
+        // Check if environment variable exists first
+        const envValue = process.env[name];
+        
+        if (envValue) {
+          this.cachedSecrets[name] = envValue;
           continue;
         }
-
-        // Check if secret exists in Secret Manager
-        await this.getSecret(secret.name);
+        
+        // Try to get from Secret Manager
+        const secretValue = await this.secretManager.getSecret(
+          `${name}_${ENVIRONMENT}`
+        );
+        
+        this.cachedSecrets[name] = secretValue;
       } catch (error) {
-        missing.push(secret.name);
-      }
-    }
-
-    return {
-      valid: missing.length === 0,
-      missing,
-    };
-  }
-
-  /**
-   * Load application configuration from secrets
-   */
-  async loadAppConfig(): Promise<Record<string, string>> {
-    const config: Record<string, string> = {};
-
-    for (const secret of DULCE_SECRETS) {
-      try {
-        config[secret.envVar] = await this.getSecretWithFallback(secret.name, secret.envVar);
-      } catch (error) {
-        if (secret.required) {
-          throw new Error(`Required secret ${secret.name} not found: ${error}`);
-        }
-        // For optional secrets, use default value or skip
-        if (secret.defaultValue) {
-          config[secret.envVar] = secret.defaultValue;
+        if (required) {
+          console.error(`Failed to load required secret ${name}:`, error);
+          throw error;
+        } else {
+          console.warn(`Non-required secret ${name} not found`);
         }
       }
     }
-
-    return config;
   }
 
   /**
-   * Clear secret cache (useful for testing)
+   * Get a secret by name
+   * @param name Secret name
+   * @returns Secret value
    */
-  clearCache(): void {
-    this.secretManager.clearCache();
+  getSecret(name: string): string {
+    if (!this.initialized) {
+      throw new Error('Secrets Manager not initialized');
+    }
+    
+    const secretValue = this.cachedSecrets[name];
+    
+    if (!secretValue) {
+      throw new Error(`Secret ${name} not found`);
+    }
+    
+    return secretValue;
+  }
+
+  /**
+   * Check if a secret exists
+   * @param name Secret name
+   * @returns True if the secret exists
+   */
+  hasSecret(name: string): boolean {
+    return Boolean(this.cachedSecrets[name]);
   }
 }
 
 // Export singleton instance
 export const secretsManager = new SecretsManager();
 
-// Export convenience functions
-export async function getSecret(name: string): Promise<string> {
-  return secretsManager.getSecret(name);
-}
-
-export async function getSecrets(names: string[]): Promise<Record<string, string>> {
-  return secretsManager.getSecrets(names);
-}
-
-export async function loadAppConfig(): Promise<Record<string, string>> {
-  return secretsManager.loadAppConfig();
-}
-
-export async function validateSecrets(): Promise<{ valid: boolean; missing: string[] }> {
-  return secretsManager.validateRequiredSecrets();
-}
+// Re-export types
+export { DulceSecretManager };

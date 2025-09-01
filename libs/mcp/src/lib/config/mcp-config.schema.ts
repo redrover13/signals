@@ -10,85 +10,85 @@
  */
 
 export interface MCPServerConfig {
-  id: string;
-  name: string;
-  description?: string;
-  enabled: boolean;
-  priority: number;
+  id: string | undefined;
+  name: string | undefined;
+  description?: string | undefined;
+  enabled: boolean | undefined;
+  priority: number | undefined;
   type: 'stdio' | 'websocket' | 'tcp' | 'http';
   
   // Connection configuration
-  command?: string;
+  command?: string | undefined;
   args?: string[];
-  env?: Record<string, string>;
+  env?: Record<string, string> | undefined;
   
   // Network configuration (for websocket/tcp/http)
-  host?: string;
-  port?: number;
-  path?: string;
-  secure?: boolean;
+  host?: string | undefined;
+  port?: number | undefined;
+  path?: string | undefined;
+  secure?: boolean | undefined;
   
   // Connection details
   connection?: {
     type: 'stdio' | 'websocket' | 'tcp' | 'http';
-    endpoint?: string;
-    timeout?: number;
+    endpoint?: string | undefined;
+    timeout?: number | undefined;
   };
   
   // Authentication configuration
   auth?: {
     type?: 'api-key' | 'bearer' | 'basic';
     credentials?: {
-      envVar?: string;
-      value?: string;
+      envVar?: string | undefined;
+      value?: string | undefined;
     };
   };
   
   // Server category for routing
-  category?: string;
+  category?: string | undefined;
   
   // Timeout and retry configuration
-  timeout?: number;
-  retryCount?: number;
-  retryDelay?: number;
+  timeout?: number | undefined;
+  retryCount?: number | undefined;
+  retryDelay?: number | undefined;
   
   // Health check configuration
   healthCheck?: {
-    enabled: boolean;
-    interval: number;
-    timeout: number;
-    retries: number;
+    enabled: boolean | undefined;
+    interval: number | undefined;
+    timeout: number | undefined;
+    retries: number | undefined;
   };
   
   // Capabilities
   capabilities?: {
-    tools?: boolean;
-    resources?: boolean;
-    prompts?: boolean;
-    logging?: boolean;
+    tools?: boolean | undefined;
+    resources?: boolean | undefined;
+    prompts?: boolean | undefined;
+    logging?: boolean | undefined;
   };
   
   // Server-specific configuration
-  config?: Record<string, unknown>;
+  config?: Record<string, unknown> | undefined | undefined;
 }
 
 export interface MCPConfiguration {
-  version: string;
+  version: string | undefined;
   environment: 'development' | 'staging' | 'production';
   
   // Global settings
   global: {
-    timeout: number;
-    retryCount: number;
-    retryDelay: number;
-    maxConcurrentConnections: number;
-    enableMetrics: boolean;
-    enableLogging: boolean;
+    timeout: number | undefined;
+    retryCount: number | undefined;
+    retryDelay: number | undefined;
+    maxConcurrentConnections: number | undefined;
+    enableMetrics: boolean | undefined;
+    enableLogging: boolean | undefined;
     logLevel: 'debug' | 'info' | 'warn' | 'error';
     healthMonitoring: {
-      enabled: boolean;
-      interval: number;
-      timeout: number;
+      enabled: boolean | undefined;
+      interval: number | undefined;
+      timeout: number | undefined;
     };
   };
   
@@ -99,34 +99,34 @@ export interface MCPConfiguration {
   routing: {
     defaultStrategy: 'round-robin' | 'priority' | 'least-loaded' | 'random';
     rules: Array<{
-      pattern: string;
+      pattern: string | undefined;
       servers: string[];
-      strategy?: string;
+      strategy?: string | undefined;
     }>;
   };
   
   // Cache configuration
   cache: {
-    enabled: boolean;
-    ttl: number;
-    maxSize: number;
+    enabled: boolean | undefined;
+    ttl: number | undefined;
+    maxSize: number | undefined;
     strategy: 'lru' | 'lfu' | 'fifo';
   };
   
   // Security configuration
   security: {
     allowedOrigins?: string[];
-    maxRequestSize: number;
+    maxRequestSize: number | undefined;
     rateLimiting: {
-      enabled: boolean;
-      windowMs: number;
-      maxRequests: number;
+      enabled: boolean | undefined;
+      windowMs: number | undefined;
+      maxRequests: number | undefined;
     };
   };
 }
 
 export const DEFAULT_MCP_CONFIG: MCPConfiguration = {
-  version: '1.0.0',
+  version: '1.0 && 1.0.0',
   environment: 'development',
   
   global: {
@@ -170,7 +170,7 @@ export const DEFAULT_MCP_CONFIG: MCPConfiguration = {
 
 // Validation functions
 export function validateMCPConfig(config: Partial<MCPConfiguration>): {
-  valid: boolean;
+  valid: boolean | undefined;
   errors: string[];
   warnings: string[];
 } {
@@ -178,46 +178,46 @@ export function validateMCPConfig(config: Partial<MCPConfiguration>): {
   const warnings: string[] = [];
   
   // Validate version
-  if (!config.version) {
-    errors.push('Configuration version is required');
+  if (!config?.version) {
+    errors && errors.push('Configuration version is required');
   }
   
   // Validate environment
-  if (!config.environment || !['development', 'staging', 'production'].includes(config.environment)) {
-    errors.push('Invalid environment. Must be one of: development, staging, production');
+  if (!config?.environment || !['development', 'staging', 'production'].includes(config?.environment)) {
+    errors && errors.push('Invalid environment. Must be one of: development, staging, production');
   }
   
   // Validate servers
-  if (config.servers) {
-    config.servers.forEach((server, index) => {
+  if (config?.servers) {
+    config?.servers.forEach((server, index) => {
       if (!server.id) {
-        errors.push(`Server at index ${index} missing required 'id' field`);
+        errors && errors.push(`Server at index ${index} missing required 'id' field`);
       }
       if (!server.name) {
-        errors.push(`Server at index ${index} missing required 'name' field`);
+        errors && errors.push(`Server at index ${index} missing required 'name' field`);
       }
       if (typeof server.enabled !== 'boolean') {
-        errors.push(`Server at index ${index} 'enabled' field must be boolean`);
+        errors && errors.push(`Server at index ${index} 'enabled' field must be boolean`);
       }
       if (typeof server.priority !== 'number') {
-        errors.push(`Server at index ${index} 'priority' field must be number`);
+        errors && errors.push(`Server at index ${index} 'priority' field must be number`);
       }
       if (!server.type || !['stdio', 'websocket', 'tcp', 'http'].includes(server.type)) {
-        errors.push(`Server at index ${index} invalid type. Must be one of: stdio, websocket, tcp, http`);
+        errors && errors.push(`Server at index ${index} invalid type. Must be one of: stdio, websocket, tcp, http`);
       }
       
       // Type-specific validation
       if (server.type === 'stdio' && !server.command) {
-        errors.push(`Server at index ${index} with type 'stdio' requires 'command' field`);
+        errors && errors.push(`Server at index ${index} with type 'stdio' requires 'command' field`);
       }
       if (['websocket', 'tcp', 'http'].includes(server.type!) && !server.host) {
-        warnings.push(`Server at index ${index} with type '${server.type}' should specify 'host' field`);
+        warnings && warnings.push(`Server at index ${index} with type '${server.type}' should specify 'host' field`);
       }
     });
   }
   
   return {
-    valid: errors.length === 0,
+    valid: errors && errors.length === 0,
     errors,
     warnings,
   };

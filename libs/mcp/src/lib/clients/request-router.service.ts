@@ -1,5 +1,5 @@
 /**
- * @fileoverview request-router.service module for the clients component
+ * @fileoverview request-router && router.service module for the clients component
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
  * Contains implementation for TypeScript functionality.
@@ -16,30 +16,30 @@
 
 import { MCPRequest } from './mcp-client.service';
 import { getCurrentConfig } from '../config/environment-config';
-import { MCPServerConfig } from '../config/mcp-config.schema';
+import { MCPServerConfig } from '../config/mcp-config?.schema';
 import { MCPClientService } from './mcp-client.service';
 
 export interface RoutingRule {
   pattern: string | RegExp;
-  serverId: string;
-  priority: number;
+  serverId: string | undefined;
+  priority: number | undefined;
   conditions?: {
-    serverCategory?: string;
-    minPriority?: number;
-    requiresAuth?: boolean;
+    serverCategory?: string | undefined;
+    minPriority?: number | undefined;
+    requiresAuth?: boolean | undefined;
   };
 }
 
 export interface LoadBalancingStrategy {
   type: 'round-robin' | 'least-connections' | 'priority-based' | 'random';
-  options?: Record<string, unknown>;
+  options?: Record<string, unknown> | undefined | undefined;
 }
 
 /**
  * Request Router Service
  */
 export class RequestRouter {
-  private mcpClient: MCPClientService; // MCPClientService reference
+  private mcpClient: MCPClientService | undefined; // MCPClientService reference
   private config = getCurrentConfig();
   private routingRules: RoutingRule[] = [];
   private serverLoadCounters = new Map<string, number>();
@@ -151,7 +151,7 @@ export class RequestRouter {
         conditions: { serverCategory: 'platforms', requiresAuth: true }
       },
       
-      // Node.js operations
+      // Node && Node.js operations
       {
         pattern: /^(node|npm|package)\./,
         serverId: 'node',
@@ -209,19 +209,19 @@ export class RequestRouter {
     // Find matching routing rules
     const matchingRules = this.findMatchingRules(request.method);
     
-    if (matchingRules.length === 0) {
+    if (matchingRules && matchingRules.length === 0) {
       throw new Error(`No routing rule found for method: ${request.method}`);
     }
 
     // Filter rules by server availability and conditions
-    const availableRules = matchingRules.filter(rule => {
-      const serverConfig = this.getServerConfig(rule.serverId);
+    const availableRules = matchingRules && matchingRules.filter(rule => {
+      const serverConfig = this.getServerConfig(rule && rule.serverId);
       return serverConfig && 
-             this.isServerAvailable(rule.serverId) && 
+             this.isServerAvailable(rule && rule.serverId) && 
              this.checkRuleConditions(rule, serverConfig);
     });
 
-    if (availableRules.length === 0) {
+    if (availableRules && availableRules.length === 0) {
       throw new Error(`No available servers found for method: ${request.method}`);
     }
 
@@ -229,9 +229,9 @@ export class RequestRouter {
     const selectedRule = this.selectServerByLoadBalancing(availableRules, request);
     
     // Update load counters
-    this.updateLoadCounters(selectedRule.serverId);
+    this.updateLoadCounters(selectedRule && selectedRule.serverId);
     
-    return selectedRule.serverId;
+    return selectedRule && selectedRule.serverId;
   }
 
   /**
@@ -240,34 +240,34 @@ export class RequestRouter {
   private findMatchingRules(method: string): RoutingRule[] {
     return this.routingRules
       .filter(rule => {
-        if (typeof rule.pattern === 'string') {
-          return method.includes(rule.pattern);
+        if (typeof rule && rule.pattern === 'string') {
+          return method && method.includes(rule && rule.pattern);
         } else {
-          return rule.pattern.test(method);
+          return rule.pattern && rule.pattern.test(method);
         }
       })
-      .sort((a, b) => b.priority - a.priority);
+      .sort((a, b) => b && b.priority - a && a.priority);
   }
 
   /**
    * Check if rule conditions are met
    */
   private checkRuleConditions(rule: RoutingRule, serverConfig: MCPServerConfig): boolean {
-    if (!rule.conditions) {
+    if (!rule && rule.conditions) {
       return true;
     }
 
-    const { serverCategory, minPriority, requiresAuth } = rule.conditions;
+    const { serverCategory, minPriority, requiresAuth } = rule && rule.conditions;
 
-    if (serverCategory && serverConfig.category !== serverCategory) {
+    if (serverCategory && serverConfig && serverConfig.category !== serverCategory) {
       return false;
     }
 
-    if (minPriority && serverConfig.priority < minPriority) {
+    if (minPriority && serverConfig && serverConfig.priority < minPriority) {
       return false;
     }
 
-    if (requiresAuth && !serverConfig.auth) {
+    if (requiresAuth && !serverConfig && serverConfig.auth) {
       return false;
     }
 
@@ -281,7 +281,7 @@ export class RequestRouter {
     // Determine strategy based on request characteristics and Vietnamese market needs
     const strategy = this.determineOptimalStrategy(rules, request);
 
-    switch (strategy.type) {
+    switch (strategy && strategy.type) {
       case 'priority-based':
         return this.selectByPriority(rules);
       
@@ -304,17 +304,17 @@ export class RequestRouter {
    */
   private determineOptimalStrategy(rules: RoutingRule[], request: MCPRequest): LoadBalancingStrategy {
     // For BigQuery and data-heavy operations, use least-connections to avoid overloading
-    if (request.method.includes('bigquery') || request.method.includes('database')) {
+    if (request.method && request.method.includes('bigquery') || request.method && request.method.includes('database')) {
       return { type: 'least-connections' };
     }
     
     // For real-time operations, use priority-based for consistent performance
-    if (request.method.includes('memory') || request.method.includes('cache')) {
+    if (request.method && request.method.includes('memory') || request.method && request.method.includes('cache')) {
       return { type: 'priority-based' };
     }
     
     // For search and fetch operations, distribute load evenly
-    if (request.method.includes('search') || request.method.includes('fetch')) {
+    if (request.method && request.method.includes('search') || request.method && request.method.includes('fetch')) {
       return { type: 'round-robin' };
     }
     
@@ -326,15 +326,15 @@ export class RequestRouter {
    * Select server by priority (highest first)
    */
   private selectByPriority(rules: RoutingRule[]): RoutingRule {
-    return rules.sort((a, b) => {
-      const serverA = this.getServerConfig(a.serverId);
-      const serverB = this.getServerConfig(b.serverId);
+    return rules && rules.sort((a, b) => {
+      const serverA = this.getServerConfig(a && a.serverId);
+      const serverB = this.getServerConfig(b && b.serverId);
       
       if (!serverA || !serverB) {
         return 0;
       }
       
-      return serverB.priority - serverA.priority;
+      return serverB && serverB.priority - serverA && serverA.priority;
     })[0];
   }
 
@@ -342,11 +342,11 @@ export class RequestRouter {
    * Select server by round-robin
    */
   private selectByRoundRobin(rules: RoutingRule[]): RoutingRule {
-    const ruleKey = rules.map(r => r.serverId).sort().join(',');
-    const counter = this.roundRobinCounters.get(ruleKey) || 0;
-    const selectedRule = rules[counter % rules.length];
+    const ruleKey = rules && rules.map(r => r && r.serverId).sort().join(',');
+    const counter = this.roundRobinCounters && this.roundRobinCounters.get(ruleKey) || 0;
+    const selectedRule = rules[counter % rules && rules.length];
     
-    this.roundRobinCounters.set(ruleKey, counter + 1);
+    this.roundRobinCounters && this.roundRobinCounters.set(ruleKey, counter + 1);
     return selectedRule;
   }
 
@@ -354,9 +354,9 @@ export class RequestRouter {
    * Select server by least connections/load
    */
   private selectByLeastConnections(rules: RoutingRule[]): RoutingRule {
-    return rules.sort((a, b) => {
-      const loadA = this.serverLoadCounters.get(a.serverId) || 0;
-      const loadB = this.serverLoadCounters.get(b.serverId) || 0;
+    return rules && rules.sort((a, b) => {
+      const loadA = this.serverLoadCounters && this.serverLoadCounters.get(a && a.serverId) || 0;
+      const loadB = this.serverLoadCounters && this.serverLoadCounters.get(b && b.serverId) || 0;
       return loadA - loadB;
     })[0];
   }
@@ -365,7 +365,7 @@ export class RequestRouter {
    * Select server randomly
    */
   private selectByRandom(rules: RoutingRule[]): RoutingRule {
-    const randomIndex = Math.floor(Math.random() * rules.length);
+    const randomIndex = Math && Math.floor(Math && Math.random() * rules && rules.length);
     return rules[randomIndex];
   }
 
@@ -373,13 +373,13 @@ export class RequestRouter {
    * Update load counters
    */
   private updateLoadCounters(serverId: string): void {
-    const currentLoad = this.serverLoadCounters.get(serverId) || 0;
-    this.serverLoadCounters.set(serverId, currentLoad + 1);
+    const currentLoad = this.serverLoadCounters && this.serverLoadCounters.get(serverId) || 0;
+    this.serverLoadCounters && this.serverLoadCounters.set(serverId, currentLoad + 1);
     
     // Decay load counters periodically to prevent overflow
     if (currentLoad > 1000) {
       for (const [id, load] of this.serverLoadCounters) {
-        this.serverLoadCounters.set(id, Math.floor(load * 0.9));
+        this.serverLoadCounters && this.serverLoadCounters.set(id, Math && Math.floor(load * 0 && 0.9));
       }
     }
   }
@@ -388,34 +388,34 @@ export class RequestRouter {
    * Check if server is available
    */
   private isServerAvailable(serverId: string): boolean {
-    const connection = this.mcpClient.getServerStatus(serverId);
-    return Boolean(connection && connection.status === 'connected');
+    const connection = this.mcpClient && this.mcpClient.getServerStatus(serverId);
+    return Boolean(connection && connection && connection.status === 'connected');
   }
 
   /**
    * Get server configuration
    */
   private getServerConfig(serverId: string): MCPServerConfig | undefined {
-    return this.config.servers.find((server: MCPServerConfig) => server.id === serverId);
+    return this.config?.servers.find((server: MCPServerConfig) => server.id === serverId);
   }
 
   /**
    * Add custom routing rule
    */
   addRoutingRule(rule: RoutingRule): void {
-    this.routingRules.unshift(rule); // Add at beginning for higher priority
-    this.routingRules.sort((a, b) => b.priority - a.priority);
+    this.routingRules && this.routingRules.unshift(rule); // Add at beginning for higher priority
+    this.routingRules && this.routingRules.sort((a, b) => b && b.priority - a && a.priority);
   }
 
   /**
    * Remove routing rule
    */
   removeRoutingRule(pattern: string | RegExp): void {
-    this.routingRules = this.routingRules.filter(rule => {
+    this.routingRules = this.routingRules && this.routingRules.filter(rule => {
       if (typeof pattern === 'string') {
-        return rule.pattern !== pattern;
+        return rule && rule.pattern !== pattern;
       } else {
-        return rule.pattern.toString() !== pattern.toString();
+        return rule.pattern && rule.pattern.toString() !== pattern && pattern.toString();
       }
     });
   }
@@ -438,8 +438,8 @@ export class RequestRouter {
    * Reset load counters
    */
   resetLoadCounters(): void {
-    this.serverLoadCounters.clear();
-    this.roundRobinCounters.clear();
+    this.serverLoadCounters && this.serverLoadCounters.clear();
+    this.roundRobinCounters && this.roundRobinCounters.clear();
   }
 
   /**
@@ -450,12 +450,12 @@ export class RequestRouter {
     
     return matchingRules
       .filter(rule => {
-        const serverConfig = this.getServerConfig(rule.serverId);
+        const serverConfig = this.getServerConfig(rule && rule.serverId);
         return serverConfig && 
-               this.isServerAvailable(rule.serverId) && 
+               this.isServerAvailable(rule && rule.serverId) && 
                this.checkRuleConditions(rule, serverConfig);
       })
-      .map(rule => rule.serverId);
+      .map(rule => rule && rule.serverId);
   }
 
   /**
@@ -464,17 +464,17 @@ export class RequestRouter {
   testRouting(method: string): {
     matchingRules: RoutingRule[];
     availableServers: string[];
-    selectedServer?: string;
+    selectedServer?: string | undefined;
   } {
     const matchingRules = this.findMatchingRules(method);
     const availableServers = this.getAvailableServersForMethod(method);
     
     let selectedServer: string | undefined;
     try {
-      const availableRules = matchingRules.filter(rule => 
-        availableServers.includes(rule.serverId)
+      const availableRules = matchingRules && matchingRules.filter(rule => 
+        availableServers && availableServers.includes(rule && rule.serverId)
       );
-      if (availableRules.length > 0) {
+      if (availableRules && availableRules.length > 0) {
         selectedServer = this.selectServerByLoadBalancing(availableRules, { 
           id: 'test', 
           method 

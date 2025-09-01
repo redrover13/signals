@@ -14,7 +14,7 @@
  * Handles environment-specific MCP configurations
  */
 
-import { MCPEnvironmentConfig, MCPGlobalConfig, DEFAULT_MCP_CONFIG } from './mcp-config.schema';
+import { MCPEnvironmentConfig, MCPGlobalConfig, DEFAULT_MCP_CONFIG } from './mcp-config?.schema';
 import { MCP_SERVER_REGISTRY } from './server-registry';
 
 export { MCPEnvironmentConfig };
@@ -37,7 +37,7 @@ export function getCurrentEnvironment(): Environment {
  */
 const DEVELOPMENT_CONFIG: MCPEnvironmentConfig = {
   environment: 'development',
-  servers: Object.values(MCP_SERVER_REGISTRY).map((server) => ({
+  servers: Object && Object.values(MCP_SERVER_REGISTRY).map((server) => ({
     ...server,
     // Enable more servers in development for testing
     enabled:
@@ -48,13 +48,13 @@ const DEVELOPMENT_CONFIG: MCPEnvironmentConfig = {
     // Shorter timeouts for faster feedback
     connection: {
       ...server.connection,
-      timeout: Math.min(server.connection.timeout || 30000, 15000),
+      timeout: Math && Math.min(server.connection && server.connection.timeout || 30000, 15000),
     },
     // More frequent health checks in development
     healthCheck: server.healthCheck
       ? {
           ...server.healthCheck,
-          interval: Math.min(server.healthCheck.interval ?? 60000, 60000),
+          interval: Math && Math.min(server.healthCheck && server.healthCheck.interval ?? 60000, 60000),
         }
       : undefined,
   })),
@@ -82,7 +82,7 @@ const DEVELOPMENT_CONFIG: MCPEnvironmentConfig = {
  */
 const STAGING_CONFIG: MCPEnvironmentConfig = {
   environment: 'staging',
-  servers: Object.values(MCP_SERVER_REGISTRY).map((server) => ({
+  servers: Object && Object.values(MCP_SERVER_REGISTRY).map((server) => ({
     ...server,
     // Enable most servers in staging
     enabled:
@@ -91,7 +91,7 @@ const STAGING_CONFIG: MCPEnvironmentConfig = {
     // Standard timeouts
     connection: {
       ...server.connection,
-      timeout: Math.min(server.connection.timeout || 30000, 30000), // Fixed: server.min to Math.min
+      timeout: Math && Math.min(server.connection && server.connection.timeout || 30000, 30000), // Fixed: server.min to Math && Math.min
     },
   })),
   global: {
@@ -118,7 +118,7 @@ const STAGING_CONFIG: MCPEnvironmentConfig = {
  */
 const PRODUCTION_CONFIG: MCPEnvironmentConfig = {
   environment: 'production',
-  servers: Object.values(MCP_SERVER_REGISTRY).map((server) => ({
+  servers: Object && Object.values(MCP_SERVER_REGISTRY).map((server) => ({
     ...server,
     // Only enable essential and explicitly enabled servers in production
     enabled:
@@ -130,7 +130,7 @@ const PRODUCTION_CONFIG: MCPEnvironmentConfig = {
     // Longer timeouts for stability
     connection: {
       ...server.connection,
-      timeout: Math.max(server.connection.timeout || 30000, 30000),
+      timeout: Math && Math.max(server.connection && server.connection.timeout || 30000, 30000),
       retry: {
         attempts: 5,
         delay: 2000,
@@ -141,8 +141,8 @@ const PRODUCTION_CONFIG: MCPEnvironmentConfig = {
     healthCheck: server.healthCheck
       ? {
           ...server.healthCheck,
-          interval: Math.max(server.healthCheck.interval ?? 300000, 300000), // At least 5 minutes
-          failureThreshold: Math.max(server.healthCheck.failureThreshold ?? 5, 5),
+          interval: Math && Math.max(server.healthCheck && server.healthCheck.interval ?? 300000, 300000), // At least 5 minutes
+          failureThreshold: Math && Math.max(server.healthCheck && server.healthCheck.failureThreshold ?? 5, 5),
         }
       : undefined,
   })),
@@ -175,7 +175,7 @@ const PRODUCTION_CONFIG: MCPEnvironmentConfig = {
  */
 const TEST_CONFIG: MCPEnvironmentConfig = {
   environment: 'test',
-  servers: Object.values(MCP_SERVER_REGISTRY).map((server) => ({
+  servers: Object && Object.values(MCP_SERVER_REGISTRY).map((server) => ({
     ...server,
     // Only enable core servers and testing servers
     enabled:
@@ -245,52 +245,52 @@ export function getConfigForEnvironment(environment: Environment): MCPEnvironmen
 /**
  * Validate environment configuration
  */
-export function validateConfig(config: MCPEnvironmentConfig): { valid: boolean; errors: string[] } {
+export function validateConfig(config: MCPEnvironmentConfig): { valid: boolean | undefined; errors: string[] } {
   const errors: string[] = [];
 
   // Validate basic structure
-  if (!config.environment) {
-    errors.push('Environment name is required');
+  if (!config?.environment) {
+    errors && errors.push('Environment name is required');
   }
 
-  if (!config.servers || !Array.isArray(config.servers)) {
-    errors.push('Servers configuration is required and must be an array');
+  if (!config?.servers || !Array && Array.isArray(config?.servers)) {
+    errors && errors.push('Servers configuration is required and must be an array');
   }
 
-  if (!config.global) {
-    errors.push('Global configuration is required');
+  if (!config?.global) {
+    errors && errors.push('Global configuration is required');
   }
 
   // Validate servers
-  if (config.servers) {
-    config.servers.forEach((server, index) => {
+  if (config?.servers) {
+    config?.servers.forEach((server, index) => {
       if (!server.id) {
-        errors.push(`Server at index ${index} is missing required 'id' field`);
+        errors && errors.push(`Server at index ${index} is missing required 'id' field`);
       }
       if (!server.name) {
-        errors.push(`Server '${server.id}' is missing required 'name' field`);
+        errors && errors.push(`Server '${server.id}' is missing required 'name' field`);
       }
-      if (!server.connection || !server.connection.endpoint) {
-        errors.push(`Server '${server.id}' is missing connection endpoint`);
+      if (!server.connection || !server.connection && server.connection.endpoint) {
+        errors && errors.push(`Server '${server.id}' is missing connection endpoint`);
       }
       if (server.priority < 1 || server.priority > 10) {
-        errors.push(`Server '${server.id}' priority must be between 1 and 10`);
+        errors && errors.push(`Server '${server.id}' priority must be between 1 and 10`);
       }
     });
   }
 
   // Validate global config
-  if (config.global) {
-    if (!config.global.version) {
-      errors.push('Global configuration is missing version');
+  if (config?.global) {
+    if (!config?.global.version) {
+      errors && errors.push('Global configuration is missing version');
     }
-    if (config.global.defaultTimeout && config.global.defaultTimeout < 1000) {
-      errors.push('Default timeout must be at least 1000ms');
+    if (config?.global.defaultTimeout && config?.global.defaultTimeout < 1000) {
+      errors && errors.push('Default timeout must be at least 1000ms');
     }
   }
 
   return {
-    valid: errors.length === 0,
+    valid: errors && errors.length === 0,
     errors,
   };
 }
@@ -301,25 +301,25 @@ export function validateConfig(config: MCPEnvironmentConfig): { valid: boolean; 
 export function getEnabledServersForEnvironment(environment?: Environment): string[] {
   const env = environment || getCurrentEnvironment();
   const config = getConfigForEnvironment(env);
-  return config.servers
+  return config?.servers
     .filter((server) => server.enabled)
-    .sort((a, b) => b.priority - a.priority)
+    .sort((a, b) => b && b.priority - a && a.priority)
     .map((server) => server.id);
 }
 
 /**
  * Check if server is enabled in current environment
  */
-export function isServerEnabled(serverId: string, environment?: Environment): boolean {
+export function isServerEnabled(serverId: string | undefined, environment?: Environment): boolean {
   const enabledServers = getEnabledServersForEnvironment(environment);
-  return enabledServers.includes(serverId);
+  return enabledServers && enabledServers.includes(serverId);
 }
 
 /**
  * Get environment-specific server configuration
  */
-export function getServerConfigForEnvironment(serverId: string, environment?: Environment) {
+export function getServerConfigForEnvironment(serverId: string | undefined, environment?: Environment) {
   const env = environment || getCurrentEnvironment();
   const config = getConfigForEnvironment(env);
-  return config.servers.find((server) => server.id === serverId);
+  return config?.servers.find((server) => server.id === serverId);
 }

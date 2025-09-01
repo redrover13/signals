@@ -66,7 +66,7 @@ export interface ADKConfig {
 const defaultConfig: ADKConfig = {
   serviceName: 'adkService',
   environment: process.env['NODE_ENV'] || 'development',
-  version: '1.0 && 1.0.0',
+  version: '1.0.0',
   
   gcp: {
     projectId: process.env['GCP_PROJECT_ID'] || '',

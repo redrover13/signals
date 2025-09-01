@@ -26,18 +26,18 @@ export function signalFromStore<T>(
   const initialValue = selector(store.getState());
   
   // Create signal with selected state
-  const signal = signal<T>(initialValue as T);
+  const signalInstance = signal<T>(initialValue);
 
   // Subscribe to store changes
   const unsubscribe = store.subscribe(() => {
     const newValue = selector(store.getState());
     if (newValue !== undefined) {
-      signal.set(newValue as T);
+      signalInstance.set(newValue);
     }
   });
 
   // Return cleanup function
-  return signal;
+  return signalInstance;
 }
 
 /**
@@ -52,13 +52,13 @@ export function signalFromSelector<S, T = S>(
   const selected = selector(store.getState());
   const initialValue = mapper ? mapper(selected) : selected as unknown as T;
   
-  const signal = signal<T>(initialValue);
+  const signalInstance = signal<T>(initialValue);
 
   const unsubscribe = store.subscribe(() => {
     const newSelected = selector(store.getState());
     const newValue = mapper ? mapper(newSelected) : newSelected as unknown as T;
-    signal.set(newValue);
+    signalInstance.set(newValue);
   });
 
-  return signal;
+  return signalInstance;
 }

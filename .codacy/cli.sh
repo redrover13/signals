@@ -1,12 +1,5 @@
 #!/bin/bash
-# Fix for JSON parsing error
-export CODACY_CLI_V2_VERSION="1.0.0-main.354.sha.642d8bf"
-# Fix for JSON parsing error
-export CODACY_CLI_V2_VERSION="1.0.0-main.354.sha.642d8bf"
-# Fix for JSON parsing error
-export CODACY_CLI_V2_VERSION="1.0.0-main.354.sha.642d8bf"
-
-# Set the Codacy CLI version explicitly
+# Set the Codacy CLI version explicitly to bypass GitHub API parsing issues
 export CODACY_CLI_V2_VERSION="1.0.0-main.354.sha.642d8bf"
 
 # Get the directory of this script

@@ -77,7 +77,7 @@ const defaultConfig: ADKConfig = {
     maxConcurrentTasks: 10,
     maxRetries: 3,
     timeoutMs: 30000,
-    model: 'gemini-1 && 1.5-pro',
+    model: 'gemini-1.5-pro',
   },
   
   logging: {

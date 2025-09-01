@@ -9,158 +9,143 @@
  * @license MIT
  */
 
+/**
+ * GCP Auth utilities for Dulce Saigon
+ */
+import { GoogleAuth } from 'google-auth-library';
+import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import { BigQuery } from '@google-cloud/bigquery';
 import { Storage } from '@google-cloud/storage';
 import { PubSub } from '@google-cloud/pubsub';
-import { PredictionServiceClient, v1 } from '@google-cloud/aiplatform';
-import { GoogleAuth } from 'google-auth-library';
-import memoize from 'lodash-es/memoize';
-import { getProjectId, GcpInitializationError } from '@nx-monorepo/gcp-core';
+import { Firestore } from '@google-cloud/firestore';
+import { v1 } from '@google-cloud/aiplatform';
 
-export async function getGoogleCloudCredentials(): Promise<{
-  auth: GoogleAuth;
-  projectId: string;
-}> {
-  try {
-    const projectId = getProjectId();
-    const auth = new GoogleAuth({
-      scopes: ['https://www.googleapis.com/auth/cloud-platform'],
-    });
-    return { auth, projectId };
-  } catch (error) {
-    let msg = 'An unknown error occurred while fetching GCP credentials.';
-    if (error instanceof Error) msg = error.message;
-    throw new GcpInitializationError(msg);
-  }
-}
-
-export const getBigQueryClient = memoize((): BigQuery => {
-  try {
-    const projectId = getProjectId();
-    return new BigQuery({ projectId });
-  } catch (error) {
-    let msg = 'Could not instantiate BigQuery client.';
-    if (error instanceof Error) msg = error.message;
-    throw new GcpInitializationError(msg);
-  }
-});
-
-export const getStorageClient = memoize((): Storage => {
-  try {
-    const projectId = getProjectId();
-    return new Storage({ projectId });
-  } catch (error) {
-    let msg = 'Could not instantiate Storage client.';
-    if (error instanceof Error) msg = error.message;
-    throw new GcpInitializationError(msg);
-  }
-});
-
-export async function query(sql: string, params?: Record<string, unknown>) {
-  const bigquery = getBigQueryClient();
-  const [rows] = await bigquery.query({ query: sql, params: params as any });
-  return rows;
-}
-
-export async function insertRows(datasetTable: string, rows: Array<Record<string, unknown>>) {
-  const bigquery = getBigQueryClient();
-  let datasetName = '';
-  let tableName = '';
-  if (datasetTable.includes('.')) {
-    const parts = datasetTable.split('.');
-    tableName = parts.pop() as string;
-    datasetName = parts.join('.');
-  } else if (datasetTable.includes('/')) {
-    const parts = datasetTable.split('/');
-    datasetName = parts[0] as string;
-    tableName = parts[1] as string;
-  } else {
-    throw new Error('insertRows expects dataset.table or dataset/table');
-  }
-
-  const dataset = bigquery.dataset(datasetName);
-  const table = dataset.table(tableName);
-  const res: unknown = await (
-    table as unknown as { insert: (r: unknown) => Promise<unknown> }
-  ).insert(rows);
-  return res;
-}
-
-export async function uploadString(path: string, contents: string | Buffer, contentType?: string) {
-  const storage = getStorageClient();
-  const firstSlash = path.indexOf('/');
-  if (firstSlash === -1)
-    throw new Error('uploadString expects path in the form "bucket/objectPath"');
-  const bucketName = path.slice(0, firstSlash);
-  const objectName = path.slice(firstSlash + 1);
-  const file = storage.bucket(bucketName).file(objectName);
-  await file.save(typeof contents === 'string' ? Buffer.from(contents) : contents, { contentType: contentType as any });
-  return `gs://${bucketName}/${objectName}`;
-}
-
-export const getVertexAIClient = memoize(
-  (options: { location: string }): v1.PredictionServiceClient => {
-    try {
-      getProjectId();
-      return new PredictionServiceClient({
-        apiEndpoint: `${options.location}-aiplatform.googleapis.com`,
-      });
-    } catch (error) {
-      let msg = 'Could not instantiate Vertex AI client.';
-      if (error instanceof Error) msg = error.message;
-      throw new GcpInitializationError(msg);
-    }
-  },
-);
-
-export const getPubSubClient = (() => {
-  let client: PubSub | null = null;
-  return (): PubSub => {
-    if (client) return client;
-    try {
-      const projectId = getProjectId();
-      client = new PubSub({ projectId });
-      return client;
-    } catch (error) {
-      // Do not cache the failure; allow retry on next call
-      client = null;
-      let msg = 'Could not instantiate Pub/Sub client.';
-      if (error instanceof Error) msg = error.message;
-      throw new GcpInitializationError(msg);
-    }
-  };
-})();
-
-export { getProjectId };
+// Cache clients to avoid creating multiple instances
+const clientCache = new Map<string, any>();
 
 /**
- * Pub/Sub helpers for publishing messages to topics.
+ * Get GCP auth client with specific scopes
+ * @param scopes OAuth scopes
  */
-export function getPubSub() {
-  const pubsub = getPubSubClient();
-  return {
-    topic: (name: string) => ({
-      publishMessage: async (msg: unknown) => {
-        const topic = pubsub.topic(name);
-        const data = Buffer.from(JSON.stringify(msg));
-        const [messageId] = await topic.publishMessage({ data });
-        return { messageId, name };
-      },
-    }),
-  };
+export function getGoogleAuthClient(scopes?: string | string[]): GoogleAuth {
+  const cacheKey = `auth:${scopes ? (Array.isArray(scopes) ? scopes.join(',') : scopes) : 'default'}`;
+  
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey) as GoogleAuth;
+  }
+  
+  const authClient = new GoogleAuth({
+    scopes: scopes || 'https://www.googleapis.com/auth/cloud-platform',
+  });
+  
+  clientCache.set(cacheKey, authClient);
+  return authClient;
 }
 
-export async function ensureTopic(name: string) {
-  try {
-    const pubsub = getPubSubClient();
-    const topic = pubsub.topic(name);
-    const [exists] = await topic.exists();
-    if (!exists) {
-      await topic.create();
-    }
-    return true;
-  } catch (error) {
-    console.warn(`Failed to ensure topic ${name}:`, error);
-    return false;
+/**
+ * Get Secret Manager client
+ */
+export function getSecretManagerClient(): SecretManagerServiceClient {
+  const cacheKey = 'secretmanager';
+  
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey) as SecretManagerServiceClient;
   }
+  
+  const client = new SecretManagerServiceClient();
+  clientCache.set(cacheKey, client);
+  return client;
 }
+
+/**
+ * Get BigQuery client
+ * @param projectId Optional project ID
+ */
+export function getBigQueryClient(projectId?: string): BigQuery {
+  const cacheKey = `bigquery:${projectId || 'default'}`;
+  
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey) as BigQuery;
+  }
+  
+  const client = new BigQuery({ projectId });
+  clientCache.set(cacheKey, client);
+  return client;
+}
+
+/**
+ * Get Storage client
+ * @param projectId Optional project ID
+ */
+export function getStorageClient(projectId?: string): Storage {
+  const cacheKey = `storage:${projectId || 'default'}`;
+  
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey) as Storage;
+  }
+  
+  const client = new Storage({ projectId });
+  clientCache.set(cacheKey, client);
+  return client;
+}
+
+/**
+ * Get PubSub client
+ * @param projectId Optional project ID
+ */
+export function getPubSubClient(projectId?: string): PubSub {
+  const cacheKey = `pubsub:${projectId || 'default'}`;
+  
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey) as PubSub;
+  }
+  
+  const client = new PubSub({ projectId });
+  clientCache.set(cacheKey, client);
+  return client;
+}
+
+/**
+ * Get Firestore client
+ * @param projectId Optional project ID
+ */
+export function getFirestoreClient(projectId?: string): Firestore {
+  const cacheKey = `firestore:${projectId || 'default'}`;
+  
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey) as Firestore;
+  }
+  
+  const client = new Firestore({ projectId });
+  clientCache.set(cacheKey, client);
+  return client;
+}
+
+/**
+ * Get Vertex AI Prediction Service client
+ * @param options Client options
+ */
+export function getPredictionServiceClient(
+  options: { location: string }
+): v1.PredictionServiceClient {
+  const cacheKey = `vertex:prediction:${options.location}`;
+  
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey) as v1.PredictionServiceClient;
+  }
+  
+  const client = new v1.PredictionServiceClient(options);
+  clientCache.set(cacheKey, client);
+  return client;
+}
+
+// Export common GCP client types
+export { 
+  GoogleAuth,
+  SecretManagerServiceClient,
+  BigQuery,
+  Storage,
+  PubSub,
+  Firestore,
+  v1 as VertexAI
+};

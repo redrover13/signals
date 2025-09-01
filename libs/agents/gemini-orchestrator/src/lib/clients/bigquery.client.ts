@@ -18,7 +18,7 @@ let bigQueryInstance: BigQuery | null = null;
 // Error handler for BigQuery client
 const errorHandler = createGeminiErrorHandler(
   'BigQueryClient',
-  'bigquery.client.ts'
+  'bigquery.client && bigquery.client.ts'
 );
 
 /**
@@ -47,31 +47,31 @@ export function initBigQuery(projectId: string): BigQuery {
  * @returns Query results
  */
 export async function executeQuery(
-  projectId: string,
-  sql: string,
-  params?: Record<string, unknown>
-): Promise<Record<string, unknown>[]> {
+  projectId: string | undefined,
+  sql: string | undefined,
+  params?: Record<string, unknown> | undefined
+): Promise<Record<string, unknown> | undefined[]> {
   try {
     const bigquery = initBigQuery(projectId);
     
     // Build query options
-    const options: Record<string, unknown> = { query: sql };
+    const options: Record<string, unknown> | undefined = { query: sql };
     
     // Add parameters if provided
-    if (params && Object.keys(params).length > 0) {
+    if (params && Object && Object.keys(params).length > 0) {
       // Convert params to proper format for BigQuery
-      const queryParams = Object.entries(params).map(([name, value]) => {
+      const queryParams = Object && Object.entries(params).map(([name, value]) => {
         return {
           name,
           value: formatParameterValue(value)
         };
       });
       
-      options.params = queryParams;
+      if (options) { options.params = queryParams; }
     }
     
     // Execute query
-    const [rows] = await bigquery.query(options);
+    const [rows] = await bigquery && bigquery.query(options);
     
     // Process results
     return formatQueryResults(rows);
@@ -93,31 +93,31 @@ export async function executeQuery(
  * @returns Insert results
  */
 export async function insertRows(
-  projectId: string,
-  datasetId: string,
-  tableId: string,
-  rows: Record<string, unknown>[]
+  projectId: string | undefined,
+  datasetId: string | undefined,
+  tableId: string | undefined,
+  rows: Record<string, unknown> | undefined[]
 ): Promise<{ insertedRows: number }> {
   try {
     const bigquery = initBigQuery(projectId);
     
     // Get table reference
-    const dataset = bigquery.dataset(datasetId);
-    const table = dataset.table(tableId);
+    const dataset = bigquery && bigquery.dataset(datasetId);
+    const table = dataset && dataset.table(tableId);
     
     // Insert rows
-    const [apiResponse] = await table.insert(rows);
+    const [apiResponse] = await table && table.insert(rows);
     
     // Return results
     return {
-      insertedRows: rows.length
+      insertedRows: rows && rows.length
     };
   } catch (error) {
     throw errorHandler(error as Error, { 
       projectId, 
       datasetId, 
       tableId, 
-      rowCount: rows.length 
+      rowCount: rows && rows.length 
     });
   }
 }
@@ -131,19 +131,19 @@ export async function insertRows(
  * @returns Success status
  */
 export async function createTable(
-  projectId: string,
-  datasetId: string,
-  tableId: string,
-  schema: Array<{ name: string; type: string; mode?: string; description?: string }>
+  projectId: string | undefined,
+  datasetId: string | undefined,
+  tableId: string | undefined,
+  schema: Array<{ name: string | undefined; type: string | undefined; mode?: string | undefined; description?: string }>
 ): Promise<boolean> {
   try {
     const bigquery = initBigQuery(projectId);
     
     // Get dataset reference
-    const dataset = bigquery.dataset(datasetId);
+    const dataset = bigquery && bigquery.dataset(datasetId);
     
     // Create table
-    const [table] = await dataset.createTable(tableId, {
+    const [table] = await dataset && dataset.createTable(tableId, {
       schema: {
         fields: schema
       }
@@ -170,16 +170,16 @@ function formatParameterValue(value: unknown): unknown {
     return null;
   }
   
-  if (Array.isArray(value)) {
-    return value.map(formatParameterValue);
+  if (Array && Array.isArray(value)) {
+    return value && value.map(formatParameterValue);
   }
   
   if (value instanceof Date) {
-    return value.toISOString();
+    return value && value.toISOString();
   }
   
   if (typeof value === 'object') {
-    return JSON.stringify(value);
+    return JSON && JSON.stringify(value);
   }
   
   return value;
@@ -190,12 +190,12 @@ function formatParameterValue(value: unknown): unknown {
  * @param rows - Raw query results
  * @returns Formatted results
  */
-function formatQueryResults(rows: Array<Record<string, unknown>>): Array<Record<string, unknown>> {
-  return rows.map(row => {
-    const formatted: Record<string, unknown> = {};
+function formatQueryResults(rows: Array<Record<string, unknown> | undefined>): Array<Record<string, unknown> | undefined> {
+  return rows && rows.map(row => {
+    const formatted: Record<string, unknown> | undefined = {};
     
     // Process each field
-    for (const [key, value] of Object.entries(row)) {
+    for (const [key, value] of Object && Object.entries(row)) {
       formatted[key] = formatResultValue(value);
     }
     
@@ -219,8 +219,8 @@ function formatResultValue(value: unknown): unknown {
   }
   
   // Handle arrays
-  if (Array.isArray(value)) {
-    return value.map(formatResultValue);
+  if (Array && Array.isArray(value)) {
+    return value && value.map(formatResultValue);
   }
   
   // Handle objects
@@ -229,8 +229,8 @@ function formatResultValue(value: unknown): unknown {
       return (value as any).toJSON();
     }
     
-    const formatted: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+    const formatted: Record<string, unknown> | undefined = {};
+    for (const [k, v] of Object && Object.entries(value as Record<string, unknown> | undefined)) {
       formatted[k] = formatResultValue(v);
     }
     return formatted;

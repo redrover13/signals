@@ -10,133 +10,131 @@
  */
 
 /**
- * This script updates all project.json files in the workspace with optimized configurations
- * for caching, builds, and linting.
+ * Script to update project configuration files
  */
 import * as fs from 'fs';
 import * as path from 'path';
-import * as glob from 'glob';
+import { glob } from 'glob';
 
 interface ProjectConfig {
-  name: string;
-  $schema: string;
-  sourceRoot: string;
-  projectType: 'library' | 'application';
+  name?: string;
+  $schema?: string;
+  projectType?: 'application' | 'library';
+  sourceRoot?: string;
+  targets?: Record<string, any>;
+  tags?: string[];
   implicitDependencies?: string[];
-  targets: Record<string, any>;
-  tags: string[];
   namedInputs?: Record<string, any>;
 }
 
-const updateLibraryProject = (config: ProjectConfig, projectPath: string): ProjectConfig => {
-  const projectName = path.basename(path.dirname(projectPath));
-  const projectType = config.projectType || 'library';
-  
-  // Extract domain from directory structure
-  const pathParts = path.dirname(projectPath).split(path.sep);
-  const domain = pathParts[pathParts.length - 1];
-  
-  // Update build target
-  if (config.targets.build) {
-    config.targets.build = {
-      ...config.targets.build,
-      configurations: {
-        production: {
-          optimization: true,
-          extractLicenses: true,
-          generatePackageJson: true,
-          sourceMap: false
-        },
-        development: {
-          optimization: false,
-          sourceMap: true
-        }
-      },
-      defaultConfiguration: 'production',
-      cache: true,
-      dependsOn: config.targets.build.dependsOn || ["^build"],
-      inputs: ["production", "^production"]
-    };
+const STANDARD_ESLINT_CONFIG = {
+  executor: '@nx/eslint:lint',
+  outputs: ['{options.outputFile}'],
+  options: {
+    lintFilePatterns: ['libs/**/*.ts', 'libs/**/*.html']
   }
-  
-  // Update lint target
-  if (config.targets.lint) {
-    config.targets.lint = {
-      ...config.targets.lint,
-      inputs: ["default", "{workspaceRoot}/.eslintrc.json"],
-      cache: true
-    };
-  }
-  
-  // Update test target
-  if (config.targets.test) {
-    config.targets.test = {
-      ...config.targets.test,
-      configurations: {
-        ci: {
-          ci: true,
-          codeCoverage: true
-        }
-      },
-      inputs: ["default", "^default", "{workspaceRoot}/jest.preset.js"],
-      cache: true
-    };
-  }
-  
-  // Add tags
-  config.tags = [`domain:${domain}`, `type:${projectType}`];
-  
-  // Add namedInputs
-  config.namedInputs = {
-    default: ["{projectRoot}/**/*", "sharedGlobals"],
-    production: [
-      "default",
-      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
-      "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/jest.config.[jt]s",
-      "!{projectRoot}/.eslintrc.json"
-    ],
-    sharedGlobals: []
-  };
-  
-  return config;
 };
 
-const updateProjectConfigs = (): void => {
-  try {
-    // Find all project.json files
-    const projectFiles = glob.sync('**/project.json', {
-      ignore: ['node_modules/**', 'dist/**', 'tools/**']
-    });
+const STANDARD_TEST_CONFIG = {
+  executor: '@nx/jest:jest',
+  outputs: ['{workspaceRoot}/coverage/{projectRoot}'],
+  options: {
+    jestConfig: 'jest.config.ts',
+    passWithNoTests: true
+  },
+  configurations: {
+    ci: {
+      ci: true,
+      codeCoverage: true
+    }
+  }
+};
+
+const STANDARD_BUILD_CONFIG = {
+  executor: '@nx/js:tsc',
+  outputs: ['{options.outputPath}'],
+  options: {
+    outputPath: 'dist/{projectRoot}',
+    tsConfig: '{projectRoot}/tsconfig.lib.json',
+    packageJson: '{projectRoot}/package.json',
+    main: '{projectRoot}/src/index.ts',
+    assets: ['{projectRoot}/*.md']
+  }
+};
+
+/**
+ * Update project configuration files
+ */
+async function updateProjectConfigs(): Promise<void> {
+  const projectPaths = await glob('libs/**/project.json');
+  
+  for (const projectPath of projectPaths) {
+    console.log(`Updating ${projectPath}...`);
     
-    console.log(`Found ${projectFiles.length} project.json files to update`);
-    
-    projectFiles.forEach(projectPath => {
-      try {
-        const fullPath = path.resolve(projectPath);
-        const config = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+    try {
+      const configContent = fs.readFileSync(projectPath, 'utf8');
+      const config: ProjectConfig = JSON.parse(configContent);
+      
+      // Extract domain from path for tagging
+      const pathParts = path.dirname(projectPath).split(path.sep);
+      const domain = pathParts[1]; // 'libs/domain/...'
+      
+      // Add standard configurations
+      if (config?.targets) {
+        config.targets["build"] = {
+          ...STANDARD_BUILD_CONFIG,
+          ...config.targets["build"]
+        };
         
-        // Skip if not a library or application
-        if (!config.projectType) {
-          console.log(`Skipping ${projectPath}: No projectType found`);
-          return;
-        }
+        config.targets["lint"] = {
+          ...STANDARD_ESLINT_CONFIG,
+          ...config.targets["lint"]
+        };
         
-        // Update configuration
-        const updatedConfig = updateLibraryProject(config, projectPath);
-        
-        // Write back to file
-        fs.writeFileSync(fullPath, JSON.stringify(updatedConfig, null, 2));
-        console.log(`Updated ${projectPath}`);
-      } catch (err) {
-        console.error(`Error updating ${projectPath}:`, err);
+        config.targets["test"] = {
+          ...STANDARD_TEST_CONFIG,
+          ...config.targets["test"]
+        };
       }
-    });
-    
-    console.log('Project configuration update complete!');
-  } catch (err) {
-    console.error('Failed to update project configurations:', err);
+      
+      // Add named inputs for cache busting
+      if (config) {
+        config.namedInputs = {
+          default: ['{projectRoot}/**/*', '!{projectRoot}/**/*.test.ts'],
+          production: ['default'],
+          ...config.namedInputs
+        };
+      }
+      
+      // Add domain tags
+      if (config) {
+        config.tags = config.tags || [];
+      }
+      
+      if (config?.tags && domain && !config.tags.includes(domain)) {
+        config.tags.push(domain);
+      }
+      
+      // Write updated config
+      fs.writeFileSync(projectPath, JSON.stringify(config, null, 2), 'utf8');
+      console.log(`✅ Updated ${projectPath}`);
+    } catch (err) {
+      console.error(`Error updating ${projectPath}:`, err);
+    }
   }
 }
 
-updateProjectConfigs();
+/**
+ * Main function
+ */
+async function main(): Promise<void> {
+  console.log('🔄 Updating project configurations...');
+  await updateProjectConfigs();
+  console.log('✅ Project configurations updated successfully!');
+}
+
+// Run the script
+main().catch(err => {
+  console.error('Error updating project configurations:', err);
+  process.exit(1);
+});

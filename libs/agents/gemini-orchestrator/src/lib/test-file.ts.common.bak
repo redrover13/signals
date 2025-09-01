@@ -1,0 +1,15 @@
+/**
+ * Test file with proper line endings
+ */
+
+export class TestClass {
+  private value: string | undefined;
+
+  constructor(initialValue: string) {
+    this.value = initialValue;
+  }
+
+  public getValue(): string {
+    return this.value;
+  }
+}

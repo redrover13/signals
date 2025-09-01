@@ -1,0 +1,5015 @@
+{
+  "timestamp": "2025-09-01T03:40:18.121Z",
+  "typescriptVersion": "Version 5.9.2",
+  "totalFiles": 67,
+  "totalErrors": 601,
+  "errorCategories": {
+    "2304": {
+      "count": 1,
+      "message": "Cannot find name 'dataStoreId'.",
+      "examples": [
+        {
+          "file": "libs/adk/src/services/vertex.ts",
+          "line": 228,
+          "column": 33,
+          "message": "Cannot find name 'dataStoreId'."
+        }
+      ]
+    },
+    "2305": {
+      "count": 19,
+      "message": "Module '\"@google/generative-ai\"' has no exported member 'GenModel'.",
+      "examples": [
+        {
+          "file": "libs/adk/src/services/vertex.ts",
+          "line": 13,
+          "column": 10,
+          "message": "Module '\"@google/generative-ai\"' has no exported member 'GenModel'."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+          "line": 13,
+          "column": 26,
+          "message": "Module '\"@nx-monorepo/adk\"' has no exported member 'DocumentChunk'."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+          "line": 13,
+          "column": 41,
+          "message": "Module '\"@nx-monorepo/adk\"' has no exported member 'RAGSearchOptions'."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+          "line": 14,
+          "column": 10,
+          "message": "Module '\"../utils/error-handler\"' has no exported member 'errorHandler'."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/rag.client.ts",
+          "line": 12,
+          "column": 26,
+          "message": "Module '\"@nx-monorepo/adk\"' has no exported member 'DocumentChunk'."
+        }
+      ]
+    },
+    "2307": {
+      "count": 83,
+      "message": "Cannot find module '@google-cloud/vertexai' or its corresponding type declarations.",
+      "examples": [
+        {
+          "file": "libs/adk/src/services/vertex.ts",
+          "line": 12,
+          "column": 26,
+          "message": "Cannot find module '@google-cloud/vertexai' or its corresponding type declarations."
+        },
+        {
+          "file": "libs/adk/src/services/vertex.ts",
+          "line": 14,
+          "column": 76,
+          "message": "Cannot find module '../utilities/gemini' or its corresponding type declarations."
+        },
+        {
+          "file": "libs/adk/src/services/vertex.ts",
+          "line": 15,
+          "column": 31,
+          "message": "Cannot find module './vertex-indexer' or its corresponding type declarations."
+        },
+        {
+          "file": "libs/adk/src/services/vertex.ts",
+          "line": 16,
+          "column": 32,
+          "message": "Cannot find module './vertex-embedder' or its corresponding type declarations."
+        },
+        {
+          "file": "libs/adk/src/services/vertex.ts",
+          "line": 17,
+          "column": 33,
+          "message": "Cannot find module '../interfaces/embedding-config' or its corresponding type declarations."
+        }
+      ]
+    },
+    "2322": {
+      "count": 40,
+      "message": "Type 'string | undefined' is not assignable to type 'string'.",
+      "examples": [
+        {
+          "file": "libs/adk/src/agents/base-agent.ts",
+          "line": 45,
+          "column": 7,
+          "message": "Type 'string | undefined' is not assignable to type 'string'."
+        },
+        {
+          "file": "libs/adk/src/agents/base-agent.ts",
+          "line": 55,
+          "column": 5,
+          "message": "Type 'string | undefined' is not assignable to type 'string'."
+        },
+        {
+          "file": "libs/adk/src/agents/base-agent.ts",
+          "line": 62,
+          "column": 5,
+          "message": "Type 'string | undefined' is not assignable to type 'string'."
+        },
+        {
+          "file": "libs/adk/src/agents/base-agent.ts",
+          "line": 75,
+          "column": 7,
+          "message": "Type 'string | undefined' is not assignable to type 'string'."
+        },
+        {
+          "file": "libs/adk/src/agents/base-agent.ts",
+          "line": 95,
+          "column": 7,
+          "message": "Type 'string | undefined' is not assignable to type 'string'."
+        }
+      ]
+    },
+    "2339": {
+      "count": 80,
+      "message": "Property 'error' does not exist on type 'never'.",
+      "examples": [
+        {
+          "file": "libs/adk/src/agents/root-agent.ts",
+          "line": 190,
+          "column": 109,
+          "message": "Property 'error' does not exist on type 'never'."
+        },
+        {
+          "file": "libs/adk/src/tools/gcp-tools.ts",
+          "line": 19,
+          "column": 11,
+          "message": "Property 'sql' does not exist on type 'Record<string, unknown> | undefined'."
+        },
+        {
+          "file": "libs/adk/src/tools/gcp-tools.ts",
+          "line": 19,
+          "column": 16,
+          "message": "Property 'params' does not exist on type 'Record<string, unknown> | undefined'."
+        },
+        {
+          "file": "libs/adk/src/tools/gcp-tools.ts",
+          "line": 40,
+          "column": 11,
+          "message": "Property 'table' does not exist on type 'Record<string, unknown> | undefined'."
+        },
+        {
+          "file": "libs/adk/src/tools/gcp-tools.ts",
+          "line": 40,
+          "column": 18,
+          "message": "Property 'rows' does not exist on type 'Record<string, unknown> | undefined'."
+        }
+      ]
+    },
+    "2345": {
+      "count": 71,
+      "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'.",
+      "examples": [
+        {
+          "file": "libs/adk/src/agents/root-agent.ts",
+          "line": 78,
+          "column": 56,
+          "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+        },
+        {
+          "file": "libs/adk/src/agents/root-agent.ts",
+          "line": 143,
+          "column": 96,
+          "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+        },
+        {
+          "file": "libs/adk/src/agents/root-agent.ts",
+          "line": 151,
+          "column": 76,
+          "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+        },
+        {
+          "file": "libs/adk/src/utilities/performance.ts",
+          "line": 75,
+          "column": 42,
+          "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+        },
+        {
+          "file": "libs/adk/src/utilities/performance.ts",
+          "line": 82,
+          "column": 38,
+          "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+        }
+      ]
+    },
+    "2347": {
+      "count": 2,
+      "message": "Untyped function calls may not accept type arguments.",
+      "examples": [
+        {
+          "file": "libs/utils/signals/src/nx-integration.ts",
+          "line": 29,
+          "column": 18,
+          "message": "Untyped function calls may not accept type arguments."
+        },
+        {
+          "file": "libs/utils/signals/src/nx-integration.ts",
+          "line": 55,
+          "column": 18,
+          "message": "Untyped function calls may not accept type arguments."
+        }
+      ]
+    },
+    "2349": {
+      "count": 1,
+      "message": "This expression is not callable.",
+      "examples": [
+        {
+          "file": "libs/utils/monitoring/src/lib/cloud-trace-exporter.ts",
+          "line": 92,
+          "column": 23,
+          "message": "This expression is not callable."
+        }
+      ]
+    },
+    "2352": {
+      "count": 2,
+      "message": "Conversion of type 'Process | undefined' to type 'ChildProcess' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.",
+      "examples": [
+        {
+          "file": "libs/utils/api-clients/src/lib/mcp-client.service.ts",
+          "line": 401,
+          "column": 21,
+          "message": "Conversion of type 'Process | undefined' to type 'ChildProcess' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first."
+        },
+        {
+          "file": "libs/utils/api-clients/src/lib/mcp-client.service.ts",
+          "line": 490,
+          "column": 25,
+          "message": "Conversion of type 'Process | undefined' to type 'ChildProcess' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first."
+        }
+      ]
+    },
+    "2353": {
+      "count": 11,
+      "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'.",
+      "examples": [
+        {
+          "file": "libs/adk/src/tools/gcp-tools.ts",
+          "line": 132,
+          "column": 5,
+          "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+        },
+        {
+          "file": "libs/adk/src/tools/gcp-tools.ts",
+          "line": 154,
+          "column": 5,
+          "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+        },
+        {
+          "file": "libs/adk/src/tools/gcp-tools.ts",
+          "line": 179,
+          "column": 5,
+          "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+        },
+        {
+          "file": "libs/adk/src/tools/gcp-tools.ts",
+          "line": 211,
+          "column": 5,
+          "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+        },
+        {
+          "file": "libs/adk/src/tools/gcp-tools.ts",
+          "line": 267,
+          "column": 7,
+          "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+        }
+      ]
+    },
+    "2363": {
+      "count": 18,
+      "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.",
+      "examples": [
+        {
+          "file": "libs/adk/src/utilities/security.ts",
+          "line": 232,
+          "column": 44,
+          "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+        },
+        {
+          "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+          "line": 297,
+          "column": 40,
+          "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+        },
+        {
+          "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+          "line": 404,
+          "column": 73,
+          "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+        },
+        {
+          "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+          "line": 494,
+          "column": 69,
+          "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+        },
+        {
+          "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+          "line": 514,
+          "column": 109,
+          "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+        }
+      ]
+    },
+    "2365": {
+      "count": 7,
+      "message": "Operator '<' cannot be applied to types 'number' and 'string | string[]'.",
+      "examples": [
+        {
+          "file": "libs/adk/src/utilities/configuration.ts",
+          "line": 141,
+          "column": 21,
+          "message": "Operator '<' cannot be applied to types 'number' and 'string | string[]'."
+        },
+        {
+          "file": "libs/adk/src/utilities/configuration.ts",
+          "line": 272,
+          "column": 23,
+          "message": "Operator '<' cannot be applied to types 'number' and 'string | string[]'."
+        },
+        {
+          "file": "libs/adk/src/utilities/security.ts",
+          "line": 171,
+          "column": 48,
+          "message": "Operator '>' cannot be applied to types 'number' and '{ allowHtml: boolean | undefined; maxLength?: number | undefined; stripNumbers: boolean | undefined; }'."
+        },
+        {
+          "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+          "line": 273,
+          "column": 72,
+          "message": "Operator '+' cannot be applied to types 'number' and 'Review'."
+        },
+        {
+          "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+          "line": 514,
+          "column": 83,
+          "message": "Operator '+' cannot be applied to types 'number' and 'Review'."
+        }
+      ]
+    },
+    "2367": {
+      "count": 2,
+      "message": "This comparison appears to be unintentional because the types 'number' and 'string' have no overlap.",
+      "examples": [
+        {
+          "file": "libs/adk/src/utilities/security.ts",
+          "line": 190,
+          "column": 14,
+          "message": "This comparison appears to be unintentional because the types 'number' and 'string' have no overlap."
+        },
+        {
+          "file": "libs/mcp/src/lib/clients/request-router.service.ts",
+          "line": 418,
+          "column": 32,
+          "message": "This comparison appears to be unintentional because the types 'string' and 'RegExp' have no overlap."
+        }
+      ]
+    },
+    "2375": {
+      "count": 4,
+      "message": "Type '{ role: string | undefined; parts: { text: string; }[]; }' is not assignable to type 'Content' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.",
+      "examples": [
+        {
+          "file": "libs/adk/src/agents/base-agent.ts",
+          "line": 77,
+          "column": 7,
+          "message": "Type '{ role: string | undefined; parts: { text: string; }[]; }' is not assignable to type 'Content' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+        },
+        {
+          "file": "libs/mcp/src/lib/services/connection-pool.service.ts",
+          "line": 323,
+          "column": 13,
+          "message": "Type '{ id: string; serverId: string | undefined; connection: unknown; createdAt: number; lastUsed: number; usageCount: number; busy: true; }' is not assignable to type 'PooledConnection' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+        },
+        {
+          "file": "libs/mcp/src/lib/services/performance-metrics.service.ts",
+          "line": 76,
+          "column": 11,
+          "message": "Type '{ id: string; url: string; method: string; startTime: number; endTime: number; duration: number; success: false; serverId: string | undefined; }' is not assignable to type 'RequestMetrics' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+        },
+        {
+          "file": "libs/mcp/src/lib/utils/logging.ts",
+          "line": 244,
+          "column": 11,
+          "message": "Type '{ timestamp: Date; level: LogLevel; category: string; message: string; data: unknown; error: Error | undefined; }' is not assignable to type 'LogEntry' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+        }
+      ]
+    },
+    "2379": {
+      "count": 7,
+      "message": "Argument of type '{ projectId: string | undefined; location: string; }' is not assignable to parameter of type 'BigQueryOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.",
+      "examples": [
+        {
+          "file": "libs/agents/bq-agent/src/lib/bq-agent.ts",
+          "line": 43,
+          "column": 34,
+          "message": "Argument of type '{ projectId: string | undefined; location: string; }' is not assignable to parameter of type 'BigQueryOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+        },
+        {
+          "file": "libs/utils/gcp-auth/src/index.ts",
+          "line": 71,
+          "column": 31,
+          "message": "Argument of type '{ projectId: string | undefined; }' is not assignable to parameter of type 'BigQueryOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+        },
+        {
+          "file": "libs/utils/gcp-auth/src/index.ts",
+          "line": 87,
+          "column": 30,
+          "message": "Argument of type '{ projectId: string | undefined; }' is not assignable to parameter of type 'StorageOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+        },
+        {
+          "file": "libs/utils/gcp-auth/src/index.ts",
+          "line": 103,
+          "column": 29,
+          "message": "Argument of type '{ projectId: string | undefined; }' is not assignable to parameter of type 'ClientConfig' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+        },
+        {
+          "file": "libs/utils/monitoring/src/lib/bigquery-logger.ts",
+          "line": 57,
+          "column": 34,
+          "message": "Argument of type '{ projectId: string | undefined; }' is not assignable to parameter of type 'BigQueryOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+        }
+      ]
+    },
+    "2412": {
+      "count": 3,
+      "message": "Type 'number | undefined' is not assignable to type 'number' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.",
+      "examples": [
+        {
+          "file": "libs/mcp/src/lib/services/performance-metrics.service.ts",
+          "line": 98,
+          "column": 5,
+          "message": "Type 'number | undefined' is not assignable to type 'number' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target."
+        },
+        {
+          "file": "libs/utils/monitoring/src/lib/cloud-trace-exporter.ts",
+          "line": 39,
+          "column": 5,
+          "message": "Type 'string | undefined' is not assignable to type 'string' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target."
+        },
+        {
+          "file": "libs/utils/monitoring/src/lib/error-handler.ts",
+          "line": 102,
+          "column": 5,
+          "message": "Type 'Error | undefined' is not assignable to type 'Error' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target."
+        }
+      ]
+    },
+    "2416": {
+      "count": 14,
+      "message": "Property 'name' in type 'DulceBaseAgent' is not assignable to the same property in base type 'BaseAgent'.",
+      "examples": [
+        {
+          "file": "libs/adk/src/agents/base-agent.ts",
+          "line": 39,
+          "column": 28,
+          "message": "Property 'name' in type 'DulceBaseAgent' is not assignable to the same property in base type 'BaseAgent'."
+        },
+        {
+          "file": "libs/adk/src/agents/base-agent.ts",
+          "line": 40,
+          "column": 28,
+          "message": "Property 'description' in type 'DulceBaseAgent' is not assignable to the same property in base type 'BaseAgent'."
+        },
+        {
+          "file": "libs/adk/src/agents/base-agent.ts",
+          "line": 90,
+          "column": 28,
+          "message": "Property 'name' in type 'DulceLlmAgent' is not assignable to the same property in base type 'LlmAgent'."
+        },
+        {
+          "file": "libs/adk/src/agents/base-agent.ts",
+          "line": 91,
+          "column": 28,
+          "message": "Property 'description' in type 'DulceLlmAgent' is not assignable to the same property in base type 'LlmAgent'."
+        },
+        {
+          "file": "libs/adk/src/agents/base-agent.ts",
+          "line": 117,
+          "column": 28,
+          "message": "Property 'name' in type 'DulceSequentialAgent' is not assignable to the same property in base type 'SequentialAgent'."
+        }
+      ]
+    },
+    "2448": {
+      "count": 2,
+      "message": "Block-scoped variable 'signal' used before its declaration.",
+      "examples": [
+        {
+          "file": "libs/utils/signals/src/nx-integration.ts",
+          "line": 29,
+          "column": 18,
+          "message": "Block-scoped variable 'signal' used before its declaration."
+        },
+        {
+          "file": "libs/utils/signals/src/nx-integration.ts",
+          "line": 55,
+          "column": 18,
+          "message": "Block-scoped variable 'signal' used before its declaration."
+        }
+      ]
+    },
+    "2459": {
+      "count": 3,
+      "message": "Module '\"./mcp-client.service\"' declares 'MCPRequest' locally, but it is not exported.",
+      "examples": [
+        {
+          "file": "libs/mcp/src/lib/clients/request-router.service.ts",
+          "line": 17,
+          "column": 10,
+          "message": "Module '\"./mcp-client.service\"' declares 'MCPRequest' locally, but it is not exported."
+        },
+        {
+          "file": "libs/mcp/src/lib/mcp.service.ts",
+          "line": 12,
+          "column": 28,
+          "message": "Module '\"./clients/mcp-client.service\"' declares 'MCPRequest' locally, but it is not exported."
+        },
+        {
+          "file": "libs/mcp/src/lib/mcp.service.ts",
+          "line": 12,
+          "column": 40,
+          "message": "Module '\"./clients/mcp-client.service\"' declares 'MCPResponse' locally, but it is not exported."
+        }
+      ]
+    },
+    "2488": {
+      "count": 8,
+      "message": "Type 'Promise<SimpleQueryRowsResponse> | undefined' must have a '[Symbol.iterator]()' method that returns an iterator.",
+      "examples": [
+        {
+          "file": "libs/agents-sdk/src/lib/main-agent.ts",
+          "line": 27,
+          "column": 13,
+          "message": "Type 'Promise<SimpleQueryRowsResponse> | undefined' must have a '[Symbol.iterator]()' method that returns an iterator."
+        },
+        {
+          "file": "libs/agents/bq-agent/src/lib/bq-agent.ts",
+          "line": 61,
+          "column": 13,
+          "message": "Type '(Promise<JobResponse> & void) | undefined' must have a '[Symbol.iterator]()' method that returns an iterator."
+        },
+        {
+          "file": "libs/agents/bq-agent/src/lib/bq-agent.ts",
+          "line": 164,
+          "column": 13,
+          "message": "Type 'Promise<DatasetsResponse> | undefined' must have a '[Symbol.iterator]()' method that returns an iterator."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/bigquery.client.ts",
+          "line": 74,
+          "column": 11,
+          "message": "Type 'Promise<SimpleQueryRowsResponse>' must have a '[Symbol.iterator]()' method that returns an iterator."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/bigquery.client.ts",
+          "line": 109,
+          "column": 11,
+          "message": "Type 'Promise<InsertRowsResponse>' must have a '[Symbol.iterator]()' method that returns an iterator."
+        }
+      ]
+    },
+    "2532": {
+      "count": 22,
+      "message": "Object is possibly 'undefined'.",
+      "examples": [
+        {
+          "file": "libs/adk/src/utilities/security.ts",
+          "line": 232,
+          "column": 27,
+          "message": "Object is possibly 'undefined'."
+        },
+        {
+          "file": "libs/agents-sdk/src/lib/main-agent.ts",
+          "line": 27,
+          "column": 45,
+          "message": "Object is possibly 'undefined'."
+        },
+        {
+          "file": "libs/agents-sdk/src/lib/main-agent.ts",
+          "line": 102,
+          "column": 43,
+          "message": "Object is possibly 'undefined'."
+        },
+        {
+          "file": "libs/agents-sdk/src/lib/main-agent.ts",
+          "line": 129,
+          "column": 39,
+          "message": "Object is possibly 'undefined'."
+        },
+        {
+          "file": "libs/agents-sdk/src/lib/main-agent.ts",
+          "line": 163,
+          "column": 39,
+          "message": "Object is possibly 'undefined'."
+        }
+      ]
+    },
+    "2538": {
+      "count": 9,
+      "message": "Type 'undefined' cannot be used as an index type.",
+      "examples": [
+        {
+          "file": "libs/adk/src/utilities/configuration.ts",
+          "line": 143,
+          "column": 48,
+          "message": "Type 'undefined' cannot be used as an index type."
+        },
+        {
+          "file": "libs/adk/src/utilities/configuration.ts",
+          "line": 144,
+          "column": 17,
+          "message": "Type 'undefined' cannot be used as an index type."
+        },
+        {
+          "file": "libs/adk/src/utilities/configuration.ts",
+          "line": 146,
+          "column": 25,
+          "message": "Type 'undefined' cannot be used as an index type."
+        },
+        {
+          "file": "libs/adk/src/utilities/configuration.ts",
+          "line": 149,
+          "column": 28,
+          "message": "Type 'undefined' cannot be used as an index type."
+        },
+        {
+          "file": "libs/adk/src/utilities/configuration.ts",
+          "line": 275,
+          "column": 19,
+          "message": "Type 'undefined' cannot be used as an index type."
+        }
+      ]
+    },
+    "2551": {
+      "count": 1,
+      "message": "Property 'getDescription' does not exist on type 'LlmAgent'. Did you mean 'description'?",
+      "examples": [
+        {
+          "file": "libs/adk/src/agents/root-agent.ts",
+          "line": 200,
+          "column": 35,
+          "message": "Property 'getDescription' does not exist on type 'LlmAgent'. Did you mean 'description'?"
+        }
+      ]
+    },
+    "2554": {
+      "count": 10,
+      "message": "Expected 2-3 arguments, but got 1.",
+      "examples": [
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/schemas.ts",
+          "line": 30,
+          "column": 13,
+          "message": "Expected 2-3 arguments, but got 1."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/schemas.ts",
+          "line": 62,
+          "column": 14,
+          "message": "Expected 2-3 arguments, but got 1."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/schemas.ts",
+          "line": 72,
+          "column": 19,
+          "message": "Expected 2-3 arguments, but got 1."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/schemas.ts",
+          "line": 82,
+          "column": 24,
+          "message": "Expected 2-3 arguments, but got 1."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/schemas.ts",
+          "line": 93,
+          "column": 15,
+          "message": "Expected 2-3 arguments, but got 1."
+        }
+      ]
+    },
+    "2578": {
+      "count": 1,
+      "message": "Unused '@ts-expect-error' directive.",
+      "examples": [
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/firebase.client.ts",
+          "line": 116,
+          "column": 9,
+          "message": "Unused '@ts-expect-error' directive."
+        }
+      ]
+    },
+    "2612": {
+      "count": 2,
+      "message": "Property 'name' will overwrite the base property in 'BaseAgent'. If this is intentional, add an initializer. Otherwise, add a 'declare' modifier or remove the redundant declaration.",
+      "examples": [
+        {
+          "file": "libs/adk/src/agents/base-agent.ts",
+          "line": 39,
+          "column": 28,
+          "message": "Property 'name' will overwrite the base property in 'BaseAgent'. If this is intentional, add an initializer. Otherwise, add a 'declare' modifier or remove the redundant declaration."
+        },
+        {
+          "file": "libs/adk/src/agents/base-agent.ts",
+          "line": 40,
+          "column": 28,
+          "message": "Property 'description' will overwrite the base property in 'BaseAgent'. If this is intentional, add an initializer. Otherwise, add a 'declare' modifier or remove the redundant declaration."
+        }
+      ]
+    },
+    "2693": {
+      "count": 1,
+      "message": "'Resource' only refers to a type, but is being used as a value here.",
+      "examples": [
+        {
+          "file": "libs/utils/monitoring/src/lib/otel-config.ts",
+          "line": 64,
+          "column": 24,
+          "message": "'Resource' only refers to a type, but is being used as a value here."
+        }
+      ]
+    },
+    "2722": {
+      "count": 1,
+      "message": "Cannot invoke an object which is possibly 'undefined'.",
+      "examples": [
+        {
+          "file": "libs/utils/monitoring/src/lib/cloud-trace-exporter.ts",
+          "line": 92,
+          "column": 7,
+          "message": "Cannot invoke an object which is possibly 'undefined'."
+        }
+      ]
+    },
+    "2724": {
+      "count": 4,
+      "message": "'\"@nx-monorepo/adk\"' has no exported member named 'VertexAIClient'. Did you mean 'VertexClient'?",
+      "examples": [
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+          "line": 13,
+          "column": 10,
+          "message": "'\"@nx-monorepo/adk\"' has no exported member named 'VertexAIClient'. Did you mean 'VertexClient'?"
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/rag.client.ts",
+          "line": 12,
+          "column": 10,
+          "message": "'\"@nx-monorepo/adk\"' has no exported member named 'VertexAIClient'. Did you mean 'VertexClient'?"
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/mcp.service.ts",
+          "line": 25,
+          "column": 10,
+          "message": "'\"./utils/error-handler\"' has no exported member named 'createServiceErrorHandler'. Did you mean 'createGeminiErrorHandler'?"
+        },
+        {
+          "file": "libs/mcp/src/lib/mcp.service.ts",
+          "line": 18,
+          "column": 37,
+          "message": "'\"./services/performance-metrics.service\"' has no exported member named 'performanceMetricsService'. Did you mean 'PerformanceMetricsService'?"
+        }
+      ]
+    },
+    "2740": {
+      "count": 2,
+      "message": "Type 'Promise<{ review: Review; sentiment: SentimentAnalysis; }[]>' is missing the following properties from type '{ review: Review | undefined; sentiment: SentimentAnalysis; }[]': length, pop, push, concat, and 29 more.",
+      "examples": [
+        {
+          "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+          "line": 249,
+          "column": 9,
+          "message": "Type 'Promise<{ review: Review; sentiment: SentimentAnalysis; }[]>' is missing the following properties from type '{ review: Review | undefined; sentiment: SentimentAnalysis; }[]': length, pop, push, concat, and 29 more."
+        },
+        {
+          "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+          "line": 540,
+          "column": 11,
+          "message": "Type 'Promise<{ period: string; averageRating: number; reviewCount: number; sentimentScore: any; }[]>' is missing the following properties from type '{ period: string | undefined; averageRating: number | undefined; reviewCount: number | undefined; sentimentScore: number | undefined; }[]': length, pop, push, concat, and 29 more."
+        }
+      ]
+    },
+    "2741": {
+      "count": 1,
+      "message": "Property 'message' is missing in type '{ serviceContext: { service?: string; version?: string; } | undefined; timestamp: string; severity: string; }' but required in type 'LogEntry'.",
+      "examples": [
+        {
+          "file": "libs/utils/monitoring/src/lib/bigquery-logger.ts",
+          "line": 91,
+          "column": 7,
+          "message": "Property 'message' is missing in type '{ serviceContext: { service?: string; version?: string; } | undefined; timestamp: string; severity: string; }' but required in type 'LogEntry'."
+        }
+      ]
+    },
+    "2769": {
+      "count": 15,
+      "message": "No overload matches this call.",
+      "examples": [
+        {
+          "file": "apps/looker-dashboards/src/lib/dashboard-templates.ts",
+          "line": 385,
+          "column": 33,
+          "message": "No overload matches this call."
+        },
+        {
+          "file": "apps/looker-dashboards/src/lib/dashboard-templates.ts",
+          "line": 386,
+          "column": 39,
+          "message": "No overload matches this call."
+        },
+        {
+          "file": "apps/looker-dashboards/src/lib/dashboard-templates.ts",
+          "line": 387,
+          "column": 41,
+          "message": "No overload matches this call."
+        },
+        {
+          "file": "apps/looker-dashboards/src/lib/dashboard-templates.ts",
+          "line": 388,
+          "column": 39,
+          "message": "No overload matches this call."
+        },
+        {
+          "file": "libs/adk/src/agents/root-agent.ts",
+          "line": 85,
+          "column": 32,
+          "message": "No overload matches this call."
+        }
+      ]
+    },
+    "2779": {
+      "count": 15,
+      "message": "The left-hand side of an assignment expression may not be an optional property access.",
+      "examples": [
+        {
+          "file": "libs/mcp/src/lib/config/environment-config.ts",
+          "line": 173,
+          "column": 7,
+          "message": "The left-hand side of an assignment expression may not be an optional property access."
+        },
+        {
+          "file": "libs/mcp/src/lib/config/environment-config.ts",
+          "line": 174,
+          "column": 7,
+          "message": "The left-hand side of an assignment expression may not be an optional property access."
+        },
+        {
+          "file": "libs/mcp/src/lib/config/environment-config.ts",
+          "line": 175,
+          "column": 7,
+          "message": "The left-hand side of an assignment expression may not be an optional property access."
+        },
+        {
+          "file": "libs/mcp/src/lib/config/environment-config.ts",
+          "line": 179,
+          "column": 7,
+          "message": "The left-hand side of an assignment expression may not be an optional property access."
+        },
+        {
+          "file": "libs/mcp/src/lib/config/environment-config.ts",
+          "line": 180,
+          "column": 7,
+          "message": "The left-hand side of an assignment expression may not be an optional property access."
+        }
+      ]
+    },
+    "4111": {
+      "count": 6,
+      "message": "Property 'params' comes from an index signature, so it must be accessed with ['params'].",
+      "examples": [
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/bigquery.client.ts",
+          "line": 70,
+          "column": 30,
+          "message": "Property 'params' comes from an index signature, so it must be accessed with ['params']."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+          "line": 38,
+          "column": 71,
+          "message": "Property 'GCP_PROJECT_ID' comes from an index signature, so it must be accessed with ['GCP_PROJECT_ID']."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+          "line": 39,
+          "column": 69,
+          "message": "Property 'GCP_LOCATION' comes from an index signature, so it must be accessed with ['GCP_LOCATION']."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+          "line": 50,
+          "column": 81,
+          "message": "Property 'RAG_DATASTORE_ID' comes from an index signature, so it must be accessed with ['RAG_DATASTORE_ID']."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts",
+          "line": 51,
+          "column": 87,
+          "message": "Property 'RAG_SEARCH_ENGINE_ID' comes from an index signature, so it must be accessed with ['RAG_SEARCH_ENGINE_ID']."
+        }
+      ]
+    },
+    "4114": {
+      "count": 2,
+      "message": "This member must have an 'override' modifier because it overrides a member in the base class 'LlmAgent'.",
+      "examples": [
+        {
+          "file": "libs/adk/src/agents/root-agent.ts",
+          "line": 39,
+          "column": 19,
+          "message": "This member must have an 'override' modifier because it overrides a member in the base class 'LlmAgent'."
+        },
+        {
+          "file": "libs/adk/src/agents/root-agent.ts",
+          "line": 40,
+          "column": 19,
+          "message": "This member must have an 'override' modifier because it overrides a member in the base class 'LlmAgent'."
+        }
+      ]
+    },
+    "5076": {
+      "count": 3,
+      "message": "'&&' and '??' operations cannot be mixed without parentheses.",
+      "examples": [
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/config/environment-config.ts",
+          "line": 57,
+          "column": 38,
+          "message": "'&&' and '??' operations cannot be mixed without parentheses."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/config/environment-config.ts",
+          "line": 144,
+          "column": 38,
+          "message": "'&&' and '??' operations cannot be mixed without parentheses."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/config/environment-config.ts",
+          "line": 145,
+          "column": 46,
+          "message": "'&&' and '??' operations cannot be mixed without parentheses."
+        }
+      ]
+    },
+    "6133": {
+      "count": 38,
+      "message": "'GenModel' is declared but its value is never read.",
+      "examples": [
+        {
+          "file": "libs/adk/src/services/vertex.ts",
+          "line": 13,
+          "column": 1,
+          "message": "'GenModel' is declared but its value is never read."
+        },
+        {
+          "file": "libs/adk/src/services/vertex.ts",
+          "line": 19,
+          "column": 1,
+          "message": "'Buffer' is declared but its value is never read."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/bigquery.client.ts",
+          "line": 109,
+          "column": 12,
+          "message": "'apiResponse' is declared but its value is never read."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/clients/bigquery.client.ts",
+          "line": 146,
+          "column": 12,
+          "message": "'table' is declared but its value is never read."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/mcp.service.ts",
+          "line": 279,
+          "column": 15,
+          "message": "'config' is declared but its value is never read."
+        }
+      ]
+    },
+    "6142": {
+      "count": 1,
+      "message": "Module './lib/ui-components' was resolved to '/home/g_nelson/signals-1/libs/ui/components/src/lib/ui-components.tsx', but '--jsx' is not set.",
+      "examples": [
+        {
+          "file": "libs/ui/components/src/index.ts",
+          "line": 12,
+          "column": 15,
+          "message": "Module './lib/ui-components' was resolved to '/home/g_nelson/signals-1/libs/ui/components/src/lib/ui-components.tsx', but '--jsx' is not set."
+        }
+      ]
+    },
+    "6192": {
+      "count": 2,
+      "message": "All imports in import declaration are unused.",
+      "examples": [
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/gemini-orchestrator.ts",
+          "line": 13,
+          "column": 1,
+          "message": "All imports in import declaration are unused."
+        },
+        {
+          "file": "libs/utils/monitoring/src/lib/otel-config.ts",
+          "line": 20,
+          "column": 1,
+          "message": "All imports in import declaration are unused."
+        }
+      ]
+    },
+    "6307": {
+      "count": 2,
+      "message": "File '/home/g_nelson/signals-1/apps/looker-dashboards/src/lib/dashboard-templates.ts' is not listed within the file list of project '/home/g_nelson/signals-1/tsconfig.json'. Projects must list all files or use an 'include' pattern.",
+      "examples": [
+        {
+          "file": "scripts/demo-opentelemetry.ts",
+          "line": 21,
+          "column": 43,
+          "message": "File '/home/g_nelson/signals-1/apps/looker-dashboards/src/lib/dashboard-templates.ts' is not listed within the file list of project '/home/g_nelson/signals-1/tsconfig.json'. Projects must list all files or use an 'include' pattern."
+        },
+        {
+          "file": "scripts/demo-opentelemetry.ts",
+          "line": 22,
+          "column": 41,
+          "message": "File '/home/g_nelson/signals-1/apps/looker-dashboards/src/lib/monitoring-queries.ts' is not listed within the file list of project '/home/g_nelson/signals-1/tsconfig.json'. Projects must list all files or use an 'include' pattern."
+        }
+      ]
+    },
+    "7006": {
+      "count": 36,
+      "message": "Parameter 'table' implicitly has an 'any' type.",
+      "examples": [
+        {
+          "file": "libs/agents/bq-agent/src/lib/bq-agent.ts",
+          "line": 172,
+          "column": 40,
+          "message": "Parameter 'table' implicitly has an 'any' type."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/config/environment-config.ts",
+          "line": 266,
+          "column": 30,
+          "message": "Parameter 'server' implicitly has an 'any' type."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/config/environment-config.ts",
+          "line": 266,
+          "column": 38,
+          "message": "Parameter 'index' implicitly has an 'any' type."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/config/environment-config.ts",
+          "line": 305,
+          "column": 14,
+          "message": "Parameter 'server' implicitly has an 'any' type."
+        },
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/config/environment-config.ts",
+          "line": 306,
+          "column": 12,
+          "message": "Parameter 'a' implicitly has an 'any' type."
+        }
+      ]
+    },
+    "7015": {
+      "count": 1,
+      "message": "Element implicitly has an 'any' type because index expression is not of type 'number'.",
+      "examples": [
+        {
+          "file": "libs/adk/src/utilities/configuration.ts",
+          "line": 280,
+          "column": 30,
+          "message": "Element implicitly has an 'any' type because index expression is not of type 'number'."
+        }
+      ]
+    },
+    "7022": {
+      "count": 2,
+      "message": "'signal' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.",
+      "examples": [
+        {
+          "file": "libs/utils/signals/src/nx-integration.ts",
+          "line": 29,
+          "column": 9,
+          "message": "'signal' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer."
+        },
+        {
+          "file": "libs/utils/signals/src/nx-integration.ts",
+          "line": 55,
+          "column": 9,
+          "message": "'signal' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer."
+        }
+      ]
+    },
+    "7027": {
+      "count": 1,
+      "message": "Unreachable code detected.",
+      "examples": [
+        {
+          "file": "libs/agents/reviews-agent/src/lib/reviews-agent.ts",
+          "line": 193,
+          "column": 5,
+          "message": "Unreachable code detected."
+        }
+      ]
+    },
+    "7031": {
+      "count": 2,
+      "message": "Binding element 'name' implicitly has an 'any' type.",
+      "examples": [
+        {
+          "file": "libs/security/src/secret-manager.ts",
+          "line": 75,
+          "column": 46,
+          "message": "Binding element 'name' implicitly has an 'any' type."
+        },
+        {
+          "file": "libs/security/src/secret-manager.ts",
+          "line": 75,
+          "column": 52,
+          "message": "Binding element 'value' implicitly has an 'any' type."
+        }
+      ]
+    },
+    "7053": {
+      "count": 1,
+      "message": "Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Console'.",
+      "examples": [
+        {
+          "file": "libs/utils/monitoring/src/lib/error-handler.ts",
+          "line": 114,
+          "column": 3,
+          "message": "Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Console'."
+        }
+      ]
+    },
+    "18004": {
+      "count": 1,
+      "message": "No value exists in scope for the shorthand property 'mcpServers'. Either declare one or provide an initializer.",
+      "examples": [
+        {
+          "file": "libs/agents/gemini-orchestrator/src/lib/config/config.service.ts",
+          "line": 306,
+          "column": 7,
+          "message": "No value exists in scope for the shorthand property 'mcpServers'. Either declare one or provide an initializer."
+        }
+      ]
+    },
+    "18046": {
+      "count": 3,
+      "message": "'error' is of type 'unknown'.",
+      "examples": [
+        {
+          "file": "libs/utils/api-clients/src/lib/mcp-client.service.ts",
+          "line": 377,
+          "column": 40,
+          "message": "'error' is of type 'unknown'."
+        },
+        {
+          "file": "libs/utils/api-clients/src/lib/mcp-client.service.ts",
+          "line": 378,
+          "column": 39,
+          "message": "'error' is of type 'unknown'."
+        },
+        {
+          "file": "libs/utils/api-clients/src/lib/mcp-client.service.ts",
+          "line": 378,
+          "column": 65,
+          "message": "'error' is of type 'unknown'."
+        }
+      ]
+    },
+    "18047": {
+      "count": 2,
+      "message": "'process.stdout' is possibly 'null'.",
+      "examples": [
+        {
+          "file": "libs/utils/api-clients/src/lib/mcp-client.service.ts",
+          "line": 441,
+          "column": 7,
+          "message": "'process.stdout' is possibly 'null'."
+        },
+        {
+          "file": "libs/utils/api-clients/src/lib/mcp-client.service.ts",
+          "line": 444,
+          "column": 7,
+          "message": "'process.stdin' is possibly 'null'."
+        }
+      ]
+    },
+    "18048": {
+      "count": 36,
+      "message": "'parts' is possibly 'undefined'.",
+      "examples": [
+        {
+          "file": "libs/adk/src/utilities/configuration.ts",
+          "line": 123,
+          "column": 24,
+          "message": "'parts' is possibly 'undefined'."
+        },
+        {
+          "file": "libs/adk/src/utilities/configuration.ts",
+          "line": 141,
+          "column": 25,
+          "message": "'parts' is possibly 'undefined'."
+        },
+        {
+          "file": "libs/adk/src/utilities/configuration.ts",
+          "line": 141,
+          "column": 34,
+          "message": "'parts' is possibly 'undefined'."
+        },
+        {
+          "file": "libs/adk/src/utilities/configuration.ts",
+          "line": 142,
+          "column": 20,
+          "message": "'parts' is possibly 'undefined'."
+        },
+        {
+          "file": "libs/adk/src/utilities/configuration.ts",
+          "line": 143,
+          "column": 13,
+          "message": "'part' is possibly 'undefined'."
+        }
+      ]
+    },
+    "STRICT_NULL_CHECKS": {
+      "count": 0,
+      "errors": []
+    },
+    "TYPE_DECLARATION": {
+      "count": 0,
+      "errors": []
+    },
+    "MODULE_SYSTEM": {
+      "count": 0,
+      "errors": []
+    },
+    "PROPERTY_ACCESS": {
+      "count": 0,
+      "errors": []
+    },
+    "TYPE_COMPATIBILITY": {
+      "count": 0,
+      "errors": []
+    },
+    "MISCELLANEOUS": {
+      "count": 0,
+      "errors": []
+    }
+  },
+  "errorsByFile": {
+    "apps/looker-dashboards/src/lib/dashboard-templates.ts": [
+      {
+        "code": "2769",
+        "line": 385,
+        "column": 33,
+        "message": "No overload matches this call."
+      },
+      {
+        "code": "2769",
+        "line": 386,
+        "column": 39,
+        "message": "No overload matches this call."
+      },
+      {
+        "code": "2769",
+        "line": 387,
+        "column": 41,
+        "message": "No overload matches this call."
+      },
+      {
+        "code": "2769",
+        "line": 388,
+        "column": 39,
+        "message": "No overload matches this call."
+      }
+    ],
+    "libs/adk/src/agents/base-agent.ts": [
+      {
+        "code": "2416",
+        "line": 39,
+        "column": 28,
+        "message": "Property 'name' in type 'DulceBaseAgent' is not assignable to the same property in base type 'BaseAgent'."
+      },
+      {
+        "code": "2612",
+        "line": 39,
+        "column": 28,
+        "message": "Property 'name' will overwrite the base property in 'BaseAgent'. If this is intentional, add an initializer. Otherwise, add a 'declare' modifier or remove the redundant declaration."
+      },
+      {
+        "code": "2416",
+        "line": 40,
+        "column": 28,
+        "message": "Property 'description' in type 'DulceBaseAgent' is not assignable to the same property in base type 'BaseAgent'."
+      },
+      {
+        "code": "2612",
+        "line": 40,
+        "column": 28,
+        "message": "Property 'description' will overwrite the base property in 'BaseAgent'. If this is intentional, add an initializer. Otherwise, add a 'declare' modifier or remove the redundant declaration."
+      },
+      {
+        "code": "2322",
+        "line": 45,
+        "column": 7,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2322",
+        "line": 55,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2322",
+        "line": 62,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2322",
+        "line": 75,
+        "column": 7,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2375",
+        "line": 77,
+        "column": 7,
+        "message": "Type '{ role: string | undefined; parts: { text: string; }[]; }' is not assignable to type 'Content' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+      },
+      {
+        "code": "2416",
+        "line": 90,
+        "column": 28,
+        "message": "Property 'name' in type 'DulceLlmAgent' is not assignable to the same property in base type 'LlmAgent'."
+      },
+      {
+        "code": "2416",
+        "line": 91,
+        "column": 28,
+        "message": "Property 'description' in type 'DulceLlmAgent' is not assignable to the same property in base type 'LlmAgent'."
+      },
+      {
+        "code": "2322",
+        "line": 95,
+        "column": 7,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2322",
+        "line": 105,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2322",
+        "line": 109,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2416",
+        "line": 117,
+        "column": 28,
+        "message": "Property 'name' in type 'DulceSequentialAgent' is not assignable to the same property in base type 'SequentialAgent'."
+      },
+      {
+        "code": "2416",
+        "line": 118,
+        "column": 28,
+        "message": "Property 'description' in type 'DulceSequentialAgent' is not assignable to the same property in base type 'SequentialAgent'."
+      },
+      {
+        "code": "2322",
+        "line": 122,
+        "column": 7,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2322",
+        "line": 131,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2322",
+        "line": 135,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2416",
+        "line": 143,
+        "column": 28,
+        "message": "Property 'name' in type 'DulceParallelAgent' is not assignable to the same property in base type 'ParallelAgent'."
+      },
+      {
+        "code": "2416",
+        "line": 144,
+        "column": 28,
+        "message": "Property 'description' in type 'DulceParallelAgent' is not assignable to the same property in base type 'ParallelAgent'."
+      },
+      {
+        "code": "2322",
+        "line": 148,
+        "column": 7,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2322",
+        "line": 157,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2322",
+        "line": 161,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      }
+    ],
+    "libs/adk/src/agents/root-agent.ts": [
+      {
+        "code": "2416",
+        "line": 39,
+        "column": 19,
+        "message": "Property 'name' in type 'RootAgent' is not assignable to the same property in base type 'LlmAgent'."
+      },
+      {
+        "code": "4114",
+        "line": 39,
+        "column": 19,
+        "message": "This member must have an 'override' modifier because it overrides a member in the base class 'LlmAgent'."
+      },
+      {
+        "code": "2416",
+        "line": 40,
+        "column": 19,
+        "message": "Property 'description' in type 'RootAgent' is not assignable to the same property in base type 'LlmAgent'."
+      },
+      {
+        "code": "4114",
+        "line": 40,
+        "column": 19,
+        "message": "This member must have an 'override' modifier because it overrides a member in the base class 'LlmAgent'."
+      },
+      {
+        "code": "2322",
+        "line": 64,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2322",
+        "line": 71,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 78,
+        "column": 56,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2769",
+        "line": 85,
+        "column": 32,
+        "message": "No overload matches this call."
+      },
+      {
+        "code": "2345",
+        "line": 143,
+        "column": 96,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 151,
+        "column": 76,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2339",
+        "line": 190,
+        "column": 109,
+        "message": "Property 'error' does not exist on type 'never'."
+      },
+      {
+        "code": "2769",
+        "line": 198,
+        "column": 68,
+        "message": "No overload matches this call."
+      },
+      {
+        "code": "2551",
+        "line": 200,
+        "column": 35,
+        "message": "Property 'getDescription' does not exist on type 'LlmAgent'. Did you mean 'description'?"
+      }
+    ],
+    "libs/adk/src/services/vertex.ts": [
+      {
+        "code": "2307",
+        "line": 12,
+        "column": 26,
+        "message": "Cannot find module '@google-cloud/vertexai' or its corresponding type declarations."
+      },
+      {
+        "code": "6133",
+        "line": 13,
+        "column": 1,
+        "message": "'GenModel' is declared but its value is never read."
+      },
+      {
+        "code": "2305",
+        "line": 13,
+        "column": 10,
+        "message": "Module '\"@google/generative-ai\"' has no exported member 'GenModel'."
+      },
+      {
+        "code": "2307",
+        "line": 14,
+        "column": 76,
+        "message": "Cannot find module '../utilities/gemini' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 15,
+        "column": 31,
+        "message": "Cannot find module './vertex-indexer' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 16,
+        "column": 32,
+        "message": "Cannot find module './vertex-embedder' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 17,
+        "column": 33,
+        "message": "Cannot find module '../interfaces/embedding-config' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 18,
+        "column": 47,
+        "message": "Cannot find module '../interfaces/document-chunk' or its corresponding type declarations."
+      },
+      {
+        "code": "6133",
+        "line": 19,
+        "column": 1,
+        "message": "'Buffer' is declared but its value is never read."
+      },
+      {
+        "code": "2304",
+        "line": 228,
+        "column": 33,
+        "message": "Cannot find name 'dataStoreId'."
+      }
+    ],
+    "libs/adk/src/tools/gcp-tools.ts": [
+      {
+        "code": "2339",
+        "line": 19,
+        "column": 11,
+        "message": "Property 'sql' does not exist on type 'Record<string, unknown> | undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 19,
+        "column": 16,
+        "message": "Property 'params' does not exist on type 'Record<string, unknown> | undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 40,
+        "column": 11,
+        "message": "Property 'table' does not exist on type 'Record<string, unknown> | undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 40,
+        "column": 18,
+        "message": "Property 'rows' does not exist on type 'Record<string, unknown> | undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 61,
+        "column": 11,
+        "message": "Property 'bucket' does not exist on type 'Record<string, unknown> | undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 61,
+        "column": 19,
+        "message": "Property 'filename' does not exist on type 'Record<string, unknown> | undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 61,
+        "column": 29,
+        "message": "Property 'content' does not exist on type 'Record<string, unknown> | undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 61,
+        "column": 38,
+        "message": "Property 'contentType' does not exist on type 'Record<string, unknown> | undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 87,
+        "column": 11,
+        "message": "Property 'url' does not exist on type 'Record<string, unknown> | undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 87,
+        "column": 16,
+        "message": "Property 'method' does not exist on type 'Record<string, unknown> | undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 87,
+        "column": 24,
+        "message": "Property 'headers' does not exist on type 'Record<string, unknown> | undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 87,
+        "column": 33,
+        "message": "Property 'body' does not exist on type 'Record<string, unknown> | undefined'."
+      },
+      {
+        "code": "2353",
+        "line": 132,
+        "column": 5,
+        "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+      },
+      {
+        "code": "2353",
+        "line": 154,
+        "column": 5,
+        "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+      },
+      {
+        "code": "2353",
+        "line": 179,
+        "column": 5,
+        "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+      },
+      {
+        "code": "2353",
+        "line": 211,
+        "column": 5,
+        "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+      },
+      {
+        "code": "2353",
+        "line": 267,
+        "column": 7,
+        "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+      },
+      {
+        "code": "2353",
+        "line": 294,
+        "column": 7,
+        "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+      },
+      {
+        "code": "2353",
+        "line": 324,
+        "column": 7,
+        "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+      },
+      {
+        "code": "2353",
+        "line": 361,
+        "column": 7,
+        "message": "Object literal may only specify known properties, and 'name' does not exist in type '(args: Record<string, unknown>, toolContext?: ToolContext | undefined) => unknown'."
+      }
+    ],
+    "libs/adk/src/utilities/configuration.ts": [
+      {
+        "code": "18048",
+        "line": 123,
+        "column": 24,
+        "message": "'parts' is possibly 'undefined'."
+      },
+      {
+        "code": "2365",
+        "line": 141,
+        "column": 21,
+        "message": "Operator '<' cannot be applied to types 'number' and 'string | string[]'."
+      },
+      {
+        "code": "18048",
+        "line": 141,
+        "column": 25,
+        "message": "'parts' is possibly 'undefined'."
+      },
+      {
+        "code": "18048",
+        "line": 141,
+        "column": 34,
+        "message": "'parts' is possibly 'undefined'."
+      },
+      {
+        "code": "18048",
+        "line": 142,
+        "column": 20,
+        "message": "'parts' is possibly 'undefined'."
+      },
+      {
+        "code": "18048",
+        "line": 143,
+        "column": 13,
+        "message": "'part' is possibly 'undefined'."
+      },
+      {
+        "code": "2538",
+        "line": 143,
+        "column": 48,
+        "message": "Type 'undefined' cannot be used as an index type."
+      },
+      {
+        "code": "2538",
+        "line": 144,
+        "column": 17,
+        "message": "Type 'undefined' cannot be used as an index type."
+      },
+      {
+        "code": "2538",
+        "line": 146,
+        "column": 25,
+        "message": "Type 'undefined' cannot be used as an index type."
+      },
+      {
+        "code": "18048",
+        "line": 149,
+        "column": 22,
+        "message": "'parts' is possibly 'undefined'."
+      },
+      {
+        "code": "2538",
+        "line": 149,
+        "column": 28,
+        "message": "Type 'undefined' cannot be used as an index type."
+      },
+      {
+        "code": "2322",
+        "line": 157,
+        "column": 5,
+        "message": "Type '{ [key: string]: any; serviceName?: string | undefined; environment?: string | undefined; version?: string | undefined; gcp?: { projectId: string | undefined; location: string | undefined; serviceAccount?: string | undefined; credentials?: any | undefined; }; agent?: { maxConcurrentTasks: number | undefined; maxRetr...' is not assignable to type 'ADKConfig'."
+      },
+      {
+        "code": "2339",
+        "line": 183,
+        "column": 49,
+        "message": "Property 'includes' does not exist on type 'never'."
+      },
+      {
+        "code": "2339",
+        "line": 185,
+        "column": 125,
+        "message": "Property 'join' does not exist on type 'never'."
+      },
+      {
+        "code": "2339",
+        "line": 202,
+        "column": 27,
+        "message": "Property 'isArray' does not exist on type 'never'."
+      },
+      {
+        "code": "2365",
+        "line": 272,
+        "column": 23,
+        "message": "Operator '<' cannot be applied to types 'number' and 'string | string[]'."
+      },
+      {
+        "code": "18048",
+        "line": 274,
+        "column": 15,
+        "message": "'part' is possibly 'undefined'."
+      },
+      {
+        "code": "2538",
+        "line": 275,
+        "column": 19,
+        "message": "Type 'undefined' cannot be used as an index type."
+      },
+      {
+        "code": "2538",
+        "line": 277,
+        "column": 27,
+        "message": "Type 'undefined' cannot be used as an index type."
+      },
+      {
+        "code": "7015",
+        "line": 280,
+        "column": 30,
+        "message": "Element implicitly has an 'any' type because index expression is not of type 'number'."
+      }
+    ],
+    "libs/adk/src/utilities/logging.ts": [
+      {
+        "code": "2307",
+        "line": 18,
+        "column": 28,
+        "message": "Cannot find module '@angular/core' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 19,
+        "column": 26,
+        "message": "Cannot find module '../types/log-level' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 20,
+        "column": 26,
+        "message": "Cannot find module '../types/log-entry' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 21,
+        "column": 32,
+        "message": "Cannot find module '../types/log-destination' or its corresponding type declarations."
+      }
+    ],
+    "libs/adk/src/utilities/performance.ts": [
+      {
+        "code": "2345",
+        "line": 75,
+        "column": 42,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2339",
+        "line": 78,
+        "column": 44,
+        "message": "Property 'MONITORING' does not exist on type 'typeof ADKErrorType'."
+      },
+      {
+        "code": "2345",
+        "line": 82,
+        "column": 38,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 96,
+        "column": 53,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2339",
+        "line": 100,
+        "column": 44,
+        "message": "Property 'MONITORING' does not exist on type 'typeof ADKErrorType'."
+      },
+      {
+        "code": "2345",
+        "line": 116,
+        "column": 42,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2339",
+        "line": 119,
+        "column": 44,
+        "message": "Property 'MONITORING' does not exist on type 'typeof ADKErrorType'."
+      },
+      {
+        "code": "2345",
+        "line": 123,
+        "column": 38,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 137,
+        "column": 53,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2339",
+        "line": 141,
+        "column": 44,
+        "message": "Property 'MONITORING' does not exist on type 'typeof ADKErrorType'."
+      },
+      {
+        "code": "2345",
+        "line": 162,
+        "column": 42,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2339",
+        "line": 165,
+        "column": 44,
+        "message": "Property 'MONITORING' does not exist on type 'typeof ADKErrorType'."
+      },
+      {
+        "code": "2345",
+        "line": 169,
+        "column": 38,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 184,
+        "column": 53,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2339",
+        "line": 188,
+        "column": 44,
+        "message": "Property 'MONITORING' does not exist on type 'typeof ADKErrorType'."
+      },
+      {
+        "code": "2339",
+        "line": 235,
+        "column": 44,
+        "message": "Property 'MONITORING' does not exist on type 'typeof ADKErrorType'."
+      },
+      {
+        "code": "2339",
+        "line": 259,
+        "column": 44,
+        "message": "Property 'MONITORING' does not exist on type 'typeof ADKErrorType'."
+      },
+      {
+        "code": "2339",
+        "line": 279,
+        "column": 44,
+        "message": "Property 'MONITORING' does not exist on type 'typeof ADKErrorType'."
+      },
+      {
+        "code": "18048",
+        "line": 285,
+        "column": 33,
+        "message": "'span.endTime' is possibly 'undefined'."
+      },
+      {
+        "code": "18048",
+        "line": 285,
+        "column": 48,
+        "message": "'span.startTime' is possibly 'undefined'."
+      },
+      {
+        "code": "2322",
+        "line": 296,
+        "column": 9,
+        "message": "Type 'string | undefined' is not assignable to type 'string | number | boolean'."
+      }
+    ],
+    "libs/adk/src/utilities/security.ts": [
+      {
+        "code": "2339",
+        "line": 50,
+        "column": 44,
+        "message": "Property 'SECURITY' does not exist on type 'typeof ADKErrorType'."
+      },
+      {
+        "code": "2339",
+        "line": 79,
+        "column": 44,
+        "message": "Property 'SECURITY' does not exist on type 'typeof ADKErrorType'."
+      },
+      {
+        "code": "2339",
+        "line": 92,
+        "column": 44,
+        "message": "Property 'SECURITY' does not exist on type 'typeof ADKErrorType'."
+      },
+      {
+        "code": "2339",
+        "line": 122,
+        "column": 44,
+        "message": "Property 'SECURITY' does not exist on type 'typeof ADKErrorType'."
+      },
+      {
+        "code": "2345",
+        "line": 132,
+        "column": 58,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'BinaryLike'."
+      },
+      {
+        "code": "2339",
+        "line": 156,
+        "column": 23,
+        "message": "Property 'allowHtml' does not exist on type 'never'."
+      },
+      {
+        "code": "18048",
+        "line": 157,
+        "column": 19,
+        "message": "'sanitized' is possibly 'undefined'."
+      },
+      {
+        "code": "2365",
+        "line": 171,
+        "column": 48,
+        "message": "Operator '>' cannot be applied to types 'number' and '{ allowHtml: boolean | undefined; maxLength?: number | undefined; stripNumbers: boolean | undefined; }'."
+      },
+      {
+        "code": "2322",
+        "line": 175,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2367",
+        "line": 190,
+        "column": 14,
+        "message": "This comparison appears to be unintentional because the types 'number' and 'string' have no overlap."
+      },
+      {
+        "code": "2769",
+        "line": 195,
+        "column": 29,
+        "message": "No overload matches this call."
+      },
+      {
+        "code": "2339",
+        "line": 224,
+        "column": 44,
+        "message": "Property 'SECURITY' does not exist on type 'typeof ADKErrorType'."
+      },
+      {
+        "code": "2532",
+        "line": 232,
+        "column": 27,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2363",
+        "line": 232,
+        "column": 44,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      }
+    ],
+    "libs/agents-sdk/src/lib/main-agent.ts": [
+      {
+        "code": "2488",
+        "line": 27,
+        "column": 13,
+        "message": "Type 'Promise<SimpleQueryRowsResponse> | undefined' must have a '[Symbol.iterator]()' method that returns an iterator."
+      },
+      {
+        "code": "2532",
+        "line": 27,
+        "column": 45,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2345",
+        "line": 69,
+        "column": 41,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 73,
+        "column": 26,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "18048",
+        "line": 84,
+        "column": 37,
+        "message": "'model' is possibly 'undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 98,
+        "column": 32,
+        "message": "Property 'response' does not exist on type 'Promise<GenerateContentResult>'."
+      },
+      {
+        "code": "2532",
+        "line": 102,
+        "column": 43,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2532",
+        "line": 129,
+        "column": 39,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2532",
+        "line": 163,
+        "column": 39,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2532",
+        "line": 190,
+        "column": 39,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2532",
+        "line": 221,
+        "column": 39,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2532",
+        "line": 264,
+        "column": 39,
+        "message": "Object is possibly 'undefined'."
+      }
+    ],
+    "libs/agents/bq-agent/src/lib/bq-agent.ts": [
+      {
+        "code": "2379",
+        "line": 43,
+        "column": 34,
+        "message": "Argument of type '{ projectId: string | undefined; location: string; }' is not assignable to parameter of type 'BigQueryOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+      },
+      {
+        "code": "2488",
+        "line": 61,
+        "column": 13,
+        "message": "Type '(Promise<JobResponse> & void) | undefined' must have a '[Symbol.iterator]()' method that returns an iterator."
+      },
+      {
+        "code": "2532",
+        "line": 61,
+        "column": 44,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2345",
+        "line": 61,
+        "column": 73,
+        "message": "Argument of type '{ query: string | undefined; location: string; params: any[]; useLegacySql: boolean; }' is not assignable to parameter of type 'string | Query'."
+      },
+      {
+        "code": "2488",
+        "line": 164,
+        "column": 13,
+        "message": "Type 'Promise<DatasetsResponse> | undefined' must have a '[Symbol.iterator]()' method that returns an iterator."
+      },
+      {
+        "code": "2532",
+        "line": 164,
+        "column": 49,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "7006",
+        "line": 172,
+        "column": 40,
+        "message": "Parameter 'table' implicitly has an 'any' type."
+      },
+      {
+        "code": "2345",
+        "line": 187,
+        "column": 62,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "18048",
+        "line": 188,
+        "column": 24,
+        "message": "'dataset' is possibly 'undefined'."
+      },
+      {
+        "code": "2769",
+        "line": 188,
+        "column": 44,
+        "message": "No overload matches this call."
+      }
+    ],
+    "libs/agents/content-agent/src/lib/content-agent.ts": [
+      {
+        "code": "2307",
+        "line": 20,
+        "column": 47,
+        "message": "Cannot find module '@nx-monorepo/data-models' or its corresponding type declarations."
+      },
+      {
+        "code": "2416",
+        "line": 26,
+        "column": 28,
+        "message": "Property 'name' in type 'ContentAgent' is not assignable to the same property in base type 'LlmAgent'."
+      },
+      {
+        "code": "2416",
+        "line": 27,
+        "column": 28,
+        "message": "Property 'description' in type 'ContentAgent' is not assignable to the same property in base type 'LlmAgent'."
+      },
+      {
+        "code": "2322",
+        "line": 63,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2322",
+        "line": 70,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      }
+    ],
+    "libs/agents/crm-agent/src/lib/crm-agent.ts": [
+      {
+        "code": "2307",
+        "line": 20,
+        "column": 30,
+        "message": "Cannot find module '@nx-monorepo/data-models' or its corresponding type declarations."
+      },
+      {
+        "code": "2416",
+        "line": 26,
+        "column": 28,
+        "message": "Property 'name' in type 'CrmAgent' is not assignable to the same property in base type 'LlmAgent'."
+      },
+      {
+        "code": "2416",
+        "line": 27,
+        "column": 28,
+        "message": "Property 'description' in type 'CrmAgent' is not assignable to the same property in base type 'LlmAgent'."
+      },
+      {
+        "code": "2322",
+        "line": 63,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2322",
+        "line": 70,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/index.ts": [
+      {
+        "code": "2307",
+        "line": 13,
+        "column": 15,
+        "message": "Cannot find module './lib/mcp && mcp.service' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 15,
+        "column": 15,
+        "message": "Cannot find module './lib/config/mcp-config?.schema' or its corresponding type declarations."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/lib/clients/bigquery.client.ts": [
+      {
+        "code": "2345",
+        "line": 55,
+        "column": 35,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "4111",
+        "line": 70,
+        "column": 30,
+        "message": "Property 'params' comes from an index signature, so it must be accessed with ['params']."
+      },
+      {
+        "code": "2488",
+        "line": 74,
+        "column": 11,
+        "message": "Type 'Promise<SimpleQueryRowsResponse>' must have a '[Symbol.iterator]()' method that returns an iterator."
+      },
+      {
+        "code": "2322",
+        "line": 77,
+        "column": 5,
+        "message": "Type '(Record<string, unknown> | undefined)[]' is not assignable to type 'Record<string, unknown> | undefined[]'."
+      },
+      {
+        "code": "2345",
+        "line": 102,
+        "column": 35,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 105,
+        "column": 50,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 106,
+        "column": 44,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2488",
+        "line": 109,
+        "column": 11,
+        "message": "Type 'Promise<InsertRowsResponse>' must have a '[Symbol.iterator]()' method that returns an iterator."
+      },
+      {
+        "code": "6133",
+        "line": 109,
+        "column": 12,
+        "message": "'apiResponse' is declared but its value is never read."
+      },
+      {
+        "code": "2322",
+        "line": 113,
+        "column": 7,
+        "message": "Type 'unknown' is not assignable to type 'number'."
+      },
+      {
+        "code": "2345",
+        "line": 140,
+        "column": 35,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 143,
+        "column": 50,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2488",
+        "line": 146,
+        "column": 11,
+        "message": "Type 'Promise<TableResponse> & void' must have a '[Symbol.iterator]()' method that returns an iterator."
+      },
+      {
+        "code": "6133",
+        "line": 146,
+        "column": 12,
+        "message": "'table' is declared but its value is never read."
+      },
+      {
+        "code": "2769",
+        "line": 146,
+        "column": 58,
+        "message": "No overload matches this call."
+      },
+      {
+        "code": "2769",
+        "line": 198,
+        "column": 57,
+        "message": "No overload matches this call."
+      },
+      {
+        "code": "2769",
+        "line": 233,
+        "column": 51,
+        "message": "No overload matches this call."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/lib/clients/default-rag.client.ts": [
+      {
+        "code": "2307",
+        "line": 12,
+        "column": 27,
+        "message": "Cannot find module './rag && rag.client' or its corresponding type declarations."
+      },
+      {
+        "code": "2724",
+        "line": 13,
+        "column": 10,
+        "message": "'\"@nx-monorepo/adk\"' has no exported member named 'VertexAIClient'. Did you mean 'VertexClient'?"
+      },
+      {
+        "code": "2305",
+        "line": 13,
+        "column": 26,
+        "message": "Module '\"@nx-monorepo/adk\"' has no exported member 'DocumentChunk'."
+      },
+      {
+        "code": "2305",
+        "line": 13,
+        "column": 41,
+        "message": "Module '\"@nx-monorepo/adk\"' has no exported member 'RAGSearchOptions'."
+      },
+      {
+        "code": "2305",
+        "line": 14,
+        "column": 10,
+        "message": "Module '\"../utils/error-handler\"' has no exported member 'errorHandler'."
+      },
+      {
+        "code": "4111",
+        "line": 38,
+        "column": 71,
+        "message": "Property 'GCP_PROJECT_ID' comes from an index signature, so it must be accessed with ['GCP_PROJECT_ID']."
+      },
+      {
+        "code": "4111",
+        "line": 39,
+        "column": 69,
+        "message": "Property 'GCP_LOCATION' comes from an index signature, so it must be accessed with ['GCP_LOCATION']."
+      },
+      {
+        "code": "4111",
+        "line": 50,
+        "column": 81,
+        "message": "Property 'RAG_DATASTORE_ID' comes from an index signature, so it must be accessed with ['RAG_DATASTORE_ID']."
+      },
+      {
+        "code": "4111",
+        "line": 51,
+        "column": 87,
+        "message": "Property 'RAG_SEARCH_ENGINE_ID' comes from an index signature, so it must be accessed with ['RAG_SEARCH_ENGINE_ID']."
+      },
+      {
+        "code": "2339",
+        "line": 75,
+        "column": 69,
+        "message": "Property 'message' does not exist on type '{}'."
+      },
+      {
+        "code": "2339",
+        "line": 106,
+        "column": 55,
+        "message": "Property 'message' does not exist on type '{}'."
+      },
+      {
+        "code": "2339",
+        "line": 147,
+        "column": 68,
+        "message": "Property 'message' does not exist on type '{}'."
+      },
+      {
+        "code": "2339",
+        "line": 173,
+        "column": 60,
+        "message": "Property 'message' does not exist on type '{}'."
+      },
+      {
+        "code": "2339",
+        "line": 194,
+        "column": 65,
+        "message": "Property 'message' does not exist on type '{}'."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/lib/clients/firebase.client.ts": [
+      {
+        "code": "2307",
+        "line": 12,
+        "column": 53,
+        "message": "Cannot find module 'firebase-admin/app' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 13,
+        "column": 111,
+        "message": "Cannot find module 'firebase-admin/firestore' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 15,
+        "column": 27,
+        "message": "Cannot find module '../config/config?.service' or its corresponding type declarations."
+      },
+      {
+        "code": "2345",
+        "line": 77,
+        "column": 35,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 108,
+        "column": 58,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2578",
+        "line": 116,
+        "column": 9,
+        "message": "Unused '@ts-expect-error' directive."
+      },
+      {
+        "code": "2345",
+        "line": 160,
+        "column": 58,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 188,
+        "column": 58,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 229,
+        "column": 58,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2339",
+        "line": 250,
+        "column": 42,
+        "message": "Property 'toDate' does not exist on type '{}'."
+      },
+      {
+        "code": "18048",
+        "line": 251,
+        "column": 9,
+        "message": "'acc' is possibly 'undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 251,
+        "column": 35,
+        "message": "Property 'toDate' does not exist on type '{}'."
+      },
+      {
+        "code": "18048",
+        "line": 253,
+        "column": 9,
+        "message": "'acc' is possibly 'undefined'."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/lib/clients/rag.client.ts": [
+      {
+        "code": "2724",
+        "line": 12,
+        "column": 10,
+        "message": "'\"@nx-monorepo/adk\"' has no exported member named 'VertexAIClient'. Did you mean 'VertexClient'?"
+      },
+      {
+        "code": "2305",
+        "line": 12,
+        "column": 26,
+        "message": "Module '\"@nx-monorepo/adk\"' has no exported member 'DocumentChunk'."
+      },
+      {
+        "code": "2305",
+        "line": 12,
+        "column": 41,
+        "message": "Module '\"@nx-monorepo/adk\"' has no exported member 'RAGSearchOptions'."
+      },
+      {
+        "code": "2305",
+        "line": 13,
+        "column": 10,
+        "message": "Module '\"../utils/error-handler\"' has no exported member 'errorHandler'."
+      },
+      {
+        "code": "2339",
+        "line": 118,
+        "column": 55,
+        "message": "Property 'message' does not exist on type '{}'."
+      },
+      {
+        "code": "2339",
+        "line": 157,
+        "column": 68,
+        "message": "Property 'message' does not exist on type '{}'."
+      },
+      {
+        "code": "2339",
+        "line": 180,
+        "column": 60,
+        "message": "Property 'message' does not exist on type '{}'."
+      },
+      {
+        "code": "2339",
+        "line": 197,
+        "column": 65,
+        "message": "Property 'message' does not exist on type '{}'."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/lib/config/config.service.ts": [
+      {
+        "code": "2305",
+        "line": 14,
+        "column": 10,
+        "message": "Module '\"@nx-monorepo/utils/monitoring\"' has no exported member 'ErrorCategory'."
+      },
+      {
+        "code": "2305",
+        "line": 14,
+        "column": 25,
+        "message": "Module '\"@nx-monorepo/utils/monitoring\"' has no exported member 'ErrorSeverity'."
+      },
+      {
+        "code": "2305",
+        "line": 14,
+        "column": 40,
+        "message": "Module '\"@nx-monorepo/utils/monitoring\"' has no exported member 'createError'."
+      },
+      {
+        "code": "2307",
+        "line": 15,
+        "column": 75,
+        "message": "Cannot find module './mcp-config?.schema' or its corresponding type declarations."
+      },
+      {
+        "code": "2339",
+        "line": 121,
+        "column": 29,
+        "message": "Property 'payload' does not exist on type 'never'."
+      },
+      {
+        "code": "2345",
+        "line": 128,
+        "column": 46,
+        "message": "Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2322",
+        "line": 130,
+        "column": 5,
+        "message": "Type 'string | null | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2538",
+        "line": 147,
+        "column": 29,
+        "message": "Type 'undefined' cannot be used as an index type."
+      },
+      {
+        "code": "2345",
+        "line": 190,
+        "column": 46,
+        "message": "Argument of type 'Promise<string>' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "18004",
+        "line": 306,
+        "column": 7,
+        "message": "No value exists in scope for the shorthand property 'mcpServers'. Either declare one or provide an initializer."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/lib/config/environment-config.ts": [
+      {
+        "code": "2307",
+        "line": 17,
+        "column": 75,
+        "message": "Cannot find module './mcp-config?.schema' or its corresponding type declarations."
+      },
+      {
+        "code": "5076",
+        "line": 57,
+        "column": 38,
+        "message": "'&&' and '??' operations cannot be mixed without parentheses."
+      },
+      {
+        "code": "5076",
+        "line": 144,
+        "column": 38,
+        "message": "'&&' and '??' operations cannot be mixed without parentheses."
+      },
+      {
+        "code": "5076",
+        "line": 145,
+        "column": 46,
+        "message": "'&&' and '??' operations cannot be mixed without parentheses."
+      },
+      {
+        "code": "2339",
+        "line": 256,
+        "column": 43,
+        "message": "Property 'isArray' does not exist on type 'never'."
+      },
+      {
+        "code": "7006",
+        "line": 266,
+        "column": 30,
+        "message": "Parameter 'server' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 266,
+        "column": 38,
+        "message": "Parameter 'index' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 305,
+        "column": 14,
+        "message": "Parameter 'server' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 306,
+        "column": 12,
+        "message": "Parameter 'a' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 306,
+        "column": 15,
+        "message": "Parameter 'b' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 307,
+        "column": 11,
+        "message": "Parameter 'server' implicitly has an 'any' type."
+      },
+      {
+        "code": "2345",
+        "line": 315,
+        "column": 52,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "7006",
+        "line": 324,
+        "column": 32,
+        "message": "Parameter 'server' implicitly has an 'any' type."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/lib/config/index.ts": [
+      {
+        "code": "2307",
+        "line": 18,
+        "column": 15,
+        "message": "Cannot find module './mcp-config?.schema' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 31,
+        "column": 8,
+        "message": "Cannot find module './server-config?.defaults' or its corresponding type declarations."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/lib/config/server-config.defaults.ts": [
+      {
+        "code": "2307",
+        "line": 17,
+        "column": 59,
+        "message": "Cannot find module './mcp-config?.schema' or its corresponding type declarations."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/lib/config/server-registry.ts": [
+      {
+        "code": "2307",
+        "line": 12,
+        "column": 33,
+        "message": "Cannot find module './mcp-config?.schema' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 13,
+        "column": 33,
+        "message": "Cannot find module './server-config?.defaults' or its corresponding type declarations."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/lib/gemini-orchestrator.ts": [
+      {
+        "code": "6192",
+        "line": 13,
+        "column": 1,
+        "message": "All imports in import declaration are unused."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/lib/mcp.service.ts": [
+      {
+        "code": "2307",
+        "line": 22,
+        "column": 8,
+        "message": "Cannot find module './clients/server-health && health.service' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 23,
+        "column": 31,
+        "message": "Cannot find module './clients/request-router && router.service' or its corresponding type declarations."
+      },
+      {
+        "code": "2724",
+        "line": 25,
+        "column": 10,
+        "message": "'\"./utils/error-handler\"' has no exported member named 'createServiceErrorHandler'. Did you mean 'createGeminiErrorHandler'?"
+      },
+      {
+        "code": "2322",
+        "line": 53,
+        "column": 5,
+        "message": "Type 'MCPService | undefined' is not assignable to type 'MCPService'."
+      },
+      {
+        "code": "2532",
+        "line": 68,
+        "column": 37,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2532",
+        "line": 109,
+        "column": 44,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "6133",
+        "line": 279,
+        "column": 15,
+        "message": "'config' is declared but its value is never read."
+      },
+      {
+        "code": "2339",
+        "line": 283,
+        "column": 44,
+        "message": "Property 'initialize' does not exist on type 'GeminiOrchestrator'."
+      },
+      {
+        "code": "2339",
+        "line": 286,
+        "column": 59,
+        "message": "Property 'orchestrate' does not exist on type 'GeminiOrchestrator'."
+      },
+      {
+        "code": "7006",
+        "line": 425,
+        "column": 24,
+        "message": "Parameter 'server' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 426,
+        "column": 14,
+        "message": "Parameter 'a' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 426,
+        "column": 17,
+        "message": "Parameter 'b' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 427,
+        "column": 13,
+        "message": "Parameter 'server' implicitly has an 'any' type."
+      },
+      {
+        "code": "2532",
+        "line": 457,
+        "column": 37,
+        "message": "Object is possibly 'undefined'."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/lib/schemas.ts": [
+      {
+        "code": "2554",
+        "line": 30,
+        "column": 13,
+        "message": "Expected 2-3 arguments, but got 1."
+      },
+      {
+        "code": "2554",
+        "line": 62,
+        "column": 14,
+        "message": "Expected 2-3 arguments, but got 1."
+      },
+      {
+        "code": "2769",
+        "line": 63,
+        "column": 86,
+        "message": "No overload matches this call."
+      },
+      {
+        "code": "2554",
+        "line": 72,
+        "column": 19,
+        "message": "Expected 2-3 arguments, but got 1."
+      },
+      {
+        "code": "2554",
+        "line": 82,
+        "column": 24,
+        "message": "Expected 2-3 arguments, but got 1."
+      },
+      {
+        "code": "2554",
+        "line": 93,
+        "column": 15,
+        "message": "Expected 2-3 arguments, but got 1."
+      },
+      {
+        "code": "2554",
+        "line": 123,
+        "column": 14,
+        "message": "Expected 2-3 arguments, but got 1."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/lib/test-file.ts": [
+      {
+        "code": "2322",
+        "line": 24,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/lib/tools.ts": [
+      {
+        "code": "2554",
+        "line": 25,
+        "column": 13,
+        "message": "Expected 2-3 arguments, but got 1."
+      },
+      {
+        "code": "2554",
+        "line": 34,
+        "column": 19,
+        "message": "Expected 2-3 arguments, but got 1."
+      },
+      {
+        "code": "2554",
+        "line": 83,
+        "column": 11,
+        "message": "Expected 2-3 arguments, but got 1."
+      },
+      {
+        "code": "2322",
+        "line": 129,
+        "column": 5,
+        "message": "Type '() => { name: string | undefined; description: string | undefined; parameters: { type: \"object\"; properties: any; required: any; }; }' is not assignable to type '() => FunctionDeclaration'."
+      },
+      {
+        "code": "2339",
+        "line": 131,
+        "column": 53,
+        "message": "Property 'innerType' does not exist on type 'ZodType<TInput, unknown, $ZodTypeInternals<TInput, unknown>>'."
+      },
+      {
+        "code": "2339",
+        "line": 131,
+        "column": 92,
+        "message": "Property 'innerType' does not exist on type 'ZodType<TInput, unknown, $ZodTypeInternals<TInput, unknown>>'."
+      },
+      {
+        "code": "2345",
+        "line": 172,
+        "column": 46,
+        "message": "Argument of type 'Record<string | number | symbol, unknown>[]' is not assignable to parameter of type 'Record<string, unknown> | undefined[]'."
+      },
+      {
+        "code": "2345",
+        "line": 230,
+        "column": 33,
+        "message": "Argument of type 'unknown' is not assignable to parameter of type '{ sql: string; params?: Record<string | number | symbol, unknown> | undefined; } & { table: string; rows: Record<string | number | symbol, unknown>[]; } & { path: string; contents: string; contentType?: string | undefined; }'."
+      }
+    ],
+    "libs/agents/gemini-orchestrator/src/lib/utils/error-handler.ts": [
+      {
+        "code": "2305",
+        "line": 13,
+        "column": 3,
+        "message": "Module '\"@nx-monorepo/utils/monitoring\"' has no exported member 'ErrorCategory'."
+      },
+      {
+        "code": "2305",
+        "line": 14,
+        "column": 3,
+        "message": "Module '\"@nx-monorepo/utils/monitoring\"' has no exported member 'ErrorSeverity'."
+      },
+      {
+        "code": "2305",
+        "line": 15,
+        "column": 3,
+        "message": "Module '\"@nx-monorepo/utils/monitoring\"' has no exported member 'StandardizedError'."
+      },
+      {
+        "code": "2305",
+        "line": 16,
+        "column": 3,
+        "message": "Module '\"@nx-monorepo/utils/monitoring\"' has no exported member 'createError'."
+      },
+      {
+        "code": "2305",
+        "line": 17,
+        "column": 3,
+        "message": "Module '\"@nx-monorepo/utils/monitoring\"' has no exported member 'categorizeError'."
+      },
+      {
+        "code": "18048",
+        "line": 53,
+        "column": 21,
+        "message": "'error' is possibly 'undefined'."
+      },
+      {
+        "code": "18048",
+        "line": 53,
+        "column": 38,
+        "message": "'error' is possibly 'undefined'."
+      },
+      {
+        "code": "2345",
+        "line": 111,
+        "column": 43,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      }
+    ],
+    "libs/agents/looker-agent/src/lib/looker-agent.ts": [
+      {
+        "code": "2339",
+        "line": 256,
+        "column": 43,
+        "message": "Property 'success' does not exist on type 'never'."
+      },
+      {
+        "code": "2339",
+        "line": 275,
+        "column": 37,
+        "message": "Property 'success' does not exist on type 'never'."
+      },
+      {
+        "code": "2322",
+        "line": 372,
+        "column": 5,
+        "message": "Type 'LookerResult<{ url: string; }>' is not assignable to type 'LookerResult<{ downloadUrl: string; }>'."
+      }
+    ],
+    "libs/agents/reviews-agent/src/lib/reviews-agent.ts": [
+      {
+        "code": "6133",
+        "line": 83,
+        "column": 11,
+        "message": "'_config' is declared but its value is never read."
+      },
+      {
+        "code": "2345",
+        "line": 105,
+        "column": 45,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2339",
+        "line": 132,
+        "column": 32,
+        "message": "Property 'response' does not exist on type 'Promise<GenerateContentResult>'."
+      },
+      {
+        "code": "2345",
+        "line": 150,
+        "column": 45,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2353",
+        "line": 186,
+        "column": 7,
+        "message": "Object literal may only specify known properties, and 'data' does not exist in type 'Promise<ReviewsResult<SentimentAnalysis>>'."
+      },
+      {
+        "code": "7027",
+        "line": 193,
+        "column": 5,
+        "message": "Unreachable code detected."
+      },
+      {
+        "code": "2353",
+        "line": 194,
+        "column": 7,
+        "message": "Object literal may only specify known properties, and 'success' does not exist in type 'Promise<ReviewsResult<SentimentAnalysis>>'."
+      },
+      {
+        "code": "2740",
+        "line": 249,
+        "column": 9,
+        "message": "Type 'Promise<{ review: Review; sentiment: SentimentAnalysis; }[]>' is missing the following properties from type '{ review: Review | undefined; sentiment: SentimentAnalysis; }[]': length, pop, push, concat, and 29 more."
+      },
+      {
+        "code": "2339",
+        "line": 265,
+        "column": 49,
+        "message": "Property 'success' does not exist on type 'never'."
+      },
+      {
+        "code": "2339",
+        "line": 265,
+        "column": 98,
+        "message": "Property 'data' does not exist on type 'never'."
+      },
+      {
+        "code": "2339",
+        "line": 268,
+        "column": 55,
+        "message": "Property 'error' does not exist on type 'never'."
+      },
+      {
+        "code": "2365",
+        "line": 273,
+        "column": 72,
+        "message": "Operator '+' cannot be applied to types 'number' and 'Review'."
+      },
+      {
+        "code": "2532",
+        "line": 286,
+        "column": 11,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2532",
+        "line": 287,
+        "column": 48,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "18048",
+        "line": 295,
+        "column": 45,
+        "message": "'data.count' is possibly 'undefined'."
+      },
+      {
+        "code": "2345",
+        "line": 297,
+        "column": 15,
+        "message": "Argument of type '(a: { topic: string; count: number | undefined; sentiment: number; }, b: { topic: string; count: number | undefined; sentiment: number; }) => number | undefined' is not assignable to parameter of type '(a: { topic: string; count: number | undefined; sentiment: number; }, b: { topic: string; count: number | undefined; sentiment: number; }) => number'."
+      },
+      {
+        "code": "18048",
+        "line": 297,
+        "column": 30,
+        "message": "'b.count' is possibly 'undefined'."
+      },
+      {
+        "code": "2363",
+        "line": 297,
+        "column": 40,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      },
+      {
+        "code": "18048",
+        "line": 301,
+        "column": 75,
+        "message": "'topic.count' is possibly 'undefined'."
+      },
+      {
+        "code": "2345",
+        "line": 304,
+        "column": 60,
+        "message": "Argument of type '{ topic: string; count: number | undefined; sentiment: number; }[]' is not assignable to parameter of type '{ topic: string | undefined; sentiment: number | undefined; count: number; }[]'."
+      },
+      {
+        "code": "18048",
+        "line": 342,
+        "column": 20,
+        "message": "'topic.sentiment' is possibly 'undefined'."
+      },
+      {
+        "code": "2363",
+        "line": 404,
+        "column": 73,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      },
+      {
+        "code": "2339",
+        "line": 432,
+        "column": 47,
+        "message": "Property 'success' does not exist on type 'never'."
+      },
+      {
+        "code": "2339",
+        "line": 435,
+        "column": 53,
+        "message": "Property 'error' does not exist on type 'never'."
+      },
+      {
+        "code": "2769",
+        "line": 485,
+        "column": 31,
+        "message": "No overload matches this call."
+      },
+      {
+        "code": "2363",
+        "line": 494,
+        "column": 69,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      },
+      {
+        "code": "2365",
+        "line": 514,
+        "column": 83,
+        "message": "Operator '+' cannot be applied to types 'number' and 'Review'."
+      },
+      {
+        "code": "2363",
+        "line": 514,
+        "column": 109,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      },
+      {
+        "code": "2339",
+        "line": 521,
+        "column": 14,
+        "message": "Property 'filter' does not exist on type 'Promise<ReviewsResult<SentimentAnalysis>[]>'."
+      },
+      {
+        "code": "7006",
+        "line": 521,
+        "column": 21,
+        "message": "Parameter 'r' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 522,
+        "column": 22,
+        "message": "Parameter 'sum' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 522,
+        "column": 27,
+        "message": "Parameter 'r' implicitly has an 'any' type."
+      },
+      {
+        "code": "2363",
+        "line": 522,
+        "column": 64,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      },
+      {
+        "code": "2339",
+        "line": 522,
+        "column": 101,
+        "message": "Property 'length' does not exist on type 'Promise<ReviewsResult<SentimentAnalysis>[]>'."
+      },
+      {
+        "code": "2339",
+        "line": 533,
+        "column": 24,
+        "message": "Property 'sort' does not exist on type 'Promise<{ period: string; averageRating: number; reviewCount: number; sentimentScore: any; }[]>'."
+      },
+      {
+        "code": "7006",
+        "line": 533,
+        "column": 30,
+        "message": "Parameter 'a' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 533,
+        "column": 33,
+        "message": "Parameter 'b' implicitly has an 'any' type."
+      },
+      {
+        "code": "2345",
+        "line": 535,
+        "column": 51,
+        "message": "Argument of type 'Promise<{ period: string; averageRating: number; reviewCount: number; sentimentScore: any; }[]>' is not assignable to parameter of type '{ period: string | undefined; averageRating: number | undefined; reviewCount: number | undefined; sentimentScore: number; }[]'."
+      },
+      {
+        "code": "2740",
+        "line": 540,
+        "column": 11,
+        "message": "Type 'Promise<{ period: string; averageRating: number; reviewCount: number; sentimentScore: any; }[]>' is missing the following properties from type '{ period: string | undefined; averageRating: number | undefined; reviewCount: number | undefined; sentimentScore: number | undefined; }[]': length, pop, push, concat, and 29 more."
+      },
+      {
+        "code": "18048",
+        "line": 570,
+        "column": 36,
+        "message": "'latest.averageRating' is possibly 'undefined'."
+      },
+      {
+        "code": "2363",
+        "line": 570,
+        "column": 59,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      },
+      {
+        "code": "2345",
+        "line": 571,
+        "column": 26,
+        "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
+      },
+      {
+        "code": "18048",
+        "line": 573,
+        "column": 9,
+        "message": "'ratingChange' is possibly 'undefined'."
+      },
+      {
+        "code": "2345",
+        "line": 575,
+        "column": 60,
+        "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
+      },
+      {
+        "code": "2532",
+        "line": 580,
+        "column": 26,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2532",
+        "line": 580,
+        "column": 27,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "18048",
+        "line": 580,
+        "column": 38,
+        "message": "'latest.reviewCount' is possibly 'undefined'."
+      },
+      {
+        "code": "2363",
+        "line": 580,
+        "column": 59,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      },
+      {
+        "code": "2363",
+        "line": 580,
+        "column": 95,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      },
+      {
+        "code": "2363",
+        "line": 590,
+        "column": 63,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      }
+    ],
+    "libs/agents/src/index.ts": [
+      {
+        "code": "2307",
+        "line": 12,
+        "column": 15,
+        "message": "Cannot find module '@nx-monorepo/bq-agent' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 13,
+        "column": 15,
+        "message": "Cannot find module '@nx-monorepo/content-agent' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 14,
+        "column": 15,
+        "message": "Cannot find module '@nx-monorepo/crm-agent' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 15,
+        "column": 15,
+        "message": "Cannot find module '@nx-monorepo/looker-agent' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 16,
+        "column": 15,
+        "message": "Cannot find module '@nx-monorepo/reviews-agent' or its corresponding type declarations."
+      }
+    ],
+    "libs/build-tools/vite.config.ts": [
+      {
+        "code": "2307",
+        "line": 16,
+        "column": 31,
+        "message": "Cannot find module '@nx/vite/plugins/nx-tsconfig-paths && paths.plugin' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 17,
+        "column": 36,
+        "message": "Cannot find module '@nx/vite/plugins/nx-copy-assets && assets.plugin' or its corresponding type declarations."
+      }
+    ],
+    "libs/env/src/index.ts": [
+      {
+        "code": "2307",
+        "line": 13,
+        "column": 86,
+        "message": "Cannot find module './load && load.js' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 14,
+        "column": 105,
+        "message": "Cannot find module './schema && schema.js' or its corresponding type declarations."
+      }
+    ],
+    "libs/env/src/load.ts": [
+      {
+        "code": "2307",
+        "line": 12,
+        "column": 90,
+        "message": "Cannot find module './schema && schema.js' or its corresponding type declarations."
+      }
+    ],
+    "libs/gcp/src/index.ts": [
+      {
+        "code": "6133",
+        "line": 17,
+        "column": 1,
+        "message": "'getProjectId' is declared but its value is never read."
+      },
+      {
+        "code": "6133",
+        "line": 39,
+        "column": 62,
+        "message": "'contents' is declared but its value is never read."
+      }
+    ],
+    "libs/mcp/jest.setup.ts": [
+      {
+        "code": "6133",
+        "line": 26,
+        "column": 11,
+        "message": "'command' is declared but its value is never read."
+      },
+      {
+        "code": "6133",
+        "line": 26,
+        "column": 40,
+        "message": "'args' is declared but its value is never read."
+      },
+      {
+        "code": "6133",
+        "line": 26,
+        "column": 56,
+        "message": "'opts' is declared but its value is never read."
+      }
+    ],
+    "libs/mcp/performance-benchmark.ts": [
+      {
+        "code": "2307",
+        "line": 19,
+        "column": 28,
+        "message": "Cannot find module './src/lib/mcp && mcp.service' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 20,
+        "column": 30,
+        "message": "Cannot find module './src/lib/services/cache && cache.service' or its corresponding type declarations."
+      },
+      {
+        "code": "6133",
+        "line": 33,
+        "column": 11,
+        "message": "'mcpService' is declared but its value is never read."
+      },
+      {
+        "code": "2345",
+        "line": 62,
+        "column": 23,
+        "message": "Argument of type 'Promise<BenchmarkResult[]>' is not assignable to parameter of type 'BenchmarkResult[]'."
+      },
+      {
+        "code": "2363",
+        "line": 129,
+        "column": 45,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      },
+      {
+        "code": "2363",
+        "line": 176,
+        "column": 41,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      },
+      {
+        "code": "2345",
+        "line": 180,
+        "column": 84,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 185,
+        "column": 76,
+        "message": "Argument of type 'string' is not assignable to parameter of type 'RequestMetrics'."
+      },
+      {
+        "code": "2363",
+        "line": 222,
+        "column": 35,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      },
+      {
+        "code": "2339",
+        "line": 231,
+        "column": 97,
+        "message": "Property 'networkOptimized' does not exist on type '{ totalRequests: number; averageResponseTime: number; successRate: number; status: \"error\" | \"healthy\" | \"degraded\"; recommendation: string; }'."
+      },
+      {
+        "code": "2345",
+        "line": 264,
+        "column": 52,
+        "message": "Argument of type 'string' is not assignable to parameter of type 'RequestMetrics'."
+      },
+      {
+        "code": "18048",
+        "line": 295,
+        "column": 20,
+        "message": "'result.name' is possibly 'undefined'."
+      },
+      {
+        "code": "18048",
+        "line": 296,
+        "column": 24,
+        "message": "'result.duration' is possibly 'undefined'."
+      },
+      {
+        "code": "18048",
+        "line": 297,
+        "column": 28,
+        "message": "'result.opsPerSecond' is possibly 'undefined'."
+      },
+      {
+        "code": "2365",
+        "line": 309,
+        "column": 60,
+        "message": "Operator '+' cannot be applied to types 'number' and 'BenchmarkResult'."
+      },
+      {
+        "code": "2365",
+        "line": 310,
+        "column": 65,
+        "message": "Operator '+' cannot be applied to types 'number' and 'BenchmarkResult'."
+      },
+      {
+        "code": "2363",
+        "line": 312,
+        "column": 82,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      }
+    ],
+    "libs/mcp/src/index.ts": [
+      {
+        "code": "2307",
+        "line": 22,
+        "column": 15,
+        "message": "Cannot find module './lib/clients/request-router && router.service' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 25,
+        "column": 15,
+        "message": "Cannot find module './lib/services/cache && cache.service' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 26,
+        "column": 15,
+        "message": "Cannot find module './lib/services/connection-pool && pool.service' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 30,
+        "column": 28,
+        "message": "Cannot find module './lib/mcp && mcp.service' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 37,
+        "column": 16,
+        "message": "Cannot find module './lib/mcp && mcp.service' or its corresponding type declarations."
+      }
+    ],
+    "libs/mcp/src/jest.setup.ts": [
+      {
+        "code": "6133",
+        "line": 26,
+        "column": 11,
+        "message": "'command' is declared but its value is never read."
+      },
+      {
+        "code": "6133",
+        "line": 26,
+        "column": 40,
+        "message": "'args' is declared but its value is never read."
+      },
+      {
+        "code": "6133",
+        "line": 26,
+        "column": 56,
+        "message": "'opts' is declared but its value is never read."
+      }
+    ],
+    "libs/mcp/src/lib/clients/mcp-client.service.ts": [
+      {
+        "code": "2307",
+        "line": 12,
+        "column": 28,
+        "message": "Cannot find module '@nestjs/common' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 13,
+        "column": 29,
+        "message": "Cannot find module '@nestjs/axios' or its corresponding type declarations."
+      },
+      {
+        "code": "6133",
+        "line": 14,
+        "column": 10,
+        "message": "'Observable' is declared but its value is never read."
+      },
+      {
+        "code": "2307",
+        "line": 14,
+        "column": 72,
+        "message": "Cannot find module 'rxjs' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 15,
+        "column": 43,
+        "message": "Cannot find module 'axios' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 16,
+        "column": 27,
+        "message": "Cannot find module '../interfaces/mcp-config.interface' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 17,
+        "column": 33,
+        "message": "Cannot find module '../interfaces/mcp-server-config.interface' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 18,
+        "column": 35,
+        "message": "Cannot find module '../interfaces/health-check-result.interface' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 19,
+        "column": 29,
+        "message": "Cannot find module '../interfaces/mcp-response.interface' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 20,
+        "column": 28,
+        "message": "Cannot find module '../interfaces/mcp-request.interface' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 21,
+        "column": 45,
+        "message": "Cannot find module '../services/mcp-invocation-logging.service' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 22,
+        "column": 26,
+        "message": "Cannot find module '../enums/log-level.enum' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 23,
+        "column": 28,
+        "message": "Cannot find module '../enums/error-codes.enum' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 24,
+        "column": 26,
+        "message": "Cannot find module '../errors/mcp.error' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 25,
+        "column": 47,
+        "message": "Cannot find module '../services/server-health-monitoring.service' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 26,
+        "column": 36,
+        "message": "Cannot find module '../interfaces/server-health-status.interface' or its corresponding type declarations."
+      },
+      {
+        "code": "6133",
+        "line": 69,
+        "column": 17,
+        "message": "'connectToServer' is declared but its value is never read."
+      },
+      {
+        "code": "6133",
+        "line": 157,
+        "column": 17,
+        "message": "'health' is declared but its value is never read."
+      },
+      {
+        "code": "7006",
+        "line": 235,
+        "column": 40,
+        "message": "Parameter 's' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 247,
+        "column": 42,
+        "message": "Parameter 'server' implicitly has an 'any' type."
+      }
+    ],
+    "libs/mcp/src/lib/clients/request-router.service.ts": [
+      {
+        "code": "2459",
+        "line": 17,
+        "column": 10,
+        "message": "Module '\"./mcp-client.service\"' declares 'MCPRequest' locally, but it is not exported."
+      },
+      {
+        "code": "2307",
+        "line": 19,
+        "column": 33,
+        "message": "Cannot find module '../config/mcp-config?.schema' or its corresponding type declarations."
+      },
+      {
+        "code": "2345",
+        "line": 218,
+        "column": 49,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 220,
+        "column": 37,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 232,
+        "column": 29,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2322",
+        "line": 234,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2339",
+        "line": 246,
+        "column": 47,
+        "message": "Property 'test' does not exist on type 'string | RegExp'."
+      },
+      {
+        "code": "2345",
+        "line": 249,
+        "column": 13,
+        "message": "Argument of type '(a: RoutingRule, b: RoutingRule) => number | undefined' is not assignable to parameter of type '(a: RoutingRule, b: RoutingRule) => number'."
+      },
+      {
+        "code": "18048",
+        "line": 249,
+        "column": 28,
+        "message": "'b.priority' is possibly 'undefined'."
+      },
+      {
+        "code": "2363",
+        "line": 249,
+        "column": 41,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      },
+      {
+        "code": "2339",
+        "line": 256,
+        "column": 23,
+        "message": "Property 'conditions' does not exist on type 'never'."
+      },
+      {
+        "code": "2339",
+        "line": 260,
+        "column": 13,
+        "message": "Property 'serverCategory' does not exist on type '{ serverCategory?: string | undefined; minPriority?: number | undefined; requiresAuth?: boolean | undefined; } | undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 260,
+        "column": 29,
+        "message": "Property 'minPriority' does not exist on type '{ serverCategory?: string | undefined; minPriority?: number | undefined; requiresAuth?: boolean | undefined; } | undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 260,
+        "column": 42,
+        "message": "Property 'requiresAuth' does not exist on type '{ serverCategory?: string | undefined; minPriority?: number | undefined; requiresAuth?: boolean | undefined; } | undefined'."
+      },
+      {
+        "code": "6133",
+        "line": 305,
+        "column": 36,
+        "message": "'rules' is declared but its value is never read."
+      },
+      {
+        "code": "2322",
+        "line": 329,
+        "column": 5,
+        "message": "Type 'RoutingRule | undefined' is not assignable to type 'RoutingRule'."
+      },
+      {
+        "code": "2345",
+        "line": 330,
+        "column": 44,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 331,
+        "column": 44,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2363",
+        "line": 347,
+        "column": 42,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      },
+      {
+        "code": "2322",
+        "line": 350,
+        "column": 5,
+        "message": "Type 'RoutingRule | undefined' is not assignable to type 'RoutingRule'."
+      },
+      {
+        "code": "2322",
+        "line": 357,
+        "column": 5,
+        "message": "Type 'RoutingRule | undefined' is not assignable to type 'RoutingRule'."
+      },
+      {
+        "code": "2345",
+        "line": 358,
+        "column": 76,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 359,
+        "column": 76,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2363",
+        "line": 368,
+        "column": 68,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      },
+      {
+        "code": "2322",
+        "line": 369,
+        "column": 5,
+        "message": "Type 'RoutingRule | undefined' is not assignable to type 'RoutingRule'."
+      },
+      {
+        "code": "2339",
+        "line": 391,
+        "column": 57,
+        "message": "Property 'getServerStatus' does not exist on type 'MCPClientService'."
+      },
+      {
+        "code": "2345",
+        "line": 407,
+        "column": 49,
+        "message": "Argument of type '(a: RoutingRule, b: RoutingRule) => number | undefined' is not assignable to parameter of type '(a: RoutingRule, b: RoutingRule) => number'."
+      },
+      {
+        "code": "18048",
+        "line": 407,
+        "column": 64,
+        "message": "'b.priority' is possibly 'undefined'."
+      },
+      {
+        "code": "2363",
+        "line": 407,
+        "column": 77,
+        "message": "The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type."
+      },
+      {
+        "code": "2367",
+        "line": 418,
+        "column": 32,
+        "message": "This comparison appears to be unintentional because the types 'string' and 'RegExp' have no overlap."
+      },
+      {
+        "code": "2322",
+        "line": 451,
+        "column": 5,
+        "message": "Type '(string | undefined)[]' is not assignable to type 'string[]'."
+      },
+      {
+        "code": "2345",
+        "line": 453,
+        "column": 51,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 455,
+        "column": 39,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 475,
+        "column": 55,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      }
+    ],
+    "libs/mcp/src/lib/clients/server-health.service.ts": [
+      {
+        "code": "6133",
+        "line": 30,
+        "column": 24,
+        "message": "'serverId' is declared but its value is never read."
+      },
+      {
+        "code": "6133",
+        "line": 37,
+        "column": 20,
+        "message": "'serverId' is declared but its value is never read."
+      }
+    ],
+    "libs/mcp/src/lib/config/environment-config.ts": [
+      {
+        "code": "2307",
+        "line": 12,
+        "column": 71,
+        "message": "Cannot find module './mcp-config?.schema' or its corresponding type declarations."
+      },
+      {
+        "code": "2779",
+        "line": 173,
+        "column": 7,
+        "message": "The left-hand side of an assignment expression may not be an optional property access."
+      },
+      {
+        "code": "2779",
+        "line": 174,
+        "column": 7,
+        "message": "The left-hand side of an assignment expression may not be an optional property access."
+      },
+      {
+        "code": "2779",
+        "line": 175,
+        "column": 7,
+        "message": "The left-hand side of an assignment expression may not be an optional property access."
+      },
+      {
+        "code": "2779",
+        "line": 179,
+        "column": 7,
+        "message": "The left-hand side of an assignment expression may not be an optional property access."
+      },
+      {
+        "code": "2779",
+        "line": 180,
+        "column": 7,
+        "message": "The left-hand side of an assignment expression may not be an optional property access."
+      },
+      {
+        "code": "2779",
+        "line": 181,
+        "column": 7,
+        "message": "The left-hand side of an assignment expression may not be an optional property access."
+      },
+      {
+        "code": "2779",
+        "line": 185,
+        "column": 7,
+        "message": "The left-hand side of an assignment expression may not be an optional property access."
+      },
+      {
+        "code": "2779",
+        "line": 186,
+        "column": 7,
+        "message": "The left-hand side of an assignment expression may not be an optional property access."
+      },
+      {
+        "code": "2779",
+        "line": 187,
+        "column": 7,
+        "message": "The left-hand side of an assignment expression may not be an optional property access."
+      },
+      {
+        "code": "2779",
+        "line": 188,
+        "column": 7,
+        "message": "The left-hand side of an assignment expression may not be an optional property access."
+      },
+      {
+        "code": "2779",
+        "line": 189,
+        "column": 7,
+        "message": "The left-hand side of an assignment expression may not be an optional property access."
+      },
+      {
+        "code": "2779",
+        "line": 190,
+        "column": 7,
+        "message": "The left-hand side of an assignment expression may not be an optional property access."
+      },
+      {
+        "code": "2779",
+        "line": 196,
+        "column": 5,
+        "message": "The left-hand side of an assignment expression may not be an optional property access."
+      },
+      {
+        "code": "2779",
+        "line": 200,
+        "column": 5,
+        "message": "The left-hand side of an assignment expression may not be an optional property access."
+      },
+      {
+        "code": "2779",
+        "line": 204,
+        "column": 5,
+        "message": "The left-hand side of an assignment expression may not be an optional property access."
+      },
+      {
+        "code": "7006",
+        "line": 235,
+        "column": 49,
+        "message": "Parameter 'server' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 241,
+        "column": 41,
+        "message": "Parameter 'server' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 242,
+        "column": 55,
+        "message": "Parameter 'id' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 242,
+        "column": 59,
+        "message": "Parameter 'index' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 248,
+        "column": 59,
+        "message": "Parameter 'server' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 265,
+        "column": 31,
+        "message": "Parameter 'server' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 273,
+        "column": 33,
+        "message": "Parameter 'server' implicitly has an 'any' type."
+      },
+      {
+        "code": "6133",
+        "line": 279,
+        "column": 66,
+        "message": "'updates' is declared but its value is never read."
+      }
+    ],
+    "libs/mcp/src/lib/mcp.service.ts": [
+      {
+        "code": "2459",
+        "line": 12,
+        "column": 28,
+        "message": "Module '\"./clients/mcp-client.service\"' declares 'MCPRequest' locally, but it is not exported."
+      },
+      {
+        "code": "2459",
+        "line": 12,
+        "column": 40,
+        "message": "Module '\"./clients/mcp-client.service\"' declares 'MCPResponse' locally, but it is not exported."
+      },
+      {
+        "code": "2307",
+        "line": 13,
+        "column": 75,
+        "message": "Cannot find module './clients/server-health && health.service' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 14,
+        "column": 31,
+        "message": "Cannot find module './clients/request-router && router.service' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 16,
+        "column": 33,
+        "message": "Cannot find module './config/mcp-config?.schema' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 17,
+        "column": 44,
+        "message": "Cannot find module './services/cache && cache.service' or its corresponding type declarations."
+      },
+      {
+        "code": "2724",
+        "line": 18,
+        "column": 37,
+        "message": "'\"./services/performance-metrics.service\"' has no exported member named 'performanceMetricsService'. Did you mean 'PerformanceMetricsService'?"
+      },
+      {
+        "code": "2554",
+        "line": 33,
+        "column": 26,
+        "message": "Expected 4 arguments, but got 0."
+      },
+      {
+        "code": "2322",
+        "line": 47,
+        "column": 5,
+        "message": "Type 'MCPService | undefined' is not assignable to type 'MCPService'."
+      },
+      {
+        "code": "2532",
+        "line": 61,
+        "column": 35,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 61,
+        "column": 54,
+        "message": "Property 'initialize' does not exist on type 'MCPClientService'."
+      },
+      {
+        "code": "2345",
+        "line": 88,
+        "column": 80,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 98,
+        "column": 76,
+        "message": "Argument of type 'string' is not assignable to parameter of type 'RequestMetrics'."
+      },
+      {
+        "code": "2532",
+        "line": 113,
+        "column": 52,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 113,
+        "column": 71,
+        "message": "Property 'sendRequest' does not exist on type 'MCPClientService'."
+      },
+      {
+        "code": "2345",
+        "line": 117,
+        "column": 73,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 122,
+        "column": 74,
+        "message": "Argument of type 'string' is not assignable to parameter of type 'RequestMetrics'."
+      },
+      {
+        "code": "2345",
+        "line": 131,
+        "column": 9,
+        "message": "Argument of type 'string' is not assignable to parameter of type 'RequestMetrics'."
+      },
+      {
+        "code": "2339",
+        "line": 373,
+        "column": 55,
+        "message": "Property 'getServerStatus' does not exist on type 'MCPClientService'."
+      },
+      {
+        "code": "2339",
+        "line": 375,
+        "column": 53,
+        "message": "Property 'getAllServerStatuses' does not exist on type 'MCPClientService'."
+      },
+      {
+        "code": "2532",
+        "line": 517,
+        "column": 35,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 517,
+        "column": 54,
+        "message": "Property 'disconnect' does not exist on type 'MCPClientService'."
+      },
+      {
+        "code": "18048",
+        "line": 591,
+        "column": 19,
+        "message": "'query' is possibly 'undefined'."
+      },
+      {
+        "code": "2322",
+        "line": 598,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      }
+    ],
+    "libs/mcp/src/lib/services/cache.service.ts": [
+      {
+        "code": "2307",
+        "line": 17,
+        "column": 28,
+        "message": "Cannot find module '@angular/core' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 18,
+        "column": 45,
+        "message": "Cannot find module 'rxjs' or its corresponding type declarations."
+      },
+      {
+        "code": "6133",
+        "line": 19,
+        "column": 1,
+        "message": "'map' is declared but its value is never read."
+      },
+      {
+        "code": "2307",
+        "line": 19,
+        "column": 21,
+        "message": "Cannot find module 'rxjs/operators' or its corresponding type declarations."
+      },
+      {
+        "code": "7006",
+        "line": 107,
+        "column": 42,
+        "message": "Parameter 'observer' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 290,
+        "column": 32,
+        "message": "Parameter 'observer' implicitly has an 'any' type."
+      }
+    ],
+    "libs/mcp/src/lib/services/connection-pool.service.ts": [
+      {
+        "code": "2307",
+        "line": 17,
+        "column": 28,
+        "message": "Cannot find module '@angular/core' or its corresponding type declarations."
+      },
+      {
+        "code": "18048",
+        "line": 121,
+        "column": 12,
+        "message": "'connection' is possibly 'undefined'."
+      },
+      {
+        "code": "2345",
+        "line": 123,
+        "column": 38,
+        "message": "Argument of type 'PooledConnection | undefined' is not assignable to parameter of type 'PooledConnection'."
+      },
+      {
+        "code": "18048",
+        "line": 131,
+        "column": 9,
+        "message": "'connection' is possibly 'undefined'."
+      },
+      {
+        "code": "18048",
+        "line": 132,
+        "column": 9,
+        "message": "'connection' is possibly 'undefined'."
+      },
+      {
+        "code": "18048",
+        "line": 133,
+        "column": 9,
+        "message": "'connection' is possibly 'undefined'."
+      },
+      {
+        "code": "18048",
+        "line": 135,
+        "column": 26,
+        "message": "'connection' is possibly 'undefined'."
+      },
+      {
+        "code": "18048",
+        "line": 135,
+        "column": 48,
+        "message": "'connection' is possibly 'undefined'."
+      },
+      {
+        "code": "2322",
+        "line": 139,
+        "column": 9,
+        "message": "Type 'PooledConnection | undefined' is not assignable to type 'PooledConnection'."
+      },
+      {
+        "code": "6133",
+        "line": 257,
+        "column": 22,
+        "message": "'conn' is declared but its value is never read."
+      },
+      {
+        "code": "2375",
+        "line": 323,
+        "column": 13,
+        "message": "Type '{ id: string; serverId: string | undefined; connection: unknown; createdAt: number; lastUsed: number; usageCount: number; busy: true; }' is not assignable to type 'PooledConnection' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+      },
+      {
+        "code": "6133",
+        "line": 342,
+        "column": 71,
+        "message": "'timeout' is declared but its value is never read."
+      },
+      {
+        "code": "2339",
+        "line": 351,
+        "column": 31,
+        "message": "Property 'url' does not exist on type 'MCPServerConfig'."
+      },
+      {
+        "code": "2345",
+        "line": 366,
+        "column": 47,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 369,
+        "column": 30,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "2345",
+        "line": 386,
+        "column": 30,
+        "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "18048",
+        "line": 494,
+        "column": 14,
+        "message": "'connection' is possibly 'undefined'."
+      },
+      {
+        "code": "2345",
+        "line": 494,
+        "column": 58,
+        "message": "Argument of type 'PooledConnection | undefined' is not assignable to parameter of type 'PooledConnection'."
+      }
+    ],
+    "libs/mcp/src/lib/services/performance-metrics.service.ts": [
+      {
+        "code": "2307",
+        "line": 17,
+        "column": 28,
+        "message": "Cannot find module '@angular/core' or its corresponding type declarations."
+      },
+      {
+        "code": "2375",
+        "line": 76,
+        "column": 11,
+        "message": "Type '{ id: string; url: string; method: string; startTime: number; endTime: number; duration: number; success: false; serverId: string | undefined; }' is not assignable to type 'RequestMetrics' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+      },
+      {
+        "code": "2412",
+        "line": 98,
+        "column": 5,
+        "message": "Type 'number | undefined' is not assignable to type 'number' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target."
+      }
+    ],
+    "libs/mcp/src/lib/utils/logging.ts": [
+      {
+        "code": "2307",
+        "line": 18,
+        "column": 28,
+        "message": "Cannot find module '@angular/core' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 19,
+        "column": 45,
+        "message": "Cannot find module 'rxjs' or its corresponding type declarations."
+      },
+      {
+        "code": "2375",
+        "line": 244,
+        "column": 11,
+        "message": "Type '{ timestamp: Date; level: LogLevel; category: string; message: string; data: unknown; error: Error | undefined; }' is not assignable to type 'LogEntry' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+      }
+    ],
+    "libs/security/src/index.ts": [
+      {
+        "code": "2339",
+        "line": 90,
+        "column": 59,
+        "message": "Property 'authentication' does not exist on type 'never'."
+      },
+      {
+        "code": "6133",
+        "line": 181,
+        "column": 3,
+        "message": "'request' is declared but its value is never read."
+      },
+      {
+        "code": "2339",
+        "line": 214,
+        "column": 19,
+        "message": "Property 'routeConfig' does not exist on type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'."
+      },
+      {
+        "code": "2339",
+        "line": 214,
+        "column": 42,
+        "message": "Property 'routeConfig' does not exist on type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'."
+      }
+    ],
+    "libs/security/src/secret-manager.ts": [
+      {
+        "code": "2307",
+        "line": 18,
+        "column": 30,
+        "message": "Cannot find module '@dulce/gcp' or its corresponding type declarations."
+      },
+      {
+        "code": "2322",
+        "line": 39,
+        "column": 7,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      },
+      {
+        "code": "2488",
+        "line": 44,
+        "column": 13,
+        "message": "Type 'Promise<[IAccessSecretVersionResponse, IAccessSecretVersionRequest | undefined, {} | undefined]> | undefined' must have a '[Symbol.iterator]()' method that returns an iterator."
+      },
+      {
+        "code": "2532",
+        "line": 44,
+        "column": 46,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2339",
+        "line": 75,
+        "column": 31,
+        "message": "Property 'reduce' does not exist on type 'Promise<{ name: string; value: string; }[]>'."
+      },
+      {
+        "code": "7006",
+        "line": 75,
+        "column": 39,
+        "message": "Parameter 'acc' implicitly has an 'any' type."
+      },
+      {
+        "code": "7031",
+        "line": 75,
+        "column": 46,
+        "message": "Binding element 'name' implicitly has an 'any' type."
+      },
+      {
+        "code": "7031",
+        "line": 75,
+        "column": 52,
+        "message": "Binding element 'value' implicitly has an 'any' type."
+      },
+      {
+        "code": "2532",
+        "line": 94,
+        "column": 28,
+        "message": "Object is possibly 'undefined'."
+      },
+      {
+        "code": "2538",
+        "line": 124,
+        "column": 32,
+        "message": "Type 'undefined' cannot be used as an index type."
+      },
+      {
+        "code": "2488",
+        "line": 149,
+        "column": 11,
+        "message": "Type 'Promise<[string, string, string, string, string]>' must have a '[Symbol.iterator]()' method that returns an iterator."
+      }
+    ],
+    "libs/ui/components/src/index.ts": [
+      {
+        "code": "6142",
+        "line": 12,
+        "column": 15,
+        "message": "Module './lib/ui-components' was resolved to '/home/g_nelson/signals-1/libs/ui/components/src/lib/ui-components.tsx', but '--jsx' is not set."
+      }
+    ],
+    "libs/utils/api-clients/src/lib/mcp-client.service.ts": [
+      {
+        "code": "2307",
+        "line": 15,
+        "column": 73,
+        "message": "Cannot find module 'axios' or its corresponding type declarations."
+      },
+      {
+        "code": "2345",
+        "line": 123,
+        "column": 50,
+        "message": "Argument of type 'this' is not assignable to parameter of type '{ servers: MCPServerConfig[]; } | undefined'."
+      },
+      {
+        "code": "2769",
+        "line": 219,
+        "column": 36,
+        "message": "No overload matches this call."
+      },
+      {
+        "code": "2339",
+        "line": 226,
+        "column": 22,
+        "message": "Property 'on' does not exist on type 'never'."
+      },
+      {
+        "code": "7006",
+        "line": 226,
+        "column": 35,
+        "message": "Parameter 'error' implicitly has an 'any' type."
+      },
+      {
+        "code": "2339",
+        "line": 232,
+        "column": 22,
+        "message": "Property 'on' does not exist on type 'never'."
+      },
+      {
+        "code": "2345",
+        "line": 317,
+        "column": 45,
+        "message": "Argument of type 'string | Promise<string>' is not assignable to parameter of type 'string'."
+      },
+      {
+        "code": "18046",
+        "line": 377,
+        "column": 40,
+        "message": "'error' is of type 'unknown'."
+      },
+      {
+        "code": "18046",
+        "line": 378,
+        "column": 39,
+        "message": "'error' is of type 'unknown'."
+      },
+      {
+        "code": "18046",
+        "line": 378,
+        "column": 65,
+        "message": "'error' is of type 'unknown'."
+      },
+      {
+        "code": "2352",
+        "line": 401,
+        "column": 21,
+        "message": "Conversion of type 'Process | undefined' to type 'ChildProcess' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first."
+      },
+      {
+        "code": "18047",
+        "line": 441,
+        "column": 7,
+        "message": "'process.stdout' is possibly 'null'."
+      },
+      {
+        "code": "18047",
+        "line": 444,
+        "column": 7,
+        "message": "'process.stdin' is possibly 'null'."
+      },
+      {
+        "code": "2352",
+        "line": 490,
+        "column": 25,
+        "message": "Conversion of type 'Process | undefined' to type 'ChildProcess' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first."
+      }
+    ],
+    "libs/utils/api-clients/src/lib/request-router.service.ts": [
+      {
+        "code": "2305",
+        "line": 18,
+        "column": 10,
+        "message": "Module '\"./mcp-client.service\"' has no exported member 'MCPRequest'."
+      },
+      {
+        "code": "2305",
+        "line": 19,
+        "column": 28,
+        "message": "Module '\"../../../../agents/gemini-orchestrator/src/lib/config\"' has no exported member 'MCPServerConfig'."
+      },
+      {
+        "code": "6133",
+        "line": 29,
+        "column": 11,
+        "message": "'mcpClient' is declared but its value is never read."
+      },
+      {
+        "code": "6133",
+        "line": 66,
+        "column": 11,
+        "message": "'getServerConfig' is declared but its value is never read."
+      },
+      {
+        "code": "2322",
+        "line": 82,
+        "column": 16,
+        "message": "Type 'string | undefined' is not assignable to type 'string'."
+      }
+    ],
+    "libs/utils/api-clients/src/lib/server-health.service.ts": [
+      {
+        "code": "2307",
+        "line": 15,
+        "column": 33,
+        "message": "Cannot find module './interfaces' or its corresponding type declarations."
+      }
+    ],
+    "libs/utils/common-types/src/index.ts": [
+      {
+        "code": "2538",
+        "line": 40,
+        "column": 29,
+        "message": "Type 'undefined' cannot be used as an index type."
+      }
+    ],
+    "libs/utils/gcp-auth/src/index.ts": [
+      {
+        "code": "2307",
+        "line": 20,
+        "column": 27,
+        "message": "Cannot find module '@google-cloud/firestore' or its corresponding type declarations."
+      },
+      {
+        "code": "2379",
+        "line": 71,
+        "column": 31,
+        "message": "Argument of type '{ projectId: string | undefined; }' is not assignable to parameter of type 'BigQueryOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+      },
+      {
+        "code": "2379",
+        "line": 87,
+        "column": 30,
+        "message": "Argument of type '{ projectId: string | undefined; }' is not assignable to parameter of type 'StorageOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+      },
+      {
+        "code": "2379",
+        "line": 103,
+        "column": 29,
+        "message": "Argument of type '{ projectId: string | undefined; }' is not assignable to parameter of type 'ClientConfig' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+      }
+    ],
+    "libs/utils/monitoring/src/lib/bigquery-logger.ts": [
+      {
+        "code": "2379",
+        "line": 57,
+        "column": 34,
+        "message": "Argument of type '{ projectId: string | undefined; }' is not assignable to parameter of type 'BigQueryOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+      },
+      {
+        "code": "2741",
+        "line": 91,
+        "column": 7,
+        "message": "Property 'message' is missing in type '{ serviceContext: { service?: string; version?: string; } | undefined; timestamp: string; severity: string; }' but required in type 'LogEntry'."
+      }
+    ],
+    "libs/utils/monitoring/src/lib/cloud-trace-exporter.ts": [
+      {
+        "code": "2412",
+        "line": 39,
+        "column": 5,
+        "message": "Type 'string | undefined' is not assignable to type 'string' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target."
+      },
+      {
+        "code": "2722",
+        "line": 92,
+        "column": 7,
+        "message": "Cannot invoke an object which is possibly 'undefined'."
+      },
+      {
+        "code": "2349",
+        "line": 92,
+        "column": 23,
+        "message": "This expression is not callable."
+      },
+      {
+        "code": "4111",
+        "line": 92,
+        "column": 23,
+        "message": "Property 'forEach' comes from an index signature, so it must be accessed with ['forEach']."
+      },
+      {
+        "code": "7006",
+        "line": 92,
+        "column": 32,
+        "message": "Parameter 'value' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 92,
+        "column": 39,
+        "message": "Parameter 'key' implicitly has an 'any' type."
+      }
+    ],
+    "libs/utils/monitoring/src/lib/error-handler.ts": [
+      {
+        "code": "6133",
+        "line": 87,
+        "column": 5,
+        "message": "'retryable' is declared but its value is never read."
+      },
+      {
+        "code": "6133",
+        "line": 88,
+        "column": 5,
+        "message": "'retryDelay' is declared but its value is never read."
+      },
+      {
+        "code": "2412",
+        "line": 102,
+        "column": 5,
+        "message": "Type 'Error | undefined' is not assignable to type 'Error' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target."
+      },
+      {
+        "code": "7053",
+        "line": 114,
+        "column": 3,
+        "message": "Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'Console'."
+      }
+    ],
+    "libs/utils/monitoring/src/lib/mcp-utils.ts": [
+      {
+        "code": "2769",
+        "line": 107,
+        "column": 7,
+        "message": "No overload matches this call."
+      }
+    ],
+    "libs/utils/monitoring/src/lib/otel-config.ts": [
+      {
+        "code": "6133",
+        "line": 12,
+        "column": 1,
+        "message": "'Resource' is declared but its value is never read."
+      },
+      {
+        "code": "2307",
+        "line": 15,
+        "column": 37,
+        "message": "Cannot find module '@opentelemetry/sdk-trace-node' or its corresponding type declarations."
+      },
+      {
+        "code": "2307",
+        "line": 17,
+        "column": 35,
+        "message": "Cannot find module '@opentelemetry/exporter-trace-otlp-http' or its corresponding type declarations."
+      },
+      {
+        "code": "6133",
+        "line": 18,
+        "column": 1,
+        "message": "'BigQueryLogger' is declared but its value is never read."
+      },
+      {
+        "code": "6192",
+        "line": 20,
+        "column": 1,
+        "message": "All imports in import declaration are unused."
+      },
+      {
+        "code": "2307",
+        "line": 20,
+        "column": 50,
+        "message": "Cannot find module '@angular/core' or its corresponding type declarations."
+      },
+      {
+        "code": "2693",
+        "line": 64,
+        "column": 24,
+        "message": "'Resource' only refers to a type, but is being used as a value here."
+      },
+      {
+        "code": "2379",
+        "line": 74,
+        "column": 44,
+        "message": "Argument of type '{ projectId: string | undefined; serviceContext: { service: string; version: string; }; }' is not assignable to parameter of type 'CloudTraceExporterOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+      },
+      {
+        "code": "2339",
+        "line": 97,
+        "column": 16,
+        "message": "Property 'instrumentations' does not exist on type '{ resource: any; traceExporter: any; }'."
+      },
+      {
+        "code": "2379",
+        "line": 237,
+        "column": 7,
+        "message": "Argument of type '{ kind: SpanKind | undefined; }' is not assignable to parameter of type '{ attributes?: Record<string, string | number | boolean>; kind?: SpanKind; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+      }
+    ],
+    "libs/utils/secrets-manager/src/index.ts": [
+      {
+        "code": "6133",
+        "line": 15,
+        "column": 1,
+        "message": "'SecretManagerServiceClient' is declared but its value is never read."
+      }
+    ],
+    "libs/utils/signals/index.ts": [
+      {
+        "code": "2307",
+        "line": 12,
+        "column": 42,
+        "message": "Cannot find module '@angular/core' or its corresponding type declarations."
+      }
+    ],
+    "libs/utils/signals/src/index.ts": [
+      {
+        "code": "2307",
+        "line": 15,
+        "column": 103,
+        "message": "Cannot find module '@angular/core' or its corresponding type declarations."
+      },
+      {
+        "code": "2345",
+        "line": 56,
+        "column": 18,
+        "message": "Argument of type '{ [K in keyof D]: D[K] extends Signal<infer U> ? U : never; }' is not assignable to parameter of type '{ [K in keyof D]: D[K] extends Signal<infer U> ? U : never; }'."
+      },
+      {
+        "code": "6133",
+        "line": 64,
+        "column": 23,
+        "message": "'dep' is declared but its value is never read."
+      },
+      {
+        "code": "2345",
+        "line": 67,
+        "column": 39,
+        "message": "Argument of type '{ [K in keyof D]: D[K] extends Signal<infer U> ? U : never; }' is not assignable to parameter of type '{ [K in keyof D]: D[K] extends Signal<infer U> ? U : never; }'."
+      }
+    ],
+    "libs/utils/signals/src/nx-integration.ts": [
+      {
+        "code": "2307",
+        "line": 12,
+        "column": 23,
+        "message": "Cannot find module '@ngrx/store' or its corresponding type declarations."
+      },
+      {
+        "code": "6133",
+        "line": 13,
+        "column": 10,
+        "message": "'signal' is declared but its value is never read."
+      },
+      {
+        "code": "2307",
+        "line": 13,
+        "column": 32,
+        "message": "Cannot find module '@angular/core' or its corresponding type declarations."
+      },
+      {
+        "code": "7022",
+        "line": 29,
+        "column": 9,
+        "message": "'signal' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer."
+      },
+      {
+        "code": "2448",
+        "line": 29,
+        "column": 18,
+        "message": "Block-scoped variable 'signal' used before its declaration."
+      },
+      {
+        "code": "2347",
+        "line": 29,
+        "column": 18,
+        "message": "Untyped function calls may not accept type arguments."
+      },
+      {
+        "code": "6133",
+        "line": 32,
+        "column": 9,
+        "message": "'unsubscribe' is declared but its value is never read."
+      },
+      {
+        "code": "7022",
+        "line": 55,
+        "column": 9,
+        "message": "'signal' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer."
+      },
+      {
+        "code": "2448",
+        "line": 55,
+        "column": 18,
+        "message": "Block-scoped variable 'signal' used before its declaration."
+      },
+      {
+        "code": "2347",
+        "line": 55,
+        "column": 18,
+        "message": "Untyped function calls may not accept type arguments."
+      },
+      {
+        "code": "6133",
+        "line": 57,
+        "column": 9,
+        "message": "'unsubscribe' is declared but its value is never read."
+      }
+    ],
+    "scripts/demo-opentelemetry.ts": [
+      {
+        "code": "2305",
+        "line": 15,
+        "column": 3,
+        "message": "Module '\"../libs/utils/monitoring/src/lib/otel-config\"' has no exported member 'withSpan'."
+      },
+      {
+        "code": "2305",
+        "line": 16,
+        "column": 3,
+        "message": "Module '\"../libs/utils/monitoring/src/lib/otel-config\"' has no exported member 'logEvent'."
+      },
+      {
+        "code": "6307",
+        "line": 21,
+        "column": 43,
+        "message": "File '/home/g_nelson/signals-1/apps/looker-dashboards/src/lib/dashboard-templates.ts' is not listed within the file list of project '/home/g_nelson/signals-1/tsconfig.json'. Projects must list all files or use an 'include' pattern."
+      },
+      {
+        "code": "6307",
+        "line": 22,
+        "column": 41,
+        "message": "File '/home/g_nelson/signals-1/apps/looker-dashboards/src/lib/monitoring-queries.ts' is not listed within the file list of project '/home/g_nelson/signals-1/tsconfig.json'. Projects must list all files or use an 'include' pattern."
+      },
+      {
+        "code": "2353",
+        "line": 34,
+        "column": 5,
+        "message": "Object literal may only specify known properties, and 'gcpProjectId' does not exist in type 'OtelConfig'."
+      },
+      {
+        "code": "7006",
+        "line": 41,
+        "column": 59,
+        "message": "Parameter 'span' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 86,
+        "column": 42,
+        "message": "Parameter 'span' implicitly has an 'any' type."
+      },
+      {
+        "code": "7006",
+        "line": 124,
+        "column": 53,
+        "message": "Parameter 'span' implicitly has an 'any' type."
+      },
+      {
+        "code": "6133",
+        "line": 159,
+        "column": 9,
+        "message": "'logger' is declared but its value is never read."
+      },
+      {
+        "code": "7006",
+        "line": 239,
+        "column": 51,
+        "message": "Parameter 'span' implicitly has an 'any' type."
+      }
+    ]
+  },
+  "configIssues": [],
+  "moduleSystemIssues": [],
+  "strictModeViolations": [],
+  "typeDefinitionGaps": [],
+  "recommendations": []
+}

@@ -1,293 +1,239 @@
 /**
- * @fileoverview BigQuery logger for agent traces and logs
+ * @fileoverview bigquery-logger module for the lib component
  *
- * This module provides structured logging to BigQuery for long-term
- * analytics and compliance with Vietnamese data regulations.
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
  *
  * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
  */
 
-import { BigQuery, Dataset, Table } from '@google-cloud/bigquery';
-
 /**
- * Configuration for BigQuery logger
+ * BigQuery Logger for Dulce Saigon
  */
+import { BigQuery } from '@google-cloud/bigquery';
+import { LogEntry } from './types';
+
 export interface BigQueryLoggerConfig {
-  projectId: string;
-  datasetId: string;
-  tableId: string;
-  location?: string;
+  projectId?: string;
+  datasetId?: string;
+  tableId?: string;
   bufferSize?: number;
   flushIntervalMs?: number;
+  serviceContext?: {
+    service?: string;
+    version?: string;
+  };
 }
 
 /**
- * Log entry structure for BigQuery
- */
-export interface LogEntry {
-  timestamp: Date;
-  traceId?: string;
-  spanId?: string;
-  level: 'debug' | 'info' | 'warn' | 'error';
-  service: string;
-  event: string;
-  data: Record<string, any>;
-  userId?: string;
-  sessionId?: string;
-}
-
-/**
- * Error log entry structure
- */
-export interface ErrorLogEntry {
-  timestamp: Date;
-  spanName: string;
-  error: string;
-  stack?: string;
-  attributes?: Record<string, any>;
-  traceId?: string;
-  spanId?: string;
-}
-
-/**
- * BigQuery table schema for agent logs
- */
-const LOG_TABLE_SCHEMA = [
-  { name: 'timestamp', type: 'TIMESTAMP', mode: 'REQUIRED' },
-  { name: 'trace_id', type: 'STRING', mode: 'NULLABLE' },
-  { name: 'span_id', type: 'STRING', mode: 'NULLABLE' },
-  { name: 'level', type: 'STRING', mode: 'REQUIRED' },
-  { name: 'service', type: 'STRING', mode: 'REQUIRED' },
-  { name: 'event', type: 'STRING', mode: 'REQUIRED' },
-  { name: 'data', type: 'JSON', mode: 'NULLABLE' },
-  { name: 'user_id', type: 'STRING', mode: 'NULLABLE' },
-  { name: 'session_id', type: 'STRING', mode: 'NULLABLE' },
-  { name: 'region', type: 'STRING', mode: 'REQUIRED' },
-  { name: 'compliance_marker', type: 'STRING', mode: 'REQUIRED' },
-];
-
-/**
- * BigQuery logger for agent telemetry
+ * Logger that sends log entries to BigQuery
  */
 export class BigQueryLogger {
   private bigquery: BigQuery;
-  private dataset: Dataset;
-  private table: Table;
-  private config: Required<BigQueryLoggerConfig>;
+  private config: BigQueryLoggerConfig;
   private buffer: any[] = [];
-  private flushTimer?: NodeJS.Timeout;
+  private flushTimer: NodeJS.Timeout | null = null;
+  private datasetTable: string;
 
-  constructor(config: BigQueryLoggerConfig) {
+  /**
+   * Constructor
+   * @param config Logger configuration
+   */
+  constructor(config: BigQueryLoggerConfig = {}) {
     this.config = {
-      location: 'asia-southeast1',
-      bufferSize: 100,
-      flushIntervalMs: 10000, // 10 seconds
-      ...config,
+      projectId: config.projectId || process.env['GOOGLE_CLOUD_PROJECT'] || '',
+      datasetId: config.datasetId || 'logging',
+      tableId: config.tableId || 'logs',
+      bufferSize: config.bufferSize || 100,
+      flushIntervalMs: config.flushIntervalMs || 30000, // 30 seconds
+      serviceContext: config.serviceContext || {
+        service: 'unknown-service',
+        version: 'unknown-version',
+      },
     };
 
     this.bigquery = new BigQuery({
       projectId: this.config.projectId,
-      location: this.config.location,
     });
 
-    this.dataset = this.bigquery.dataset(this.config.datasetId);
-    this.table = this.dataset.table(this.config.tableId);
+    // Construct dataset.table
+    this.datasetTable = `${this.config.datasetId}.${this.config.tableId}`;
+
+    // Start flush timer
+    this.startFlushTimer();
   }
 
   /**
-   * Initialize BigQuery dataset and table
+   * Log a message to BigQuery
+   * @param message Message or object to log
+   * @param severity Log severity (info, warn, error)
+   * @param metadata Additional metadata
    */
-  async initialize(): Promise<void> {
-    try {
-      // Create dataset if it doesn't exist
-      const [datasetExists] = await this.dataset.exists();
-      if (!datasetExists) {
-        console.log(`📊 Creating BigQuery dataset: ${this.config.datasetId}`);
-        await this.dataset.create({
-          location: this.config.location,
-          labels: {
-            project: 'dulce-de-saigon',
-            component: 'agent-telemetry',
-            compliance: 'vietnam-data-law',
-          },
-        });
-      }
+  log(
+    message: string | Record<string, any>,
+    severity: string = 'info',
+    metadata: Record<string, any> = {}
+  ): void {
+    const timestamp = new Date().toISOString();
+    let entry: LogEntry;
 
-      // Create table if it doesn't exist
-      const [tableExists] = await this.table.exists();
-      if (!tableExists) {
-        console.log(`📊 Creating BigQuery table: ${this.config.tableId}`);
-        await this.table.create({
-          schema: { fields: LOG_TABLE_SCHEMA },
-          labels: {
-            type: 'agent-logs',
-            compliance: 'gdpr-vietnam',
-          },
-        });
-      }
-
-      // Start flush timer
-      this.startFlushTimer();
-
-      console.log(`✅ BigQuery logger initialized: ${this.config.projectId}.${this.config.datasetId}.${this.config.tableId}`);
-    } catch (error) {
-      console.error('❌ Failed to initialize BigQuery logger:', error);
-      throw error;
+    if (typeof message === 'string') {
+      entry = {
+        timestamp,
+        severity,
+        message,
+        ...metadata,
+        serviceContext: this.config.serviceContext,
+      };
+    } else {
+      entry = {
+        timestamp,
+        severity,
+        ...message,
+        ...metadata,
+        serviceContext: this.config.serviceContext,
+      };
     }
-  }
 
-  /**
-   * Log an event to BigQuery
-   */
-  async logEvent(entry: LogEntry): Promise<void> {
-    const row = {
-      timestamp: entry.timestamp.toISOString(),
-      trace_id: entry.traceId || null,
-      span_id: entry.spanId || null,
-      level: entry.level,
-      service: entry.service,
-      event: entry.event,
-      data: JSON.stringify(entry.data),
-      user_id: entry.userId || null,
-      session_id: entry.sessionId || null,
-      region: 'vietnam-southeast1',
-      compliance_marker: 'GDPR-VIETNAM-COMPLIANT',
-    };
-
-    this.addToBuffer(row);
+    this.addToBuffer(entry);
   }
 
   /**
    * Log an error to BigQuery
+   * @param error Error object
+   * @param metadata Additional metadata
    */
-  async logError(entry: ErrorLogEntry): Promise<void> {
-    const row = {
-      timestamp: entry.timestamp.toISOString(),
-      trace_id: entry.traceId || null,
-      span_id: entry.spanId || null,
-      level: 'error',
-      service: 'dulce-de-saigon-agent',
-      event: 'span_error',
-      data: JSON.stringify({
-        span_name: entry.spanName,
-        error_message: entry.error,
-        stack_trace: entry.stack,
-        attributes: entry.attributes,
-      }),
-      user_id: null,
-      session_id: null,
-      region: 'vietnam-southeast1',
-      compliance_marker: 'GDPR-VIETNAM-COMPLIANT',
+  logError(
+    error: Error | any,
+    metadata: Record<string, any> = {}
+  ): void {
+    const entry = {
+      timestamp: new Date().toISOString(),
+      severity: 'error',
+      message: error.message || 'Unknown error',
+      stack: error.stack,
+      errorName: error.name,
+      ...metadata,
+      serviceContext: this.config.serviceContext,
     };
 
-    this.addToBuffer(row);
+    this.addToBuffer(entry);
   }
 
   /**
-   * Log agent performance metrics
+   * Log a performance metric to BigQuery
+   * @param metric Performance metric name
+   * @param value Metric value
+   * @param metadata Additional metadata
    */
-  async logPerformanceMetrics(metrics: {
-    operation: string;
-    duration: number;
-    success: boolean;
-    errorCount?: number;
-    metadata?: Record<string, any>;
-  }): Promise<void> {
-    const entry: LogEntry = {
-      timestamp: new Date(),
-      level: 'info',
-      service: 'dulce-de-saigon-agent',
-      event: 'performance_metric',
-      data: {
-        operation: metrics.operation,
-        duration_ms: metrics.duration,
-        success: metrics.success,
-        error_count: metrics.errorCount || 0,
-        metadata: metrics.metadata || {},
-      },
+  logPerformance(
+    metric: string,
+    value: number,
+    metadata: Record<string, any> = {}
+  ): void {
+    const entry = {
+      timestamp: new Date().toISOString(),
+      severity: 'info',
+      message: `Performance: ${metric}`,
+      metric,
+      value,
+      ...metadata,
+      serviceContext: this.config.serviceContext,
     };
 
-    await this.logEvent(entry);
+    this.addToBuffer(entry);
   }
 
   /**
-   * Log user interaction events (F&B specific)
+   * Log a user interaction event to BigQuery
+   * @param event User interaction event
    */
-  async logUserInteraction(event: {
-    userId: string;
-    sessionId: string;
-    action: string;
-    restaurantId?: string;
-    menuItemId?: string;
-    metadata?: Record<string, any>;
-  }): Promise<void> {
+  async logUserInteraction(
+    event: {
+      userId: string | undefined;
+      sessionId: string | undefined;
+      action: string | undefined;
+      restaurantId?: string | undefined;
+      menuItemId?: string | undefined;
+      metadata?: Record<string, any> | undefined;
+    }
+  ): Promise<void> {
     const entry: LogEntry = {
-      timestamp: new Date(),
-      level: 'info',
-      service: 'dulce-de-saigon-agent',
-      event: 'user_interaction',
-      data: {
-        action: event.action,
-        restaurant_id: event.restaurantId,
-        menu_item_id: event.menuItemId,
-        metadata: event.metadata || {},
-      },
+      timestamp: new Date().toISOString(),
+      severity: 'info',
+      message: `User Interaction: ${event.action}`,
       userId: event.userId,
       sessionId: event.sessionId,
+      action: event.action,
+      restaurantId: event.restaurantId,
+      menuItemId: event.menuItemId,
+      ...(event.metadata || {}),
+      serviceContext: this.config.serviceContext,
     };
 
-    await this.logEvent(entry);
+    this.addToBuffer(entry);
   }
 
   /**
-   * Add row to buffer
+   * Add a row to the buffer
+   * @param row Row to add
    */
   private addToBuffer(row: any): void {
-    this.buffer.push(row);
-
-    // Flush if buffer is full
-    if (this.buffer.length >= this.config.bufferSize) {
-      this.flush();
+    if (this.buffer) {
+      this.buffer.push(row);
+    }
+    
+    // If buffer is full, flush it
+    if (this.buffer && this.buffer.length >= (this.config?.bufferSize || 100)) {
+      this.flush().catch(console.error);
     }
   }
 
   /**
-   * Flush buffered logs to BigQuery
+   * Flush the buffer to BigQuery
    */
   async flush(): Promise<void> {
-    if (this.buffer.length === 0) {
+    if (this.buffer && this.buffer.length === 0) {
       return;
     }
 
-    const rowsToInsert = [...this.buffer];
-    this.buffer = [];
-
     try {
-      await this.table.insert(rowsToInsert);
-      console.log(`📊 Flushed ${rowsToInsert.length} log entries to BigQuery`);
+      // Make a copy of the buffer and clear it
+      const rows = [...(this.buffer || [])];
+      this.buffer = [];
+
+      // Insert rows into BigQuery
+      await this.bigquery.dataset(this.config.datasetId || 'logging')
+        .table(this.config.tableId || 'logs')
+        .insert(rows, {
+          skipInvalidRows: true,
+          ignoreUnknownValues: true,
+        });
+
+      console.log(`Flushed ${rows.length} logs to BigQuery`);
     } catch (error) {
-      console.error('❌ Failed to insert logs to BigQuery:', error);
+      console.error('Error flushing logs to BigQuery:', error);
       
-      // Re-add failed rows to buffer (simple retry logic)
-      this.buffer.unshift(...rowsToInsert);
-      
-      // Prevent infinite buffer growth
-      if (this.buffer.length > this.config.bufferSize * 3) {
-        console.warn('⚠️  Dropping oldest log entries due to persistent BigQuery errors');
-        this.buffer = this.buffer.slice(-this.config.bufferSize);
+      // Add back to buffer for retry
+      if (this.buffer) {
+        this.buffer.push(...(this.buffer || []));
       }
     }
   }
 
   /**
-   * Start automatic flush timer
+   * Start the flush timer
    */
   private startFlushTimer(): void {
+    if (this.flushTimer) {
+      clearInterval(this.flushTimer);
+    }
+    
     this.flushTimer = setInterval(() => {
       this.flush().catch(console.error);
-    }, this.config.flushIntervalMs);
+    }, this.config?.flushIntervalMs || 30000);
   }
 
   /**
@@ -296,61 +242,90 @@ export class BigQueryLogger {
   async shutdown(): Promise<void> {
     if (this.flushTimer) {
       clearInterval(this.flushTimer);
-      this.flushTimer = undefined;
+      this.flushTimer = null;
     }
 
-    // Final flush
-    await this.flush();
-    console.log('🔄 BigQuery logger shutdown complete');
+    // Flush any remaining logs
+    try {
+      await this.flush();
+    } catch (error) {
+      console.error('Error during shutdown flush:', error);
+    }
   }
 
   /**
-   * Query logs from BigQuery (for debugging/monitoring)
+   * Query logs from BigQuery
+   * @param options Query options
    */
-  async queryLogs(options: {
-    startTime?: Date;
-    endTime?: Date;
-    level?: string;
-    service?: string;
-    limit?: number;
-  } = {}): Promise<any[]> {
+  async queryLogs(
+    options: {
+      startTime?: Date | undefined;
+      endTime?: Date | undefined;
+      level?: string | undefined;
+      service?: string | undefined;
+      limit?: number | undefined;
+    } = {}
+  ): Promise<any[]> {
     const {
-      startTime = new Date(Date.now() - 24 * 60 * 60 * 1000), // 24 hours ago
-      endTime = new Date(),
+      startTime,
+      endTime,
       level,
       service,
-      limit = 100,
+      limit = 100
     } = options;
 
     let query = `
       SELECT *
-      FROM \`${this.config.projectId}.${this.config.datasetId}.${this.config.tableId}\`
-      WHERE timestamp BETWEEN @startTime AND @endTime
+      FROM \`${this.config.projectId}.${this.datasetTable}\`
+      WHERE 1=1
     `;
 
     const params: any = {
-      startTime: startTime.toISOString(),
-      endTime: endTime.toISOString(),
+      
     };
 
+    if (startTime) {
+      query += ` AND timestamp >= @startTime`;
+      if (params) {
+        params.startTime = startTime.toISOString();
+      }
+    }
+
+    if (endTime) {
+      query += ` AND timestamp <= @endTime`;
+      if (params) {
+        params.endTime = endTime.toISOString();
+      }
+    }
+
     if (level) {
-      query += ' AND level = @level';
-      params.level = level;
+      query += ` AND severity = @level`;
+      if (params) {
+        params.level = level;
+      }
     }
 
     if (service) {
-      query += ' AND service = @service';
-      params.service = service;
+      query += ` AND serviceContext.service = @service`;
+      if (params) {
+        params.service = service;
+      }
     }
 
     query += ' ORDER BY timestamp DESC';
     query += ` LIMIT ${limit}`;
 
-    const [rows] = await this.bigquery.query({
-      query,
-      params,
-    });
+    try {
+      const [rows] = await this.bigquery.query({
+        query,
+        params,
+        parameterMode: 'named',
+      });
 
-    return rows;
+      return rows;
+    } catch (error) {
+      console.error('Error querying logs:', error);
+      throw error;
+    }
   }
 }

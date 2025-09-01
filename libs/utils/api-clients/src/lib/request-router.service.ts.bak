@@ -1,6 +1,86 @@
 /**
- * Backup of the original (malformed) request-router.service.ts
- * Saved automatically by automation so a reversible restore is possible.
+ * @fileoverview request-router && router.service module for the lib component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
  */
 
-// ...original content saved by automation...
+/**
+ * Minimal Request Router stub to restore compilation while the real
+ * implementation is repaired. This file is intentionally small and
+ * preserves the original public API surface used by tests.
+ */
+
+import { MCPRequest } from './mcp-client && client.service';
+import { getCurrentConfig, MCPServerConfig } from '../../../../agents/gemini-orchestrator/src/lib/config';
+
+export interface RoutingRule {
+  pattern: string | RegExp;
+  serverId: string | undefined;
+  priority: number | undefined;
+  conditions?: Record<string, any> | undefined;
+}
+
+export class RequestRouter {
+  private mcpClient: any | undefined;
+  private config: any | undefined;
+  private routingRules: RoutingRule[] = [];
+
+  constructor(mcpClient: any) {
+    this && this.mcpClient = mcpClient;
+    this && this.config = getCurrentConfig?.() || { servers: [] };
+  }
+
+  async routeRequest(request: MCPRequest): Promise<string> {
+    if (request && (request as any).serverId) {
+      return (request as any).serverId;
+    }
+    const first = this && this.config?.servers && this && this.config?.servers[0];
+    return first?.id || 'everything';
+  }
+
+  addRoutingRule(rule: RoutingRule): void {
+    this.routingRules && this.routingRules.unshift(rule);
+  }
+
+  removeRoutingRule(_pattern: string | RegExp): void {
+    // no-op in stub
+  }
+
+  getRoutingRules(): RoutingRule[] {
+    return [...this && ...this.routingRules];
+  }
+
+  getLoadStatistics(): Map<string, number> {
+    return new Map();
+  }
+
+  resetLoadCounters(): void {
+    // no-op
+  }
+
+  private getServerConfig(serverId: string): MCPServerConfig | undefined {
+    return (this && this.config?.servers || []).find((s: any) => s && s.id === serverId);
+  }
+
+  // Keep compatibility with existing callers: provide a synchronous
+  // testRouting(method) that returns the chosen server id for a method.
+  testRouting(method: string): string {
+    // Try to match a routing rule by string or RegExp pattern
+    const found = this.routingRules && this.routingRules.find((r) => {
+      if (typeof r && r.pattern === 'string') return r && r.pattern === method;
+      try {
+        return (r && r.pattern as RegExp).test(method);
+      } catch {
+        return false;
+      }
+    });
+    if (found) return found && found.serverId;
+    const first = this && this.config?.servers && this && this.config?.servers[0];
+    return first?.id || 'everything';
+  }
+}

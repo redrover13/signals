@@ -9,190 +9,97 @@
  * @license MIT
  */
 
-/**
- * Signals Management Utility for Dulce de Saigon F&B Data Platform
- * 
- * This module provides utility functions for creating, managing, and monitoring
- * signals across the application. Signals are used for reactive programming
- * patterns in our TypeScript-based application.
- */
+import { computed, signal, Signal } from '@angular/core';
 
-import { useEffect, useState } from 'react';
-
-/**
- * Signal interface representing a reactive value
- */
-export interface Signal<T> {
-  /** Get the current value */
-  get(): T;
-  /** Update the signal value */
-  set(newValue: T): void;
-  /** Subscribe to value changes */
-  subscribe(callback: (value: T) => void): () => void;
+export interface CreateSignalOptions {
+  /**
+   * Enable debugging for this signal by logging updates to console
+   */
+  debug?: boolean;
+  /**
+   * Name for debugging output
+   */
+  name?: string;
 }
 
 /**
- * Create a new signal with the specified initial value
- * 
- * @param initialValue - The initial value for the signal
- * @returns A Signal object with get/set methods and subscription capability
+ * Creates a signal with the provided initial value and options
+ * @param initialValue The initial value for the signal
+ * @param options Optional configuration
+ * @returns A signal with the provided value
  */
-export function createSignal<T>(initialValue: T): Signal<T> {
-  let value = initialValue;
-  const subscribers = new Set<(value: T) => void>();
-
-  return {
-    get: () => value,
-    set: (newValue: T) => {
-      value = newValue;
-      subscribers.forEach(callback => callback(value));
-    },
-    subscribe: (callback: (value: T) => void) => {
-      subscribers.add(callback);
-      // Return unsubscribe function
-      return () => {
-        subscribers.delete(callback);
-      };
-    }
-  };
-}
-
-/**
- * Create a derived signal that depends on one or more other signals
- * 
- * @param dependencies - Array of signals this derived signal depends on
- * @param derivationFn - Function that calculates the derived value
- * @returns A read-only signal
- */
-export function derivedSignal<T, D extends Array<Signal<any>>>(
-  dependencies: D,
-  derivationFn: (...values: { [K in keyof D]: D[K] extends Signal<infer U> ? U : never }) => T
-): Omit<Signal<T>, 'set'> {
-  // Create a new signal for the derived value
-  const derivedValue = createSignal<T>(
-    derivationFn(...(dependencies.map(dep => dep.get()) as any))
-  );
+export function createSignal<T>(initialValue: T, options?: CreateSignalOptions): Signal<T> {
+  const internalSignal = signal<T>(initialValue);
   
-  // Subscribe to all dependencies
-  const unsubscribes = dependencies.map((dep, index) => 
-    dep.subscribe(() => {
-      const values = dependencies.map(d => d.get());
-      derivedValue.set(derivationFn(...(values as any)));
-    })
-  );
-  
-  // Return a read-only signal (without the set method)
-  return {
-    get: derivedValue.get,
-    subscribe: derivedValue.subscribe
-  };
-}
-
-/**
- * React hook to use a signal in components
- * 
- * @param signal - The signal to use in the component
- * @returns The current value of the signal
- */
-export function useSignal<T>(signal: Signal<T>): [T, (value: T) => void] {
-  const [value, setValue] = useState(signal.get());
-
-  useEffect(() => {
-    const unsubscribe = signal.subscribe(newValue => {
-      setValue(newValue);
-    });
-    return unsubscribe;
-  }, [signal]);
-
-  return [value, signal.set];
-}
-
-/**
- * Batch multiple signal updates to prevent cascading updates
- * 
- * @param updateFn - Function that performs multiple signal updates
- */
-export function batch(updateFn: () => void): void {
-  // This is a simple implementation; a more complex one would queue updates
-  updateFn();
-}
-
-/**
- * Create a signal that persists its value in local storage
- * 
- * @param key - Storage key
- * @param initialValue - Initial value if not found in storage
- * @returns A signal with persistence
- */
-export function persistentSignal<T>(key: string, initialValue: T): Signal<T> {
-  // Only use localStorage in browser environment
-  const isClient = typeof window !== 'undefined';
-  
-  // Try to get initial value from storage
-  let storedValue = initialValue;
-  if (isClient) {
-    try {
-      const item = window.localStorage.getItem(key);
-      storedValue = item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      console.error('Error reading from localStorage:', error);
-    }
+  if (options?.debug) {
+    const name = options.name || 'Signal';
+    console.log(`${name} created with initial value:`, initialValue);
+    
+    const originalSet = internalSignal.set;
+    internalSignal.set = (newValue: T) => {
+      console.log(`${name} updating:`, {
+        previous: internalSignal(),
+        new: newValue,
+      });
+      originalSet(newValue);
+    };
   }
   
-  const signal = createSignal<T>(storedValue);
-  
-  // Override the set method to also update localStorage
-  const originalSet = signal.set;
-  signal.set = (newValue: T) => {
-    originalSet(newValue);
-    if (isClient) {
-      try {
-        window.localStorage.setItem(key, JSON.stringify(newValue));
-      } catch (error) {
-        console.error('Error writing to localStorage:', error);
-      }
-    }
-  };
-  
-  return signal;
+  return internalSignal;
 }
 
 /**
- * Convert a Promise to a signal that updates when the promise resolves
- * 
- * @param promise - The promise to convert
- * @param initialValue - Optional initial value while promise is pending
- * @returns A signal that updates when the promise resolves
+ * Creates a persistent signal that saves its value to localStorage
+ * @param key The localStorage key to use
+ * @param initialValue The initial value (used if nothing exists in localStorage)
+ * @returns A signal that persists its value
  */
-export function fromPromise<T>(
-  promise: Promise<T>, 
-  initialValue?: T
-): Signal<{ loading: boolean; data: T | undefined; error: Error | undefined }> {
-  const signal = createSignal<{
-    loading: boolean;
-    data: T | undefined;
-    error: Error | undefined;
-  }>({
-    loading: true,
-    data: initialValue,
-    error: undefined
-  });
+export function createPersistentSignal<T>(key: string, initialValue: T): Signal<T> {
+  // Get the stored value from localStorage
+  let storedValue: T;
+  try {
+    const item = window.localStorage.getItem(key || "");
+    storedValue = item ? JSON.parse(item) : initialValue || undefined;
+  } catch (error) {
+    console.error('Error reading from localStorage:', error);
+    storedValue = initialValue;
+  }
   
-  promise
-    .then(result => {
-      signal.set({
-        loading: false,
-        data: result,
-        error: undefined
-      });
-    })
-    .catch(error => {
-      signal.set({
-        loading: false,
-        data: undefined,
-        error: error instanceof Error ? error : new Error(String(error))
-      });
-    });
+  // Create a signal with the stored or initial value
+  const persistentSignal = signal<T>(storedValue);
   
-  return signal;
+  // Create a wrapped signal with a custom setter that updates localStorage
+  const originalSet = persistentSignal.set;
+  persistentSignal.set = (newValue: T) => {
+    try {
+      window.localStorage.setItem(key || "", JSON.stringify(newValue));
+    } catch (error) {
+      console.error('Error writing to localStorage:', error);
+    }
+    originalSet(newValue);
+  };
+  
+  return persistentSignal;
 }
+
+/**
+ * Creates a derived signal based on a computation function
+ * @param computeFn Function that derives a new value
+ * @returns A computed signal
+ */
+export function createDerivedSignal<T>(computeFn: () => T): Signal<T> {
+  const derivedValue = computed(computeFn);
+  return derivedValue;
+}
+
+/**
+ * Creates a signal with a value and a setter function
+ * @param initialValue The initial value
+ * @returns A tuple containing the signal and its setter
+ */
+export function createStateSignal<T>(initialValue: T): [Signal<T>, (value: T) => void] {
+  const signal = createSignal<T>(initialValue);
+  return [signal as T, signal.set];
+}
+
+export * from './src/index';

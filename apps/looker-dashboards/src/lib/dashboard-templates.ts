@@ -14,10 +14,10 @@
  */
 export interface DashboardDataSource {
   type: 'bigquery' | 'cloud-monitoring';
-  projectId: string;
-  datasetId?: string;
-  tableId?: string;
-  query?: string;
+  projectId: string | undefined;
+  datasetId?: string | undefined;
+  tableId?: string | undefined;
+  query?: string | undefined;
 }
 
 /**
@@ -373,24 +373,24 @@ export const REALTIME_DASHBOARD = {
  * Generate a dashboard template with custom parameters
  */
 export function generateDashboardTemplate(options: {
-  projectId: string;
-  datasetId: string;
-  tableId: string;
-  dashboardName?: string;
+  projectId: string | undefined;
+  datasetId: string | undefined;
+  tableId: string | undefined;
+  dashboardName?: string | undefined;
 }): any {
   const template = JSON.parse(JSON.stringify(AGENT_MONITORING_DASHBOARD));
   
   // Replace placeholders
   const templateStr = JSON.stringify(template)
-    .replace(/\{project_id\}/g, options.projectId)
-    .replace(/\$\{GCP_PROJECT_ID\}/g, options.projectId)
-    .replace(/\$\{BIGQUERY_DATASET\}/g, options.datasetId)
-    .replace(/\$\{BIGQUERY_TABLE\}/g, options.tableId);
+    .replace(/\{project_id\}/g, options?.projectId || '')
+    .replace(/\$\{GCP_PROJECT_ID\}/g, options?.projectId || '')
+    .replace(/\$\{BIGQUERY_DATASET\}/g, options?.datasetId || '')
+    .replace(/\$\{BIGQUERY_TABLE\}/g, options?.tableId || '');
   
   const customizedTemplate = JSON.parse(templateStr);
   
-  if (options.dashboardName) {
-    customizedTemplate.name = options.dashboardName;
+  if (options?.dashboardName) {
+    customizedTemplate.name = options?.dashboardName;
   }
   
   return customizedTemplate;

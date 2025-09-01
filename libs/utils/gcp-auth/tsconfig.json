@@ -1,7 +1,10 @@
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "commonjs",
+    "composite": true,
+    "declaration": true,
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "importHelpers": true,
@@ -11,7 +14,7 @@
     "noPropertyAccessFromIndexSignature": true
   },
   "files": [],
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "references": [
     {
       "path": "./tsconfig.lib.json"
@@ -21,6 +24,9 @@
     },
     {
       "path": "../../gcp-core"
+    },
+    {
+      "path": "../../common-types"
     }
   ],
   "exclude": [

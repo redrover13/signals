@@ -1,3 +1,12 @@
+# NOTICE: TRANSITIONING TO CENTRALIZED INSTRUCTION DOCUMENT
+
+> **IMPORTANT: This file is being deprecated in favor of the new centralized [agents.md](/agents.md) file at the root of the repository.**
+>
+> Please refer to the [agents.md](/agents.md) file for the most up-to-date and comprehensive instructions for AI assistants.
+> This file will be maintained during a transition period but will eventually be removed.
+
+---
+
 # Qodo AI Assistant - Enhanced Project Instructions
 
 This document provides comprehensive instructions for the Qodo AI assistant to ensure it provides maximum support and leverages the full potential of the configured MCP servers for the "Dulce de Saigon" F&B Data Platform.

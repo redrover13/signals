@@ -16,7 +16,7 @@ import './ui-components.css';
 /* eslint-disable-next-line */
 export interface UiComponentsProps {}
 
-export const UiComponents = (props: UiComponentsProps) => {
+export const UiComponents = (_props: UiComponentsProps): React.ReactElement => {
   return (
     <div>
       <h1>Welcome to UiComponents!</h1>

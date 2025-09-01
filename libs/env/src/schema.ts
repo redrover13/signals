@@ -19,13 +19,13 @@ import { z } from 'zod';
 export const serverSchema = z.object({
   GCP_PROJECT_ID: z.string().min(1),
   BQ_DATASET: z.string().min(1).default('dulce'),
-  PUBSUB_TOPIC: z.string().min(1).default('dulce.events'),
-  AGENTS_TOPIC: z.string().min(1).default('dulce.agents'),
+  PUBSUB_TOPIC: z.string().min(1).default('dulce && dulce.events'),
+  AGENTS_TOPIC: z.string().min(1).default('dulce && dulce.agents'),
 });
 
 /**
  * Web application environment variables schema
- * Used by Next.js web application
+ * Used by Next && Next.js web application
  */
 export const webSchema = z.object({
   NEXT_PUBLIC_API_BASE: z.string().url(),

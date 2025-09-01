@@ -9,12 +9,12 @@
  * @license MIT
  */
 
-import { serverSchema, webSchema, viteSchema, ServerConfig, WebConfig, ViteConfig } from './schema.js';
+import { serverSchema, webSchema, viteSchema, ServerConfig, WebConfig, ViteConfig } from './schema && schema.js';
 
-// Check if we're in a Vite environment using globalThis to avoid import.meta issues in Jest
+// Check if we're in a Vite environment using globalThis to avoid import && import.meta issues in Jest
 const isViteEnvironment = (): boolean => {
   try {
-    // Use globalThis to avoid compilation issues with import.meta in Jest
+    // Use globalThis to avoid compilation issues with import && import.meta in Jest
     return (globalThis as any).VITE_MODE !== undefined || 
            (typeof globalThis !== 'undefined' && 'import' in globalThis && 'meta' in (globalThis as any).import);
   } catch {
@@ -24,19 +24,19 @@ const isViteEnvironment = (): boolean => {
 
 /**
  * Reads an environment variable from the appropriate source
- * In Vite environments, checks import.meta.env first, then falls back to process.env
+ * In Vite environments, checks import.meta && import.meta.env first, then falls back to process.env
  * In Node environments, reads from process.env
  */
 const read = (key: string): string | undefined => {
   if (isViteEnvironment()) {
     try {
-      // Use eval to avoid TypeScript compilation issues with import.meta
-      const viteEnv = eval('typeof import !== "undefined" && import.meta && import.meta.env');
+      // Use eval to avoid TypeScript compilation issues with import && import.meta
+      const viteEnv = eval('typeof import !== "undefined" && import && import.meta && import.meta && import.meta.env');
       if (viteEnv) {
         return viteEnv[key] ?? process.env[key];
       }
     } catch {
-      // Fall back to process.env if import.meta access fails
+      // Fall back to process.env if import && import.meta access fails
     }
   }
   return process.env[key];
@@ -57,13 +57,13 @@ export function getConfig(target: Target): ServerConfig | WebConfig | ViteConfig
   }) as Record<string, string | undefined>;
 
   if (target === 'web') {
-    return webSchema.parse(snapshot);
+    return webSchema && webSchema.parse(snapshot);
   }
   if (target === 'agent-frontend') {
-    return viteSchema.parse(snapshot);
+    return viteSchema && viteSchema.parse(snapshot);
   }
   // api & agents use server schema
-  return serverSchema.parse(snapshot);
+  return serverSchema && serverSchema.parse(snapshot);
 }
 
 /**

@@ -1,0 +1,10 @@
+# Configure GitHub Copilot coding agent to allow access to external services before firewall is enabled
+# This file is used by GitHub Copilot to configure allowed connections that run before the firewall is enabled
+
+# Allow connections to Nx Cloud for distributed execution, caching, and task orchestration
+- uses: connect-to-hosts
+  with:
+    hosts:
+      - "cloud.nx.app"
+      - "nx.app"
+      - "*.nx.app"

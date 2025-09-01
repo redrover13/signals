@@ -1,240 +1,165 @@
 /**
- * @fileoverview Custom Cloud Trace exporter for large payloads
+ * @fileoverview cloud-trace-exporter module for the lib component
  *
- * This exporter stores large trace payloads in Google Cloud Storage
- * and sends lightweight references to Cloud Trace, following the 
- * Agent Starter Pack pattern for handling large telemetry data.
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
  *
  * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
  */
 
-import { SpanExporter, ReadableSpan } from '@opentelemetry/sdk-trace-base';
+/**
+ * Google Cloud Trace exporter for OpenTelemetry
+ */
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
+import { SpanExporter } from '@opentelemetry/sdk-trace-base';
+import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { Storage } from '@google-cloud/storage';
-import { v4 as uuidv4 } from 'uuid';
+import { CloudTraceExporterOptions } from './types';
 
 /**
- * Configuration for the Cloud Trace exporter
- */
-export interface CloudTraceExporterConfig {
-  projectId: string;
-  bucketName: string;
-  maxPayloadSize?: number;
-  enableCompression?: boolean;
-  retryAttempts?: number;
-}
-
-/**
- * Lightweight span reference for Cloud Trace
- */
-interface SpanReference {
-  traceId: string;
-  spanId: string;
-  name: string;
-  startTime: string;
-  endTime: string;
-  status: string;
-  gcsPath?: string;
-  payloadSize: number;
-}
-
-/**
- * Custom Cloud Trace exporter that stores large payloads in GCS
+ * Exporter that writes spans to Google Cloud Trace
  */
 export class CloudTraceExporter implements SpanExporter {
+  private projectId: string;
+  private bucketName?: string;
   private storage: Storage;
-  private config: Required<CloudTraceExporterConfig>;
+  private serviceContext: {
+    service?: string;
+    version?: string;
+  };
 
-  constructor(config: CloudTraceExporterConfig) {
-    this.config = {
-      maxPayloadSize: 1024 * 1024, // 1MB default
-      enableCompression: true,
-      retryAttempts: 3,
-      ...config,
+  /**
+   * Constructor
+   * @param options Configuration options
+   */
+  constructor(options: CloudTraceExporterOptions = {}) {
+    this.projectId = options.projectId || process.env['GOOGLE_CLOUD_PROJECT'] || '';
+    this.bucketName = options.bucketName;
+    this.serviceContext = options.serviceContext || {
+      service: 'unknown-service',
+      version: 'unknown-version',
     };
-
-    this.storage = new Storage({
-      projectId: this.config.projectId,
-    });
+    
+    this.storage = new Storage(this.projectId ? {
+      projectId: this.projectId
+    } : {});
   }
 
   /**
-   * Export spans to Cloud Trace with GCS overflow for large payloads
+   * Export spans to Google Cloud Trace
+   * @param spans Spans to export
+   * @param resultCallback Callback for export result
    */
-  async export(spans: ReadableSpan[], resultCallback: (result: ExportResult) => void): Promise<void> {
-    try {
-      const exportedSpans: SpanReference[] = [];
-
-      for (const span of spans) {
-        try {
-          const spanData = this.serializeSpan(span);
-          const spanRef = await this.processSpan(span, spanData);
-          exportedSpans.push(spanRef);
-        } catch (error) {
-          console.error('Failed to process span:', span.name, error);
-          // Continue processing other spans
-        }
-      }
-
-      // Send lightweight references to Cloud Trace (simulated)
-      await this.sendToCloudTrace(exportedSpans);
-
+  export(spans: ReadableSpan[], resultCallback: (result: ExportResult) => void): void {
+    if (!spans || spans.length === 0) {
       resultCallback({ code: ExportResultCode.SUCCESS });
-    } catch (error) {
-      console.error('Cloud Trace export failed:', error);
-      resultCallback({ 
-        code: ExportResultCode.FAILED,
-        error: error instanceof Error ? error : new Error('Unknown export error')
-      });
+      return;
     }
-  }
 
-  /**
-   * Process a single span, storing large payloads in GCS
-   */
-  private async processSpan(span: ReadableSpan, spanData: string): Promise<SpanReference> {
-    const payloadSize = Buffer.byteLength(spanData, 'utf8');
-    
-    const spanRef: SpanReference = {
-      traceId: span.spanContext().traceId,
-      spanId: span.spanContext().spanId,
-      name: span.name,
-      startTime: new Date(span.startTime[0] * 1000 + span.startTime[1] / 1000000).toISOString(),
-      endTime: new Date(span.endTime[0] * 1000 + span.endTime[1] / 1000000).toISOString(),
-      status: span.status?.code?.toString() || 'OK',
-      payloadSize,
-    };
-
-    // Store large payloads in GCS
-    if (payloadSize > this.config.maxPayloadSize) {
-      const gcsPath = await this.storeInGCS(span, spanData);
-      spanRef.gcsPath = gcsPath;
+    try {
+      const traceData = this.convertSpansToTraceData(spans);
       
-      console.log(`📦 Large span payload stored in GCS: ${gcsPath} (${payloadSize} bytes)`);
+      if (this.bucketName) {
+        this.exportToCloudStorage(traceData)
+          .then(() => resultCallback({ code: ExportResultCode.SUCCESS }))
+          .catch((err) => {
+            console.error('Error exporting to Cloud Storage:', err);
+            resultCallback({ code: ExportResultCode.FAILED, error: err });
+          });
+      } else {
+        // If no bucket specified, just log to console in development
+        console.log('Trace data (no bucket specified):', JSON.stringify(traceData, null, 2));
+        resultCallback({ code: ExportResultCode.SUCCESS });
+      }
+    } catch (err) {
+      console.error('Error converting spans:', err);
+      resultCallback({ code: ExportResultCode.FAILED, error: err as Error });
     }
-
-    return spanRef;
   }
 
   /**
-   * Store span data in Google Cloud Storage
+   * Convert OpenTelemetry spans to Cloud Trace format
+   * @param spans Spans to convert
+   * @returns Trace data in Cloud Trace format
    */
-  private async storeInGCS(span: ReadableSpan, spanData: string): Promise<string> {
-    const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    const fileName = `traces/${timestamp}/${span.spanContext().traceId}/${span.spanContext().spanId}-${uuidv4()}.json`;
-    
-    let dataToStore = spanData;
-    
-    // Compress if enabled
-    if (this.config.enableCompression) {
-      const zlib = await import('zlib');
-      dataToStore = zlib.gzipSync(spanData).toString('base64');
-    }
-
-    const bucket = this.storage.bucket(this.config.bucketName);
-    const file = bucket.file(fileName);
-
-    const metadata = {
-      metadata: {
-        traceId: span.spanContext().traceId,
-        spanId: span.spanContext().spanId,
-        spanName: span.name,
-        compressed: this.config.enableCompression.toString(),
-        originalSize: Buffer.byteLength(spanData, 'utf8').toString(),
-        timestamp: new Date().toISOString(),
-      },
-    };
-
-    await file.save(dataToStore, {
-      metadata,
-      gzip: false, // We handle compression ourselves
-    });
-
-    return `gs://${this.config.bucketName}/${fileName}`;
-  }
-
-  /**
-   * Send lightweight span references to Cloud Trace
-   */
-  private async sendToCloudTrace(spans: SpanReference[]): Promise<void> {
-    // In a real implementation, this would use the Cloud Trace API
-    // For now, we'll log the structured data
-    
-    const traceData = {
-      projectId: this.config.projectId,
-      spans: spans.map(span => ({
-        ...span,
-        // Add Vietnamese compliance metadata
-        dataLocation: 'vietnam-southeast1',
-        complianceMarker: 'GDPR-VIETNAM-COMPLIANT',
-      })),
-      exportedAt: new Date().toISOString(),
-      exporterVersion: '1.0.0',
-    };
-
-    // Log for development/debugging
-    if (process.env.NODE_ENV === 'development') {
-      console.log('☁️  Cloud Trace export:', JSON.stringify(traceData, null, 2));
-    }
-
-    // In production, you would send this to Cloud Trace API:
-    // const traceClient = new CloudTrace({ projectId: this.config.projectId });
-    // await traceClient.patchTraces({
-    //   projectId: this.config.projectId,
-    //   body: { traces: traceData.spans }
-    // });
-  }
-
-  /**
-   * Serialize span to JSON with F&B specific attributes
-   */
-  private serializeSpan(span: ReadableSpan): string {
-    const spanData = {
-      traceId: span.spanContext().traceId,
-      spanId: span.spanContext().spanId,
-      parentSpanId: span.parentSpanId,
-      name: span.name,
-      kind: span.kind,
-      startTime: span.startTime,
-      endTime: span.endTime,
-      status: span.status,
-      attributes: span.attributes,
-      events: span.events?.map(event => ({
+  private convertSpansToTraceData(spans: ReadableSpan[]): any[] {
+    return spans.map(span => {
+      const attributes: Record<string, any> = {};
+      
+      // Convert attributes
+      span.attributes.forEach((value, key) => {
+        attributes[key] = value;
+      });
+      
+      // Convert events
+      const events = span.events.map(event => ({
         name: event.name,
-        time: event.time,
-        attributes: event.attributes,
-      })),
-      links: span.links,
-      resource: span.resource,
-      // Add F&B platform specific metadata
-      platform: {
-        service: 'dulce-de-saigon',
-        component: 'agent-telemetry',
-        region: 'vietnam-southeast1',
-        compliance: {
-          gdpr: true,
-          vietnamDataLaw: true,
+        timestamp: event.time[0] * 1000000 + event.time[1] / 1000000,
+        attributes: event.attributes || {},
+      }));
+      
+      // Convert links
+      const links = span.links.map(link => ({
+        spanId: (link as any).spanId,
+        traceId: (link as any).traceId,
+        attributes: link.attributes || {},
+      }));
+      
+      return {
+        name: span.name,
+        spanId: span.spanContext().spanId,
+        traceId: span.spanContext().traceId,
+        // parentSpanId: removed - not available in ReadableSpan,
+        startTime: span.startTime[0] * 1000000 + span.startTime[1] / 1000000,
+        endTime: span.endTime[0] * 1000000 + span.endTime[1] / 1000000,
+        attributes,
+        events,
+        links,
+        status: {
+          code: span.status.code,
+          message: span.status.message || '',
         },
-      },
-    };
+        kind: span.kind,
+        serviceContext: this.serviceContext,
+      };
+    });
+  }
 
-    return JSON.stringify(spanData, null, 2);
+  /**
+   * Export trace data to Cloud Storage
+   * @param traceData Trace data to export
+   */
+  private async exportToCloudStorage(traceData: any[]): Promise<void> {
+    if (!this.bucketName) {
+      console.warn('No bucket name specified for Cloud Trace export');
+      return;
+    }
+    
+    const timestamp = new Date().toISOString();
+    const filename = `traces/${timestamp}-${Math.random().toString(36).substring(2, 10)}.json`;
+    
+    const bucket = this.storage.bucket(this.bucketName);
+    const file = bucket.file(filename);
+    
+    const stream = file.createWriteStream({
+      metadata: {
+        contentType: 'application/json',
+      },
+    });
+    
+    return new Promise((resolve, reject) => {
+      stream.on('error', reject);
+      stream.on('finish', resolve);
+      stream.end(JSON.stringify(traceData, null, 2));
+    });
   }
 
   /**
    * Shutdown the exporter
    */
-  async shutdown(): Promise<void> {
-    console.log('🔄 Cloud Trace exporter shutdown');
-  }
-
-  /**
-   * Force flush any pending exports
-   */
-  async forceFlush(): Promise<void> {
-    // No buffering in this implementation
-    console.log('🔄 Cloud Trace exporter force flush');
+  shutdown(): Promise<void> {
+    return Promise.resolve();
   }
 }

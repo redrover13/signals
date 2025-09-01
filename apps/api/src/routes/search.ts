@@ -135,6 +135,7 @@ async function searchInFile(
   query: string | undefined,
   ciTerms: string[],
 ): Promise<SearchResult | null> {
+  if (!filePath || !query) return null;
   try {
     const content = fs.readFileSync(filePath, 'utf-8');
     const lines = content.split('\n');

@@ -69,19 +69,19 @@ jobs:
           EOL
 
       - name: Initialize Nx Cloud run
-        run: pnpm nx-cloud start-ci-run
+        run: pnpm exec nx-cloud start-ci-run
 
       - name: Run lint tasks
-        run: pnpm nx-cloud record -- pnpm nx run-many --target=lint --all --parallel=3
+        run: pnpm exec nx-cloud record -- pnpm exec nx run-many --target=lint --all --parallel=3
 
       - name: Run build tasks
-        run: pnpm nx-cloud record -- pnpm nx run-many --target=build --all --parallel=3
+        run: pnpm exec nx-cloud record -- pnpm exec nx run-many --target=build --all --parallel=3
 
       - name: Report affected projects
         id: affected
         run: |
-          AFFECTED_APPS=$(pnpm nx show projects --affected --type=app)
-          AFFECTED_LIBS=$(pnpm nx show projects --affected --type=lib)
+          AFFECTED_APPS=$(pnpm exec nx show projects --affected --type=app)
+          AFFECTED_LIBS=$(pnpm exec nx show projects --affected --type=lib)
           
           echo "Affected apps: $AFFECTED_APPS"
           echo "Affected libs: $AFFECTED_LIBS"
@@ -91,7 +91,7 @@ jobs:
 
       - name: Stop Nx Cloud run
         if: always()
-        run: pnpm nx-cloud stop-all-agents
+        run: pnpm exec nx-cloud stop-all-agents
 
   agents:
     name: Nx Cloud Agent ${{ matrix.agent }}
@@ -149,6 +149,6 @@ jobs:
           EOL
 
       - name: Start Nx Agent ${{ matrix.agent }}
-        run: pnpm nx-cloud start-agent
+        run: pnpm exec nx-cloud start-agent
         env:
           NX_AGENT_NAME: ${{ matrix.agent }}

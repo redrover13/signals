@@ -12,7 +12,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as _ from 'lodash';
+import escapeRegExp from 'lodash-es/escapeRegExp';
 import { z } from "zod";
 
 // Input validation schema for search requests
@@ -142,7 +142,7 @@ async function searchInFile(
     const matches: string[] = [];
     let relevance = 0;
 
-    const safeQuery = _.escapeRegExp(query);
+    const safeQuery = escapeRegExp(query);
     const queryRegex = new RegExp(safeQuery, 'gi');
     const queryMatches = content.match(queryRegex);
     if (queryMatches) {

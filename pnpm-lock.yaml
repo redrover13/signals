@@ -64,9 +64,12 @@ importers:
       '@opentelemetry/semantic-conventions':
         specifier: ^1.36.0
         version: 1.36.0
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@waldzellai/adk-typescript':
         specifier: ^0.1.0
-        version: 0.1.0(encoding@0.1.13)(ws@8.18.0)(zod@4.1.5)
+        version: 0.1.0(encoding@0.1.13)(ws@8.18.0)(zod@3.25.76)
       chalk:
         specifier: ^5.6.0
         version: 5.6.0
@@ -82,9 +85,12 @@ importers:
       google-auth-library:
         specifier: ^10.2.1
         version: 10.2.1
-      lodash:
+      lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      lodash.memoize:
+        specifier: ^4.1.2
+        version: 4.1.2
       minimatch:
         specifier: ^10.0.3
         version: 10.0.3
@@ -102,7 +108,7 @@ importers:
         version: 9.0.1
       zod-to-json-schema:
         specifier: ^3.24.6
-        version: 3.24.6(zod@4.1.5)
+        version: 3.24.6(zod@3.25.76)
     devDependencies:
       '@jest/types':
         specifier: ^30.0.5
@@ -188,9 +194,6 @@ importers:
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
-      '@types/lodash':
-        specifier: ^4.17.20
-        version: 4.17.20
       '@types/node':
         specifier: 24.3.0
         version: 24.3.0
@@ -321,8 +324,8 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@24.3.0)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(less@4.4.1)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(tsx@4.20.5)(yaml@2.8.1)
       zod:
-        specifier: ^4.1.5
-        version: 4.1.5
+        specifier: ^3.25.76
+        version: 3.25.76
 
   apps/agents: {}
 
@@ -4156,6 +4159,9 @@ packages:
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
 
+  '@types/lodash-es@4.17.12':
+    resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
+
   '@types/lodash@4.17.20':
     resolution: {integrity: sha512-H3MHACvFUEiujabxhaI/ImO6gUrd8oOurg7LQtS7mbwIXA/cUqWrvBsaeJ23aZEPk1TAYkurjfMbSELfoCXlGA==}
 
@@ -7878,6 +7884,9 @@ packages:
   lockfile@1.0.4:
     resolution: {integrity: sha512-cvbTwETRfsFh4nHsL1eGWapU1XFi5Ot9E85sWAwia7Y7EgB7vfqcZhTKZ+l7hCGxSPoushMv5GKhT5PdLv03WA==}
 
+  lodash-es@4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+
   lodash.camelcase@4.3.0:
     resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}
 
@@ -11241,9 +11250,6 @@ packages:
 
   zod@4.0.17:
     resolution: {integrity: sha512-1PHjlYRevNxxdy2JZ8JcNAw7rX8V9P1AKkP+x/xZfxB0K5FYfuV+Ug6P/6NVSR2jHQ+FzDDoDHS04nYUsOIyLQ==}
-
-  zod@4.1.5:
-    resolution: {integrity: sha512-rcUUZqlLJgBC33IT3PNMgsCq6TzLQEG/Ei/KTCU0PedSWRMAXoOUN+4t/0H+Q8bdnLPdqUYnvboJT0bn/229qg==}
 
 snapshots:
 
@@ -16349,6 +16355,10 @@ snapshots:
 
   '@types/json5@0.0.29': {}
 
+  '@types/lodash-es@4.17.12':
+    dependencies:
+      '@types/lodash': 4.17.20
+
   '@types/lodash@4.17.20': {}
 
   '@types/long@4.0.2': {}
@@ -16959,11 +16969,11 @@ snapshots:
 
   '@vue/shared@3.5.20': {}
 
-  '@waldzellai/adk-typescript@0.1.0(encoding@0.1.13)(ws@8.18.0)(zod@4.1.5)':
+  '@waldzellai/adk-typescript@0.1.0(encoding@0.1.13)(ws@8.18.0)(zod@3.25.76)':
     dependencies:
       '@google/genai': 0.12.0(encoding@0.1.13)
       node-fetch: 2.7.0(encoding@0.1.13)
-      openai: 4.104.0(encoding@0.1.13)(ws@8.18.0)(zod@4.1.5)
+      openai: 4.104.0(encoding@0.1.13)(ws@8.18.0)(zod@3.25.76)
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -21327,6 +21337,8 @@ snapshots:
     dependencies:
       signal-exit: 3.0.7
 
+  lodash-es@4.17.21: {}
+
   lodash.camelcase@4.3.0: {}
 
   lodash.clonedeepwith@4.5.0: {}
@@ -21924,7 +21936,7 @@ snapshots:
       is-docker: 2.2.1
       is-wsl: 2.2.0
 
-  openai@4.104.0(encoding@0.1.13)(ws@8.18.0)(zod@4.1.5):
+  openai@4.104.0(encoding@0.1.13)(ws@8.18.0)(zod@3.25.76):
     dependencies:
       '@types/node': 18.19.123
       '@types/node-fetch': 2.6.13
@@ -21935,7 +21947,7 @@ snapshots:
       node-fetch: 2.7.0(encoding@0.1.13)
     optionalDependencies:
       ws: 8.18.0
-      zod: 4.1.5
+      zod: 3.25.76
     transitivePeerDependencies:
       - encoding
 
@@ -25315,12 +25327,6 @@ snapshots:
     dependencies:
       zod: 3.25.76
 
-  zod-to-json-schema@3.24.6(zod@4.1.5):
-    dependencies:
-      zod: 4.1.5
-
   zod@3.25.76: {}
 
   zod@4.0.17: {}
-
-  zod@4.1.5: {}

@@ -152,7 +152,7 @@ export function createSignal<T>(initialValue: T, options?: CreateSignalOptions):
 /**
  * Helper function to check equality (configurable)
  */
-function areEqual(a: any, b: any, customEquals?: (a: any, b: any) => boolean): boolean {
+function areEqual<T>(a: T, b: T, customEquals?: (a: T, b: T) => boolean): boolean {
   if (customEquals) {
     return customEquals(a, b);
   }

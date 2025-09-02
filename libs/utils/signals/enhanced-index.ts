@@ -189,7 +189,7 @@ function areEqual(a: any, b: any, customEquals?: (a: any, b: any) => boolean): b
   if (keysA.length !== keysB.length) return false;
   
   for (const key of keysA) {
-    if (!keysB.includes(key)) return false;
+    if (!Object.prototype.hasOwnProperty.call(b, key)) return false;
     if (!areEqual(a[key], b[key])) return false;
   }
   

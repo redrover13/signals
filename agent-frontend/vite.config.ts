@@ -171,8 +171,8 @@ export default defineConfig(async ({ mode }) => {
     optimizeDeps: {
       include: ['react', 'react-dom', 'lodash-es'],
       exclude: ['@nx-monorepo/utils/signals'],
-      // Enable dependency pre-bundling
-      force: mode === 'development',
+      // Enable dependency pre-bundling only when explicitly requested
+      force: env.VITE_FORCE_OPTIMIZE === 'true',
     },
   };
 });

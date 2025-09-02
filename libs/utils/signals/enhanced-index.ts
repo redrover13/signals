@@ -56,7 +56,7 @@ let signalIdCounter = 0;
  * @returns A signal with the provided value
  */
 export function createSignal<T>(initialValue: T, options?: CreateSignalOptions): Signal<T> {
-  const signalId = `signal_${++signalIdCounter}`;
+  const signalId = `DDS-signal-${++signalIdCounter}`;
   const internalSignal = signal<T>(initialValue);
   
   // Create extended signal with additional methods

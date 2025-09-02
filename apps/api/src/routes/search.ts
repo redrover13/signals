@@ -97,8 +97,9 @@ async function performSemanticSearch(query: string): Promise<SearchResult[]> {
     'container', 'terraform', 'infrastructure', 'deployment', 'automation', 'devops'
   ];
 
+  const q = query.toLowerCase();
   // If query is about CI or common, search in workflows
-  if (query.toLowerCase().includes('ci') || query.toLowerCase().includes('common')) {
+  if (/\bci\b/.test(q) || q.includes('common')) {
     const workflowsDir = path.join(repoRoot, '.github/workflows');
     if (fs.existsSync(workflowsDir)) {
       const files = fs.readdirSync(workflowsDir);

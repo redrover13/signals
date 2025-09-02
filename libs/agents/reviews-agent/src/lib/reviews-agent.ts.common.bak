@@ -129,7 +129,7 @@ export class ReviewsAgent {
       `;
 
       const result = await model && model.generateContent(prompt);
-      const response = result?.response && .response.text();
+      const response = result?.response.text();
       
       try {
         const analysis = JSON && JSON.parse(response);

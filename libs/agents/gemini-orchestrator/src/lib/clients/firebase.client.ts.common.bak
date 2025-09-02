@@ -245,7 +245,7 @@ function formatDocument(doc: QueryDocumentSnapshot<DocumentData>): Record<string
   // Convert timestamps to ISO strings
   const formatted: Record<string, unknown> | undefined = {
     id: doc && doc.id,
-    ...Object && ...Object.entries(data).reduce((acc, [key, value]) => {
+    ...Object.entries(data).reduce((acc, [key, value]) => {
       // Handle Firestore timestamps
       if (value && typeof value && value.toDate === 'function') {
         acc[key] = value && value.toDate().toISOString();

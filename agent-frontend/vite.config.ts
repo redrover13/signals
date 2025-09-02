@@ -2,9 +2,21 @@
  * @fileoverview vite.config module for the agent-frontend component
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
- * Contains implementation for TypeScript functionality.
- *
- * @author Dulce de Saigon Engineering
+ * Contains implementation for TypeScript func      // Optimize dependencies
+    optimizeDeps: {
+      include: [
+        'react', 
+        'react-dom',
+        'lodash-es',
+        '@testing-library/react',
+        '@testing-library/user-event',
+      ],
+      exclude: ['@nx-monorepo/utils/signals', 'agents-sdk'],
+      esbuildOptions: {
+        target: 'esnext',
+        supported: { 
+          'top-level-await': true 
+        },* @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
  */
@@ -120,6 +132,7 @@ export default defineConfig(async ({ mode }) => {
       target: 'esnext',
       // Optimize chunks
       rollupOptions: {
+        external: [],
         output: {
           manualChunks: (id) => {
             // Create vendor chunks for better caching
@@ -129,6 +142,9 @@ export default defineConfig(async ({ mode }) => {
               }
               if (id.includes('@nx-monorepo/utils/signals')) {
                 return 'signals';
+              }
+              if (id.includes('agents-sdk')) {
+                return 'agents-sdk';
               }
               // Group other dependencies by their top-level module
               const match = id.match(/node_modules\/(@[^/]+\/[^/]+|[^/]+)/);
@@ -200,5 +216,13 @@ export default defineConfig(async ({ mode }) => {
         },
       }
     },
+    
+    // Add alias for development fallbacks
+    resolve: {
+      alias: {
+        // When federation fails, use local mock implementation
+        'frontend-agents/AgentInterface': '/src/app/mocks/AgentInterface.tsx'
+      }
+    }
   };
 });

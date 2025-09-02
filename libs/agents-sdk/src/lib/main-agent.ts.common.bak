@@ -16,7 +16,7 @@ import { getFirestore, doc, setDoc } from 'firebase/firestore';
 
 // Legacy sub-agent for BigQuery operations (kept for backwards compatibility)
 export class BQSubAgent {
-  private bigquery: BigQuery | undefined;
+  private bigquery: BigQuery;
 
   constructor(projectId: string) {
     this.bigquery = new BigQuery({ projectId });
@@ -24,17 +24,17 @@ export class BQSubAgent {
 
   async execute(sql: string): Promise<any> {
     try {
-      const [rows] = await this.bigquery && this.bigquery.query({ query: sql });
+      const [rows] = await this.bigquery.query({ query: sql });
       return { success: true, data: rows };
     } catch (error) {
-      return { success: false, error: error instanceof Error ? error && error.message : 'Unknown error' };
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   }
 }
 
 // Legacy sub-agent for Firebase operations (kept for backwards compatibility)
 export class FirebaseSubAgent {
-  private db: any | undefined;
+  private db: any;
 
   constructor(firebaseConfig: any) {
     const app = initializeApp(firebaseConfig);
@@ -43,35 +43,36 @@ export class FirebaseSubAgent {
 
   async execute(data: { path: string | undefined; value: any }): Promise<any> {
     try {
-      const docRef = doc(this.db, data?.path);
-      await setDoc(docRef, data?.value);
+      if (!data.path) throw new Error('Path is required');
+      const docRef = doc(this.db, data.path);
+      await setDoc(docRef, data.value);
       return { success: true, message: 'Data updated successfully' };
     } catch (error) {
-      return { success: false, error: error instanceof Error ? error && error.message : 'Unknown error' };
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   }
 }
 
 export interface MainAgentConfig {
-  apiKey: string | undefined;
-  projectId: string | undefined;
-  firebaseConfig?: any | undefined;
+  apiKey: string;
+  projectId: string;
+  firebaseConfig?: any;
 }
 
 // Main orchestrator class with enhanced functionality
 export class MainAgent {
-  private genAI: GoogleGenerativeAI | undefined;
-  private subAgents: { bq: BQSubAgent | undefined; firebase: FirebaseSubAgent };
-  private config: MainAgentConfig | undefined;
+  private genAI: GoogleGenerativeAI;
+  private subAgents: { bq: BQSubAgent; firebase: FirebaseSubAgent };
+  private config: MainAgentConfig;
 
   constructor(config: MainAgentConfig) {
     this.config = config;
-    this.genAI = new GoogleGenerativeAI(config?.apiKey);
+    this.genAI = new GoogleGenerativeAI(config.apiKey || '');
     
     // Initialize sub-agents
     this.subAgents = {
-      bq: new BQSubAgent(config?.projectId),
-      firebase: new FirebaseSubAgent(config?.firebaseConfig || {}),
+      bq: new BQSubAgent(config.projectId || ''),
+      firebase: new FirebaseSubAgent(config.firebaseConfig || {}),
     };
   }
 
@@ -80,11 +81,11 @@ export class MainAgent {
    */
   async orchestrate(query: string | undefined, context?: Record<string, any>): Promise<any> {
     try {
-      const model = this.genAI && this.genAI.getGenerativeModel({ model: 'gemini-1 && 1.5-flash' });
-      const result = await model && model.generateContent(`
+      const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const result = await model.generateContent(`
         Analyze this F&B platform query and determine the appropriate action:
         Query: ${query}
-        Context: ${JSON && JSON.stringify(context || {})}
+        Context: ${JSON.stringify(context || {})}
         
         Respond with one of:
         - "BIGQUERY: <SQL_QUERY>" for data analysis queries
@@ -95,16 +96,16 @@ export class MainAgent {
         - "ERROR: <REASON>" if the query cannot be processed
       `);
       
-      const response = result?.response && .response.text();
+      const response = await result.response.text();
 
       if (response.startsWith('BIGQUERY:')) {
         const sql = response.replace('BIGQUERY:', '').trim();
-        return await this.subAgents.bq && this.subAgents.bq.execute(sql);
+        return await this.subAgents.bq.execute(sql);
       } else if (response.startsWith('FIREBASE:')) {
         const parts = response.replace('FIREBASE:', '').trim().split('|');
         const path = parts[0] || '';
-        const data = JSON && JSON.parse(parts[1] || '{}');
-        return await this.subAgents.firebase && this.subAgents.firebase.execute({ path, value: data });
+        const data = JSON.parse(parts[1] || '{}');
+        return await this.subAgents.firebase.execute({ path, value: data });
       } else if (response.startsWith('F&B_ANALYTICS:')) {
         const restaurantId = response.replace('F&B_ANALYTICS:', '').trim() || context?.['restaurantId'];
         return await this.getFBAnalytics(restaurantId, context?.['dateRange']);
@@ -126,14 +127,14 @@ export class MainAgent {
    * Direct access to BigQuery operations
    */
   async queryBigQuery(sql: string): Promise<any> {
-    return await this.subAgents.bq && this.subAgents.bq.execute(sql);
+    return await this.subAgents.bq.execute(sql);
   }
 
   /**
    * Direct access to Firebase operations
    */
   async updateFirebase(path: string | undefined, data: any): Promise<any> {
-    return await this.subAgents.firebase && this.subAgents.firebase.execute({ path, value: data });
+    return await this.subAgents.firebase.execute({ path, value: data });
   }
 
   /**
@@ -160,7 +161,7 @@ export class MainAgent {
       LIMIT 100
     `;
 
-    return await this.subAgents.bq && this.subAgents.bq.execute(sql);
+    return await this.subAgents.bq.execute(sql);
   }
 
   /**
@@ -187,7 +188,7 @@ export class MainAgent {
       LIMIT 50
     `;
 
-    return await this.subAgents.bq && this.subAgents.bq.execute(sql);
+    return await this.subAgents.bq.execute(sql);
   }
 
   /**
@@ -218,7 +219,7 @@ export class MainAgent {
       LIMIT 20
     `;
 
-    return await this.subAgents.bq && this.subAgents.bq.execute(sql);
+    return await this.subAgents.bq.execute(sql);
   }
 
   /**
@@ -261,7 +262,7 @@ export class MainAgent {
       LIMIT 50
     `;
 
-    return await this.subAgents.bq && this.subAgents.bq.execute(sql);
+    return await this.subAgents.bq.execute(sql);
   }
 
   /**
@@ -282,6 +283,6 @@ export class MainAgent {
       type: 'food_item'
     };
 
-    return await this.subAgents.firebase && this.subAgents.firebase.execute({ path, value: data });
+    return await this.subAgents.firebase.execute({ path, value: data });
   }
 }

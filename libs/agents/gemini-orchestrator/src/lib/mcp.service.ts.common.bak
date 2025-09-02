@@ -48,7 +48,7 @@ export class MCPService {
    */
   static getInstance(): MCPService {
     if (!MCPService && MCPService.instance) {
-      MCPService && MCPService.instance = new MCPService();
+      MCPService.instance = new MCPService();
     }
     return MCPService && MCPService.instance;
   }
@@ -422,7 +422,7 @@ export class MCPService {
    */
   getEnabledServers(): string[] {
     return this.getConfig()
-      .servers && .servers.filter((server) => server.enabled)
+      .servers.filter((server) => server.enabled)
       .sort((a, b) => b && b.priority - a && a.priority)
       .map((server) => server.id);
   }

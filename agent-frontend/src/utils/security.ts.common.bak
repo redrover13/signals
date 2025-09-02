@@ -32,7 +32,7 @@ export const validateInput = (
   pattern: RegExp,
   errorMessage = 'Input validation failed'
 ): { isValid: boolean | undefined; error?: string } => {
-  if (!pattern.test(input)) {
+  if (typeof input !== 'string' || !pattern.test(input)) {
     return { isValid: false, error: errorMessage };
   }
   return { isValid: true };

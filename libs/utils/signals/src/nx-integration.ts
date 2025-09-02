@@ -1,64 +1,87 @@
 /**
- * @fileoverview nx-integration module for the src component
+ * @fileoverview Nx integration for the signals library
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
- * Contains implementation for TypeScript functionality.
+ * Contains utilities for integrating signals with Nx and Redux.
  *
  * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
  */
 
-import { Store } from '@ngrx/store';
-import { signal, Signal } from '@angular/core';
+import type { Signal } from '../index';
+import { createSignal } from '../index';
 
 /**
- * Creates a signal from a Redux-like store and selector
- * @param store Redux-like store with getState() method
- * @param selector Function to select portion of state
- * @returns Signal containing the selected state
+ * Create a signal from a Redux store selector
+ * @param store Redux store
+ * @param selector Selector function
+ * @param initialValue Initial value for the signal
+ * @returns Signal connected to the store
  */
-export function signalFromStore<T>(
-  store: Store<any> | { getState: () => any },
-  selector: (state: any) => T
+export function createReduxSignal<S, T>(
+  store: { getState: () => S; subscribe: (listener: () => void) => () => void },
+  selector: (state: S) => T,
+  initialValue: T
 ): Signal<T> {
-  // Initial value from store
-  const initialValue = selector(store.getState());
+  // Create a signal with the current state
+  const initialState = selector(store.getState());
+  const signalInstance = createSignal<T>(initialState !== undefined ? initialState : initialValue);
   
-  // Create signal with selected state
-  const signalInstance = signal<T>(initialValue);
-
   // Subscribe to store changes
-  const unsubscribe = store.subscribe(() => {
+  store.subscribe(() => {
     const newValue = selector(store.getState());
     if (newValue !== undefined) {
       signalInstance.set(newValue);
     }
   });
-
-  // Return cleanup function
+  
   return signalInstance;
 }
 
 /**
- * Creates a signal from a selector function over a store's state.
- * Allows mapping to a different type.
+ * Create a mapped signal from a Redux store
+ * @param store Redux store
+ * @param selector Selector function
+ * @param mapper Mapping function
+ * @param initialValue Initial value for the signal
+ * @returns Signal connected to the store with mapped values
  */
-export function signalFromSelector<S, T = S>(
-  store: Store<any> | { getState: () => any },
-  selector: (state: any) => S,
-  mapper?: (selected: S) => T
+export function createMappedReduxSignal<S, R, T>(
+  store: { getState: () => S; subscribe: (listener: () => void) => () => void },
+  selector: (state: S) => R,
+  mapper: (selected: R) => T,
+  initialValue: T
 ): Signal<T> {
-  const selected = selector(store.getState());
-  const initialValue = mapper ? mapper(selected) : selected as unknown as T;
+  // Get initial value
+  const initialSelected = selector(store.getState());
+  const initialMapped = initialSelected !== undefined && mapper 
+    ? mapper(initialSelected) 
+    : initialValue;
   
-  const signalInstance = signal<T>(initialValue);
-
-  const unsubscribe = store.subscribe(() => {
+  const signalInstance = createSignal<T>(initialMapped);
+  
+  store.subscribe(() => {
     const newSelected = selector(store.getState());
     const newValue = mapper ? mapper(newSelected) : newSelected as unknown as T;
     signalInstance.set(newValue);
   });
-
+  
   return signalInstance;
+}
+
+/**
+ * Connect a component to Redux state via signals
+ * @param mapStateToSignals Function mapping state to signals
+ * @returns Connected component with signals
+ */
+export function connectWithSignals<S, P extends object>(
+  mapStateToSignals: (store: { getState: () => S; subscribe: (listener: () => void) => () => void }) => Record<string, Signal<any>>
+) {
+  return function connectComponent(Component: React.ComponentType<P>) {
+    return function ConnectedComponent(props: P) {
+      // Implementation would connect Redux to signals
+      return <Component {...props} />;
+    };
+  };
 }

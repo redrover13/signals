@@ -28,7 +28,7 @@ const agents = {
   'bq-agent': {
     name: 'BigQuery Agent',
     async process(query: string | undefined, params?: Record<string, unknown> | undefined) {
-      if (query.toLowerCase().includes('analytics') || query.toLowerCase().includes('restaurant performance')) {
+      if (query && (query.toLowerCase().includes('analytics') || query.toLowerCase().includes('restaurant performance'))) {
         const restaurantId = params?.restaurantId as string;
         return `F&B Analytics: ${restaurantId ? `Analysis for ${restaurantId}` : 'Global analysis'} - Revenue trends: ↑15% MoM, Peak hours: 7-9PM Vietnamese dinner time, Top dishes: Phở variants leading with 1,234 orders, Customer retention: 78% return within 30 days`;
       }

@@ -55,7 +55,7 @@ export class ADKError extends Error {
     }
     
     // Capture stack trace
-    Error && Error.captureStackTrace(this, ADKError);
+    Error.captureStackTrace(this, ADKError);
   }
 
   /**

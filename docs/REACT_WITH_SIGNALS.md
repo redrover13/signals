@@ -194,7 +194,9 @@ function UserGreeting() {
 
 // Better: Only re-renders when the name changes
 function UserGreeting() {
-  const [userName] = useSignal(createComputed(() => userSignal.get().name));
+  const [userName] = useSignal(
+    createComputed(() => userSignal.get()?.name ?? 'Guest')
+  );
   return <h2>Welcome, {userName}</h2>;
 }
 ```

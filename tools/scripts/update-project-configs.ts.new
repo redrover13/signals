@@ -1,0 +1,143 @@
+/**
+ * @fileoverview update-project-configs module for the scripts component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
+ * This script updates all project.json files in the workspace with optimized configurations
+ * for caching, builds, and linting.
+ */
+import * as fs from 'fs';
+import * as path from 'path';
+import * as glob from 'glob';
+
+interface ProjectConfig {
+  name: string | undefined;
+  $schema: string | undefined;
+  sourceRoot: string | undefined;
+  projectType: 'library' | 'application';
+  implicitDependencies?: string[];
+  targets: Record<string, any> | undefined;
+  tags: string[];
+  namedInputs?: Record<string, any> | undefined;
+}
+
+const updateLibraryProject = (config: ProjectConfig, projectPath: string): ProjectConfig => {
+  const projectName = path.basename(path.dirname(projectPath));
+  const projectType = config.projectType || 'library';
+  
+  // Extract domain from directory structure
+  const pathParts = path.dirname(projectPath).split(path.sep);
+  const domain = pathParts[pathParts.length - 1];
+  
+  // Update build target
+  if (config.targets && config.targets["build"]) {
+    config.targets["build"] = {
+      ...config.targets["build"],
+      configurations: {
+        production: {
+          optimization: true,
+          extractLicenses: true,
+          generatePackageJson: true,
+          sourceMap: false
+        },
+        development: {
+          optimization: false,
+          extractLicenses: false,
+          generatePackageJson: true,
+          sourceMap: true
+        }
+      },
+      cache: true,
+      dependsOn: config.targets["build"].dependsOn || ["^build"],
+    };
+  }
+  
+  // Update lint target
+  if (config.targets && config.targets["lint"]) {
+    config.targets["lint"] = {
+      ...config.targets["lint"],
+      cache: true,
+      options: {
+        ...config.targets["lint"].options,
+        lintFilePatterns: config.targets["lint"].options?.lintFilePatterns || [
+          `${config.sourceRoot}/**/*.ts`
+        ]
+      }
+    };
+  }
+  
+  // Update test target
+  if (config.targets && config.targets["test"]) {
+    config.targets["test"] = {
+      ...config.targets["test"],
+      cache: true,
+      options: {
+        ...config.targets["test"].options,
+        passWithNoTests: true,
+        codeCoverage: true
+      }
+    };
+  }
+  
+  // Add/update namedInputs
+  config.namedInputs = {
+    ...(config.namedInputs || {}),
+    default: ['{projectRoot}/**/*', '!{projectRoot}/**/*.test.ts'],
+    production: ['default', '!{projectRoot}/**/*.spec.ts'],
+  };
+  
+  // Add/update tags
+  config.tags = config.tags || [];
+  if (!config.tags.includes(domain)) {
+    config.tags.push(domain);
+  }
+  if (!config.tags.includes(projectType)) {
+    config.tags.push(projectType);
+  }
+  
+  return config;
+};
+
+const main = () => {
+  const projectFiles = glob.sync('**/project.json', {
+    ignore: ['node_modules/**', 'dist/**'],
+    cwd: process.cwd()
+  });
+  
+  console.log(`Found ${projectFiles.length} project.json files to update`);
+  
+  for (const projectFile of projectFiles) {
+    const projectPath = path.join(process.cwd(), projectFile);
+    console.log(`Updating ${projectPath}`);
+    
+    try {
+      const content = fs.readFileSync(projectPath, 'utf8');
+      const config = JSON.parse(content) as ProjectConfig;
+      
+      // Update the config
+      const updatedConfig = updateLibraryProject(config, projectPath);
+      
+      // Write back to file
+      fs.writeFileSync(
+        projectPath,
+        JSON.stringify(updatedConfig, null, 2),
+        'utf8'
+      );
+      
+      console.log(`Updated ${projectPath}`);
+    } catch (error) {
+      console.error(`Error updating ${projectPath}:`, error);
+    }
+  }
+  
+  console.log('All project.json files have been updated');
+};
+
+main();

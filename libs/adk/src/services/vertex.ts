@@ -9,259 +9,228 @@
  * @license MIT
  */
 
-import { PredictionServiceClient } from '@google-cloud/aiplatform';
+import { VertexAI } from '@google-cloud/vertexai';
+import { GenModel } from '@google/generative-ai';
+import { GeminiConfig, extractGeminiResponseText, formatGeminiError } from '../utilities/gemini';
+import { VertexIndexer } from './vertex-indexer';
+import { VertexEmbedder } from './vertex-embedder';
+import { EmbeddingConfig } from '../interfaces/embedding-config';
+import { FeatureDetails, DocumentChunk } from '../interfaces/document-chunk';
+import { Buffer } from 'buffer';
 
-export interface VertexAIClientConfig {
-  projectId: string;
-  location: string;
-  embeddingModel?: string;
-}
-
-export interface DocumentChunk {
-  id: string;
-  content: string;
-  metadata: Record<string, any>;
-  embedding?: number[];
-}
-
-export interface EmbeddingResponse {
-  embeddings: number[][];
-}
-
-export interface SearchResult {
-  id: string;
-  content: string;
-  metadata: Record<string, any>;
-  score: number;
-}
-
-export interface RAGSearchOptions {
-  query: string;
-  maxResults?: number;
-  filter?: Record<string, any>;
-}
-
-/**
- * Enhanced Vertex AI client with RAG capabilities
- */
-export class VertexAIClient {
-  private predictionClient: PredictionServiceClient;
+export class VertexClient {
+  private vertex: VertexAI;
+  private indexer: VertexIndexer;
+  private embedder: VertexEmbedder;
+  private predictionClient: any;
+  private endpointId: string;
   private projectId: string;
   private location: string;
-  private endpointId: string;
-  private embeddingModel: string;
+  private modelName: string;
+  private temperature: number;
+  private maxOutputTokens: number;
+  private topK: number;
+  private topP: number;
 
-  constructor(config: VertexAIClientConfig) {
+  constructor(config: GeminiConfig & { projectId: string; location: string; endpointId?: string }) {
     this.projectId = config.projectId;
     this.location = config.location;
-    this.endpointId = config.endpointId;
-    this.embeddingModel = config.embeddingModel || 'textembedding-gecko@003';
-    
-    this.predictionClient = new PredictionServiceClient();
+    this.modelName = config.modelName;
+    this.temperature = config.temperature || 0.2;
+    this.maxOutputTokens = config.maxOutputTokens || 1024;
+    this.topK = config.topK || 40;
+    this.topP = config.topP || 0.8;
+    this.endpointId = config.endpointId || '';
+
+    // Initialize Vertex AI
+    this.vertex = new VertexAI({
+      project: this.projectId,
+      location: this.location,
+    });
+
+    // Initialize indexing and embedding
+    this.indexer = new VertexIndexer({
+      projectId: this.projectId,
+      location: this.location,
+    });
+
+    this.embedder = new VertexEmbedder({
+      projectId: this.projectId,
+      location: this.location,
+    });
+
+    // Initialize Prediction client if endpoint is provided
+    if (this.endpointId) {
+      const { PredictionServiceClient } = require('@google-cloud/aiplatform');
+      this.predictionClient = new PredictionServiceClient();
+    }
   }
 
-  /**
-   * Generate embeddings for text content
-   */
-  async generateEmbeddings(texts: string[]): Promise<EmbeddingResponse> {
-    // Use Vertex AI PredictionServiceClient to generate embeddings
-    console.log(`Generating embeddings for ${texts.length} texts`);
-
-    const endpoint = `projects/${this.projectId}/locations/${this.location}/publishers/google/models/${this.embeddingModel}`;
-
-    // Prepare the instances for the request
-    const instances = texts.map(text => ({ content: text }));
-
-    const request = {
-      endpoint,
-      instances,
-    };
-
+  async generateContent(promptText: string): Promise<string> {
     try {
-      const [response] = await this.predictionClient.predict(request);
-      // The embeddings are typically in response.predictions
-      const embeddings: number[][] = response.predictions?.map((pred: any) => pred.embeddings || pred.values || []) || [];
-      return { embeddings };
+      // Get the generative model
+      const generativeModel = this.vertex.getGenerativeModel({
+        model: this.modelName,
+        generationConfig: {
+          temperature: this.temperature,
+          maxOutputTokens: this.maxOutputTokens,
+          topK: this.topK,
+          topP: this.topP,
+        },
+      });
+
+      // Generate content
+      const response = await generativeModel.generateContent(promptText);
+      return extractGeminiResponseText(response);
     } catch (error) {
-      console.error('Error generating embeddings from Vertex AI:', error);
+      console.error('Error generating content:', formatGeminiError(error));
       throw error;
     }
   }
 
-  /**
-   * Index document chunks in Vertex AI Search
-   * Note: This is a placeholder implementation for discovery engine functionality
-   */
-  async indexDocuments(
-    dataStoreId: string,
-    documents: DocumentChunk[]
-  ): Promise<void> {
-    // TODO: Implement with discovery engine client when available
-    console.log(`Indexing ${documents.length} documents to data store ${dataStoreId}`);
-    
-    // For now, log the documents that would be indexed
-    documents.forEach(doc => {
-      console.log(`Document ${doc.id}: ${doc.content.substring(0, 100)}...`);
-    });
-  }
-
-  /**
-   * Search for relevant documents using Vertex AI Search
-   * Note: This is a placeholder implementation for discovery engine functionality
-   */
-  async searchDocuments(
-    searchEngineId: string,
-    options: RAGSearchOptions
-  ): Promise<SearchResult[]> {
-    // TODO: Implement with discovery engine client when available
-    console.log(`Searching in engine ${searchEngineId} for: ${options.query}`);
-    
-    // Return mock results for now
-    return [
-      {
-        id: 'mock_result_1',
-        content: `Mock search result for query: ${options.query}`,
-        metadata: { source: 'mock', query: options.query },
-        score: 0.95
-      }
-    ];
-  }
-
-  /**
-   * Process and chunk a document for RAG
-   */
-  chunkDocument(
-    content: string,
-    metadata: Record<string, any> = {},
-    chunkSize = 1000,
-    overlap = 200
-  ): DocumentChunk[] {
-    const chunks: DocumentChunk[] = [];
-    const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
-    
-    let currentChunk = '';
-    let chunkIndex = 0;
-    
-    for (let i = 0; i < sentences.length; i++) {
-      const sentence = sentences[i].trim() + '.';
-      
-      if (currentChunk.length + sentence.length <= chunkSize) {
-        currentChunk += (currentChunk ? ' ' : '') + sentence;
-      } else {
-        if (currentChunk) {
-          chunks.push({
-            id: `${metadata['documentId'] || 'doc'}_chunk_${chunkIndex}`,
-            content: currentChunk,
-            metadata: {
-              ...metadata,
-              chunkIndex,
-              originalLength: content.length
-            }
-          });
-          chunkIndex++;
-        }
-        
-        // Start new chunk with overlap
-        const overlapText = this.getOverlapText(currentChunk, overlap);
-        currentChunk = overlapText + (overlapText ? ' ' : '') + sentence;
-      }
-    }
-    
-    // Add the last chunk
-    if (currentChunk) {
-      chunks.push({
-        id: `${metadata['documentId'] || 'doc'}_chunk_${chunkIndex}`,
-        content: currentChunk,
-        metadata: {
-          ...metadata,
-          chunkIndex,
-          originalLength: content.length
-        }
-      });
-    }
-    
-    return chunks;
-  }
-
-  /**
-   * Get overlap text from the end of a chunk
-   */
-  private getOverlapText(text: string, overlap: number): string {
-    if (text.length <= overlap) return text;
-    
-    const overlapText = text.slice(-overlap);
-    const lastSpaceIndex = overlapText.lastIndexOf(' ');
-    
-    return lastSpaceIndex > 0 ? overlapText.slice(lastSpaceIndex + 1) : overlapText;
-  }
-
-  /**
-   * Extract text content from various file formats
-   */
-  async extractTextFromFile(
-    fileBuffer: Buffer,
-    mimeType: string,
-    fileName: string
-  ): Promise<string> {
+  async generateContentStream(promptText: string): Promise<ReadableStream<any>> {
     try {
-      switch (mimeType) {
-        case 'text/plain':
-          return fileBuffer.toString('utf-8');
-        
-        case 'application/json':
-          const jsonData = JSON.parse(fileBuffer.toString('utf-8'));
-          return JSON.stringify(jsonData, null, 2);
-        
-        case 'text/markdown':
-        case 'text/x-markdown':
-          return fileBuffer.toString('utf-8');
-        
-        default:
-          // For unsupported formats, return basic text representation
-          console.warn(`Unsupported file type ${mimeType} for ${fileName}`);
-          return fileBuffer.toString('utf-8');
-      }
+      // Get the generative model
+      const generativeModel = this.vertex.getGenerativeModel({
+        model: this.modelName,
+        generationConfig: {
+          temperature: this.temperature,
+          maxOutputTokens: this.maxOutputTokens,
+          topK: this.topK,
+          topP: this.topP,
+        },
+      });
+
+      // Generate content stream
+      const responseStream = await generativeModel.generateContentStream(promptText);
+      return responseStream.stream;
     } catch (error) {
-      throw new Error(`Failed to extract text from ${fileName}: ${error}`);
+      console.error('Error generating content stream:', formatGeminiError(error));
+      throw error;
     }
   }
 
-  /**
-   * Complete RAG pipeline: process document, chunk, embed, and index
-   */
-  async processDocumentForRAG(
-    content: string,
-    metadata: Record<string, any>,
-    dataStoreId: string,
-    options: {
-      chunkSize?: number;
-      overlap?: number;
-      generateEmbeddings?: boolean;
-    } = {}
-  ): Promise<DocumentChunk[]> {
-    const {
-      chunkSize = 1000,
-      overlap = 200,
-      generateEmbeddings = true
-    } = options;
-
-    // Chunk the document
-    const chunks = this.chunkDocument(content, metadata, chunkSize, overlap);
-
-    // Generate embeddings if requested
-    if (generateEmbeddings) {
-      const texts = chunks.map(chunk => chunk.content);
-      const embeddingResponse = await this.generateEmbeddings(texts);
-      
-      chunks.forEach((chunk, index) => {
-        chunk.embedding = embeddingResponse.embeddings[index];
-      });
+  async createEmbedding(text: string, config?: EmbeddingConfig): Promise<number[]> {
+    try {
+      return await this.embedder.createEmbedding(text, config);
+    } catch (error) {
+      console.error('Error creating embedding:', error);
+      throw error;
     }
+  }
 
-    // Index the chunks
-    await this.indexDocuments(dataStoreId, chunks);
+  async createEmbeddings(texts: string[], config?: EmbeddingConfig): Promise<number[][]> {
+    try {
+      return await this.embedder.createEmbeddings(texts, config);
+    } catch (error) {
+      console.error('Error creating embeddings:', error);
+      throw error;
+    }
+  }
 
-    return chunks;
+  async createIndex(displayName: string, description: string, metadata: Record<string, any> = {}): Promise<string> {
+    try {
+      return await this.indexer.createIndex(displayName, description, metadata);
+    } catch (error) {
+      console.error('Error creating index:', error);
+      throw error;
+    }
+  }
+
+  async listIndices(): Promise<any[]> {
+    try {
+      return await this.indexer.listIndices();
+    } catch (error) {
+      console.error('Error listing indices:', error);
+      throw error;
+    }
+  }
+
+  async deleteIndex(indexId: string): Promise<void> {
+    try {
+      await this.indexer.deleteIndex(indexId);
+    } catch (error) {
+      console.error('Error deleting index:', error);
+      throw error;
+    }
+  }
+
+  async createDataStore(indexId: string, displayName: string, description: string, metadata: Record<string, any> = {}): Promise<string> {
+    try {
+      return await this.indexer.createDataStore(indexId, displayName, description, metadata);
+    } catch (error) {
+      console.error('Error creating data store:', error);
+      throw error;
+    }
+  }
+
+  async listDataStores(indexId: string): Promise<any[]> {
+    try {
+      return await this.indexer.listDataStores(indexId);
+    } catch (error) {
+      console.error('Error listing data stores:', error);
+      throw error;
+    }
+  }
+
+  async deleteDataStore(indexId: string, dataStoreId: string): Promise<void> {
+    try {
+      await this.indexer.deleteDataStore(indexId, dataStoreId);
+    } catch (error) {
+      console.error('Error deleting data store:', error);
+      throw error;
+    }
+  }
+
+  async indexDocuments(dataStoreId: string, documents: DocumentChunk[]): Promise<void> {
+    try {
+      await this.indexer.indexDocuments(dataStoreId, documents);
+    } catch (error) {
+      console.error('Error indexing documents:', error);
+      throw error;
+    }
+  }
+
+  async createDocumentChunks(text: string, chunkSize = 1000, chunkOverlap = 200, features: FeatureDetails[] = []): Promise<DocumentChunk[]> {
+    try {
+      // Split text into chunks
+      const chunks: DocumentChunk[] = [];
+      let startIndex = 0;
+
+      while (startIndex < text.length) {
+        const endIndex = Math.min(startIndex + chunkSize, text.length);
+        const chunkText = text.substring(startIndex, endIndex);
+
+        chunks.push({
+          id: `chunk-${startIndex}`,
+          text: chunkText,
+          metadata: {
+            startIndex,
+            endIndex,
+          },
+          features,
+        });
+
+        startIndex = endIndex - chunkOverlap;
+      }
+
+      // Generate embeddings for each chunk
+      const embeddingTexts = chunks.map((chunk) => chunk.text);
+      const embeddingResponses = await this.createEmbeddings(embeddingTexts);
+
+      // Add embeddings to chunks
+      chunks.forEach((chunk, index) => {
+        if (chunk && embeddingResponses && embeddingResponses[index]) {
+          chunk.embedding = embeddingResponses[index];
+        }
+      });
+
+      await this.indexDocuments(dataStoreId, chunks);
+      return chunks;
+    } catch (error) {
+      console.error('Error creating document chunks:', error);
+      throw error;
+    }
   }
 
   async predict(instancePayload: any): Promise<any> {
@@ -270,6 +239,6 @@ export class VertexAIClient {
       endpoint,
       instances: [instancePayload],
     };
-    return this.predictionClient.predict(request);
+    return this.predictionClient && this.predictionClient.predict(request);
   }
 }

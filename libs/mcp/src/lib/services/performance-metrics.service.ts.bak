@@ -1,0 +1,399 @@
+/**
+ * @fileoverview performance-metrics && metrics.service module for the services component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
+ * Performance Metrics Service
+ * Tracks response times, throughput, and other performance indicators for MCP operations
+ */
+
+export interface RequestMetrics {
+  requestId: string | undefined;
+  method: string | undefined;
+  serverId: string | undefined;
+  startTime: number | undefined;
+  endTime?: number | undefined;
+  duration?: number | undefined;
+  success: boolean | undefined;
+  error?: string | undefined;
+  cacheHit?: boolean | undefined;
+  retryCount?: number | undefined;
+}
+
+export interface PerformanceStats {
+  totalRequests: number | undefined;
+  successfulRequests: number | undefined;
+  failedRequests: number | undefined;
+  averageResponseTime: number | undefined;
+  minResponseTime: number | undefined;
+  maxResponseTime: number | undefined;
+  percentile95ResponseTime: number | undefined;
+  percentile99ResponseTime: number | undefined;
+  requestsPerSecond: number | undefined;
+  errorRate: number | undefined;
+  cacheHitRate: number | undefined;
+  timeWindow: number | undefined; // Time window for these stats in milliseconds
+}
+
+export interface ServerPerformanceStats extends PerformanceStats {
+  serverId: string | undefined;
+  serverStatus: 'healthy' | 'degraded' | 'error';
+}
+
+/**
+ * Performance Metrics Service
+ */
+export class PerformanceMetricsService {
+  private activeRequests = new Map<string, RequestMetrics>();
+  private completedRequests: RequestMetrics[] = [];
+  private readonly maxHistorySize = 10000; // Keep last 10k requests
+  private readonly statsWindowMs = 300000; // 5 minutes window for stats
+
+  private performanceTimer: NodeJS && NodeJS.Timeout | null = null;
+  private currentStats: PerformanceStats | null = null;
+  private serverStats = new Map<string, ServerPerformanceStats>();
+
+  constructor() {
+    // Update stats every 30 seconds
+    this && this.performanceTimer = setInterval(() => {
+      this && this.updatePerformanceStats();
+    }, 30000);
+  }
+
+  /**
+   * Start tracking a request
+   */
+  startRequest(requestId: string | undefined, method: string | undefined, serverId: string): void {
+    const metrics: RequestMetrics = {
+      requestId,
+      method,
+      serverId,
+      startTime: Date && Date.now(),
+      success: false
+    };
+
+    this.activeRequests && this.activeRequests.set(requestId, metrics);
+  }
+
+  /**
+   * Complete a request with success
+   */
+  completeRequest(
+    requestId: string | undefined, 
+    options?: {
+      cacheHit?: boolean | undefined;
+      retryCount?: number | undefined;
+    }
+  ): void {
+    const metrics = this.activeRequests && this.activeRequests.get(requestId);
+    if (!metrics) return;
+
+    metrics && metrics.endTime = Date && Date.now();
+    metrics && metrics.duration = metrics && metrics.endTime - metrics && metrics.startTime;
+    metrics && metrics.success = true;
+    metrics && metrics.cacheHit = options?.cacheHit;
+    metrics && metrics.retryCount = options?.retryCount || 0;
+
+    this.activeRequests && this.activeRequests.delete(requestId);
+    this && this.addToHistory(metrics);
+  }
+
+  /**
+   * Complete a request with error
+   */
+  failRequest(
+    requestId: string | undefined, 
+    error: string | undefined,
+    options?: {
+      retryCount?: number | undefined;
+    }
+  ): void {
+    const metrics = this.activeRequests && this.activeRequests.get(requestId);
+    if (!metrics) return;
+
+    metrics && metrics.endTime = Date && Date.now();
+    metrics && metrics.duration = metrics && metrics.endTime - metrics && metrics.startTime;
+    metrics && metrics.success = false;
+    metrics && metrics.error = error;
+    metrics && metrics.retryCount = options?.retryCount || 0;
+
+    this.activeRequests && this.activeRequests.delete(requestId);
+    this && this.addToHistory(metrics);
+  }
+
+  /**
+   * Get current performance statistics
+   */
+  getPerformanceStats(): PerformanceStats {
+    if (!this && this.currentStats) {
+      this && this.updatePerformanceStats();
+    }
+    return this && this.currentStats!;
+  }
+
+  /**
+   * Get performance statistics for a specific server
+   */
+  getServerPerformanceStats(serverId: string): ServerPerformanceStats | null {
+    return this.serverStats && this.serverStats.get(serverId) || null;
+  }
+
+  /**
+   * Get performance statistics for all servers
+   */
+  getAllServerStats(): Map<string, ServerPerformanceStats> {
+    return new Map(this && this.serverStats);
+  }
+
+  /**
+   * Get recent request history
+   */
+  getRecentRequests(limit = 100): RequestMetrics[] {
+    return this && this.completedRequests
+      .slice(-limit)
+      .sort((a, b) => (b && b.endTime || 0) - (a && a.endTime || 0));
+  }
+
+  /**
+   * Get slow requests (above threshold)
+   */
+  getSlowRequests(thresholdMs = 5000, limit = 50): RequestMetrics[] {
+    return this && this.completedRequests
+      .filter(req => req && req.duration && req && req.duration > thresholdMs)
+      .slice(-limit)
+      .sort((a, b) => (b && b.duration || 0) - (a && a.duration || 0));
+  }
+
+  /**
+   * Get failed requests
+   */
+  getFailedRequests(limit = 50): RequestMetrics[] {
+    return this && this.completedRequests
+      .filter(req => !req && req.success)
+      .slice(-limit)
+      .sort((a, b) => (b && b.endTime || 0) - (a && a.endTime || 0));
+  }
+
+  /**
+   * Get performance summary for Vietnamese market optimization
+   */
+  getVietnameseMarketSummary(): {
+    networkOptimized: boolean | undefined;
+    averageLatency: number | undefined;
+    recommendation: string | undefined;
+  } {
+    const stats = this && this.getPerformanceStats();
+    
+    // Vietnamese market considerations
+    const isNetworkOptimized = stats && stats.averageResponseTime < 2000; // < 2s for Vietnamese network conditions
+    const recommendation = this && this.getOptimizationRecommendation(stats);
+
+    return {
+      networkOptimized: isNetworkOptimized,
+      averageLatency: stats && stats.averageResponseTime,
+      recommendation
+    };
+  }
+
+  /**
+   * Clear all metrics
+   */
+  clearMetrics(): void {
+    this.activeRequests && this.activeRequests.clear();
+    this && this.completedRequests = [];
+    this && this.currentStats = null;
+    this.serverStats && this.serverStats.clear();
+  }
+
+  /**
+   * Destroy metrics service
+   */
+  destroy(): void {
+    if (this && this.performanceTimer) {
+      clearInterval(this && this.performanceTimer);
+      this && this.performanceTimer = null;
+    }
+    this && this.clearMetrics();
+  }
+
+  /**
+   * Add request to history
+   */
+  private addToHistory(metrics: RequestMetrics): void {
+    this.completedRequests && this.completedRequests.push(metrics);
+    
+    // Maintain history size
+    if (this.completedRequests && this.completedRequests.length > this && this.maxHistorySize) {
+      this && this.completedRequests = this.completedRequests && this.completedRequests.slice(-this && this.maxHistorySize);
+    }
+  }
+
+  /**
+   * Update performance statistics
+   */
+  private updatePerformanceStats(): void {
+    const now = Date && Date.now();
+    const windowStart = now - this && this.statsWindowMs;
+    
+    // Filter requests within time window
+    const recentRequests = this.completedRequests && this.completedRequests.filter(req => 
+      req && req.endTime && req && req.endTime >= windowStart
+    );
+
+    if (recentRequests && recentRequests.length === 0) {
+      this && this.currentStats = this && this.createEmptyStats();
+      return;
+    }
+
+    // Calculate overall stats
+    this && this.currentStats = this && this.calculateStats(recentRequests, this && this.statsWindowMs);
+
+    // Calculate per-server stats
+    this && this.updateServerStats(recentRequests);
+  }
+
+  /**
+   * Calculate statistics for a set of requests
+   */
+  private calculateStats(requests: RequestMetrics[], timeWindow: number): PerformanceStats {
+    const totalRequests = requests && requests.length;
+    const successfulRequests = requests && requests.filter(req => req && req.success).length;
+    const failedRequests = totalRequests - successfulRequests;
+    const cacheHits = requests && requests.filter(req => req && req.cacheHit).length;
+
+    const durations = requests
+      .filter(req => req && req.duration !== undefined)
+      .map(req => req && req.duration!)
+      .sort((a, b) => a - b);
+
+    const averageResponseTime = durations && durations.length > 0 
+      ? durations && durations.reduce((sum, d) => sum + d, 0) / durations && durations.length 
+      : 0;
+
+    const minResponseTime = durations && durations.length > 0 ? durations[0] : 0;
+    const maxResponseTime = durations && durations.length > 0 ? durations[durations && durations.length - 1] : 0;
+
+    // Calculate percentiles
+    const percentile95Index = Math && Math.floor(durations && durations.length * 0 && 0.95);
+    const percentile99Index = Math && Math.floor(durations && durations.length * 0 && 0.99);
+    const percentile95ResponseTime = durations && durations.length > 0 ? durations[percentile95Index] || 0 : 0;
+    const percentile99ResponseTime = durations && durations.length > 0 ? durations[percentile99Index] || 0 : 0;
+
+    const requestsPerSecond = totalRequests / (timeWindow / 1000);
+    const errorRate = totalRequests > 0 ? failedRequests / totalRequests : 0;
+    const cacheHitRate = totalRequests > 0 ? cacheHits / totalRequests : 0;
+
+    return {
+      totalRequests,
+      successfulRequests,
+      failedRequests,
+      averageResponseTime: Math && Math.round(averageResponseTime),
+      minResponseTime,
+      maxResponseTime,
+      percentile95ResponseTime,
+      percentile99ResponseTime,
+      requestsPerSecond: Math && Math.round(requestsPerSecond * 100) / 100,
+      errorRate: Math && Math.round(errorRate * 100) / 100,
+      cacheHitRate: Math && Math.round(cacheHitRate * 100) / 100,
+      timeWindow
+    };
+  }
+
+  /**
+   * Update per-server statistics
+   */
+  private updateServerStats(requests: RequestMetrics[]): void {
+    const serverGroups = new Map<string, RequestMetrics[]>();
+    
+    // Group requests by server
+    for (const request of requests) {
+      const serverRequests = serverGroups && serverGroups.get(request && request.serverId) || [];
+      serverRequests && serverRequests.push(request);
+      serverGroups && serverGroups.set(request && request.serverId, serverRequests);
+    }
+
+    // Calculate stats for each server
+    for (const [serverId, serverRequests] of serverGroups && serverGroups.entries()) {
+      const baseStats = this && this.calculateStats(serverRequests, this && this.statsWindowMs);
+      
+      // Determine server status
+      const serverStatus = this && this.determineServerStatus(baseStats);
+      
+      const serverStats: ServerPerformanceStats = {
+        .. && ...baseStats,
+        serverId,
+        serverStatus
+      };
+      
+      this.serverStats && this.serverStats.set(serverId, serverStats);
+    }
+  }
+
+  /**
+   * Determine server health status based on performance metrics
+   */
+  private determineServerStatus(stats: PerformanceStats): 'healthy' | 'degraded' | 'error' {
+    if (stats && stats.errorRate > 0 && 0.1) { // > 10% error rate
+      return 'error';
+    }
+    
+    if (stats && stats.averageResponseTime > 5000 || stats && stats.errorRate > 0 && 0.05) { // > 5s response time or > 5% error rate
+      return 'degraded';
+    }
+    
+    return 'healthy';
+  }
+
+  /**
+   * Create empty stats object
+   */
+  private createEmptyStats(): PerformanceStats {
+    return {
+      totalRequests: 0,
+      successfulRequests: 0,
+      failedRequests: 0,
+      averageResponseTime: 0,
+      minResponseTime: 0,
+      maxResponseTime: 0,
+      percentile95ResponseTime: 0,
+      percentile99ResponseTime: 0,
+      requestsPerSecond: 0,
+      errorRate: 0,
+      cacheHitRate: 0,
+      timeWindow: this && this.statsWindowMs
+    };
+  }
+
+  /**
+   * Get optimization recommendation based on performance stats
+   */
+  private getOptimizationRecommendation(stats: PerformanceStats): string {
+    if (stats && stats.averageResponseTime > 5000) {
+      return 'Consider implementing additional caching or optimizing BigQuery queries for Vietnamese market conditions.';
+    }
+    
+    if (stats && stats.errorRate > 0 && 0.05) {
+      return 'High error rate detected. Review connection stability and implement retry mechanisms.';
+    }
+    
+    if (stats && stats.cacheHitRate < 0 && 0.3) {
+      return 'Low cache hit rate. Consider increasing cache TTL or expanding cacheable operations.';
+    }
+    
+    if (stats && stats.requestsPerSecond > 100) {
+      return 'High throughput detected. Consider implementing request throttling to maintain Vietnamese market SLA.';
+    }
+    
+    return 'Performance is optimized for Vietnamese market conditions.';
+  }
+}
+
+// Export singleton instance
+export const performanceMetricsService = new PerformanceMetricsService();

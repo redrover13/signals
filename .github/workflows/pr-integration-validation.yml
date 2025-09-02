@@ -1,0 +1,75 @@
+name: PR Integration Validation
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+jobs:
+  validate:
+    name: Validate PR Integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run Lint
+        run: pnpm nx affected --target=lint --parallel=3
+
+      - name: Run Build
+        run: pnpm nx affected --target=build --parallel=3
+
+      - name: Run Tests
+        run: pnpm nx affected --target=test --parallel=2 --max-workers=2
+
+      - name: Validate TypeScript
+        run: |
+          pnpm tsc --noEmit
+
+      - name: Generate PR Summary
+        run: |
+          echo "## Integration Validation Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Lint:** Passed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Build:** Passed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Tests:** Passed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **TypeScript Validation:** Passed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "This PR successfully integrates changes from PRs #45, #46, and #47, along with TypeScript error fixes." >> $GITHUB_STEP_SUMMARY

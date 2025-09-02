@@ -10,249 +10,391 @@
  */
 
 /**
- * Cache Service for MCP Operations
- * Provides in-memory caching with TTL for frequently accessed data
+ * Cache Service for MCP
+ * 
+ * Provides caching functionality with TTL, LRU eviction, and hierarchical invalidation.
  */
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-export interface CacheEntry<T = unknown> {
-  data: T;
-  expires: number;
-  hits: number;
-  created: number;
+export interface CacheOptions {
+  ttl?: number;  // Time to live in milliseconds
+  maxSize?: number;  // Maximum number of items in the cache
+  invalidationGroups?: string[];  // Groups for invalidation
+}
+
+export interface CacheEntry<T> {
+  value: T;
+  expiresAt: number;  // Timestamp when the entry expires
+  lastAccessed: number;  // Timestamp when the entry was last accessed
+  groups: string[];  // Invalidation groups this entry belongs to
 }
 
 export interface CacheStats {
-  totalEntries: number;
-  totalHits: number;
-  totalMisses: number;
-  hitRate: number;
-  memoryUsage: number;
+  hits: number;
+  misses: number;
+  size: number;
+  evictions: number;
+  expirations: number;
+  invalidations: number;
+  hitRatio: number;
+  averageAccessTime: number;
 }
 
-/**
- * In-memory cache service with TTL support
- */
+@Injectable({
+  providedIn: 'root'
+})
 export class CacheService {
-  private cache = new Map<string, CacheEntry>();
-  private stats = {
+  private cache = new Map<string, CacheEntry<unknown>>();
+  private defaultOptions: Required<CacheOptions> = {
+    ttl: 300000,  // 5 minutes default TTL
+    maxSize: 1000,  // Default max size
+    invalidationGroups: ['default']  // Default invalidation group
+  };
+  
+  private stats: CacheStats = {
     hits: 0,
     misses: 0,
-    sets: 0,
-    deletes: 0
+    size: 0,
+    evictions: 0,
+    expirations: 0,
+    invalidations: 0,
+    hitRatio: 0,
+    averageAccessTime: 0
   };
-
-  private readonly defaultTTL: number = 300000; // 5 minutes default TTL
-  private readonly maxEntries: number = 10000; // Maximum cache entries
-  private cleanupInterval: NodeJS.Timeout | null = null;
-
-  constructor(options?: {
-    defaultTTL?: number;
-    maxEntries?: number;
-    cleanupInterval?: number;
-  }) {
-    if (options?.defaultTTL) this.defaultTTL = options.defaultTTL;
-    if (options?.maxEntries) this.maxEntries = options.maxEntries;
-
-    // Start cleanup interval
-    const cleanupInterval = options?.cleanupInterval || 60000; // 1 minute default
-    this.cleanupInterval = setInterval(() => {
-      this.cleanup();
-    }, cleanupInterval);
+  
+  private accessTimes: number[] = [];
+  private statsSubject = new BehaviorSubject<CacheStats>(this.stats);
+  
+  constructor() {
+    // Start the periodic cleanup task
+    this.startCleanupTask();
   }
-
+  
   /**
-   * Get cached value
+   * Get a value from the cache
    */
-  get<T = unknown>(key: string): T | null {
+  get<T>(key: string): T | undefined {
+    const startTime = performance.now();
     const entry = this.cache.get(key);
     
     if (!entry) {
-      this.stats.misses++;
-      return null;
+      this.recordMiss();
+      return undefined;
     }
-
-    // Check if expired
-    if (entry.expires < Date.now()) {
-      this.cache.delete(key);
-      this.stats.misses++;
-      return null;
-    }
-
-    // Update hit count
-    entry.hits++;
-    this.stats.hits++;
     
-    return entry.data as T;
+    // Check if the entry has expired
+    if (this.isExpired(entry)) {
+      this.cache.delete(key);
+      this.recordExpiration();
+      return undefined;
+    }
+    
+    // Update the last accessed time
+    entry.lastAccessed = Date.now();
+    
+    this.recordHit();
+    this.recordAccessTime(performance.now() - startTime);
+    
+    return entry.value as T;
   }
-
+  
   /**
-   * Set cached value with TTL
+   * Get a value from the cache with an observable
    */
-  set<T = unknown>(key: string, data: T, ttl?: number): void {
-    const effectiveTTL = ttl || this.defaultTTL;
-    const expires = Date.now() + effectiveTTL;
-
-    // Check if we need to evict entries
-    if (this.cache.size >= this.maxEntries) {
+  getObservable<T>(key: string): Observable<T | undefined> {
+    return new Observable<T | undefined>(observer => {
+      try {
+        const value = this.get<T>(key);
+        observer.next(value);
+        observer.complete();
+      } catch (error) {
+        observer.error(error);
+      }
+    });
+  }
+  
+  /**
+   * Set a value in the cache
+   */
+  set<T>(key: string, value: T, options?: CacheOptions): void {
+    const opts = { ...this.defaultOptions, ...options };
+    
+    // Check if we need to make room in the cache
+    if (this.cache.size >= opts.maxSize) {
       this.evictLRU();
     }
-
-    this.cache.set(key, {
-      data,
-      expires,
-      hits: 0,
-      created: Date.now()
-    });
-
-    this.stats.sets++;
+    
+    // Create a new cache entry
+    const entry: CacheEntry<T> = {
+      value,
+      expiresAt: Date.now() + opts.ttl,
+      lastAccessed: Date.now(),
+      groups: [...opts.invalidationGroups]
+    };
+    
+    this.cache.set(key, entry as CacheEntry<unknown>);
+    this.updateStats();
   }
-
+  
   /**
-   * Delete cached value
-   */
-  delete(key: string): boolean {
-    const deleted = this.cache.delete(key);
-    if (deleted) {
-      this.stats.deletes++;
-    }
-    return deleted;
-  }
-
-  /**
-   * Check if key exists and is not expired
+   * Check if a key exists in the cache and is not expired
    */
   has(key: string): boolean {
     const entry = this.cache.get(key);
     if (!entry) return false;
     
-    if (entry.expires < Date.now()) {
+    // Check if the entry has expired
+    if (this.isExpired(entry)) {
       this.cache.delete(key);
+      this.recordExpiration();
       return false;
     }
     
     return true;
   }
-
+  
   /**
-   * Clear all cache entries
+   * Delete a value from the cache
+   */
+  delete(key: string): boolean {
+    return this.cache.delete(key);
+  }
+  
+  /**
+   * Clear the entire cache
    */
   clear(): void {
     this.cache.clear();
-    this.stats.sets = 0;
-    this.stats.hits = 0;
-    this.stats.misses = 0;
-    this.stats.deletes = 0;
+    this.updateStats();
   }
-
+  
   /**
-   * Get cache statistics
+   * Invalidate all cache entries in the specified groups
    */
-  getStats(): CacheStats {
-    const totalRequests = this.stats.hits + this.stats.misses;
-    const hitRate = totalRequests > 0 ? this.stats.hits / totalRequests : 0;
+  invalidateGroups(groups: string[]): number {
+    if (!groups || groups.length === 0) return 0;
     
-    // Estimate memory usage (rough calculation)
-    const memoryUsage = this.cache.size * 1024; // Rough estimate of 1KB per entry
-
-    return {
-      totalEntries: this.cache.size,
-      totalHits: this.stats.hits,
-      totalMisses: this.stats.misses,
-      hitRate: Math.round(hitRate * 100) / 100,
-      memoryUsage
-    };
-  }
-
-  /**
-   * Get or set pattern - fetch data if not cached
-   */
-  async getOrSet<T = unknown>(
-    key: string,
-    fetcher: () => Promise<T>,
-    ttl?: number
-  ): Promise<T> {
-    const cached = this.get<T>(key);
-    if (cached !== null) {
-      return cached;
-    }
-
-    const data = await fetcher();
-    this.set(key, data, ttl);
-    return data;
-  }
-
-  /**
-   * Create cache key for MCP requests
-   */
-  static createKey(method: string, params?: Record<string, unknown>, serverId?: string): string {
-    const paramsStr = params ? JSON.stringify(params) : '';
-    const serverStr = serverId ? `@${serverId}` : '';
-    return `${method}:${Buffer.from(paramsStr).toString('base64')}${serverStr}`;
-  }
-
-  /**
-   * Cleanup expired entries
-   */
-  private cleanup(): void {
-    const now = Date.now();
-    const toDelete: string[] = [];
-
+    let count = 0;
+    
+    // Find all keys to invalidate
+    const keysToInvalidate: string[] = [];
+    
     for (const [key, entry] of this.cache.entries()) {
-      if (entry.expires < now) {
-        toDelete.push(key);
-      }
-    }
-
-    for (const key of toDelete) {
-      this.cache.delete(key);
-    }
-  }
-
-  /**
-   * Evict least recently used entries
-   */
-  private evictLRU(): void {
-    let oldestKey: string | null = null;
-    let oldestTime = Date.now();
-
-    // Find entry with lowest hit count and oldest creation time
-    for (const [key, entry] of this.cache.entries()) {
-      if (entry.hits === 0 && entry.created < oldestTime) {
-        oldestTime = entry.created;
-        oldestKey = key;
-      }
-    }
-
-    // If no unhit entries, find oldest entry
-    if (!oldestKey) {
-      for (const [key, entry] of this.cache.entries()) {
-        if (entry.created < oldestTime) {
-          oldestTime = entry.created;
-          oldestKey = key;
+      for (const group of groups) {
+        if (entry.groups.includes(group)) {
+          keysToInvalidate.push(key);
+          count++;
+          break;
         }
       }
     }
-
+    
+    // Delete all invalidated keys
+    for (const key of keysToInvalidate) {
+      this.cache.delete(key);
+    }
+    
+    if (count > 0) {
+      this.stats.invalidations += count;
+      this.updateStats();
+    }
+    
+    return count;
+  }
+  
+  /**
+   * Get current cache statistics
+   */
+  getStats(): CacheStats {
+    return { ...this.stats };
+  }
+  
+  /**
+   * Observe cache statistics
+   */
+  observeStats(): Observable<CacheStats> {
+    return this.statsSubject.asObservable();
+  }
+  
+  /**
+   * Get cache size
+   */
+  size(): number {
+    return this.cache.size;
+  }
+  
+  /**
+   * Get all cache keys
+   */
+  keys(): string[] {
+    return Array.from(this.cache.keys());
+  }
+  
+  /**
+   * Prune expired entries
+   */
+  prune(): number {
+    const now = Date.now();
+    let count = 0;
+    
+    for (const [key, entry] of this.cache.entries()) {
+      if (entry.expiresAt <= now) {
+        this.cache.delete(key);
+        count++;
+      }
+    }
+    
+    if (count > 0) {
+      this.stats.expirations += count;
+      this.updateStats();
+    }
+    
+    return count;
+  }
+  
+  /**
+   * Refresh an entry (update its expiration time)
+   */
+  refresh(key: string, options?: CacheOptions): boolean {
+    const entry = this.cache.get(key);
+    if (!entry) return false;
+    
+    const opts = { ...this.defaultOptions, ...options };
+    entry.expiresAt = Date.now() + opts.ttl;
+    entry.lastAccessed = Date.now();
+    
+    return true;
+  }
+  
+  /**
+   * Get cache entries by group
+   */
+  getEntriesByGroup<T>(group: string): Map<string, T> {
+    const result = new Map<string, T>();
+    
+    for (const [key, entry] of this.cache.entries()) {
+      if (entry.groups.includes(group)) {
+        result.set(key, entry.value as T);
+      }
+    }
+    
+    return result;
+  }
+  
+  /**
+   * Get cache values by group as an observable
+   */
+  getValuesByGroup<T>(group: string): Observable<T[]> {
+    return new Observable<T[]>(observer => {
+      try {
+        const values: T[] = [];
+        
+        for (const [, entry] of this.cache.entries()) {
+          if (entry.groups.includes(group) && !this.isExpired(entry)) {
+            values.push(entry.value as T);
+          }
+        }
+        
+        observer.next(values);
+        observer.complete();
+      } catch (error) {
+        observer.error(error);
+      }
+    });
+  }
+  
+  /**
+   * Check if an entry is expired
+   */
+  private isExpired(entry: CacheEntry<unknown>): boolean {
+    return entry.expiresAt <= Date.now();
+  }
+  
+  /**
+   * Evict the least recently used entry
+   */
+  private evictLRU(): void {
+    if (this.cache.size === 0) return;
+    
+    let oldestKey: string | null = null;
+    let oldestTime = Infinity;
+    
+    for (const [key, entry] of this.cache.entries()) {
+      if (entry.lastAccessed < oldestTime) {
+        oldestTime = entry.lastAccessed;
+        oldestKey = key;
+      }
+    }
+    
     if (oldestKey) {
       this.cache.delete(oldestKey);
+      this.stats.evictions++;
     }
   }
-
+  
   /**
-   * Destroy cache service and cleanup resources
+   * Record a cache hit
    */
-  destroy(): void {
-    if (this.cleanupInterval) {
-      clearInterval(this.cleanupInterval);
-      this.cleanupInterval = null;
+  private recordHit(): void {
+    this.stats.hits++;
+    this.updateHitRatio();
+  }
+  
+  /**
+   * Record a cache miss
+   */
+  private recordMiss(): void {
+    this.stats.misses++;
+    this.updateHitRatio();
+  }
+  
+  /**
+   * Record a cache expiration
+   */
+  private recordExpiration(): void {
+    this.stats.expirations++;
+  }
+  
+  /**
+   * Record an access time
+   */
+  private recordAccessTime(time: number): void {
+    this.accessTimes.push(time);
+    
+    // Keep only the last 100 access times
+    if (this.accessTimes.length > 100) {
+      this.accessTimes.shift();
     }
-    this.clear();
+    
+    // Update average access time
+    this.stats.averageAccessTime = this.accessTimes.reduce((sum, t) => sum + t, 0) / this.accessTimes.length;
+  }
+  
+  /**
+   * Update hit ratio
+   */
+  private updateHitRatio(): void {
+    const total = this.stats.hits + this.stats.misses;
+    this.stats.hitRatio = total > 0 ? (this.stats.hits / total) : 0;
+  }
+  
+  /**
+   * Update cache statistics
+   */
+  private updateStats(): void {
+    this.stats.size = this.cache.size;
+    this.statsSubject.next({ ...this.stats });
+  }
+  
+  /**
+   * Start the cleanup task
+   */
+  private startCleanupTask(): void {
+    // Run cleanup every minute
+    setInterval(() => {
+      this.prune();
+    }, 60000);
   }
 }
-
-// Export singleton instance
-export const cacheService = new CacheService({
-  defaultTTL: 300000, // 5 minutes
-  maxEntries: 10000,
-  cleanupInterval: 60000 // 1 minute
-});

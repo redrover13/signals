@@ -1,0 +1,180 @@
+{
+  "totalPackages": 31,
+  "packages": [
+    {
+      "path": ".codacy/package.json"
+    },
+    {
+      "path": "agent-frontend/package.json"
+    },
+    {
+      "path": "apps/agents/package.json"
+    },
+    {
+      "path": "apps/api/package.json"
+    },
+    {
+      "path": "apps/cloud-functions/rag-processor/package.json",
+      "main": "index.js"
+    },
+    {
+      "path": "apps/event-parser/package.json",
+      "main": "index.js"
+    },
+    {
+      "path": "apps/frontend-agents/.next/package.json",
+      "type": "commonjs"
+    },
+    {
+      "path": "apps/frontend-agents/.next/types/package.json",
+      "type": "module"
+    },
+    {
+      "path": "apps/frontend-agents/package.json"
+    },
+    {
+      "path": "apps/looker-dashboards/package.json",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "infra/workflows/cloud-workflows/package.json",
+      "type": "commonjs",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "infra/workflows/pubsub-workflows/package.json",
+      "type": "commonjs",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "libs/agents/bq-agent/package.json",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "libs/agents/content-agent/package.json",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "libs/agents/crm-agent/package.json",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "libs/agents/gemini-orchestrator/package.json",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "libs/agents/looker-agent/package.json",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "libs/agents/reviews-agent/package.json",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "libs/build-tools/package.json",
+      "main": "./index.js"
+    },
+    {
+      "path": "libs/data-models/dbt-models/package.json",
+      "type": "commonjs",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "libs/data-models/schemas/package.json",
+      "type": "commonjs",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "libs/env/package.json",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "libs/gcp/package.json",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "libs/gcp-core/package.json",
+      "main": "./src/index.ts"
+    },
+    {
+      "path": "libs/security/package.json",
+      "main": "./dist/main.js"
+    },
+    {
+      "path": "libs/utils/api-clients/package.json",
+      "type": "commonjs",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "libs/utils/gcp-auth/package.json",
+      "type": "commonjs",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "libs/utils/monitoring/package.json",
+      "type": "commonjs",
+      "main": "./src/index.js"
+    },
+    {
+      "path": "libs/utils/secrets-manager/package.json",
+      "type": "commonjs",
+      "main": "./src/index.ts",
+      "exports": {
+        ".": {
+          "import": "./src/index.ts",
+          "default": "./src/index.ts"
+        }
+      }
+    },
+    {
+      "path": "package.json",
+      "type": "module"
+    },
+    {
+      "path": "package.json.bak",
+      "type": "module"
+    }
+  ],
+  "inconsistencies": [
+    {
+      "package": "apps/frontend-agents/.next/package.json",
+      "issue": "Module type 'commonjs' differs from root 'null'"
+    },
+    {
+      "package": "apps/frontend-agents/.next/types/package.json",
+      "issue": "Module type 'module' differs from root 'null'"
+    },
+    {
+      "package": "infra/workflows/cloud-workflows/package.json",
+      "issue": "Module type 'commonjs' differs from root 'null'"
+    },
+    {
+      "package": "infra/workflows/pubsub-workflows/package.json",
+      "issue": "Module type 'commonjs' differs from root 'null'"
+    },
+    {
+      "package": "libs/data-models/dbt-models/package.json",
+      "issue": "Module type 'commonjs' differs from root 'null'"
+    },
+    {
+      "package": "libs/data-models/schemas/package.json",
+      "issue": "Module type 'commonjs' differs from root 'null'"
+    },
+    {
+      "package": "libs/utils/api-clients/package.json",
+      "issue": "Module type 'commonjs' differs from root 'null'"
+    },
+    {
+      "package": "libs/utils/gcp-auth/package.json",
+      "issue": "Module type 'commonjs' differs from root 'null'"
+    },
+    {
+      "package": "libs/utils/monitoring/package.json",
+      "issue": "Module type 'commonjs' differs from root 'null'"
+    },
+    {
+      "package": "libs/utils/secrets-manager/package.json",
+      "issue": "Module type 'commonjs' differs from root 'null'"
+    }
+  ]
+}

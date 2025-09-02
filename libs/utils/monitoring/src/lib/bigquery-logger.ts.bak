@@ -1,0 +1,338 @@
+import { BigQuery, Dataset, Table } from '@google-cloud/bigquery';
+import { v4 as uuidv4 } from 'uuid';
+import { BigQueryLoggerOptions, LogEntry, ErrorLogEntry } from './types';
+
+/**
+ * BigQueryLogger is a class that provides logging functionality to BigQuery
+ */
+export class BigQueryLogger {
+  private buffer: any[] = [];
+  private flushTimer: NodeJS.Timeout | undefined;
+  private bigquery: BigQuery | undefined;
+  private dataset: Dataset | undefined;
+  private table: Table | undefined;
+  private config: BigQueryLoggerOptions;
+
+  /**
+   * Constructor for BigQueryLogger
+   * @param options Options for the logger
+   */
+  constructor(options: BigQueryLoggerOptions) {
+    this.config = {
+      projectId: options?.projectId || process.env.GOOGLE_CLOUD_PROJECT,
+      datasetId: options?.datasetId || 'logging',
+      tableId: options?.tableId || 'logs',
+      bufferSize: options?.bufferSize || 100,
+      flushIntervalMs: options?.flushIntervalMs || 5000, // 5 seconds
+      autoCreateTable: options?.autoCreateTable !== false, // Default to true
+    };
+  }
+
+  /**
+   * Initialize the BigQuery logger
+   */
+  async initialize(): Promise<void> {
+    try {
+      // Create BigQuery client
+      this.bigquery = new BigQuery({
+        projectId: this.config?.projectId,
+      });
+
+      // Get dataset reference
+      this.dataset = this.bigquery.dataset(this.config?.datasetId || 'logging');
+
+      // Check if dataset exists, create if not
+      const [datasetExists] = await this.dataset.exists();
+      if (!datasetExists) {
+        if (this.config?.autoCreateTable) {
+          await this.dataset.create();
+          console.log(`📊 Created dataset ${this.config?.datasetId}`);
+        } else {
+          throw new Error(`Dataset ${this.config?.datasetId} does not exist and autoCreateTable is false`);
+        }
+      }
+
+      // Get table reference
+      this.table = this.dataset.table(this.config?.tableId || 'logs');
+
+      // Check if table exists, create if not
+      const [tableExists] = await this.table.exists();
+      if (!tableExists) {
+        if (this.config?.autoCreateTable) {
+          await this.table.create({
+            schema: [
+              { name: 'id', type: 'STRING', mode: 'REQUIRED' },
+              { name: 'timestamp', type: 'TIMESTAMP', mode: 'REQUIRED' },
+              { name: 'level', type: 'STRING' },
+              { name: 'message', type: 'STRING' },
+              { name: 'service', type: 'STRING' },
+              { name: 'operation', type: 'STRING' },
+              { name: 'duration', type: 'INTEGER' },
+              { name: 'success', type: 'BOOLEAN' },
+              { name: 'errorCount', type: 'INTEGER' },
+              { name: 'userId', type: 'STRING' },
+              { name: 'sessionId', type: 'STRING' },
+              { name: 'error', type: 'STRING' },
+              { name: 'stackTrace', type: 'STRING' },
+              { name: 'metadata', type: 'JSON' },
+            ],
+          });
+          console.log(`📊 Created table ${this.config?.tableId}`);
+        } else {
+          throw new Error(`Table ${this.config?.tableId} does not exist and autoCreateTable is false`);
+        }
+      }
+
+      // Start flush timer
+      this.startFlushTimer();
+
+      console.log(`✅ BigQuery logger initialized: ${this.config?.projectId}.${this.config?.datasetId}.${this.config?.tableId}`);
+    } catch (error) {
+      console.error('❌ Error initializing BigQuery logger:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Log an event to BigQuery
+   * @param entry The log entry to log
+   */
+  async logEvent(entry: LogEntry): Promise<void> {
+    const row = {
+      id: entry.id || uuidv4(),
+      timestamp: entry.timestamp || new Date(),
+      level: entry.level || 'info',
+      message: entry.message || '',
+      service: entry.service || 'dulce-de-saigon',
+      operation: entry.operation,
+      duration: entry.duration,
+      success: entry.success,
+      errorCount: entry.errorCount,
+      userId: entry.userId,
+      sessionId: entry.sessionId,
+      metadata: entry.metadata ? JSON.stringify(entry.metadata) : null,
+    };
+
+    this.addToBuffer(row);
+  }
+
+  /**
+   * Log an error to BigQuery
+   * @param entry The error log entry to log
+   */
+  async logError(entry: ErrorLogEntry): Promise<void> {
+    const row = {
+      id: entry.id || uuidv4(),
+      timestamp: entry.timestamp || new Date(),
+      level: entry.level || 'error',
+      message: entry.message || '',
+      service: entry.service || 'dulce-de-saigon',
+      operation: entry.operation,
+      success: false,
+      error: entry.error?.message || '',
+      stackTrace: entry.error?.stack || '',
+      userId: entry.userId,
+      sessionId: entry.sessionId,
+      errorCount: 1,
+      metadata: entry.metadata ? JSON.stringify(entry.metadata) : null,
+    };
+
+    this.addToBuffer(row);
+  }
+
+  /**
+   * Log performance metrics to BigQuery
+   * @param metrics The performance metrics to log
+   */
+  async logPerformanceMetrics(metrics: {
+    operation: string | undefined;
+    duration: number | undefined;
+    success: boolean | undefined;
+    errorCount?: number | undefined;
+    metadata?: Record<string, any> | undefined;
+  }): Promise<void> {
+    const entry: LogEntry = {
+      id: uuidv4(),
+      timestamp: new Date(),
+      level: 'info',
+      message: `Performance metrics for ${metrics.operation}`,
+      service: 'dulce-de-saigon',
+      operation: metrics.operation,
+      duration: metrics.duration,
+      success: metrics.success,
+      errorCount: metrics.errorCount,
+      metadata: metrics.metadata,
+    };
+
+    await this.logEvent(entry);
+  }
+
+  /**
+   * Log user interaction to BigQuery
+   * @param event The user interaction event to log
+   */
+  async logUserInteraction(event: {
+    userId: string | undefined;
+    sessionId: string | undefined;
+    action: string | undefined;
+    restaurantId?: string | undefined;
+    menuItemId?: string | undefined;
+    metadata?: Record<string, any> | undefined;
+  }): Promise<void> {
+    const entry: LogEntry = {
+      id: uuidv4(),
+      timestamp: new Date(),
+      level: 'info',
+      message: `User interaction: ${event.action}`,
+      service: 'dulce-de-saigon-frontend',
+      operation: event.action,
+      userId: event.userId,
+      sessionId: event.sessionId,
+      success: true,
+      metadata: {
+        ...event.metadata,
+        restaurantId: event.restaurantId,
+        menuItemId: event.menuItemId,
+      },
+    };
+
+    await this.logEvent(entry);
+  }
+
+  /**
+   * Add a row to the buffer
+   * @param row The row to add to the buffer
+   */
+  private addToBuffer(row: any): void {
+    this.buffer.push(row);
+
+    // If buffer is full, flush
+    if (this.buffer.length >= this.config?.bufferSize) {
+      this.flush();
+    }
+  }
+
+  /**
+   * Flush the buffer to BigQuery
+   */
+  async flush(): Promise<void> {
+    if (this.buffer.length === 0) {
+      return;
+    }
+
+    try {
+      const rows = [...this.buffer];
+      this.buffer = [];
+
+      // If in development mode, just log
+      if (process.env['NODE_ENV'] === 'development') {
+        console.log(`📊 Would insert ${rows.length} rows into BigQuery`);
+        return;
+      }
+
+      // Insert rows into BigQuery
+      if (this.table) {
+        await this.table.insert(rows);
+        console.log(`📊 Inserted ${rows.length} rows into BigQuery`);
+      } else {
+        console.error('❌ BigQuery table not initialized');
+      }
+    } catch (error) {
+      console.error('❌ Error flushing logs to BigQuery:', error);
+      // Put rows back in buffer
+      this.buffer.push(...this.buffer);
+    }
+  }
+
+  /**
+   * Start the flush timer
+   */
+  private startFlushTimer(): void {
+    this.flushTimer = setInterval(() => {
+      this.flush();
+    }, this.config?.flushIntervalMs);
+  }
+
+  /**
+   * Shutdown the logger
+   */
+  async shutdown(): Promise<void> {
+    if (this.flushTimer) {
+      clearInterval(this.flushTimer);
+    }
+
+    // Final flush
+    try {
+      await this.flush();
+    } catch (error) {
+      console.error('❌ Error during final flush:', error);
+    }
+
+    console.log('🔄 BigQuery logger shutdown');
+  }
+
+  /**
+   * Query logs from BigQuery
+   * @param options Query options
+   */
+  async queryLogs(options: {
+    startTime?: Date | undefined;
+    endTime?: Date | undefined;
+    level?: string | undefined;
+    service?: string | undefined;
+    limit?: number | undefined;
+  } = {}): Promise<any[]> {
+    const {
+      startTime,
+      endTime,
+      level,
+      service,
+      limit = 100,
+    } = options;
+
+    let query = `
+      SELECT *
+      FROM \`${this.config?.projectId}.${this.config?.datasetId}.${this.config?.tableId}\`
+      WHERE 1=1
+    `;
+
+    const params: any = {
+      limit,
+    };
+
+    if (startTime) {
+      query += ' AND timestamp >= @startTime';
+      params?.startTime = startTime;
+    }
+
+    if (endTime) {
+      query += ' AND timestamp <= @endTime';
+      params?.endTime = endTime;
+    }
+
+    if (level) {
+      query += ' AND level = @level';
+      params?.level = level;
+    }
+
+    if (service) {
+      query += ' AND service = @service';
+      params?.service = service;
+    }
+
+    query += ' ORDER BY timestamp DESC';
+    query += ` LIMIT ${limit}`;
+
+    try {
+      const [rows] = await this.bigquery!.query({
+        query,
+        params,
+      });
+
+      return rows;
+    } catch (error) {
+      console.error('❌ Error querying logs:', error);
+      return [];
+    }
+  }
+}

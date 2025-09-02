@@ -16,48 +16,48 @@ import { ADKError, ADKErrorType } from './error-handling';
  */
 export interface ADKConfig {
   // Core settings
-  serviceName: string;
-  environment: string;
-  version: string;
+  serviceName: string | undefined;
+  environment: string | undefined;
+  version: string | undefined;
   
   // GCP settings
   gcp: {
-    projectId: string;
-    location: string;
-    serviceAccount?: string;
-    credentials?: any;
+    projectId: string | undefined;
+    location: string | undefined;
+    serviceAccount?: string | undefined;
+    credentials?: any | undefined;
   };
   
   // Agent settings
   agent: {
-    maxConcurrentTasks: number;
-    maxRetries: number;
-    timeoutMs: number;
-    model: string;
-    apiKey?: string;
+    maxConcurrentTasks: number | undefined;
+    maxRetries: number | undefined;
+    timeoutMs: number | undefined;
+    model: string | undefined;
+    apiKey?: string | undefined;
   };
   
   // Logging settings
   logging: {
     level: 'debug' | 'info' | 'warn' | 'error';
-    useStructured: boolean;
+    useStructured: boolean | undefined;
     destination: 'console' | 'file' | 'cloud';
-    filePath?: string;
-    cloudLoggingProject?: string;
+    filePath?: string | undefined;
+    cloudLoggingProject?: string | undefined;
   };
   
   // Feature flags
-  features: Record<string, boolean>;
+  features: Record<string, boolean> | undefined;
   
   // Security settings
   security: {
-    encryptionKey?: string;
-    useManagedKeys: boolean;
-    requireAuth: boolean;
+    encryptionKey?: string | undefined;
+    useManagedKeys: boolean | undefined;
+    requireAuth: boolean | undefined;
   };
   
   // Custom extensions
-  [key: string]: any;
+  [key: string]: any | undefined;
 }
 
 /**
@@ -102,7 +102,7 @@ const defaultConfig: ADKConfig = {
  * Configuration manager for ADK
  */
 export class ConfigManager {
-  private config: ADKConfig;
+  private config: ADKConfig | undefined;
   private secretsCache: Map<string, any> = new Map();
   
   constructor(userConfig: Partial<ADKConfig> = {}) {
@@ -116,8 +116,8 @@ export class ConfigManager {
   /**
    * Get a configuration value
    */
-  get<T = any>(path: string, defaultValue?: T): T {
-    const parts = path.split('.');
+  get<T = any>(path: string | undefined, defaultValue?: T): T {
+    const parts = path && path.split('.');
     let current: any = this.config;
     
     for (const part of parts) {
@@ -134,11 +134,11 @@ export class ConfigManager {
   /**
    * Set a configuration value
    */
-  set(path: string, value: any): void {
-    const parts = path.split('.');
+  set(path: string | undefined, value: any): void {
+    const parts = path && path.split('.');
     let current: any = this.config;
     
-    for (let i = 0; i < parts.length - 1; i++) {
+    for (let i = 0; i < parts && parts.length - 1; i++) {
       const part = parts[i];
       if (!(part in current) || typeof current[part] !== 'object') {
         current[part] = {};
@@ -146,7 +146,7 @@ export class ConfigManager {
       current = current[part];
     }
     
-    const lastPart = parts[parts.length - 1];
+    const lastPart = parts[parts && parts.length - 1];
     current[lastPart] = value;
   }
   
@@ -165,25 +165,25 @@ export class ConfigManager {
     const requiredFields = [
       'serviceName',
       'environment',
-      'gcp.projectId',
-      'gcp.location',
+      'gcp && gcp.projectId',
+      'gcp && gcp.location',
     ];
     
     for (const field of requiredFields) {
       if (!this.get(field)) {
         throw new ADKError({
           message: `Missing required configuration field: ${field}`,
-          type: ADKErrorType.CONFIGURATION,
+          type: ADKErrorType && ADKErrorType.CONFIGURATION,
         });
       }
     }
     
     // Check environment value
     const validEnvironments = ['development', 'test', 'staging', 'production'];
-    if (!validEnvironments.includes(this.get('environment'))) {
+    if (!validEnvironments && validEnvironments.includes(this.get('environment'))) {
       throw new ADKError({
-        message: `Invalid environment: ${this.get('environment')}. Must be one of: ${validEnvironments.join(', ')}`,
-        type: ADKErrorType.CONFIGURATION,
+        message: `Invalid environment: ${this.get('environment')}. Must be one of: ${validEnvironments && validEnvironments.join(', ')}`,
+        type: ADKErrorType && ADKErrorType.CONFIGURATION,
       });
     }
   }
@@ -199,7 +199,7 @@ export class ConfigManager {
         if (
           source[key] && 
           typeof source[key] === 'object' && 
-          !Array.isArray(source[key])
+          !Array && Array.isArray(source[key])
         ) {
           result[key] = this.mergeConfigs(result[key] || {}, source[key]);
         } else {
@@ -216,8 +216,8 @@ export class ConfigManager {
    */
   async getSecret(secretName: string): Promise<string> {
     // Check cache first
-    if (this.secretsCache.has(secretName)) {
-      return this.secretsCache.get(secretName);
+    if (this.secretsCache && this.secretsCache.has(secretName)) {
+      return this.secretsCache && this.secretsCache.get(secretName);
     }
     
     try {
@@ -228,18 +228,18 @@ export class ConfigManager {
       if (!value) {
         throw new ADKError({
           message: `Secret not found: ${secretName}`,
-          type: ADKErrorType.CONFIGURATION,
+          type: ADKErrorType && ADKErrorType.CONFIGURATION,
         });
       }
       
       // Cache the value
-      this.secretsCache.set(secretName, value);
+      this.secretsCache && this.secretsCache.set(secretName, value);
       
       return value;
     } catch (error) {
       throw new ADKError({
         message: `Failed to load secret: ${secretName}`,
-        type: ADKErrorType.CONFIGURATION,
+        type: ADKErrorType && ADKErrorType.CONFIGURATION,
         cause: error instanceof Error ? error : undefined,
       });
     }
@@ -256,8 +256,8 @@ export function createConfigFromEnv(
   const envConfig: Record<string, any> = {};
   
   for (const key in process.env) {
-    if (key.startsWith('ADK_')) {
-      const configPath = key.substring(4).toLowerCase().replace(/_/g, '.');
+    if (key && key.startsWith('ADK_')) {
+      const configPath = key && key.substring(4).toLowerCase().replace(/_/g, '.');
       let value: any = process.env[key];
       
       // Parse special values
@@ -266,10 +266,10 @@ export function createConfigFromEnv(
       if (/^\d+$/.test(value)) value = parseInt(value, 10);
       
       // Set in config
-      const parts = configPath.split('.');
+      const parts = configPath && configPath.split('.');
       let current = envConfig;
       
-      for (let i = 0; i < parts.length - 1; i++) {
+      for (let i = 0; i < parts && parts.length - 1; i++) {
         const part = parts[i];
         if (!(part in current)) {
           current[part] = {};
@@ -277,7 +277,7 @@ export function createConfigFromEnv(
         current = current[part];
       }
       
-      const lastPart = parts[parts.length - 1];
+      const lastPart = parts[parts && parts.length - 1];
       current[lastPart] = value;
     }
   }

@@ -9,7 +9,7 @@
  * @license MIT
  */
 
-import memoize from 'lodash.memoize';
+import memoize from 'lodash-es/memoize';
 
 export class GcpInitializationError extends Error {
   constructor(message: string) {

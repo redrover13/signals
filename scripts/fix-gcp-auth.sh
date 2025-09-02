@@ -1,0 +1,156 @@
+#!/bin/bash
+
+# Script to fix gcp-auth/index.ts
+echo "🔧 Fixing GCP Auth Index..."
+
+# Create a directory if it doesn't exist
+mkdir -p ./libs/utils/gcp-auth/src
+
+# Create the fixed file
+cat > ./libs/utils/gcp-auth/src/index.ts.new << 'EOF2'
+/**
+ * GCP Auth utilities for Dulce Saigon
+ */
+import { GoogleAuth } from 'google-auth-library';
+import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
+import { BigQuery } from '@google-cloud/bigquery';
+import { Storage } from '@google-cloud/storage';
+import { PubSub } from '@google-cloud/pubsub';
+import { Firestore } from '@google-cloud/firestore';
+import { v1 } from '@google-cloud/aiplatform';
+
+// Cache clients to avoid creating multiple instances
+const clientCache = new Map<string, any>();
+
+/**
+ * Get GCP auth client with specific scopes
+ * @param scopes OAuth scopes
+ */
+export function getGoogleAuthClient(scopes?: string | string[]): GoogleAuth {
+  const cacheKey = `auth:${scopes ? (Array.isArray(scopes) ? scopes.join(',') : scopes) : 'default'}`;
+  
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey) as GoogleAuth;
+  }
+  
+  const authClient = new GoogleAuth({
+    scopes: scopes || 'https://www.googleapis.com/auth/cloud-platform',
+  });
+  
+  clientCache.set(cacheKey, authClient);
+  return authClient;
+}
+
+/**
+ * Get Secret Manager client
+ */
+export function getSecretManagerClient(): SecretManagerServiceClient {
+  const cacheKey = 'secretmanager';
+  
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey) as SecretManagerServiceClient;
+  }
+  
+  const client = new SecretManagerServiceClient();
+  clientCache.set(cacheKey, client);
+  return client;
+}
+
+/**
+ * Get BigQuery client
+ * @param projectId Optional project ID
+ */
+export function getBigQueryClient(projectId?: string): BigQuery {
+  const cacheKey = `bigquery:${projectId || 'default'}`;
+  
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey) as BigQuery;
+  }
+  
+  const client = new BigQuery({ projectId });
+  clientCache.set(cacheKey, client);
+  return client;
+}
+
+/**
+ * Get Storage client
+ * @param projectId Optional project ID
+ */
+export function getStorageClient(projectId?: string): Storage {
+  const cacheKey = `storage:${projectId || 'default'}`;
+  
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey) as Storage;
+  }
+  
+  const client = new Storage({ projectId });
+  clientCache.set(cacheKey, client);
+  return client;
+}
+
+/**
+ * Get PubSub client
+ * @param projectId Optional project ID
+ */
+export function getPubSubClient(projectId?: string): PubSub {
+  const cacheKey = `pubsub:${projectId || 'default'}`;
+  
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey) as PubSub;
+  }
+  
+  const client = new PubSub({ projectId });
+  clientCache.set(cacheKey, client);
+  return client;
+}
+
+/**
+ * Get Firestore client
+ * @param projectId Optional project ID
+ */
+export function getFirestoreClient(projectId?: string): Firestore {
+  const cacheKey = `firestore:${projectId || 'default'}`;
+  
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey) as Firestore;
+  }
+  
+  const client = new Firestore({ projectId });
+  clientCache.set(cacheKey, client);
+  return client;
+}
+
+/**
+ * Get Vertex AI Prediction Service client
+ * @param options Client options
+ */
+export function getPredictionServiceClient(
+  options: { location: string }
+): v1.PredictionServiceClient {
+  const cacheKey = `vertex:prediction:${options.location}`;
+  
+  if (clientCache.has(cacheKey)) {
+    return clientCache.get(cacheKey) as v1.PredictionServiceClient;
+  }
+  
+  const client = new v1.PredictionServiceClient(options);
+  clientCache.set(cacheKey, client);
+  return client;
+}
+
+// Export common GCP client types
+export { 
+  GoogleAuth,
+  SecretManagerServiceClient,
+  BigQuery,
+  Storage,
+  PubSub,
+  Firestore,
+  v1 as VertexAI
+};
+EOF2
+
+# Replace the file
+mv ./libs/utils/gcp-auth/src/index.ts.new ./libs/utils/gcp-auth/src/index.ts
+
+echo "✅ GCP Auth Index fixed!"

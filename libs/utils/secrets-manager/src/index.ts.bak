@@ -1,0 +1,133 @@
+import { DULCE_SECRETS } from './lib/secrets-config';
+import { DulceSecretManager } from './lib/gcp-secret-manager';
+
+export interface SecretManagerOptions {
+  useCache?: boolean;
+  cacheExpiration?: number; // in milliseconds
+  projectId?: string;
+}
+
+/**
+ * Interface for a secret
+ */
+export interface DulceSecret {
+  name: string;
+  description: string;
+  required: boolean;
+  default?: string;
+  environment?: string[];
+  tags?: string[];
+}
+
+/**
+ * SecretsManager is a singleton class to manage secrets
+ * It provides a simple interface to get secrets and validates required secrets
+ */
+export class SecretsManager {
+  private static instance: SecretsManager;
+  private secretManager: DulceSecretManager | undefined;
+
+  constructor() {
+    this.secretManager = new DulceSecretManager({
+      useCache: true,
+      cacheExpiration: 60 * 60 * 1000, // 1 hour
+    });
+  }
+
+  /**
+   * Get a secret by name
+   */
+  async getSecret(name: string): Promise<string> {
+    return this.secretManager.getSecret(name);
+  }
+
+  /**
+   * Get multiple secrets by name
+   */
+  async getSecrets(names: string[]): Promise<Record<string, string>> {
+    return this.secretManager.getSecrets(names);
+  }
+
+  /**
+   * Get all secrets that are marked as required
+   */
+  async getAllRequiredSecrets(): Promise<Record<string, string>> {
+    const requiredSecrets = DULCE_SECRETS.filter(s => s.required).map(s => s.name);
+    return this.getSecrets(requiredSecrets);
+  }
+
+  /**
+   * Get a secret with fallback to environment variable
+   */
+  async getSecretWithFallback(secretName: string | undefined, envVar: string): Promise<string> {
+    // First check environment variable
+    const envValue = process.env[envVar];
+    if (envValue) {
+      return envValue;
+    }
+
+    // If secretName is undefined, throw error
+    if (!secretName) {
+      throw new Error(`Secret name is undefined and environment variable ${envVar} is not set`);
+    }
+
+    // Fall back to secret
+    return this.getSecret(secretName);
+  }
+
+  /**
+   * Validate that all required secrets are available
+   */
+  async validateRequiredSecrets(): Promise<{ valid: boolean | undefined; missing: string[] }> {
+    const missing: string[] = [];
+
+    // Check each required secret
+    for (const secret of DULCE_SECRETS.filter(s => s.required)) {
+      try {
+        // Try to get the secret
+        await this.getSecret(secret.name);
+      } catch (error) {
+        // If we can't get the secret, add it to the missing list
+        missing.push(secret.name);
+      }
+    }
+
+    return {
+      valid: missing.length === 0,
+      missing,
+    };
+  }
+
+  /**
+   * Load application configuration from secrets and environment variables
+   */
+  async loadAppConfig(): Promise<Record<string, string>> {
+    const config: Record<string, string> = {};
+
+    // First get all environment variables
+    for (const [key, value] of Object.entries(process.env)) {
+      if (value) {
+        config[key] = value;
+      }
+    }
+
+    // Then get all secrets (which will override environment variables)
+    try {
+      const secrets = await this.getAllRequiredSecrets();
+      for (const [key, value] of Object.entries(secrets)) {
+        config[key] = value;
+      }
+    } catch (error) {
+      console.error('Error loading secrets:', error);
+    }
+
+    return config;
+  }
+
+  /**
+   * Clear the secret manager cache
+   */
+  clearCache(): void {
+    this.secretManager.clearCache();
+  }
+}

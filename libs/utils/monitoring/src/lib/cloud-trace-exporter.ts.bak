@@ -1,0 +1,262 @@
+import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
+import { Storage } from '@google-cloud/storage';
+import * as fs from 'fs';
+import * as zlib from 'zlib';
+import { v4 as uuidv4 } from 'uuid';
+import { CloudTraceExporterOptions } from './types';
+
+/**
+ * CloudTraceExporter exports spans to Google Cloud Trace and optionally to GCS bucket
+ */
+export class CloudTraceExporter implements SpanExporter {
+  private buffer: ReadableSpan[] = [];
+  private maxBufferSize: number;
+  private bucketName: string | undefined;
+  private projectId: string | undefined;
+  private storage: Storage | undefined;
+  private flushTimeout: NodeJS.Timeout | undefined;
+  private config: CloudTraceExporterOptions;
+
+  constructor(config: CloudTraceExporterOptions) {
+    this.config = config;
+    this.maxBufferSize = config?.maxBufferSize || 100;
+    this.bucketName = config?.bucketName;
+    this.projectId = config?.projectId;
+
+    if (this.bucketName) {
+      this.storage = new Storage({
+        projectId: this.projectId,
+      });
+    }
+
+    // Set up flush interval if specified
+    if (config?.flushIntervalMillis) {
+      this.flushTimeout = setInterval(() => {
+        this.flush();
+      }, config?.flushIntervalMillis);
+    }
+  }
+
+  /**
+   * Export spans to Cloud Trace and optionally to GCS
+   * @param spans The spans to export
+   * @param resultCallback The callback to call with the result
+   */
+  export(spans: ReadableSpan[], resultCallback: (result: ExportResult) => void): void {
+    try {
+      // Add spans to buffer
+      this.buffer.push(...spans);
+
+      // Process spans if buffer is full
+      if (this.buffer.length >= this.maxBufferSize) {
+        this.flush();
+      }
+
+      if (this.config?.enableLocalLogging) {
+        this.logSpansLocally(spans);
+      }
+
+      if (this.bucketName && this.storage) {
+        this.exportToGCS(spans).catch((err) => {
+          console.error('Error exporting to GCS:', err);
+        });
+      }
+
+      this.sendToCloudTrace(spans).catch((err) => {
+        console.error('Error sending to Cloud Trace:', err);
+      });
+
+      resultCallback({ code: ExportResultCode.SUCCESS });
+    } catch (error) {
+      console.error('Error in Cloud Trace exporter:', error);
+      resultCallback({ code: ExportResultCode.FAILED, error: error as Error });
+    }
+  }
+
+  /**
+   * Flush the buffer to Cloud Trace
+   */
+  private flush(): void {
+    if (this.buffer.length === 0) {
+      return;
+    }
+
+    const spans = [...this.buffer];
+    this.buffer = [];
+
+    this.sendToCloudTrace(spans).catch((err) => {
+      console.error('Error sending to Cloud Trace during flush:', err);
+    });
+  }
+
+  /**
+   * Log spans locally for debugging
+   * @param spans The spans to log
+   */
+  private logSpansLocally(spans: ReadableSpan[]): void {
+    spans.forEach((span) => {
+      const spanData = this.serializeSpan(span);
+      console.log(`📊 Span: ${span.name} - ${span.spanContext().traceId} - ${spanData}`);
+    });
+  }
+
+  /**
+   * Export spans to GCS
+   * @param spans The spans to export
+   */
+  private async exportToGCS(spans: ReadableSpan[]): Promise<void> {
+    if (!this.bucketName || !this.storage) {
+      return;
+    }
+
+    const bucket = this.storage.bucket(this.bucketName);
+
+    for (const span of spans) {
+      const spanData = this.serializeSpan(span);
+      try {
+        await this.storeInGCS(span, spanData);
+      } catch (error) {
+        console.error('Error storing span in GCS:', error);
+      }
+    }
+  }
+
+  /**
+   * Store span data in GCS
+   * @param span The span to store
+   * @param spanData The serialized span data
+   * @returns The path to the stored file
+   */
+  private async storeInGCS(span: ReadableSpan, spanData: string): Promise<string> {
+    const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const fileName = `traces/${timestamp}/${span.spanContext().traceId}/${span.spanContext().spanId}-${uuidv4()}.json`;
+    
+    let dataToStore = spanData;
+    
+    // Compress data if enabled
+    if (this.config?.enableCompression) {
+      dataToStore = zlib.gzipSync(Buffer.from(spanData)).toString('base64');
+      
+      // If local storage is enabled, store compressed data locally
+      if (this.config?.enableLocalBackup) {
+        const localDir = './traces';
+        if (!fs.existsSync(localDir)) {
+          fs.mkdirSync(localDir, { recursive: true });
+        }
+        const localFilePath = `${localDir}/${span.spanContext().spanId}.json.gz`;
+        fs.writeFileSync(localFilePath, dataToStore);
+      }
+    }
+    
+    // Store in GCS
+    const bucket = this.storage?.bucket(this.bucketName || '');
+    const file = bucket?.file(fileName);
+    
+    await file?.save(dataToStore, {
+      contentType: 'application/json',
+      metadata: {
+        spanId: span.spanContext().spanId,
+        traceId: span.spanContext().traceId,
+      },
+    });
+    
+    return fileName;
+  }
+
+  /**
+   * Send spans to Cloud Trace
+   * @param spans The spans to send
+   */
+  private async sendToCloudTrace(spans: SpanReference[]): Promise<void> {
+    if (!this.projectId) {
+      return;
+    }
+    
+    const traceData = {
+      projectId: this.projectId,
+      spans: spans.map((span) => ({
+        id: span.spanContext().spanId,
+        traceId: span.spanContext().traceId,
+        name: span.name,
+        startTime: span.startTime,
+        endTime: span.endTime,
+        attributes: span.attributes,
+        parentSpanId: span.parentSpanId,
+      })),
+    };
+    
+    // For development, just log trace data
+    if (process.env['NODE_ENV'] === 'development') {
+      console.log('📈 Trace data:', JSON.stringify(traceData, null, 2));
+      return;
+    }
+    
+    // TODO: Implement actual Cloud Trace API call
+    // This would typically be done using the official Cloud Trace client
+    // or by making a direct API call to the Cloud Trace API
+    console.log('💡 Would send data to Cloud Trace (not implemented)');
+  }
+
+  /**
+   * Serialize a span to JSON
+   * @param span The span to serialize
+   * @returns The serialized span
+   */
+  private serializeSpan(span: ReadableSpan): string {
+    const serializedSpan = {
+      name: span.name,
+      kind: span.kind,
+      traceId: span.spanContext().traceId,
+      spanId: span.spanContext().spanId,
+      parentSpanId: span.parentSpanId,
+      startTime: span.startTime,
+      endTime: span.endTime,
+      status: span.status,
+      attributes: Object.fromEntries(
+        Object.entries(span.attributes).map(([key, value]) => {
+          // Handle arrays and objects
+          if (typeof value === 'object') {
+            return [key, JSON.stringify(value)];
+          }
+          return [key, value];
+        })
+      ),
+      events: span.events.map((event) => ({
+        name: event.name,
+        time: event.time,
+        attributes: event.attributes,
+      })),
+      links: span.links.map((link) => ({
+        spanId: link.spanId,
+        traceId: link.traceId,
+        attributes: link.attributes,
+      })),
+      resource: span.resource.attributes,
+    };
+
+    return JSON.stringify(serializedSpan);
+  }
+
+  /**
+   * Shutdown the exporter
+   */
+  async shutdown(): Promise<void> {
+    console.log('🔄 Cloud Trace exporter shutdown');
+    if (this.flushTimeout) {
+      clearInterval(this.flushTimeout);
+    }
+    this.flush();
+  }
+
+  /**
+   * Force flush the exporter
+   */
+  async forceFlush(): Promise<void> {
+    console.log('🔄 Cloud Trace exporter force flush');
+    this.flush();
+  }
+}
+
+// Type for span reference to avoid TypeScript errors
+type SpanReference = ReadableSpan;

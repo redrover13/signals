@@ -1,5 +1,5 @@
 /**
- * @fileoverview search module for the routes component
+ * @fileoverview Search module for the routes component
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
  * Contains implementation for TypeScript functionality.
@@ -27,8 +27,8 @@ const searchRequestSchema = z.object({
 });
 
 interface SearchRequest {
-  tool: string;
-  query: string;
+  tool: string | undefined;
+  query: string | undefined;
   repoOwner?: string;
   repoName?: string;
 }
@@ -53,22 +53,24 @@ export async function searchRoutes(fastify: FastifyInstance): Promise<void> {
       try {
         const body = request.body as SearchRequest;
 
-        if (!body.tool || body.tool !== 'semantic-code-search') {
+        // Validate request body
+        const parseResult = searchRequestSchema.safeParse(body);
+        if (!parseResult.success) {
           return reply.status(400).send({
-            error: "Invalid tool. Expected 'semantic-code-search'",
+            error: parseResult.error.errors.map(e => e.message).join(', ')
           });
         }
 
-        if (!body.query) {
+        if (!body.tool || body.tool !== 'semantic-code-search') {
           return reply.status(400).send({
-            error: 'Query parameter is required',
+            error: "Invalid tool. Expected 'semantic-code-search'"
           });
         }
 
         const results = await performSemanticSearch(body.query);
 
         const response: SearchResponse = {
-          query: body.query,
+          query: body.query!,
           results,
           totalMatches: results.length,
         };
@@ -88,27 +90,14 @@ async function performSemanticSearch(query: string): Promise<SearchResult[]> {
   const results: SearchResult[] = [];
   const repoRoot = process.cwd();
 
+  // Terms related to CI/CD
   const ciTerms = [
-    'ci',
-    'continuous integration',
-    'continuous deployment',
-    'pipeline',
-    'workflow',
-    'github actions',
-    'build',
-    'deploy',
-    'test',
-    'lint',
-    'cloud build',
-    'docker',
-    'container',
-    'terraform',
-    'infrastructure',
-    'deployment',
-    'automation',
-    'devops',
+    'ci', 'continuous integration', 'continuous deployment', 'pipeline', 'workflow',
+    'github actions', 'build', 'deploy', 'test', 'lint', 'cloud build', 'docker',
+    'container', 'terraform', 'infrastructure', 'deployment', 'automation', 'devops'
   ];
 
+  // If query is about CI or common, search in workflows
   if (query.toLowerCase().includes('ci') || query.toLowerCase().includes('common')) {
     const workflowsDir = path.join(repoRoot, '.github/workflows');
     if (fs.existsSync(workflowsDir)) {
@@ -133,7 +122,7 @@ async function performSemanticSearch(query: string): Promise<SearchResult[]> {
 async function searchInFile(
   filePath: string,
   query: string,
-  ciTerms: string[],
+  ciTerms: string[]
 ): Promise<SearchResult | null> {
   try {
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -166,16 +155,16 @@ async function searchInFile(
         const contextEnd = Math.min(lines.length - 1, i + 1);
 
         for (let j = contextStart; j <= contextEnd; j++) {
-          if (!relevantLines.includes(lines[j].trim()) && lines[j].trim()) {
-            relevantLines.push(lines[j].trim());
+          const trimmed = lines[j].trim();
+          if (trimmed && !relevantLines.includes(trimmed)) {
+            relevantLines.push(trimmed);
           }
         }
       }
     }
 
     if (relevance > 0) {
-      const uniqueMatches = matches.filter((match, index) => matches.indexOf(match) === index);
-
+      const uniqueMatches = Array.from(new Set(matches));
       return {
         file: path.relative(process.cwd(), filePath),
         content: relevantLines.slice(0, 5).join('\n'),
@@ -183,7 +172,6 @@ async function searchInFile(
         matches: uniqueMatches,
       };
     }
-
     return null;
   } catch {
     return null;

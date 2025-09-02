@@ -132,10 +132,6 @@ async function searchInFile(
     const matches: string[] = [];
     let relevance = 0;
 
-    // Input is escaped and constrained by zod (max length, allowed chars), mitigating ReDoS risks.
-    const safeQuery = escapeRegExp(query);
-    const queryRegexGlobal = new RegExp(safeQuery, 'gi'); // for counting across the whole content
-    const lineQueryRegex = new RegExp(safeQuery, 'i');    // for per-line tests (non-global)
     const queryMatches = content.match(queryRegexGlobal);
     if (queryMatches) {
       relevance += queryMatches.length * 10;

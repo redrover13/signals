@@ -85,25 +85,26 @@ export function createSignal<T>(initialValue: T, options?: CreateSignalOptions):
   
   // Enhanced set method that supports functional updates
   extendedSignal.set = (newValue: T | ((prev: T) => T)) => {
-    if (typeof newValue === 'function') {
+    // Check if newValue is a function AND not the expected value type
+    if (typeof newValue === 'function' && typeof initialValue !== 'function') {
       // Handle functional updates like React's setState
       const updateFn = newValue as (prev: T) => T;
       const currentValue = internalSignal();
       const nextValue = updateFn(currentValue);
-      
+    
       // Skip update if values are equal (when enabled)
       if (options?.deepEqual && areEqual(currentValue, nextValue, options?.equals)) {
         return;
       }
-      
+    
       originalSet(nextValue);
     } else {
       // Skip update if values are equal (when enabled)
-      if (options?.deepEqual && areEqual(internalSignal(), newValue, options?.equals)) {
+      if (options?.deepEqual && areEqual(internalSignal(), newValue as T, options?.equals)) {
         return;
       }
-      
-      originalSet(newValue);
+    
+      originalSet(newValue as T);
     }
   };
   

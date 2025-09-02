@@ -46,6 +46,14 @@
     "ts:build:libs": "tsc -b libs/*/tsconfig.json",
     "ts:build:apps": "tsc -b apps/*/tsconfig.json",
     "ts:refs:generate": "node scripts/generate-ts-references.js",
+    "ts:diagnostics": "node typescript-diagnostics/scripts/run-all-diagnostics.js",
+    "ts:diagnostics:fix": "node typescript-diagnostics/scripts/run-all-diagnostics.js --apply",
+    "ts:diagnostics:lodash": "node typescript-diagnostics/scripts/analyze-lodash-migration.js",
+    "ts:diagnostics:config": "node typescript-diagnostics/scripts/standardize-tsconfig.js",
+    "ts:diagnostics:errors": "node typescript-diagnostics/scripts/fix-common-errors.js",
+    "ts:diagnostics:nx": "node typescript-diagnostics/scripts/nx-typescript-diagnostics.js",
+    "ts:diagnostics:nx:fix": "node typescript-diagnostics/scripts/nx-typescript-diagnostics.js --fix",
+    "ts:diagnostics:codacy": "node typescript-diagnostics/scripts/verify-codacy-compliance.js",
     "secretlint": "secretlint \"**/*\""
   },
   "devDependencies": {
@@ -77,6 +85,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
+    "@types/lodash-es": "^4.17.12",
     "@types/node": "24.3.0",
     "@types/react": "^19.1.12",
     "@types/react-dom": "19.1.9",
@@ -135,7 +144,8 @@
       "@types/react": "^18.2.0",
       "koa": "^2.16.2",
       "protobufjs": "^7.5.4",
-      "esbuild": "^0.25.0"
+      "esbuild": "^0.25.0",
+      "lodash": "npm:lodash-es@^4.17.21"
     }
   },
   "dependencies": {

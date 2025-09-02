@@ -1,0 +1,26 @@
+{
+  "totalFiles": 501,
+  "importPatterns": {
+    "esm": 294,
+    "commonjs": 2,
+    "mixed": 2,
+    "dynamic": 19
+  },
+  "exportPatterns": {
+    "esm": 301,
+    "commonjs": 0,
+    "mixed": 0,
+    "default": 0,
+    "named": 0
+  },
+  "issues": [
+    {
+      "file": "libs/adk/src/services/vertex.ts",
+      "issue": "Mixed ESM and CommonJS imports"
+    },
+    {
+      "file": "libs/adk/src/services/vertex.ts.fixed",
+      "issue": "Mixed ESM and CommonJS imports"
+    }
+  ]
+}

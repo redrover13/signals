@@ -17,7 +17,7 @@ import { isProduction } from './env-config';
  * @param componentName - Name of the component to measure
  * @param threshold - Threshold in milliseconds to log a warning
  */
-export const useRenderPerformance = (componentName: string, threshold = 16): void => {
+export const useRenderPerformance = (componentName: string | undefined, threshold = 16): void => {
   const renderStart = useRef<number>(0);
   
   useEffect(() => {
@@ -50,7 +50,7 @@ export const useRenderPerformance = (componentName: string, threshold = 16): voi
  * @returns The interaction callback
  */
 export const trackInteraction = <T extends (...args: any[]) => any>(
-  name: string,
+  name: string | undefined,
   callback: T
 ): T => {
   return ((...args) => {
@@ -76,7 +76,7 @@ export const trackInteraction = <T extends (...args: any[]) => any>(
  * Tracks a web vital metric
  * @param metric - The web vital metric
  */
-export const reportWebVital = (metric: { name: string; value: number }): void => {
+export const reportWebVital = (metric: { name: string | undefined; value: number }): void => {
   // In production, send to analytics service
   if (isProduction()) {
     // sendToAnalyticsService(metric);

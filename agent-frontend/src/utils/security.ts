@@ -28,11 +28,11 @@ export const sanitizeInput = (input: string): string => {
  * @returns Validation result
  */
 export const validateInput = (
-  input: string,
+  input: string | undefined,
   pattern: RegExp,
   errorMessage = 'Input validation failed'
-): { isValid: boolean; error?: string } => {
-  if (!pattern.test(input)) {
+): { isValid: boolean | undefined; error?: string } => {
+  if (typeof input !== 'string' || !pattern.test(input)) {
     return { isValid: false, error: errorMessage };
   }
   return { isValid: true };

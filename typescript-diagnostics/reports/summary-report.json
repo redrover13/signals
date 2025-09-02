@@ -1,0 +1,70 @@
+{
+  "timestamp": "2025-09-01T03:40:18.121Z",
+  "typescriptVersion": "Version 5.9.2",
+  "totalErrors": 601,
+  "totalFilesWithErrors": 67,
+  "topErrorCategories": [
+    {
+      "code": "2307",
+      "count": 83,
+      "message": "Cannot find module '@google-cloud/vertexai' or its corresponding type declarations."
+    },
+    {
+      "code": "2339",
+      "count": 80,
+      "message": "Property 'error' does not exist on type 'never'."
+    },
+    {
+      "code": "2345",
+      "count": 71,
+      "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+    },
+    {
+      "code": "2322",
+      "count": 40,
+      "message": "Type 'string | undefined' is not assignable to type 'string'."
+    },
+    {
+      "code": "6133",
+      "count": 38,
+      "message": "'GenModel' is declared but its value is never read."
+    }
+  ],
+  "moduleSystemIssues": 10,
+  "configurationIssues": 0,
+  "recommendations": [
+    {
+      "pattern": "Cannot find module",
+      "occurrences": 83,
+      "recommendation": "Run 'pnpm install' to update dependencies and ensure type definitions are installed."
+    },
+    {
+      "pattern": "Type '(.+)' is not assignable to type",
+      "occurrences": 111,
+      "recommendation": "Review type definitions and ensure proper types are used for variables and function parameters."
+    },
+    {
+      "pattern": "Property '(.+)' does not exist on type",
+      "occurrences": 80,
+      "recommendation": "Add proper interface or type definitions for objects."
+    },
+    {
+      "pattern": "Cannot find name '(.+)'",
+      "occurrences": 1,
+      "recommendation": "Ensure all variables are properly declared before use."
+    },
+    {
+      "pattern": "Object is possibly 'null' or 'undefined'",
+      "occurrences": 22,
+      "recommendation": "Add null checks or use optional chaining (?.) and nullish coalescing (??) operators."
+    },
+    {
+      "pattern": "CommonJS usage in ESM context",
+      "recommendation": "Standardize on ES modules by replacing require() with import statements."
+    },
+    {
+      "pattern": "General TypeScript configuration",
+      "recommendation": "Standardize TypeScript configuration across all packages with a base tsconfig.json."
+    }
+  ]
+}

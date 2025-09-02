@@ -12,23 +12,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 interface AgentRequest {
-  query: string;
-  params?: Record<string, unknown>;
+  query: string | undefined;
+  params?: Record<string, unknown> | undefined | undefined;
 }
 
 interface AgentResponse {
-  response: string;
-  agentId: string;
-  timestamp: string;
-  metadata?: Record<string, unknown>;
+  response: string | undefined;
+  agentId: string | undefined;
+  timestamp: string | undefined;
+  metadata?: Record<string, unknown> | undefined | undefined;
 }
 
 // Enhanced agent implementations with Vietnamese F&B specialization
 const agents = {
   'bq-agent': {
     name: 'BigQuery Agent',
-    async process(query: string, params?: Record<string, unknown>) {
-      if (query.toLowerCase().includes('analytics') || query.toLowerCase().includes('restaurant performance')) {
+    async process(query: string | undefined, params?: Record<string, unknown> | undefined) {
+      if (query && (query.toLowerCase().includes('analytics') || query.toLowerCase().includes('restaurant performance'))) {
         const restaurantId = params?.restaurantId as string;
         return `F&B Analytics: ${restaurantId ? `Analysis for ${restaurantId}` : 'Global analysis'} - Revenue trends: ↑15% MoM, Peak hours: 7-9PM Vietnamese dinner time, Top dishes: Phở variants leading with 1,234 orders, Customer retention: 78% return within 30 days`;
       }
@@ -53,7 +53,7 @@ const agents = {
   
   'crm-agent': {
     name: 'CRM Agent',
-    async process(query: string, params?: Record<string, unknown>) {
+    async process(query: string | undefined, params?: Record<string, unknown> | undefined) {
       if (query.toLowerCase().includes('search customer')) {
         const criteria = params?.email || params?.phone || params?.name;
         return `Customer Search: ${criteria ? `Found 3 profiles matching "${criteria}"` : 'Advanced search active'} - Vietnamese food preferences identified, Loyalty status: Active, Recent visits: 2 Vietnamese restaurants, Cultural celebration ordering patterns detected`;
@@ -76,7 +76,7 @@ const agents = {
   
   'content-agent': {
     name: 'Content Agent',
-    async process(query: string, params?: Record<string, unknown>) {
+    async process(query: string | undefined, params?: Record<string, unknown> | undefined) {
       if (query.toLowerCase().includes('generate menu')) {
         const restaurantId = (params?.restaurantId as string) || 'demo-restaurant';
         return `Menu Generation: Authentic Vietnamese menu created for ${restaurantId} - 45 traditional dishes, Regional specialties (North/Central/South), Bilingual descriptions (Vietnamese/English), Cultural stories included, Allergen information, Pricing optimized`;
@@ -98,7 +98,7 @@ const agents = {
   
   'looker-agent': {
     name: 'Looker Agent',
-    async process(query: string, params?: Record<string, unknown>) {
+    async process(query: string | undefined, params?: Record<string, unknown> | undefined) {
       if (query.toLowerCase().includes('create dashboard')) {
         const title = (params?.title as string) || 'F&B Analytics Dashboard';
         return `Dashboard Creation: "${title}" deployed - Vietnamese restaurant KPIs, Cultural dining patterns, Festival impact analysis, Regional dish performance, Customer satisfaction by authenticity score, Mobile-responsive design`;
@@ -119,7 +119,7 @@ const agents = {
   
   'reviews-agent': {
     name: 'Reviews Agent',
-    async process(query: string, params?: Record<string, unknown>) {
+    async process(query: string | undefined, params?: Record<string, unknown> | undefined) {
       if (query.toLowerCase().includes('analyze sentiment') || query.toLowerCase().includes('sentiment analysis')) {
         const reviewCount = (params?.reviews as any[])?.length || 'multiple';
         return `Sentiment Analysis: Processed ${reviewCount} Vietnamese restaurant reviews - Overall: 78% positive, Authenticity mentions: 92% favorable, Common praise: "tastes like home", "genuine Vietnamese flavors", Cultural validation: Strong positive correlation`;
@@ -139,7 +139,7 @@ const agents = {
   
   'gemini-orchestrator': {
     name: 'Gemini Orchestrator',
-    async process(query: string, params?: Record<string, unknown>) {
+    async process(query: string | undefined, params?: Record<string, unknown> | undefined) {
       const queryLower = query.toLowerCase();
       
       if (queryLower.includes('data') || queryLower.includes('analytics') || queryLower.includes('sql')) {

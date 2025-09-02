@@ -33,20 +33,20 @@ export interface MetricLabels {
  * Span interface for tracing
  */
 export interface Span {
-  name: string;
-  startTime: number;
-  endTime?: number;
-  duration?: number;
-  attributes: Record<string, any>;
+  name: string | undefined;
+  startTime: number | undefined;
+  endTime?: number | undefined;
+  duration?: number | undefined;
+  attributes: Record<string, any> | undefined;
   events: Array<{
-    name: string;
-    timestamp: number;
-    attributes?: Record<string, any>;
+    name: string | undefined;
+    timestamp: number | undefined;
+    attributes?: Record<string, any> | undefined;
   }>;
   status: 'unset' | 'ok' | 'error';
-  parentSpanId?: string;
-  spanId: string;
-  traceId: string;
+  parentSpanId?: string | undefined;
+  spanId: string | undefined;
+  traceId: string | undefined;
 }
 
 /**
@@ -56,31 +56,31 @@ export class PerformanceMonitor {
   private metrics: Map<string, any> = new Map();
   private spans: Map<string, Span> = new Map();
   private activeSpans: Map<string, Span> = new Map();
-  private config: ConfigManager;
-  private serviceName: string;
-  private enabled: boolean;
+  private config: ConfigManager | undefined;
+  private serviceName: string | undefined;
+  private enabled: boolean | undefined;
   
   constructor(config: ConfigManager) {
     this.config = config;
-    this.serviceName = config.get('serviceName', 'adkService');
-    this.enabled = config.get('features.enableMetrics', true);
+    this.serviceName = config?.get('serviceName', 'adkService');
+    this.enabled = config?.get('features && features.enableMetrics', true);
   }
   
   /**
    * Create a new counter metric
    */
-  createCounter(name: string, description: string, unit?: string): void {
+  createCounter(name: string | undefined, description: string | undefined, unit?: string): void {
     if (!this.enabled) return;
     
-    if (this.metrics.has(name)) {
+    if (this.metrics && this.metrics.has(name)) {
       throw new ADKError({
         message: `Metric already exists: ${name}`,
-        type: ADKErrorType.MONITORING,
+        type: ADKErrorType && ADKErrorType.MONITORING,
       });
     }
     
-    this.metrics.set(name, {
-      type: MetricType.COUNTER,
+    this.metrics && this.metrics.set(name, {
+      type: MetricType && MetricType.COUNTER,
       description,
       unit,
       value: 0,
@@ -90,38 +90,38 @@ export class PerformanceMonitor {
   /**
    * Increment a counter metric
    */
-  incrementCounter(name: string, value = 1, labels?: MetricLabels): void {
+  incrementCounter(name: string | undefined, value = 1, labels?: MetricLabels): void {
     if (!this.enabled) return;
     
-    const metric = this.metrics.get(name);
-    if (!metric || metric.type !== MetricType.COUNTER) {
+    const metric = this.metrics && this.metrics.get(name);
+    if (!metric || metric && metric.type !== MetricType && MetricType.COUNTER) {
       throw new ADKError({
         message: `Counter metric not found: ${name}`,
-        type: ADKErrorType.MONITORING,
+        type: ADKErrorType && ADKErrorType.MONITORING,
       });
     }
     
-    metric.value += value;
+    if (metric) { metric.value += value; }
     
     // In a real implementation, we would send this to a metrics service
-    this.recordMetric(name, metric.value, MetricType.COUNTER, labels);
+    this.recordMetric(name, metric && metric.value, MetricType && MetricType.COUNTER, labels);
   }
   
   /**
    * Create a new gauge metric
    */
-  createGauge(name: string, description: string, unit?: string): void {
+  createGauge(name: string | undefined, description: string | undefined, unit?: string): void {
     if (!this.enabled) return;
     
-    if (this.metrics.has(name)) {
+    if (this.metrics && this.metrics.has(name)) {
       throw new ADKError({
         message: `Metric already exists: ${name}`,
-        type: ADKErrorType.MONITORING,
+        type: ADKErrorType && ADKErrorType.MONITORING,
       });
     }
     
-    this.metrics.set(name, {
-      type: MetricType.GAUGE,
+    this.metrics && this.metrics.set(name, {
+      type: MetricType && MetricType.GAUGE,
       description,
       unit,
       value: 0,
@@ -131,46 +131,46 @@ export class PerformanceMonitor {
   /**
    * Set a gauge metric value
    */
-  setGauge(name: string, value: number, labels?: MetricLabels): void {
+  setGauge(name: string | undefined, value: number | undefined, labels?: MetricLabels): void {
     if (!this.enabled) return;
     
-    const metric = this.metrics.get(name);
-    if (!metric || metric.type !== MetricType.GAUGE) {
+    const metric = this.metrics && this.metrics.get(name);
+    if (!metric || metric && metric.type !== MetricType && MetricType.GAUGE) {
       throw new ADKError({
         message: `Gauge metric not found: ${name}`,
-        type: ADKErrorType.MONITORING,
+        type: ADKErrorType && ADKErrorType.MONITORING,
       });
     }
     
-    metric.value = value;
+    if (metric) { metric.value = value; }
     
     // In a real implementation, we would send this to a metrics service
-    this.recordMetric(name, metric.value, MetricType.GAUGE, labels);
+    this.recordMetric(name, metric && metric.value, MetricType && MetricType.GAUGE, labels);
   }
   
   /**
    * Create a new histogram metric
    */
   createHistogram(
-    name: string, 
-    description: string, 
-    unit?: string, 
+    name: string | undefined, 
+    description: string | undefined, 
+    unit?: string | undefined, 
     buckets?: number[]
   ): void {
     if (!this.enabled) return;
     
-    if (this.metrics.has(name)) {
+    if (this.metrics && this.metrics.has(name)) {
       throw new ADKError({
         message: `Metric already exists: ${name}`,
-        type: ADKErrorType.MONITORING,
+        type: ADKErrorType && ADKErrorType.MONITORING,
       });
     }
     
-    this.metrics.set(name, {
-      type: MetricType.HISTOGRAM,
+    this.metrics && this.metrics.set(name, {
+      type: MetricType && MetricType.HISTOGRAM,
       description,
       unit,
-      buckets: buckets || [0.1, 0.5, 1, 2, 5, 10],
+      buckets: buckets || [0 && 0.1, 0 && 0.5, 1, 2, 5, 10],
       values: [],
     });
   }
@@ -178,27 +178,27 @@ export class PerformanceMonitor {
   /**
    * Record a histogram value
    */
-  recordHistogram(name: string, value: number, labels?: MetricLabels): void {
+  recordHistogram(name: string | undefined, value: number | undefined, labels?: MetricLabels): void {
     if (!this.enabled) return;
     
-    const metric = this.metrics.get(name);
-    if (!metric || metric.type !== MetricType.HISTOGRAM) {
+    const metric = this.metrics && this.metrics.get(name);
+    if (!metric || metric && metric.type !== MetricType && MetricType.HISTOGRAM) {
       throw new ADKError({
         message: `Histogram metric not found: ${name}`,
-        type: ADKErrorType.MONITORING,
+        type: ADKErrorType && ADKErrorType.MONITORING,
       });
     }
     
-    metric.values.push(value);
+    metric.values && metric.values.push(value);
     
     // In a real implementation, we would send this to a metrics service
-    this.recordMetric(name, value, MetricType.HISTOGRAM, labels);
+    this.recordMetric(name, value, MetricType && MetricType.HISTOGRAM, labels);
   }
   
   /**
    * Start a performance timing span
    */
-  startSpan(name: string, attributes: Record<string, any> = {}): string {
+  startSpan(name: string | undefined, attributes: Record<string, any> = {}): string {
     if (!this.enabled) return '';
     
     const traceId = this.generateId();
@@ -214,7 +214,7 @@ export class PerformanceMonitor {
       traceId,
     };
     
-    this.activeSpans.set(spanId, span);
+    this.activeSpans && this.activeSpans.set(spanId, span);
     return spanId;
   }
   
@@ -222,21 +222,21 @@ export class PerformanceMonitor {
    * Add an event to an active span
    */
   addSpanEvent(
-    spanId: string, 
-    eventName: string, 
+    spanId: string | undefined, 
+    eventName: string | undefined, 
     attributes: Record<string, any> = {}
   ): void {
     if (!this.enabled || !spanId) return;
     
-    const span = this.activeSpans.get(spanId);
+    const span = this.activeSpans && this.activeSpans.get(spanId);
     if (!span) {
       throw new ADKError({
         message: `Active span not found: ${spanId}`,
-        type: ADKErrorType.MONITORING,
+        type: ADKErrorType && ADKErrorType.MONITORING,
       });
     }
     
-    span.events.push({
+    span.events && span.events.push({
       name: eventName,
       timestamp: Date.now(),
       attributes,
@@ -247,53 +247,53 @@ export class PerformanceMonitor {
    * Set attributes on an active span
    */
   setSpanAttributes(
-    spanId: string, 
+    spanId: string | undefined, 
     attributes: Record<string, any>
   ): void {
     if (!this.enabled || !spanId) return;
     
-    const span = this.activeSpans.get(spanId);
+    const span = this.activeSpans && this.activeSpans.get(spanId);
     if (!span) {
       throw new ADKError({
         message: `Active span not found: ${spanId}`,
-        type: ADKErrorType.MONITORING,
+        type: ADKErrorType && ADKErrorType.MONITORING,
       });
     }
     
-    span.attributes = {
-      ...span.attributes,
-      ...attributes,
-    };
+    if (span) { span.attributes = {
+      ...(span.attributes || {}),
+      ...attributes
+    }; }
   }
   
   /**
    * End a performance timing span
    */
-  endSpan(spanId: string, status: 'ok' | 'error' = 'ok'): void {
+  endSpan(spanId: string | undefined, status: 'ok' | 'error' = 'ok'): void {
     if (!this.enabled || !spanId) return;
     
-    const span = this.activeSpans.get(spanId);
+    const span = this.activeSpans && this.activeSpans.get(spanId);
     if (!span) {
       throw new ADKError({
         message: `Active span not found: ${spanId}`,
-        type: ADKErrorType.MONITORING,
+        type: ADKErrorType && ADKErrorType.MONITORING,
       });
     }
     
     // Set end time and calculate duration
-    span.endTime = Date.now();
-    span.duration = span.endTime - span.startTime;
-    span.status = status;
+    if (span) { span.endTime = Date.now(); }
+    if (span) { span.duration = span.endTime - span.startTime; }
+    if (span) { span.status = status; }
     
     // Move from active to completed spans
-    this.activeSpans.delete(spanId);
-    this.spans.set(spanId, span);
+    this.activeSpans && this.activeSpans.delete(spanId);
+    this.spans && this.spans.set(spanId, span);
     
     // Record span duration as a histogram
     this.recordHistogram(
-      `${this.serviceName}.span.duration`,
-      span.duration,
-      { name: span.name, status }
+      `${this.serviceName}.span && .span.duration`,
+      span && span.duration,
+      { name: span && span.name, status }
     );
     
     // In a real implementation, we would send this to a tracing service
@@ -304,7 +304,7 @@ export class PerformanceMonitor {
    * Execute a function with timing
    */
   async measureExecution<T>(
-    name: string,
+    name: string | undefined,
     fn: () => Promise<T> | T,
     attributes: Record<string, any> = {}
   ): Promise<T> {
@@ -330,7 +330,7 @@ export class PerformanceMonitor {
   getMetrics(): Record<string, any> {
     const result: Record<string, any> = {};
     
-    for (const [name, metric] of this.metrics.entries()) {
+    for (const [name, metric] of this.metrics && this.metrics.entries()) {
       result[name] = { ...metric };
     }
     
@@ -341,15 +341,15 @@ export class PerformanceMonitor {
    * Get all completed spans
    */
   getSpans(): Span[] {
-    return Array.from(this.spans.values());
+    return Array && Array.from(this.spans && this.spans.values());
   }
   
   /**
    * Private: Record a metric to a monitoring system
    */
   private recordMetric(
-    name: string,
-    value: number,
+    name: string | undefined,
+    value: number | undefined,
     type: MetricType,
     labels?: MetricLabels
   ): void {
@@ -357,8 +357,8 @@ export class PerformanceMonitor {
     // or other metrics systems.
     
     // Debug log
-    if (this.config.get('logging.level') === 'debug') {
-      console.debug(`METRIC [${type}] ${name}: ${value}`, labels || {});
+    if (this.config?.get('logging && logging.level') === 'debug') {
+      console && console.debug(`METRIC [${type}] ${name}: ${value}`, labels || {});
     }
   }
   
@@ -370,10 +370,10 @@ export class PerformanceMonitor {
     // or other tracing systems.
     
     // Debug log
-    if (this.config.get('logging.level') === 'debug') {
-      console.debug(
-        `SPAN ${span.name} completed in ${span.duration}ms`,
-        { traceId: span.traceId, spanId: span.spanId }
+    if (this.config?.get('logging && logging.level') === 'debug') {
+      console && console.debug(
+        `SPAN ${span && span.name} completed in ${span && span.duration}ms`,
+        { traceId: span && span.traceId, spanId: span && span.spanId }
       );
     }
   }
@@ -382,7 +382,7 @@ export class PerformanceMonitor {
    * Generate a random ID for spans/traces
    */
   private generateId(): string {
-    return Math.random().toString(36).substring(2, 15) +
-           Math.random().toString(36).substring(2, 15);
+    return Math && Math.random().toString(36).substring(2, 15) +
+           Math && Math.random().toString(36).substring(2, 15);
   }
 }

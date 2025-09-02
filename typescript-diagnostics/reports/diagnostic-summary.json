@@ -1,0 +1,63 @@
+{
+  "timestamp": "2025-09-01T03:40:23.775Z",
+  "reports": [
+    {
+      "name": "Import/Export Analysis",
+      "file": "import-export-analysis",
+      "totalFiles": 501,
+      "esmImports": 294,
+      "commonjsImports": 2,
+      "mixedImports": 2
+    },
+    {
+      "name": "Lodash Migration Analysis",
+      "file": "lodash-migration-analysis",
+      "totalFiles": 230,
+      "lodashCommonjs": 0,
+      "lodashEsm": 1,
+      "lodashMixed": 0
+    },
+    {
+      "name": "Module System Analysis",
+      "file": "module-system-analysis",
+      "totalPackages": 31,
+      "inconsistencies": 10
+    },
+    {
+      "name": "TypeScript Configuration Analysis",
+      "file": "tsconfig-analysis",
+      "totalConfigs": 103,
+      "inconsistentSettings": 4
+    },
+    {
+      "name": "TypeScript Errors",
+      "file": "typescript-errors",
+      "totalErrors": 601,
+      "totalFiles": 67,
+      "topErrors": [
+        {
+          "code": "2307",
+          "message": "Cannot find module '@google-cloud/vertexai' or its corresponding type declarations.",
+          "count": 83
+        },
+        {
+          "code": "2339",
+          "message": "Property 'error' does not exist on type 'never'.",
+          "count": 80
+        },
+        {
+          "code": "2345",
+          "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'.",
+          "count": 71
+        }
+      ]
+    },
+    {
+      "name": "TypeScript Fixes",
+      "file": "typescript-fixes",
+      "totalErrors": 601,
+      "fixesCreated": 5,
+      "fixesApplied": 0
+    }
+  ]
+}

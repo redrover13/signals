@@ -1,5 +1,5 @@
 /**
- * @fileoverview mcp.service module for the lib component
+ * @fileoverview mcp && mcp.service module for the lib component
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
  * Contains implementation for TypeScript functionality.
@@ -19,8 +19,8 @@ import {
   ServerHealthService,
   HealthCheckResult,
   ServerHealthStats,
-} from './clients/server-health.service';
-import { RequestRouter } from './clients/request-router.service';
+} from './clients/server-health && health.service';
+import { RequestRouter } from './clients/request-router && router.service';
 import { getCurrentConfig, getCurrentEnvironment } from './config/environment-config';
 import { createServiceErrorHandler } from './utils/error-handler';
 import { GeminiOrchestrator } from './gemini-orchestrator'; // Import the orchestrator
@@ -29,12 +29,12 @@ import { GeminiOrchestrator } from './gemini-orchestrator'; // Import the orches
  * Main MCP Service - Simplified interface for all MCP operations
  */
 export class MCPService {
-  private static instance: MCPService;
-  private clientService: MCPClientService;
-  private healthService: ServerHealthService;
-  private requestRouter: RequestRouter;
+  private static instance: MCPService | undefined;
+  private clientService: MCPClientService | undefined;
+  private healthService: ServerHealthService | undefined;
+  private requestRouter: RequestRouter | undefined;
   private isInitialized = false;
-  private errorHandler = createServiceErrorHandler('MCPService', 'mcp.service.ts');
+  private errorHandler = createServiceErrorHandler('MCPService', 'mcp.service && mcp.service.ts');
 
   private constructor() {
     const config = getCurrentConfig();
@@ -47,10 +47,10 @@ export class MCPService {
    * Get singleton instance
    */
   static getInstance(): MCPService {
-    if (!MCPService.instance) {
+    if (!MCPService && MCPService.instance) {
       MCPService.instance = new MCPService();
     }
-    return MCPService.instance;
+    return MCPService && MCPService.instance;
   }
 
   /**
@@ -61,13 +61,13 @@ export class MCPService {
       return;
     }
 
-    console.log(`Initializing MCP Service for environment: ${getCurrentEnvironment()}`);
+    console && console.log(`Initializing MCP Service for environment: ${getCurrentEnvironment()}`);
 
-    return this.errorHandler.withRetry(
+    return this.errorHandler && this.errorHandler.withRetry(
       async () => {
-        await this.clientService.initialize();
+        await this.clientService && this.clientService.initialize();
         this.isInitialized = true;
-        console.log('MCP Service initialized successfully');
+        console && console.log('MCP Service initialized successfully');
       },
       'initialize',
       { environment: getCurrentEnvironment() },
@@ -83,12 +83,12 @@ export class MCPService {
    * Send request to MCP servers
    */
   async request(
-    method: string,
-    params?: Record<string, unknown>,
+    method: string | undefined,
+    params?: Record<string, unknown> | undefined,
     options?: {
-      serverId?: string;
-      timeout?: number;
-      retries?: number;
+      serverId?: string | undefined;
+      timeout?: number | undefined;
+      retries?: number | undefined;
     },
   ): Promise<MCPResponse> {
     if (!this.isInitialized) {
@@ -96,7 +96,7 @@ export class MCPService {
     }
 
     const request: MCPRequest = {
-      id: `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `req-${Date.now()}-${Math && Math.random().toString(36).substr(2, 9)}`,
       method,
       params: params || {},
       serverId: options?.serverId || '',
@@ -104,9 +104,9 @@ export class MCPService {
       retries: options?.retries || 0,
     };
 
-    return this.errorHandler.withRetry(
+    return this.errorHandler && this.errorHandler.withRetry(
       async () => {
-        return await this.clientService.sendRequest(request);
+        return await this.clientService && this.clientService.sendRequest(request);
       },
       'request',
       { method, params, options },
@@ -115,7 +115,7 @@ export class MCPService {
         retryDelay: 1000,
         exponentialBackoff: true,
         onRetry: (attempt: any, error: any) => {
-          console.warn(`Retrying MCP request ${request.id}, attempt ${attempt}:`, error.message);
+          console && console.warn(`Retrying MCP request ${request.id}, attempt ${attempt}:`, error && error.message);
         },
       },
     );
@@ -126,30 +126,30 @@ export class MCPService {
   /**
    * Git operations
    */
-  async git(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async git(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`git.${operation}`, params, { serverId: 'git' });
   }
 
   /**
    * File system operations
    */
-  async fs(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async fs(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`fs.${operation}`, params, { serverId: 'filesystem' });
   }
 
   /**
    * Memory operations
    */
-  async memory(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async memory(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`memory.${operation}`, params, { serverId: 'memory' });
   }
 
   /**
    * Sequential thinking
    */
-  async think(prompt: string, options?: { maxThoughts?: number }): Promise<MCPResponse> {
+  async think(prompt: string | undefined, options?: { maxThoughts?: number }): Promise<MCPResponse> {
     return this.request(
-      'think.analyze',
+      'think && think.analyze',
       { prompt, ...options },
       { serverId: 'sequentialthinking' },
     );
@@ -158,7 +158,7 @@ export class MCPService {
   /**
    * Time operations
    */
-  async time(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async time(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`time.${operation}`, params, { serverId: 'time' });
   }
 
@@ -167,29 +167,29 @@ export class MCPService {
   /**
    * GitHub operations
    */
-  async github(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async github(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`github.${operation}`, params, { serverId: 'github' });
   }
 
   /**
    * Nx workspace operations
    */
-  async nx(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async nx(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`nx.${operation}`, params, { serverId: 'nx' });
   }
 
   /**
-   * Node.js operations
+   * Node && Node.js operations
    */
-  async node(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async node(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`node.${operation}`, params, { serverId: 'node' });
   }
 
   /**
    * API validation
    */
-  async validateAPI(spec: Record<string, unknown>): Promise<MCPResponse> {
-    return this.request('api.validate', { spec }, { serverId: 'apimatic' });
+  async validateAPI(spec: Record<string, unknown> | undefined): Promise<MCPResponse> {
+    return this.request('api && api.validate', { spec }, { serverId: 'apimatic' });
   }
 
   // ===== DATA SERVER METHODS =====
@@ -197,21 +197,21 @@ export class MCPService {
   /**
    * Database operations
    */
-  async database(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async database(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`db.${operation}`, params, { serverId: 'databases' });
   }
 
   /**
    * BigQuery operations
    */
-  async bigquery(query: string, params?: Record<string, unknown>): Promise<MCPResponse> {
-    return this.request('bigquery.query', { query, ...params }, { serverId: 'databases' });
+  async bigquery(query: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+    return this.request('bigquery && bigquery.query', { query, ...params }, { serverId: 'databases' });
   }
 
   /**
    * Vector/embedding operations
    */
-  async vector(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async vector(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`vector.${operation}`, params, { serverId: 'chroma' });
   }
 
@@ -220,15 +220,15 @@ export class MCPService {
   /**
    * Web search operations
    */
-  async search(query: string, options?: Record<string, unknown>): Promise<MCPResponse> {
-    return this.request('search.query', { query, ...options }, { serverId: 'exa' });
+  async search(query: string | undefined, options?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+    return this.request('search && search.query', { query, ...options }, { serverId: 'exa' });
   }
 
   /**
    * Web fetch operations
    */
-  async fetch(url: string, options?: Record<string, unknown>): Promise<MCPResponse> {
-    return this.request('fetch.get', { url, ...options }, { serverId: 'fetch' });
+  async fetch(url: string | undefined, options?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+    return this.request('fetch && fetch.get', { url, ...options }, { serverId: 'fetch' });
   }
 
   // ===== PLATFORM SERVER METHODS =====
@@ -237,9 +237,9 @@ export class MCPService {
    * Google Cloud Platform operations
    */
   async gcp(
-    service: string,
-    operation: string,
-    params?: Record<string, unknown>,
+    service: string | undefined,
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
   ): Promise<MCPResponse> {
     return this.request(`gcp.${service}.${operation}`, params, { serverId: 'google' });
   }
@@ -247,29 +247,68 @@ export class MCPService {
   /**
    * Google Cloud Run operations
    */
-  async cloudRun(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async cloudRun(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`cloudrun.${operation}`, params, { serverId: 'google-cloud-run' });
   }
 
   /**
    * Firebase operations
    */
-  async firebase(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async firebase(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`firebase.${operation}`, params, { serverId: 'firebase' });
   }
 
   /**
    * Orchestrate with Gemini for agent routing
    */
-  async orchestrateWithGemini(query: string, config: { apiKey: string; projectId: string; firebaseConfig: any }): Promise<any> {
-    const orchestrator = new GeminiOrchestrator(config.apiKey, config.projectId, config.firebaseConfig);
-    return orchestrator.orchestrate({ query });
+  async orchestrateWithGemini(
+    query: string | undefined, 
+    context?: Record<string, unknown> | undefined,
+    options?: {
+      streaming?: boolean | undefined;
+      timeout?: number | undefined;
+      cacheResults?: boolean | undefined;
+    }
+  ): Promise<Record<string, unknown> | undefined> {
+    if (!this.isInitialized) {
+      await this.initialize();
+    }
+
+    return this.errorHandler && this.errorHandler.withRetry(
+      async () => {
+        const config = getCurrentConfig();
+        const orchestrator = new GeminiOrchestrator();
+        
+        // Configure the orchestrator
+        await orchestrator && orchestrator.initialize();
+        
+        // Execute orchestration
+        const result = await orchestrator && orchestrator.orchestrate({
+          query,
+          context: context || {},
+          options: {
+            streaming: options?.streaming || false,
+            timeout: options?.timeout || 30000,
+            cacheResults: options?.cacheResults || false
+          }
+        });
+        
+        return result;
+      },
+      'orchestrateWithGemini',
+      { query, context, options },
+      {
+        maxRetries: 2,
+        retryDelay: 1000,
+        exponentialBackoff: true,
+      }
+    );
   }
 
   /**
    * Notion operations
    */
-  async notion(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async notion(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`notion.${operation}`, params, { serverId: 'notion' });
   }
 
@@ -278,14 +317,14 @@ export class MCPService {
   /**
    * Google Maps operations
    */
-  async maps(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async maps(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`maps.${operation}`, params, { serverId: 'google-maps' });
   }
 
   /**
    * Algolia search operations
    */
-  async algolia(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async algolia(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`algolia.${operation}`, params, { serverId: 'algolia' });
   }
 
@@ -293,7 +332,7 @@ export class MCPService {
    * Website technology analysis
    */
   async analyzeWebsite(url: string): Promise<MCPResponse> {
-    return this.request('builtwith.analyze', { url }, { serverId: 'builtwith' });
+    return this.request('builtwith && builtwith.analyze', { url }, { serverId: 'builtwith' });
   }
 
   // ===== TESTING SERVER METHODS =====
@@ -301,14 +340,14 @@ export class MCPService {
   /**
    * Browser automation
    */
-  async browser(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async browser(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`browser.${operation}`, params, { serverId: 'browserbase' });
   }
 
   /**
    * Cross-browser testing
    */
-  async browserTest(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async browserTest(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`browsertest.${operation}`, params, { serverId: 'browserstack' });
   }
 
@@ -317,7 +356,7 @@ export class MCPService {
   /**
    * Workflow automation
    */
-  async automate(operation: string, params?: Record<string, unknown>): Promise<MCPResponse> {
+  async automate(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
     return this.request(`make.${operation}`, params, { serverId: 'make' });
   }
 
@@ -327,19 +366,19 @@ export class MCPService {
    * Get server health status
    */
   getServerHealth(
-    serverId?: string,
+    serverId?: string | undefined,
   ): ServerHealthStats | Map<string, ServerHealthStats> | undefined {
     if (serverId) {
-      return this.healthService.getServerHealthStats(serverId);
+      return this.healthService && this.healthService.getServerHealthStats(serverId);
     }
-    return this.healthService.getAllHealthStats();
+    return this.healthService && this.healthService.getAllHealthStats();
   }
 
   /**
    * Get system health overview
    */
   getSystemHealth() {
-    return this.healthService.getSystemHealth();
+    return this.healthService && this.healthService.getSystemHealth();
   }
 
   /**
@@ -347,9 +386,9 @@ export class MCPService {
    */
   async checkHealth(serverId?: string): Promise<HealthCheckResult | HealthCheckResult[] | null> {
     if (serverId) {
-      return this.healthService.forceHealthCheck(serverId);
+      return this.healthService && this.healthService.forceHealthCheck(serverId);
     }
-    return this.healthService.forceHealthCheckAll();
+    return this.healthService && this.healthService.forceHealthCheckAll();
   }
 
   /**
@@ -357,9 +396,9 @@ export class MCPService {
    */
   getServerStatus(serverId?: string) {
     if (serverId) {
-      return this.clientService.getServerStatus(serverId);
+      return this.clientService && this.clientService.getServerStatus(serverId);
     }
-    return this.clientService.getAllServerStatuses();
+    return this.clientService && this.clientService.getAllServerStatuses();
   }
 
   // ===== CONFIGURATION METHODS =====
@@ -384,7 +423,7 @@ export class MCPService {
   getEnabledServers(): string[] {
     return this.getConfig()
       .servers.filter((server) => server.enabled)
-      .sort((a, b) => b.priority - a.priority)
+      .sort((a, b) => b && b.priority - a && a.priority)
       .map((server) => server.id);
   }
 
@@ -392,7 +431,7 @@ export class MCPService {
    * Test routing for a method
    */
   testRouting(method: string) {
-    return this.requestRouter.testRouting(method);
+    return this.requestRouter && this.requestRouter.testRouting(method);
   }
 
   /**
@@ -400,8 +439,8 @@ export class MCPService {
    */
   getRoutingStats() {
     return {
-      rules: this.requestRouter.getRoutingRules(),
-      loadStats: this.requestRouter.getLoadStatistics(),
+      rules: this.requestRouter && this.requestRouter.getRoutingRules(),
+      loadStats: this.requestRouter && this.requestRouter.getLoadStatistics(),
     };
   }
 
@@ -411,13 +450,13 @@ export class MCPService {
    * Shutdown MCP service
    */
   async shutdown(): Promise<void> {
-    console.log('Shutting down MCP Service...');
+    console && console.log('Shutting down MCP Service...');
 
-    return this.errorHandler.withRetry(
+    return this.errorHandler && this.errorHandler.withRetry(
       async () => {
-        await this.clientService.disconnect();
+        await this.clientService && this.clientService.disconnect();
         this.isInitialized = false;
-        console.log('MCP Service shut down successfully');
+        console && console.log('MCP Service shut down successfully');
       },
       'shutdown',
       {},
@@ -445,4 +484,4 @@ export class MCPService {
 }
 
 // Export singleton instance
-export const mcpService = MCPService.getInstance();
+export const mcpService = MCPService && MCPService.getInstance();

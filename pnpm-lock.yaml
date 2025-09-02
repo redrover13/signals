@@ -11,6 +11,7 @@ overrides:
   koa: ^2.16.2
   protobufjs: ^7.5.4
   esbuild: ^0.25.0
+  lodash: npm:lodash-es@^4.17.21
 
 importers:
 
@@ -194,6 +195,9 @@ importers:
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@types/node':
         specifier: 24.3.0
         version: 24.3.0
@@ -404,7 +408,7 @@ importers:
     devDependencies:
       '@nx/next':
         specifier: 21.4.0
-        version: 21.4.0(b71b4c18410a994a1f003429381d5144)
+        version: 21.4.0(3058b5f8cb2bbf4fb69b97ba2409ad14)
       '@types/node':
         specifier: ^20
         version: 20.19.11
@@ -7935,9 +7939,6 @@ packages:
   lodash.uniq@4.5.0:
     resolution: {integrity: sha512-xfBaXQd9ryd9dlSDvnvI0lvxfLJlYAZzXomUYzLKtUeOQvOP5piqAWuGtrhWeqaXK9hhoM/iyJc5AV+XfsX3HQ==}
 
-  lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-
   log-symbols@4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}
     engines: {node: '>=10'}
@@ -13344,7 +13345,7 @@ snapshots:
       '@rushstack/rig-package': 0.5.3
       '@rushstack/terminal': 0.15.4(@types/node@24.3.0)
       '@rushstack/ts-command-line': 5.0.2(@types/node@24.3.0)
-      lodash: 4.17.21
+      lodash: lodash-es@4.17.21
       minimatch: 10.0.3
       resolve: 1.22.10
       semver: 7.5.4
@@ -13389,7 +13390,7 @@ snapshots:
     dependencies:
       '@swc/helpers': 0.5.17
       caniuse-lite: 1.0.30001737
-      lodash: 4.17.21
+      lodash: lodash-es@4.17.21
       rslog: 1.2.11
 
   '@module-federation/bridge-react-webpack-plugin@0.18.3':
@@ -14132,19 +14133,19 @@ snapshots:
       - vue-tsc
       - webpack-cli
 
-  '@nx/next@21.4.0(b71b4c18410a994a1f003429381d5144)':
+  '@nx/next@21.4.0(3058b5f8cb2bbf4fb69b97ba2409ad14)':
     dependencies:
       '@babel/plugin-proposal-decorators': 7.28.0(@babel/core@7.28.3)
       '@nx/devkit': 21.4.0(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))
       '@nx/eslint': 21.4.0(@babel/traverse@7.28.3)(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))(@zkochan/js-yaml@0.0.7)(eslint@9.34.0(jiti@2.4.2))(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))(verdaccio@6.1.6(encoding@0.1.13)(typanion@3.14.0))
       '@nx/js': 21.4.0(@babel/traverse@7.28.3)(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))(verdaccio@6.1.6(encoding@0.1.13)(typanion@3.14.0))
-      '@nx/react': 21.4.0(2be67843455e6b3d9fda9275c8defd20)
+      '@nx/react': 21.4.0(fc3a0aef54c2e1fa10cda75c132a8ec9)
       '@nx/web': 21.4.0(@babel/traverse@7.28.3)(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))(verdaccio@6.1.6(encoding@0.1.13)(typanion@3.14.0))
       '@nx/webpack': 21.4.0(@babel/traverse@7.28.3)(@rspack/core@1.4.11(@swc/helpers@0.5.17))(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9)(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))(typescript@5.9.2)(verdaccio@6.1.6(encoding@0.1.13)(typanion@3.14.0))
       '@phenomnomnominal/tsquery': 5.0.1(typescript@5.9.2)
       '@svgr/webpack': 8.1.0(typescript@5.9.2)
-      copy-webpack-plugin: 10.2.4(webpack@5.99.9(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
-      file-loader: 6.2.0(webpack@5.99.9(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
+      copy-webpack-plugin: 10.2.4(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
+      file-loader: 6.2.0(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
       ignore: 5.3.2
       next: 15.4.7(@babel/core@7.28.3)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.90.0)
       semver: 7.7.2
@@ -14327,7 +14328,7 @@ snapshots:
   '@nx/nx-win32-x64-msvc@21.4.1':
     optional: true
 
-  '@nx/react@21.4.0(2be67843455e6b3d9fda9275c8defd20)':
+  '@nx/react@21.4.0(fc3a0aef54c2e1fa10cda75c132a8ec9)':
     dependencies:
       '@nx/devkit': 21.4.0(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))
       '@nx/eslint': 21.4.0(@babel/traverse@7.28.3)(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17))(@zkochan/js-yaml@0.0.7)(eslint@9.34.0(jiti@2.4.2))(nx@21.4.0(@swc-node/register@1.9.2(@swc/core@1.13.4(@swc/helpers@0.5.17))(@swc/types@0.1.24)(typescript@5.9.2))(@swc/core@1.13.4(@swc/helpers@0.5.17)))(verdaccio@6.1.6(encoding@0.1.13)(typanion@3.14.0))
@@ -14339,7 +14340,7 @@ snapshots:
       '@phenomnomnominal/tsquery': 5.0.1(typescript@5.9.2)
       '@svgr/webpack': 8.1.0(typescript@5.9.2)
       express: 4.21.2
-      file-loader: 6.2.0(webpack@5.99.9(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
+      file-loader: 6.2.0(webpack@5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9))
       http-proxy-middleware: 3.0.5
       minimatch: 9.0.3
       picocolors: 1.1.1
@@ -16165,7 +16166,7 @@ snapshots:
       chalk: 4.1.2
       debug: 4.4.1
       js-yaml: 3.14.1
-      lodash: 4.17.21
+      lodash: lodash-es@4.17.21
       pluralize: 2.0.0
       string-width: 4.2.3
       strip-ansi: 6.0.1
@@ -16714,7 +16715,7 @@ snapshots:
       '@verdaccio/loaders': 8.0.0-next-8.9
       '@verdaccio/signature': 8.0.0-next-8.11
       debug: 4.4.1
-      lodash: 4.17.21
+      lodash: lodash-es@4.17.21
       verdaccio-htpasswd: 13.0.0-next-8.19
     transitivePeerDependencies:
       - supports-color
@@ -16729,7 +16730,7 @@ snapshots:
       '@verdaccio/core': 8.0.0-next-8.19
       debug: 4.4.1
       js-yaml: 4.1.0
-      lodash: 4.17.21
+      lodash: lodash-es@4.17.21
       minimatch: 7.4.6
     transitivePeerDependencies:
       - supports-color
@@ -16755,7 +16756,7 @@ snapshots:
     dependencies:
       '@verdaccio/core': 8.0.0-next-8.19
       debug: 4.4.1
-      lodash: 4.17.21
+      lodash: lodash-es@4.17.21
     transitivePeerDependencies:
       - supports-color
 
@@ -16766,7 +16767,7 @@ snapshots:
       '@verdaccio/streams': 10.2.1
       async: 3.2.4
       debug: 4.3.4
-      lodash: 4.17.21
+      lodash: lodash-es@4.17.21
       lowdb: 1.0.0
       mkdirp: 1.0.4
     transitivePeerDependencies:
@@ -16785,7 +16786,7 @@ snapshots:
     dependencies:
       colorette: 2.0.20
       dayjs: 1.11.13
-      lodash: 4.17.21
+      lodash: lodash-es@4.17.21
       on-exit-leak-free: 2.1.2
       pino-abstract-transport: 1.2.0
       sonic-boom: 3.8.1
@@ -16805,7 +16806,7 @@ snapshots:
       debug: 4.4.1
       express: 4.21.2
       express-rate-limit: 5.5.1
-      lodash: 4.17.21
+      lodash: lodash-es@4.17.21
       lru-cache: 7.18.3
       mime: 2.6.0
     transitivePeerDependencies:
@@ -16840,7 +16841,7 @@ snapshots:
     dependencies:
       '@verdaccio/core': 8.0.0-next-8.19
       debug: 4.4.1
-      lodash: 4.17.21
+      lodash: lodash-es@4.17.21
       validator: 13.12.0
     transitivePeerDependencies:
       - supports-color
@@ -16848,7 +16849,7 @@ snapshots:
   '@verdaccio/utils@8.1.0-next-8.19':
     dependencies:
       '@verdaccio/core': 8.0.0-next-8.19
-      lodash: 4.17.21
+      lodash: lodash-es@4.17.21
       minimatch: 7.4.6
 
   '@vitejs/plugin-react@4.7.0(vite@6.3.5(@types/node@24.3.0)(jiti@2.4.2)(less@4.4.1)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(tsx@4.20.5)(yaml@2.8.1))':
@@ -16916,7 +16917,7 @@ snapshots:
       sirv: 3.0.1
       tinyglobby: 0.2.14
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@24.3.0)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(less@4.4.1)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(tsx@4.20.5)(yaml@2.8.1)
+      vitest: 3.2.4(@types/node@20.19.11)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@26.1.0)(less@4.4.1)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(tsx@4.20.5)(yaml@2.8.1)
 
   '@vitest/utils@3.2.4':
     dependencies:
@@ -19230,12 +19231,6 @@ snapshots:
       schema-utils: 3.3.0
       webpack: 5.101.3(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9)
 
-  file-loader@6.2.0(webpack@5.99.9(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9)):
-    dependencies:
-      loader-utils: 2.0.4
-      schema-utils: 3.3.0
-      webpack: 5.99.9(@swc/core@1.13.4(@swc/helpers@0.5.17))(esbuild@0.25.9)
-
   file-type@20.5.0:
     dependencies:
       '@tokenizer/inflate': 0.2.7
@@ -21371,8 +21366,6 @@ snapshots:
 
   lodash.uniq@4.5.0: {}
 
-  lodash@4.17.21: {}
-
   log-symbols@4.1.0:
     dependencies:
       chalk: 4.1.2
@@ -21402,7 +21395,7 @@ snapshots:
     dependencies:
       graceful-fs: 4.2.11
       is-promise: 2.2.2
-      lodash: 4.17.21
+      lodash: lodash-es@4.17.21
       pify: 3.0.0
       steno: 0.4.4
 
@@ -24600,7 +24593,7 @@ snapshots:
       envinfo: 7.14.0
       express: 4.21.2
       handlebars: 4.7.8
-      lodash: 4.17.21
+      lodash: lodash-es@4.17.21
       lru-cache: 7.18.3
       mime: 3.0.0
       mkdirp: 1.0.4
@@ -25165,7 +25158,7 @@ snapshots:
       fast-json-stable-stringify: 2.1.0
       fs-extra: 9.1.0
       glob: 7.2.3
-      lodash: 4.17.21
+      lodash: lodash-es@4.17.21
       pretty-bytes: 5.6.0
       rollup: 2.79.2
       source-map: 0.8.0-beta.0

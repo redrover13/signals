@@ -1,0 +1,59 @@
+{
+  "timestamp": "2025-09-01T03:40:20.901Z",
+  "totalFiles": 230,
+  "lodashImports": {
+    "commonjs": {
+      "count": 0,
+      "files": []
+    },
+    "esm": {
+      "count": 1,
+      "files": [
+        "libs/gcp-core/src/index.ts"
+      ]
+    },
+    "mixed": {
+      "count": 0,
+      "files": []
+    }
+  },
+  "importPatterns": {
+    "wholeLibrary": {
+      "count": 0,
+      "files": []
+    },
+    "individualFunctions": {
+      "count": 1,
+      "files": [
+        "libs/gcp-core/src/index.ts"
+      ]
+    },
+    "mixedStyles": {
+      "count": 0,
+      "files": []
+    }
+  },
+  "topLodashFunctions": {
+    "memoize": 1
+  },
+  "recommendations": [
+    {
+      "title": "Use a codemod for automated migration",
+      "description": "Consider using a codemod tool to automate the migration from lodash to lodash-es.",
+      "implementation": "\n    # Example using jscodeshift with a custom transform\n    npx jscodeshift -t transform-lodash-imports.js ./src\n    \n    # Or a more manual approach with search and replace\n    find ./src -type f -name \"*.ts\" | xargs sed -i 's/require(['\"]lodash['\"]);/import _ from \"lodash-es\";/g'\n    "
+    },
+    {
+      "title": "Update tsconfig.json for proper ESM support",
+      "description": "Ensure your TypeScript configuration properly supports ES modules.",
+      "implementation": "\n    // In tsconfig.json\n    {\n      \"compilerOptions\": {\n        \"module\": \"ESNext\",\n        \"moduleResolution\": \"NodeNext\",\n        \"esModuleInterop\": true\n      }\n    }\n    "
+    }
+  ],
+  "dependencies": {
+    "totalPackages": 27,
+    "packagesWithLodash": 0,
+    "packagesWithLodashEs": 1,
+    "packagesWithBoth": 0,
+    "packagesWithLodashTypes": 1,
+    "inconsistencies": []
+  }
+}

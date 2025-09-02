@@ -1,263 +1,251 @@
 /**
- * @fileoverview OpenTelemetry configuration for Dulce de Saigon F&B Data Platform
+ * @fileoverview otel-config module for the lib component
  *
- * This file configures OpenTelemetry instrumentation for capturing traces and logs
- * from agent operations, with custom Cloud Trace exporter for large payloads.
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
  *
  * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
  */
 
-import { NodeSDK } from '@opentelemetry/sdk-node';
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { Resource } from '@opentelemetry/resources';
-import { 
-  SEMRESATTRS_SERVICE_NAME,
-  SEMRESATTRS_SERVICE_VERSION,
-  SEMRESATTRS_DEPLOYMENT_ENVIRONMENT
-} from '@opentelemetry/semantic-conventions';
-import { trace, SpanKind, SpanStatusCode } from '@opentelemetry/api';
-import { CloudTraceExporter } from './cloud-trace-exporter';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-node';
+import { SpanKind, SpanStatusCode, Tracer, trace } from '@opentelemetry/api';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { BigQueryLogger } from './bigquery-logger';
+import { CloudTraceExporter } from './cloud-trace-exporter';
+import { Signal, computed, effect, signal } from '@angular/core';
 
-/**
- * OpenTelemetry configuration options
- */
-export interface OtelConfig {
-  serviceName: string;
-  serviceVersion?: string;
-  environment?: string;
-  gcpProjectId?: string;
-  enableAutoInstrumentation?: boolean;
-  enableCustomExporter?: boolean;
-  enableBigQueryLogs?: boolean;
-}
-
-/**
- * Default configuration values
- */
-const DEFAULT_CONFIG: Required<OtelConfig> = {
-  serviceName: 'dulce-de-saigon-agent',
+// Default OpenTelemetry configuration
+export const DEFAULT_CONFIG = {
+  serviceName: 'dulce-saigon-service',
   serviceVersion: '1.0.0',
-  environment: process.env['NODE_ENV'] || 'development',
-  gcpProjectId: process.env['GCP_PROJECT_ID'] || '',
-  enableAutoInstrumentation: true,
-  enableCustomExporter: true,
-  enableBigQueryLogs: true,
+  environment: 'development',
+  traceExporterEndpoint: 'http://localhost:4318/v1/traces',
+  logLevel: 'info',
+  instrumentations: [],
+  enabled: true,
 };
 
+// Type for OpenTelemetry configuration
+export interface OtelConfig {
+  serviceName?: string;
+  serviceVersion?: string;
+  environment?: string;
+  traceExporterEndpoint?: string;
+  logLevel?: 'error' | 'warn' | 'info' | 'debug' | 'trace';
+  instrumentations?: any[];
+  enabled?: boolean;
+}
+
+// Global instance
 let sdk: NodeSDK | null = null;
-let bigQueryLogger: BigQueryLogger | null = null;
+let tracer: Tracer | null = null;
 
 /**
- * Initialize OpenTelemetry instrumentation
+ * Initialize OpenTelemetry with configuration
+ * @param config Optional configuration to override defaults
  */
-export async function initializeOpenTelemetry(config: Partial<OtelConfig> = {}): Promise<NodeSDK> {
-  const finalConfig = { ...DEFAULT_CONFIG, ...config };
-
+export function initializeOpenTelemetry(config?: OtelConfig): NodeSDK | null {
   if (sdk) {
-    console.log('OpenTelemetry already initialized');
     return sdk;
   }
 
-  console.log('🔧 Initializing OpenTelemetry...');
+  const finalConfig = { ...DEFAULT_CONFIG, ...config };
 
-  // Create resource with service metadata
+  if (!finalConfig.enabled) {
+    console.log('OpenTelemetry is disabled');
+    return null;
+  }
+
   const resource = new Resource({
-    [SEMRESATTRS_SERVICE_NAME]: finalConfig.serviceName,
-    [SEMRESATTRS_SERVICE_VERSION]: finalConfig.serviceVersion,
-    [SEMRESATTRS_DEPLOYMENT_ENVIRONMENT]: finalConfig.environment,
+    [SemanticResourceAttributes.SERVICE_NAME]: finalConfig.serviceName,
+    [SemanticResourceAttributes.SERVICE_VERSION]: finalConfig.serviceVersion,
+    [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: finalConfig.environment,
   });
 
-  // Initialize BigQuery logger
-  if (finalConfig.enableBigQueryLogs && finalConfig.gcpProjectId) {
-    bigQueryLogger = new BigQueryLogger({
-      projectId: finalConfig.gcpProjectId,
-      datasetId: process.env['BIGQUERY_LOGS_DATASET'] || 'agent_logs',
-      tableId: process.env['BIGQUERY_LOGS_TABLE'] || 'trace_logs',
+  let traceExporter: ConsoleSpanExporter | OTLPTraceExporter | CloudTraceExporter;
+  
+  if (finalConfig.environment === 'production') {
+    // Use GCP Cloud Trace in production
+    traceExporter = new CloudTraceExporter({
+      projectId: process.env['GOOGLE_CLOUD_PROJECT'],
+      serviceContext: {
+        service: finalConfig.serviceName,
+        version: finalConfig.serviceVersion,
+      },
     });
-    await bigQueryLogger.initialize();
+  } else if (finalConfig.traceExporterEndpoint) {
+    // Use OTLP exporter if endpoint provided
+    traceExporter = new OTLPTraceExporter({
+      url: finalConfig.traceExporterEndpoint,
+    });
+  } else {
+    // Fallback to console exporter
+    traceExporter = new ConsoleSpanExporter();
   }
 
-  // Configure SDK
-  const sdkOptions: any = {
+  const sdkOptions = {
     resource,
+    traceExporter,
   };
 
-  // Add auto-instrumentations if enabled
-  if (finalConfig.enableAutoInstrumentation) {
-    sdkOptions.instrumentations = [
-      getNodeAutoInstrumentations({
-        // Disable noisy instrumentations
-        '@opentelemetry/instrumentation-dns': { enabled: false },
-        '@opentelemetry/instrumentation-fs': { enabled: false },
-        '@opentelemetry/instrumentation-net': { enabled: false },
-      }),
-    ];
+  if (sdkOptions && finalConfig.instrumentations && finalConfig.instrumentations.length > 0) {
+    sdkOptions.instrumentations = finalConfig.instrumentations;
   }
 
-  // Add custom trace exporter if enabled
-  if (finalConfig.enableCustomExporter && finalConfig.gcpProjectId) {
+  if (finalConfig.environment === 'production' && process.env['GOOGLE_CLOUD_PROJECT']) {
     const customExporter = new CloudTraceExporter({
-      projectId: finalConfig.gcpProjectId,
-      bucketName: process.env['GCS_TRACES_BUCKET'] || `${finalConfig.gcpProjectId}-agent-traces`,
+      projectId: process.env['GOOGLE_CLOUD_PROJECT'],
+      serviceContext: {
+        service: finalConfig.serviceName,
+        version: finalConfig.serviceVersion,
+      },
     });
     
-    sdkOptions.traceExporter = customExporter;
+    if (sdkOptions) {
+      sdkOptions.traceExporter = customExporter;
+    }
   }
 
   sdk = new NodeSDK(sdkOptions);
+  sdk.start();
 
-  try {
-    sdk.start();
-    console.log('✅ OpenTelemetry initialized successfully');
-    console.log(`📊 Service: ${finalConfig.serviceName}`);
-    console.log(`🌍 Environment: ${finalConfig.environment}`);
-    console.log(`☁️  GCP Project: ${finalConfig.gcpProjectId || 'not configured'}`);
-  } catch (error) {
-    console.error('❌ Failed to initialize OpenTelemetry:', error);
-    throw error;
-  }
+  // Set up global tracer
+  tracer = trace.getTracer(finalConfig.serviceName);
 
+  console.log(`OpenTelemetry initialized for ${finalConfig.serviceName} in ${finalConfig.environment} environment`);
+  
   return sdk;
 }
 
 /**
- * Shutdown OpenTelemetry instrumentation
+ * Get the global tracer instance
  */
-export async function shutdownOpenTelemetry(): Promise<void> {
-  if (sdk) {
-    await sdk.shutdown();
-    sdk = null;
-    console.log('🔄 OpenTelemetry shutdown complete');
+export function getTracer(): Tracer {
+  if (!tracer) {
+    throw new Error('OpenTelemetry tracer not initialized. Call initializeOpenTelemetry first.');
   }
-
-  if (bigQueryLogger) {
-    await bigQueryLogger.shutdown();
-    bigQueryLogger = null;
-  }
+  return tracer;
 }
 
 /**
- * Get the current tracer instance
+ * Create a new span
+ * @param name Name of the span
+ * @param options Span options
  */
-export function getTracer(name = 'dulce-de-saigon-agent') {
-  return trace.getTracer(name);
-}
-
-/**
- * Create a new span with automatic error handling
- */
-export async function withSpan<T>(
-  name: string,
-  operation: (span: any) => Promise<T>,
-  options: {
-    attributes?: Record<string, string | number | boolean>;
-    kind?: SpanKind;
-  } = {}
-): Promise<T> {
+export function createSpan(name: string, options?: { attributes?: Record<string, string | number | boolean>, kind?: SpanKind }) {
   const tracer = getTracer();
   
-  return tracer.startActiveSpan(name, {
-    kind: options.kind || SpanKind.INTERNAL,
-    attributes: options.attributes,
-  }, async (span) => {
+  return tracer.startSpan(name || 'unnamed-span', {
+    attributes: options?.attributes || {},
+    kind: options?.kind || SpanKind.INTERNAL,
+  });
+}
+
+/**
+ * Create a span within a context
+ * @param name Name of the span
+ * @param options Span options
+ */
+export function startActiveSpan<T>(name: string, callback: (span: any) => T, options?: { attributes?: Record<string, string | number | boolean>, kind?: SpanKind }): T {
+  const tracer = getTracer();
+  
+  return tracer.startActiveSpan(name || 'unnamed-span', {
+    attributes: options?.attributes || {},
+    kind: options?.kind || SpanKind.INTERNAL,
+  }, (span) => {
     try {
-      const result = await operation(span);
+      const result = callback(span);
       span.setStatus({ code: SpanStatusCode.OK });
+      span.end();
       return result;
     } catch (error) {
       span.setStatus({
         code: SpanStatusCode.ERROR,
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: (error as Error)?.message || 'Unknown error',
       });
-      
-      if (error instanceof Error) {
-        span.recordException(error);
-      }
-      
-      // Log to BigQuery if available
-      if (bigQueryLogger) {
-        await bigQueryLogger.logError({
-          spanName: name,
-          error: error instanceof Error ? error.message : 'Unknown error',
-          stack: error instanceof Error ? error.stack : undefined,
-          attributes: options.attributes,
-          timestamp: new Date(),
-        });
-      }
-      
-      throw error;
-    } finally {
       span.end();
+      throw error;
     }
   });
 }
 
 /**
- * Log a structured event with trace context
+ * Add an event to a span
+ * @param span The span to add the event to
+ * @param event Event name
+ * @param data Additional event data
  */
-export async function logEvent(
-  event: string,
-  data: Record<string, any>,
-  level: 'info' | 'warn' | 'error' = 'info'
-): Promise<void> {
-  const span = trace.getActiveSpan();
-  const traceId = span?.spanContext().traceId;
-  const spanId = span?.spanContext().spanId;
-
-  const logEntry = {
-    event,
-    level,
-    data,
-    traceId,
-    spanId,
-    timestamp: new Date(),
-    service: 'dulce-de-saigon-agent',
-  };
-
-  // Add span attributes
+export function addSpanEvent(span: any, event: string, data?: Record<string, any>): void {
   if (span) {
-    span.addEvent(event, data);
-  }
-
-  // Log to BigQuery if available
-  if (bigQueryLogger) {
-    await bigQueryLogger.logEvent(logEntry);
-  }
-
-  // Console logging for development
-  if (process.env['NODE_ENV'] === 'development') {
-    console.log('📝 Agent Event:', logEntry);
+    span.addEvent(event || 'unnamed-event', data);
   }
 }
 
 /**
- * Instrument a function with automatic tracing
+ * Set span attributes
+ * @param span The span to set attributes on
+ * @param attributes Attributes to set
+ */
+export function setSpanAttributes(span: any, attributes: Record<string, string | number | boolean>): void {
+  if (span && attributes) {
+    Object.entries(attributes).forEach(([key, value]) => {
+      span.setAttribute(key, value);
+    });
+  }
+}
+
+/**
+ * Instrument a function with tracing
+ * @param name Span name
+ * @param fn Function to instrument
+ * @param options Optional configuration
  */
 export function instrument<T extends (...args: any[]) => any>(
-  name: string,
+  name: string | undefined,
   fn: T,
   options: {
-    attributes?: Record<string, string | number | boolean>;
-    kind?: SpanKind;
+    attributes?: Record<string, string | number | boolean> | undefined;
+    kind?: SpanKind | undefined;
   } = {}
 ): T {
   return (async (...args: any[]) => {
-    return withSpan(
-      name,
+    const spanName = name || fn.name || 'anonymous';
+    
+    return startActiveSpan(
+      spanName,
       async (span) => {
-        // Add function arguments as attributes (be careful with sensitive data)
         if (options.attributes) {
-          Object.entries(options.attributes).forEach(([key, value]) => {
-            span.setAttributes({ [key]: value });
-          });
+          setSpanAttributes(span, options.attributes);
         }
         
-        return fn(...args);
+        try {
+          const result = await fn(...args);
+          return result;
+        } catch (error) {
+          span.setStatus({
+            code: SpanStatusCode.ERROR,
+            message: (error as Error)?.message || 'Unknown error',
+          });
+          throw error;
+        }
       },
-      options
+      { kind: options.kind }
     );
   }) as T;
+}
+
+/**
+ * Shutdown OpenTelemetry
+ */
+export function shutdownOpenTelemetry(): Promise<void> {
+  if (!sdk) {
+    return Promise.resolve();
+  }
+  
+  return sdk.shutdown();
 }

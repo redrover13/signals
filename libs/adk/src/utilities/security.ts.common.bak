@@ -34,7 +34,7 @@ export class Security {
     this.config = config;
     
     // Initialize encryption key if available
-    const keyString = this.config?.get('security && security.encryptionKey');
+    const keyString = this.config?.get('security.encryptionKey');
     if (keyString) {
       this.encryptionKey = Buffer && Buffer.from(keyString, 'base64');
     }

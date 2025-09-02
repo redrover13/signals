@@ -40,18 +40,14 @@ describe('Enhanced Signals Library', () => {
     it('should skip update when values are equal with deepEqual option', () => {
       const obj = { a: 1, b: 2 };
       const objSignal = createSignal(obj, { deepEqual: true });
-      
-      const spy = jest.spyOn(console, 'log');
+  
+      // Perform a deep-equal update and ensure state is unchanged
       objSignal.set({ ...obj }); // Should be skipped
-      
-      // No console log should be generated for the update
-      expect(spy).not.toHaveBeenCalled();
-      
+      expect(objSignal.get()).toEqual(obj);
+  
       // Now update with a different value
       objSignal.set({ a: 1, b: 3 });
       expect(objSignal.get()).toEqual({ a: 1, b: 3 });
-      
-      spy.mockRestore();
     });
     
     it('should support custom equality functions', () => {

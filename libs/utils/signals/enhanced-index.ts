@@ -115,20 +115,20 @@ export function createSignal<T>(initialValue: T, options?: CreateSignalOptions):
     const originalSetMethod = extendedSignal.set;
     extendedSignal.set = (newValue: T | ((prev: T) => T)) => {
       const previous = internalSignal();
-      
+  
       // Handle both direct and functional updates for debugging
       const resolvedValue = typeof newValue === 'function'
         ? (newValue as Function)(previous)
         : newValue;
-      
+  
       console.log(`[SIGNAL] ${name} updating:`, {
         previous,
         new: resolvedValue,
       });
-      
-      originalSetMethod(newValue);
+  
+      // Apply the already-resolved value to avoid double evaluation
+      originalSetMethod(resolvedValue as T);
     };
-  }
   
   // Add subscribe method with better cleanup
   extendedSignal.subscribe = (callback: (value: T) => void) => {

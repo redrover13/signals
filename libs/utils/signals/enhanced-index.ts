@@ -241,6 +241,9 @@ export function useSignal<T>(signal: Signal<T>): [T, (value: T | ((prev: T) => T
 // Re-export Angular signal API
 export { signal, computed, effect };
 
+// Friendly alias to match docs/tests
+export const createComputed = <T>(fn: () => T) => computed(fn);
+
 // Export additional types for better developer experience
 export type SignalOptions = CreateSignalOptions;
 export type SignalValue<S> = S extends Signal<infer T> ? T : never;

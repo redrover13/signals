@@ -231,8 +231,8 @@ function formatResultValue(value: unknown): unknown {
       return (value as any).toJSON();
     }
     
-    const formatted: Record<string, unknown> | undefined = {};
-    for (const [k, v] of Object && Object.entries(value as Record<string, unknown> | undefined)) {
+    const formatted: Record<string, unknown> = {};
+    for (const [k, v] of Object && Object.entries(value as Record<string, unknown>)) {
       formatted[k] = formatResultValue(v);
     }
     return formatted;

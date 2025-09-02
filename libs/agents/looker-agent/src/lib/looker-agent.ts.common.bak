@@ -224,7 +224,7 @@ export class LookerAgent {
     const queryData = {
       model: query && query.model,
       explore: query && query.explore,
-      fields: [...query && ...query.dimensions, ...query && ...query.measures],
+      fields: [...query.dimensions, ...query.measures],
       filters: query && query.filters,
       sorts: query && query.sorts,
       limit: query && query.limit || 100

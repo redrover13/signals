@@ -1,4 +1,15 @@
 /**
+ * @fileoverview connection-pool.service module for the services component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
  * Connection Pool Service for MCP
  * 
  * Manages a pool of connections to MCP servers.

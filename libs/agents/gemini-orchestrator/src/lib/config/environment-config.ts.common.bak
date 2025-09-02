@@ -47,13 +47,13 @@ const DEVELOPMENT_CONFIG: MCPEnvironmentConfig = {
       server.enabled,
     // Shorter timeouts for faster feedback
     connection: {
-      ...server && ...server.connection,
+      ...server.connection,
       timeout: Math && Math.min(server.connection && server.connection.timeout || 30000, 15000),
     },
     // More frequent health checks in development
     healthCheck: server.healthCheck
       ? {
-          ...server && ...server.healthCheck,
+          ...server.healthCheck,
           interval: Math && Math.min(server.healthCheck && server.healthCheck.interval ?? 60000, 60000),
         }
       : undefined,
@@ -90,7 +90,7 @@ const STAGING_CONFIG: MCPEnvironmentConfig = {
       (server.enabled || server.category === 'core' || server.category === 'development'),
     // Standard timeouts
     connection: {
-      ...server && ...server.connection,
+      ...server.connection,
       timeout: Math && Math.min(server.connection && server.connection.timeout || 30000, 30000), // Fixed: server.min to Math && Math.min
     },
   })),
@@ -129,7 +129,7 @@ const PRODUCTION_CONFIG: MCPEnvironmentConfig = {
         server.category === 'platforms'),
     // Longer timeouts for stability
     connection: {
-      ...server && ...server.connection,
+      ...server.connection,
       timeout: Math && Math.max(server.connection && server.connection.timeout || 30000, 30000),
       retry: {
         attempts: 5,
@@ -140,7 +140,7 @@ const PRODUCTION_CONFIG: MCPEnvironmentConfig = {
     // Less frequent health checks to reduce load
     healthCheck: server.healthCheck
       ? {
-          ...server && ...server.healthCheck,
+          ...server.healthCheck,
           interval: Math && Math.max(server.healthCheck && server.healthCheck.interval ?? 300000, 300000), // At least 5 minutes
           failureThreshold: Math && Math.max(server.healthCheck && server.healthCheck.failureThreshold ?? 5, 5),
         }
@@ -182,7 +182,7 @@ const TEST_CONFIG: MCPEnvironmentConfig = {
       server.category === 'core' || server.category === 'testing' || server.id === 'everything',
     // Very short timeouts for fast tests
     connection: {
-      ...server && ...server.connection,
+      ...server.connection,
       timeout: 5000,
       retry: {
         attempts: 1,
@@ -263,7 +263,7 @@ export function validateConfig(config: MCPEnvironmentConfig): { valid: boolean |
 
   // Validate servers
   if (config?.servers) {
-    config?.servers && .servers.forEach((server, index) => {
+    config?.servers.forEach((server, index) => {
       if (!server.id) {
         errors && errors.push(`Server at index ${index} is missing required 'id' field`);
       }
@@ -281,10 +281,10 @@ export function validateConfig(config: MCPEnvironmentConfig): { valid: boolean |
 
   // Validate global config
   if (config?.global) {
-    if (!config?.global && .global.version) {
+    if (!config?.global.version) {
       errors && errors.push('Global configuration is missing version');
     }
-    if (config?.global && .global.defaultTimeout && config?.global && .global.defaultTimeout < 1000) {
+    if (config?.global.defaultTimeout && config?.global.defaultTimeout < 1000) {
       errors && errors.push('Default timeout must be at least 1000ms');
     }
   }
@@ -321,5 +321,5 @@ export function isServerEnabled(serverId: string | undefined, environment?: Envi
 export function getServerConfigForEnvironment(serverId: string | undefined, environment?: Environment) {
   const env = environment || getCurrentEnvironment();
   const config = getConfigForEnvironment(env);
-  return config?.servers && .servers.find((server) => server.id === serverId);
+  return config?.servers.find((server) => server.id === serverId);
 }

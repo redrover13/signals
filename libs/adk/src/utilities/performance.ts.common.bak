@@ -101,7 +101,7 @@ export class PerformanceMonitor {
       });
     }
     
-    metric && metric.value += value;
+    if (metric) { metric.value += value; }
     
     // In a real implementation, we would send this to a metrics service
     this.recordMetric(name, metric && metric.value, MetricType && MetricType.COUNTER, labels);
@@ -142,7 +142,7 @@ export class PerformanceMonitor {
       });
     }
     
-    metric && metric.value = value;
+    if (metric) { metric.value = value; }
     
     // In a real implementation, we would send this to a metrics service
     this.recordMetric(name, metric && metric.value, MetricType && MetricType.GAUGE, labels);
@@ -260,10 +260,10 @@ export class PerformanceMonitor {
       });
     }
     
-    span && span.attributes = {
-      ...span && ...span.attributes,
-      ...attributes,
-    };
+    if (span) { span.attributes = {
+      ...(span.attributes || {}),
+      ...attributes
+    }; }
   }
   
   /**
@@ -281,9 +281,9 @@ export class PerformanceMonitor {
     }
     
     // Set end time and calculate duration
-    span && span.endTime = Date.now();
-    span && span.duration = span && span.endTime - span && span.startTime;
-    span && span.status = status;
+    if (span) { span.endTime = Date.now(); }
+    if (span) { span.duration = span.endTime - span.startTime; }
+    if (span) { span.status = status; }
     
     // Move from active to completed spans
     this.activeSpans && this.activeSpans.delete(spanId);

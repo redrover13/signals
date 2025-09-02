@@ -11,22 +11,31 @@
 
 import React, { lazy, Suspense, useState, useEffect } from 'react';
 import styles from './federation-demo.module.css';
+import MockAgentInterface from '../mocks/AgentInterface';
 
-// Lazy load the remote component
+// Lazy load the remote component with fallback to mock
 const RemoteAgentInterface = lazy(() => {
-  return new Promise<typeof import('frontend-agents/AgentInterface')>((resolve, reject) => {
+  return new Promise<typeof import('../mocks/AgentInterface')>((resolve, reject) => {
     const timeout = setTimeout(() => {
-      reject(new Error('Timeout loading remote component'));
-    }, 10000);
+      console.warn('Timeout loading remote component, using mock implementation');
+      import('../mocks/AgentInterface')
+        .then(resolve)
+        .catch(reject);
+    }, 5000);
 
+    // Try to load the remote module first
     import('frontend-agents/AgentInterface')
       .then((module) => {
         clearTimeout(timeout);
         resolve(module);
       })
       .catch((error) => {
+        console.warn('Failed to load remote component, using mock implementation', error);
         clearTimeout(timeout);
-        reject(error);
+        // Fallback to mock implementation
+        import('../mocks/AgentInterface')
+          .then(resolve)
+          .catch(reject);
       });
   });
 });

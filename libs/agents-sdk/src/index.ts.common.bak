@@ -9,6 +9,6 @@
  * @license MIT
  */
 
-export * from './lib/agents-sdk';
-export * from './lib/main-agent';
-export * from './lib/agent-types';
+export * from './lib/agents-sdk.js';
+export * from './lib/main-agent.js';
+export * from './lib/agent-types.js';

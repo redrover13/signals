@@ -10,7 +10,7 @@
  */
 
 import React, { useState, useCallback, memo } from 'react';
-import { MainAgent } from 'agents-sdk';
+import { MainAgent } from '../../../../../../../libs/agents-sdk/src/lib/main-agent';
 import { AgentConfig, AgentResponse } from '../../types/firebase';
 import styles from './agent-interface.module.css';
 

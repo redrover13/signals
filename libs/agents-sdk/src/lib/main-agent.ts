@@ -80,7 +80,7 @@ export class MainAgent {
    */
   async orchestrate(query: string | undefined, context?: Record<string, any>): Promise<any> {
     try {
-      const model = this.genAI && this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = this.genAI?.getGenerativeModel({ model: 'gemini-1.5-flash' });
       const result = await model && model.generateContent(`
         Analyze this F&B platform query and determine the appropriate action:
         Query: ${query}

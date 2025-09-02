@@ -67,7 +67,7 @@ export async function executeQuery(
         };
       });
       
-      if (options) {
+      if (options && queryParams) {
         options.params = queryParams;
       }
     }

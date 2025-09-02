@@ -96,7 +96,7 @@ async function httpRequest(args: Record<string, unknown> | undefined, _toolConte
     };
 
     if (body && ['POST', 'PUT', 'PATCH'].includes(method as string)) {
-      if (fetchOptions) { fetchOptions.body = body as string; }
+      fetchOptions.body = body as string;
     }
 
     const response = await fetch(url as string, fetchOptions);

@@ -80,7 +80,7 @@ export class MainAgent {
    */
   async orchestrate(query: string | undefined, context?: Record<string, any>): Promise<any> {
     try {
-      const model = this.genAI && this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = this.genAI?.getGenerativeModel({ model: 'gemini-1.5-flash' });
       const result = await model && model.generateContent(`
         Analyze this F&B platform query and determine the appropriate action:
         Query: ${query}
@@ -95,7 +95,7 @@ export class MainAgent {
         - "ERROR: <REASON>" if the query cannot be processed
       `);
       
-      const response = result?.response?.text();
+      const response = await result?.response?.text() || '';
 
       if (response.startsWith('BIGQUERY:')) {
         const sql = response.replace('BIGQUERY:', '').trim();

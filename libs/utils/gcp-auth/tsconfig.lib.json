@@ -10,13 +10,16 @@
     "declarationMap": true
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*",
-    "../../gcp-core/src/**/*.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
     "jest.config.ts",
     "src/**/*.spec.ts",
     "src/**/*.test.ts"
+  ],
+  "references": [
+    {
+      "path": "../../gcp-core"
+    }
   ]
 }

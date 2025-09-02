@@ -87,16 +87,16 @@ jobs:
           EOL
 
       - name: Run type checking
-        run: pnpm nx run-many -t type-check --all --parallel=3
+        run: pnpm exec nx run-many -t type-check --all --parallel=3
 
       - name: Run linting
-        run: pnpm nx run-many -t lint --all --parallel=3
+        run: pnpm exec nx run-many -t lint --all --parallel=3
 
       - name: Run unit tests
-        run: pnpm nx run-many -t test --all --parallel=3 --coverage
+        run: pnpm exec nx run-many -t test --all --parallel=3 --coverage
 
       - name: Run build
-        run: pnpm nx run-many -t build --all --parallel=3
+        run: pnpm exec nx run-many -t build --all --parallel=3
 
       - name: Test MCP connectivity (Unix)
         if: runner.os != 'Windows'

@@ -139,6 +139,9 @@ export function createSignal<T>(initialValue: T, options?: CreateSignalOptions):
         callback(value);
       } catch (e) {
         console.error(`Error in signal subscription callback for ${options?.name || signalId}:`, e);
+        if (options?.debug) {
+          throw e; // Re-throw in debug mode for better debugging
+        }
       }
     });
     

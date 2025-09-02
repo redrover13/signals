@@ -48,10 +48,10 @@ jobs:
 
       - name: Warm Nx cache
         run: |
-          pnpm nx reset
-          pnpm nx run-many --target=lint --all
-          pnpm nx run-many --target=build --all
-          pnpm nx run-many --target=test --all
+          pnpm exec nx reset
+          pnpm exec nx run-many --target=lint --all
+          pnpm exec nx run-many --target=build --all
+          pnpm exec nx run-many --target=test --all
         env:
           NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}

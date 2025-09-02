@@ -65,9 +65,12 @@ importers:
       '@opentelemetry/semantic-conventions':
         specifier: ^1.36.0
         version: 1.36.0
+      '@types/lodash-es':
+        specifier: ^4.17.12
+        version: 4.17.12
       '@waldzellai/adk-typescript':
         specifier: ^0.1.0
-        version: 0.1.0(encoding@0.1.13)(ws@8.18.0)(zod@4.1.5)
+        version: 0.1.0(encoding@0.1.13)(ws@8.18.0)(zod@3.25.76)
       chalk:
         specifier: ^5.6.0
         version: 5.6.0
@@ -86,6 +89,9 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      lodash.memoize:
+        specifier: ^4.1.2
+        version: 4.1.2
       minimatch:
         specifier: ^10.0.3
         version: 10.0.3
@@ -103,7 +109,7 @@ importers:
         version: 9.0.1
       zod-to-json-schema:
         specifier: ^3.24.6
-        version: 3.24.6(zod@4.1.5)
+        version: 3.24.6(zod@3.25.76)
     devDependencies:
       '@jest/types':
         specifier: ^30.0.5
@@ -322,8 +328,8 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@24.3.0)(@vitest/ui@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(less@4.4.1)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(tsx@4.20.5)(yaml@2.8.1)
       zod:
-        specifier: ^4.1.5
-        version: 4.1.5
+        specifier: ^3.25.76
+        version: 3.25.76
 
   apps/agents: {}
 
@@ -11246,9 +11252,6 @@ packages:
   zod@4.0.17:
     resolution: {integrity: sha512-1PHjlYRevNxxdy2JZ8JcNAw7rX8V9P1AKkP+x/xZfxB0K5FYfuV+Ug6P/6NVSR2jHQ+FzDDoDHS04nYUsOIyLQ==}
 
-  zod@4.1.5:
-    resolution: {integrity: sha512-rcUUZqlLJgBC33IT3PNMgsCq6TzLQEG/Ei/KTCU0PedSWRMAXoOUN+4t/0H+Q8bdnLPdqUYnvboJT0bn/229qg==}
-
 snapshots:
 
   '@adobe/css-tools@4.4.4': {}
@@ -16967,11 +16970,11 @@ snapshots:
 
   '@vue/shared@3.5.20': {}
 
-  '@waldzellai/adk-typescript@0.1.0(encoding@0.1.13)(ws@8.18.0)(zod@4.1.5)':
+  '@waldzellai/adk-typescript@0.1.0(encoding@0.1.13)(ws@8.18.0)(zod@3.25.76)':
     dependencies:
       '@google/genai': 0.12.0(encoding@0.1.13)
       node-fetch: 2.7.0(encoding@0.1.13)
-      openai: 4.104.0(encoding@0.1.13)(ws@8.18.0)(zod@4.1.5)
+      openai: 4.104.0(encoding@0.1.13)(ws@8.18.0)(zod@3.25.76)
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -21926,7 +21929,7 @@ snapshots:
       is-docker: 2.2.1
       is-wsl: 2.2.0
 
-  openai@4.104.0(encoding@0.1.13)(ws@8.18.0)(zod@4.1.5):
+  openai@4.104.0(encoding@0.1.13)(ws@8.18.0)(zod@3.25.76):
     dependencies:
       '@types/node': 18.19.123
       '@types/node-fetch': 2.6.13
@@ -21937,7 +21940,7 @@ snapshots:
       node-fetch: 2.7.0(encoding@0.1.13)
     optionalDependencies:
       ws: 8.18.0
-      zod: 4.1.5
+      zod: 3.25.76
     transitivePeerDependencies:
       - encoding
 
@@ -25317,12 +25320,6 @@ snapshots:
     dependencies:
       zod: 3.25.76
 
-  zod-to-json-schema@3.24.6(zod@4.1.5):
-    dependencies:
-      zod: 4.1.5
-
   zod@3.25.76: {}
 
   zod@4.0.17: {}
-
-  zod@4.1.5: {}

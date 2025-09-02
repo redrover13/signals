@@ -210,17 +210,17 @@ export function useSignal<T>(signal: Signal<T>): [T, (value: T | ((prev: T) => T
   signalRef.current = signal;
   
   useEffect(() => {
-    // Don't subscribe on first render, we already have the value
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-    
     // Subscribe to signal updates
     const unsubscribe = signalRef.current.subscribe((newValue) => {
       setValue(newValue);
     });
-    
+
+    // Sync value in case it changed between render and effect run
+    const currentValue = signalRef.current.get();
+    if (value !== currentValue) {
+      setValue(currentValue);
+    }
+
     // Clean up subscription on unmount or signal change
     return () => {
       unsubscribe();

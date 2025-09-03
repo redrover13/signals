@@ -55,6 +55,10 @@ export function createSignal<T>(initialValue: T, options?: CreateSignalOptions):
   const subscribers = new Set<(value: T) => void>();
 
   const signalFunction = ((newValue?: T | ((prev: T) => T)): T => {
+    // Track this signal as a dependency if we're in a tracking context
+    if (currentTracker) {
+      currentTracker.add(signalFunction);
+    }
     if (newValue !== undefined) {
       const nextValue = typeof newValue === 'function' ? (newValue as (prev: T) => T)(currentValue) : newValue;
       if (nextValue !== currentValue) {
@@ -66,7 +70,13 @@ export function createSignal<T>(initialValue: T, options?: CreateSignalOptions):
   }) as Signal<T>;
 
   // Add methods to the signal
-  signalFunction.get = (): T => currentValue;
+  signalFunction.get = (): T => {
+    // Track this signal as a dependency if we're in a tracking context
+    if (currentTracker) {
+      currentTracker.add(signalFunction);
+    }
+    return currentValue;
+  };
   signalFunction.set = (value: T | ((prev: T) => T)): void => {
     const nextValue = typeof value === 'function' ? (value as (prev: T) => T)(currentValue) : value;
     if (nextValue !== currentValue) {
@@ -144,12 +154,16 @@ export { createPersistentSignal as persistentSignal };
  * @param dependencies Array of signals this derived signal depends on
  * @returns A signal that automatically updates when dependencies change
  */
+// Global state for dependency tracking
+let currentTracker: Set<Signal<any>> | null = null;
+
 export function createDerivedSignal<T>(
-  computeFn: () => T,
-  dependencies: Signal<unknown>[] = []
+  computeFn: () => T
 ): Signal<T> {
   let currentValue = computeFn();
   const subscribers = new Set<(value: T) => void>();
+  const dependencies = new Set<Signal<any>>();
+  let unsubscribeFunctions: (() => void)[] = [];
 
   const derivedSignal = (() => currentValue) as Signal<T>;
   derivedSignal.get = () => currentValue;
@@ -161,17 +175,36 @@ export function createDerivedSignal<T>(
     return () => subscribers.delete(callback);
   };
 
-  // Subscribe to all dependencies
-  // @ts-expect-error: Variable intentionally unused - derived signals don't have cleanup
-  const unsubscribeFunctions = dependencies.map((signal): (() => void) =>
-    signal.subscribe((): void => {
+  const updateValue = () => {
+    // Clean up old subscriptions
+    unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
+    unsubscribeFunctions = [];
+
+    // Track dependencies during computation
+    const prevTracker = currentTracker;
+    currentTracker = new Set();
+
+    try {
       const newValue = computeFn();
       if (newValue !== currentValue) {
         currentValue = newValue;
         subscribers.forEach(callback => callback(currentValue));
       }
-    })
-  );
+
+      // Subscribe to newly tracked dependencies
+      dependencies.clear();
+      currentTracker.forEach(signal => {
+        dependencies.add(signal);
+        const unsubscribe = signal.subscribe(updateValue);
+        unsubscribeFunctions.push(unsubscribe);
+      });
+    } finally {
+      currentTracker = prevTracker;
+    }
+  };
+
+  // Initial computation to set up dependencies
+  updateValue();
 
   return derivedSignal;
 }
@@ -184,9 +217,12 @@ export function createDerivedSignal<T>(
  */
 export function createComputed<T>(
   computeFn: () => T,
-  dependencies: Signal<unknown>[] = []
+  // @ts-expect-error: dependencies parameter kept for API compatibility
+  dependencies: Signal<any>[] = []
 ): Signal<T> {
-  return createDerivedSignal(computeFn, dependencies);
+  // For now, ignore dependencies and just create a derived signal
+  // In a more sophisticated implementation, this would use the dependencies
+  return createDerivedSignal(computeFn);
 }
 
 /**
@@ -197,7 +233,7 @@ export function createComputed<T>(
  */
 export function createEffect(
   effectFn: () => void | (() => void),
-  dependencies: Signal<unknown>[] = []
+  dependencies: Signal<any>[] = []
 ): () => void {
   let cleanup: (() => void) | void;
 
@@ -245,22 +281,25 @@ export type AsyncSignalState<T> =
 export function fromPromise<T>(
   promise: Promise<T>,
   initialValue?: T
-): Signal<AsyncSignalState<T>> {
-  const stateSignal = createSignal<AsyncSignalState<T>>({
-    status: 'pending',
-    value: initialValue,
+): Signal<{ loading: boolean; data: T | undefined; error: Error | undefined }> {
+  const stateSignal = createSignal<{ loading: boolean; data: T | undefined; error: Error | undefined }>({
+    loading: true,
+    data: initialValue,
+    error: undefined,
   });
 
   promise
     .then(value => {
       stateSignal.set({
-        status: 'fulfilled',
-        value,
+        loading: false,
+        data: value,
+        error: undefined,
       });
     })
     .catch(error => {
       stateSignal.set({
-        status: 'rejected',
+        loading: false,
+        data: undefined,
         error: error as Error,
       });
     });

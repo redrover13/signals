@@ -68,7 +68,7 @@ export function getBigQueryClient(projectId?: string): BigQuery {
     return clientCache.get(cacheKey) as BigQuery;
   }
   
-  const client = new BigQuery({ projectId });
+  const client = new BigQuery(projectId ? { projectId } : {});
   clientCache.set(cacheKey, client);
   return client;
 }
@@ -84,7 +84,7 @@ export function getStorageClient(projectId?: string): Storage {
     return clientCache.get(cacheKey) as Storage;
   }
   
-  const client = new Storage({ projectId });
+  const client = new Storage(projectId ? { projectId } : {});
   clientCache.set(cacheKey, client);
   return client;
 }
@@ -100,7 +100,7 @@ export function getPubSubClient(projectId?: string): PubSub {
     return clientCache.get(cacheKey) as PubSub;
   }
   
-  const client = new PubSub({ projectId });
+  const client = new PubSub(projectId ? { projectId } : {});
   clientCache.set(cacheKey, client);
   return client;
 }
@@ -133,7 +133,7 @@ export function getFirestoreClient(projectId?: string): Firestore {
     return clientCache.get(cacheKey) as Firestore;
   }
   
-  const client = new Firestore({ projectId });
+  const client = new Firestore(projectId ? { projectId } : {});
   clientCache.set(cacheKey, client);
   return client;
 }

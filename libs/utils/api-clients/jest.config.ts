@@ -1,9 +1,9 @@
 export default {
   displayName: 'api-clients',
-  preset: '../../../jest.preset && jest.preset.cjs',
+  preset: '../../../jest.preset.cjs',
   testEnvironment: 'node',
   transform: {
-    '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig?.spec && .spec.json' }],
+    '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../../coverage/libs/utils/api-clients',

@@ -1,0 +1,324 @@
+/**
+ * @fileoverview Comprehensive reactivity system test suite
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains advanced tests for the signals reactivity system, similar to Vue/SolidJS patterns.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+import {
+  createSignal,
+  createDerivedSignal as derivedSignal,
+  createEffect,
+  batch,
+  createComputed
+} from '../index';
+import { renderHook, act } from '@testing-library/react';
+import { useSignal, useSignalValue } from '../index';
+
+describe('Reactivity System Integration', () => {
+  describe('Complex Dependency Graphs', () => {
+    it('should handle diamond dependencies correctly', () => {
+      const a = createSignal(1);
+      const b = createSignal(2);
+
+      // Two derived signals from same source
+      const sum = derivedSignal(() => a.get() + b.get());
+      const product = derivedSignal(() => a.get() * b.get());
+
+      // Diamond: both sum and product feed into total
+      const total = derivedSignal(() => sum.get() + product.get());
+
+      expect(total.get()).toBe(5); // (1+2) + (1*2) = 5
+
+      a.set(3);
+      expect(total.get()).toBe(11); // (3+2) + (3*2) = 11
+    });
+
+    it('should handle nested derived signals', () => {
+      const base = createSignal(2);
+
+      const squared = derivedSignal(() => base.get() ** 2);
+      const cubed = derivedSignal(() => squared.get() * base.get());
+      const fourth = derivedSignal(() => squared.get() ** 2);
+
+      expect(cubed.get()).toBe(8); // 2^3 = 8
+      expect(fourth.get()).toBe(16); // 2^4 = 16
+
+      base.set(3);
+      expect(cubed.get()).toBe(27); // 3^3 = 27
+      expect(fourth.get()).toBe(81); // 3^4 = 81
+    });
+
+    it('should handle circular dependencies safely', () => {
+      const a = createSignal(1);
+      const b = createSignal(2);
+
+      // Create interdependent derived signals
+      const aPlusB = derivedSignal(() => a.get() + b.get());
+      const bTimesA = derivedSignal(() => b.get() * a.get());
+
+      // This should not cause infinite loops
+      expect(aPlusB.get()).toBe(3);
+      expect(bTimesA.get()).toBe(2);
+
+      a.set(2);
+      expect(aPlusB.get()).toBe(4);
+      expect(bTimesA.get()).toBe(4);
+    });
+  });
+
+  describe('Batching and Performance', () => {
+    it('should batch multiple updates efficiently', () => {
+      const a = createSignal(1);
+      const b = createSignal(2);
+      const c = createSignal(3);
+
+      const sum = derivedSignal(() => a.get() + b.get() + c.get());
+      const mockCallback = jest.fn();
+
+      sum.subscribe(mockCallback);
+
+      // Batch multiple updates
+      batch(() => {
+        a.set(10);
+        b.set(20);
+        c.set(30);
+      });
+
+      // Should only trigger once
+      expect(mockCallback).toHaveBeenCalledTimes(1);
+      expect(sum.get()).toBe(60);
+    });
+
+    it('should avoid unnecessary computations', () => {
+      const source = createSignal(1);
+      const computeSpy = jest.fn(() => source.get() * 2);
+
+      const derived = derivedSignal(computeSpy);
+
+      // Initial computation
+      expect(derived.get()).toBe(2);
+      expect(computeSpy).toHaveBeenCalledTimes(1);
+
+      // Setting same value shouldn't trigger recomputation
+      source.set(1);
+      expect(derived.get()).toBe(2);
+      expect(computeSpy).toHaveBeenCalledTimes(1);
+
+      // Setting different value should trigger recomputation
+      source.set(2);
+      expect(derived.get()).toBe(4);
+      expect(computeSpy).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('Memory Management', () => {
+    it('should properly clean up subscriptions', () => {
+      const source = createSignal(1);
+      const derived = derivedSignal(() => source.get() * 2);
+
+      const mockCallback = jest.fn();
+      const unsubscribe = derived.subscribe(mockCallback);
+
+      source.set(2);
+      expect(mockCallback).toHaveBeenCalledWith(4);
+
+      // Clean up
+      unsubscribe();
+
+      source.set(3);
+      // Should not trigger after cleanup
+      expect(mockCallback).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle effect cleanup properly', () => {
+      const source = createSignal(1);
+      const effectSpy = jest.fn();
+      let cleanupCalled = false;
+
+      const cleanup = createEffect(() => {
+        effectSpy();
+        return () => {
+          cleanupCalled = true;
+        };
+      }, [source]);
+
+      // Trigger effect again
+      source.set(2);
+      expect(effectSpy).toHaveBeenCalledTimes(2);
+
+      // Clean up effect
+      cleanup();
+      expect(cleanupCalled).toBe(true);
+
+      source.set(3);
+      // Effect should not run again after cleanup
+      expect(effectSpy).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('Component Integration', () => {
+    it('should work correctly with React hooks', () => {
+      const externalSignal = createSignal(0);
+
+      const { result } = renderHook(() => {
+        const [value, setValue] = useSignal(externalSignal);
+        return { value, setValue };
+      });
+
+      expect(result.current.value).toBe(0);
+
+      act(() => {
+        result.current.setValue(5);
+      });
+
+      expect(result.current.value).toBe(5);
+      expect(externalSignal.get()).toBe(5);
+    });
+
+    it('should handle derived signals in components', () => {
+      const count = createSignal(1);
+      const doubled = derivedSignal(() => count.get() * 2);
+
+      const { result } = renderHook(() => {
+        const value = useSignalValue(doubled);
+        return { value };
+      });
+
+      expect(result.current.value).toBe(2);
+
+      act(() => {
+        count.set(3);
+      });
+
+      expect(result.current.value).toBe(6);
+    });
+
+    it('should batch updates in React components', () => {
+      const a = createSignal(1);
+      const b = createSignal(2);
+      const sum = derivedSignal(() => a.get() + b.get());
+
+      const { result } = renderHook(() => {
+        const value = useSignalValue(sum);
+        return { value };
+      });
+
+      expect(result.current.value).toBe(3);
+
+      act(() => {
+        batch(() => {
+          a.set(10);
+          b.set(20);
+        });
+      });
+
+      expect(result.current.value).toBe(30);
+    });
+  });
+
+  describe('Error Handling and Edge Cases', () => {
+    it('should handle errors in derived computations', () => {
+      const source = createSignal(1);
+      const derived = derivedSignal(() => {
+        if (source.get() < 0) {
+          throw new Error('Negative value not allowed');
+        }
+        return source.get() * 2;
+      });
+
+      expect(derived.get()).toBe(2);
+
+      // This should not crash the system
+      source.set(-1);
+      expect(() => derived.get()).toThrow('Negative value not allowed');
+    });
+
+    it('should handle effects that throw errors', () => {
+      const source = createSignal(1);
+
+      createEffect(() => {
+        const value = source.get();
+        if (value < 0) {
+          throw new Error('Effect error');
+        }
+      }, [source]);
+
+      // Should not crash
+      expect(() => source.set(-1)).not.toThrow();
+    });
+
+    it('should handle undefined and null values', () => {
+      const source = createSignal<string | undefined>('hello');
+
+      const derived = derivedSignal(() => {
+        const value = source.get();
+        return value ? value.toUpperCase() : 'EMPTY';
+      });
+
+      expect(derived.get()).toBe('HELLO');
+
+      source.set(undefined);
+      expect(derived.get()).toBe('EMPTY');
+
+      source.set(null as any);
+      expect(derived.get()).toBe('EMPTY');
+    });
+  });
+
+  describe('Advanced Patterns', () => {
+    it('should support conditional dependencies', () => {
+      const condition = createSignal(true);
+      const a = createSignal(1);
+      const b = createSignal(2);
+
+      const derived = derivedSignal(() => {
+        return condition.get() ? a.get() : b.get();
+      });
+
+      expect(derived.get()).toBe(1);
+
+      // Change condition - should now depend on b
+      condition.set(false);
+      expect(derived.get()).toBe(2);
+
+      // Changing a should not affect result anymore
+      a.set(10);
+      expect(derived.get()).toBe(2);
+
+      // But changing b should
+      b.set(20);
+      expect(derived.get()).toBe(20);
+    });
+
+    it('should handle async derived computations', async () => {
+      const source = createSignal(1);
+
+      const derived = derivedSignal(async () => {
+        // Simulate async computation
+        await new Promise(resolve => setTimeout(resolve, 10));
+        return source.get() * 2;
+      });
+
+      // For now, just test that it doesn't crash
+      expect(typeof derived.get()).toBe('object'); // Promise
+    });
+
+    it('should support computed properties with setters', () => {
+      const firstName = createSignal('John');
+      const lastName = createSignal('Doe');
+
+      const fullName = createComputed(() => `${firstName.get()} ${lastName.get()}`);
+
+      expect(fullName.get()).toBe('John Doe');
+
+      // Test that it's read-only (should throw or be no-op)
+      expect(() => (fullName as any).set('Jane Smith')).toThrow();
+    });
+  });
+});</content>
+<parameter name="filePath">/home/g_nelson/signals-1/libs/utils/signals/src/reactivity-system.spec.ts

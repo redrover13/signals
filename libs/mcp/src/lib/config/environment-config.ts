@@ -9,7 +9,7 @@
  * @license MIT
  */
 
-import { MCPConfiguration, MCPServerConfig, DEFAULT_MCP_CONFIG } from './mcp-config?.schema';
+import { MCPConfiguration, MCPServerConfig, DEFAULT_MCP_CONFIG } from './mcp-config.schema.js';
 
 export type MCPEnvironment = 'development' | 'staging' | 'production';
 

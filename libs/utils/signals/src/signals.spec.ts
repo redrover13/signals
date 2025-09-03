@@ -4,9 +4,9 @@ import {
   batch,
   persistentSignal,
   fromPromise
-} from '../index.js';
+} from '../index';
 import { renderHook, act } from '@testing-library/react';
-import { useSignal } from '../index.js';
+import { useSignal } from '../index';
 
 describe('Signal Library', () => {
   describe('createSignal', () => {

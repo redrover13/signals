@@ -38,7 +38,8 @@ export default defineConfig(async ({ mode }) => {
     define: {
       'process.env.NODE_ENV': JSON.stringify(mode),
       'process.env.VITE_APP_NAME': JSON.stringify(env.VITE_APP_NAME || 'Agent Frontend'),
-      'process.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL || 'http://localhost:3000')
+      'process.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL || 'http://localhost:3000'),
+      'process.env': {},
       // Add other specific environment variables as needed
       // Never expose the entire process.env object
     },
@@ -84,27 +85,28 @@ export default defineConfig(async ({ mode }) => {
       }),
       
       // Add PWA support
-      VitePWA({
-        registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
-        manifest: {
-          name: 'Dulce de Saigon Agent Frontend',
-          short_name: 'Agent Frontend',
-          theme_color: '#4CAF50',
-          icons: [
-            {
-              src: '/pwa-192x192.png',
-              sizes: '192x192',
-              type: 'image/png'
-            },
-            {
-              src: '/pwa-512x512.png',
-              sizes: '512x512',
-              type: 'image/png'
-            }
-          ]
-        }
-      })
+      // Temporarily disabled due to stream-browserify issue
+      // VitePWA({
+      //   registerType: 'autoUpdate',
+      //   includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
+      //   manifest: {
+      //     name: 'Dulce de Saigon Agent Frontend',
+      //     short_name: 'Agent Frontend',
+      //     theme_color: '#4CAF50',
+      //     icons: [
+      //       {
+      //         src: '/pwa-192x192.png',
+      //         sizes: '192x192',
+      //         type: 'image/png'
+      //       },
+      //       {
+      //         src: '/pwa-512x512.png',
+      //         sizes: '512x512',
+      //         type: 'image/png'
+      //       }
+      //     ]
+      //   }
+      // })
     ],
     
     // Enable worker support
@@ -116,7 +118,7 @@ export default defineConfig(async ({ mode }) => {
       outDir: '../dist/agent-frontend',
       emptyOutDir: true,
       reportCompressedSize: true,
-      target: 'esnext',
+      target: 'es2020',
       // Optimize chunks
       rollupOptions: {
         external: [],
@@ -127,7 +129,7 @@ export default defineConfig(async ({ mode }) => {
               if (id.includes('react') || id.includes('react-dom')) {
                 return 'vendor-react';
               }
-              if (id.includes('@nx-monorepo/utils/signals')) {
+              if (id.includes('@dulce/utils-signals')) {
                 return 'signals';
               }
               if (id.includes('agents-sdk')) {
@@ -149,6 +151,11 @@ export default defineConfig(async ({ mode }) => {
       },
       commonjsOptions: {
         transformMixedEsModules: true,
+        // Add custom module resolution for problematic packages
+        include: [
+          /node_modules\/fetch-blob/,
+          /node_modules\/node-fetch/
+        ]
       },
       // Enable source maps in development
       sourcemap: mode !== 'production',
@@ -194,21 +201,37 @@ export default defineConfig(async ({ mode }) => {
         'lodash-es',
         '@testing-library/react',
         '@testing-library/user-event',
+        'node-fetch',
+        'stream-browserify'
       ],
-      exclude: ['@nx-monorepo/utils/signals'],
+      exclude: [
+        '@dulce/utils-signals',
+        'fetch-blob',
+        'stream-http',
+        'https-browserify'
+      ],
       esbuildOptions: {
-        target: 'esnext',
+        target: 'es2020',
         supported: { 
           'top-level-await': true 
         }
       }
     },
     
-    // Add alias for development fallbacks
+    // Add alias for development fallbacks and Node.js polyfills
     resolve: {
       alias: {
         // When federation fails, use local mock implementation
-        'frontend-agents/AgentInterface': '/src/app/mocks/AgentInterface.tsx'
+        'frontend-agents/AgentInterface': '/src/app/mocks/AgentInterface.tsx',
+        // Node.js polyfills for browser
+        'node:util': 'util',
+        'node:buffer': 'buffer',
+        'node:url': 'url',
+        'node:path': 'path-browserify',
+        'node:crypto': 'crypto-browserify',
+        'node:stream': 'stream-browserify',
+        'stream': 'stream-browserify',
+        'stream-browserify/web': 'stream-browserify'
       }
     }
   };

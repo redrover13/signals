@@ -15,7 +15,7 @@ import {
   StandardizedError, 
   createError, 
   categorizeError 
-} from '@nx-monorepo/utils/monitoring';
+} from '@dulce/utils/monitoring';
 
 /**
  * Gemini-specific error categories

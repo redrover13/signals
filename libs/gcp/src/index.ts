@@ -14,7 +14,7 @@
  * Provides common GCP service integrations
  */
 
-import { getProjectId } from '@nx-monorepo/gcp-core';
+import { getProjectId } from '@dulce/gcp-core';
 
 /**
  * Query BigQuery

@@ -15,9 +15,9 @@ import {
   GCSUploadTool, 
   HttpRequestTool,
   InvocationContext
-} from '@nx-monorepo/adk';
+} from '@dulce/adk';
 
-import { Requirements, ContentResponse } from '@nx-monorepo/data-models';
+import { Requirements, ContentResponse } from '@dulce/data-models';
 
 /**
  * Content-specialized agent for generating F&B marketing content

@@ -9,8 +9,9 @@
  * @license MIT
  */
 
-import type { Signal } from '../index';
-import { createSignal } from '../index';
+import React from 'react';
+import type { Signal } from '../index.js';
+import { createSignal } from '../index.js';
 
 /**
  * Create a signal from a Redux store selector
@@ -76,12 +77,15 @@ export function createMappedReduxSignal<S, R, T>(
  * @returns Connected component with signals
  */
 export function connectWithSignals<S, P extends object>(
-  mapStateToSignals: (store: { getState: () => S; subscribe: (listener: () => void) => () => void }) => Record<string, Signal<any>>
+  mapStateToSignals: (store: { getState: () => S; subscribe: (listener: () => void) => () => void }) => Record<string, Signal<unknown>>
 ) {
   return function connectComponent(Component: React.ComponentType<P>) {
     return function ConnectedComponent(props: P) {
       // Implementation would connect Redux to signals
-      return <Component {...props} />;
+      // For now, just pass through the props using React.createElement
+      // Note: mapStateToSignals parameter is reserved for future Redux integration
+      void mapStateToSignals; // Mark as intentionally unused for now
+      return React.createElement(Component, props);
     };
   };
 }

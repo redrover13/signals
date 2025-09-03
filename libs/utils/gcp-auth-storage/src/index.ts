@@ -9,4 +9,4 @@
  * @license MIT
  */
 
-export * from './lib/gcp-auth-storage';
+export * from './lib/gcp-auth-storage.js';

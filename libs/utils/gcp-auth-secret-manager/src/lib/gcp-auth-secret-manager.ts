@@ -10,7 +10,7 @@
  */
 
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
-import { GcpInitializationError, getProjectId } from '@nx-monorepo/gcp-core';
+import { GcpInitializationError, getProjectId } from '@dulce/gcp-core';
 
 // Cache clients to avoid creating multiple instances
 const clientCache = new Map<string, any>();

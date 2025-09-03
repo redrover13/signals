@@ -14,7 +14,8 @@
         "project": "libs/utils/secrets-manager/package.json",
         "entryFile": "libs/utils/secrets-manager/src/index.ts",
         "external": ["rxjs", "@google-cloud/secret-manager"],
-        "rollupConfig": "@nx/react/plugins/bundle-rollup"
+        "rollupConfig": "@nx/react/plugins/bundle-rollup",
+        "useLegacyTypescriptPlugin": false
       }
     },
     "lint": {

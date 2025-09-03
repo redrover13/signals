@@ -15,14 +15,12 @@
         "tsConfig": "libs/utils/signals/tsconfig.json",
         "assets": [
           "libs/utils/signals/*.md"
-        ],
-        "generatePackageJson": true
+        ]
       },
       "configurations": {
         "production": {
           "optimization": true,
           "extractLicenses": true,
-          "generatePackageJson": true,
           "sourceMap": false
         },
         "development": {

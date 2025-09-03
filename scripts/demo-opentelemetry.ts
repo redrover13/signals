@@ -16,10 +16,10 @@ import {
   logEvent, 
   instrument,
   shutdownOpenTelemetry 
-} from '../libs/utils/monitoring/src/lib/otel-config';
-import { BigQueryLogger } from '../libs/utils/monitoring/src/lib/bigquery-logger';
-import { generateDashboardTemplate } from '../apps/looker-dashboards/src/lib/dashboard-templates';
-import { generateMonitoringQuery } from '../apps/looker-dashboards/src/lib/monitoring-queries';
+} from '../libs/utils/monitoring/src/lib/otel-config.js';
+import { BigQueryLogger } from '../libs/utils/monitoring/src/lib/bigquery-logger.js';
+import { generateDashboardTemplate } from '../apps/looker-dashboards/src/lib/dashboard-templates.js';
+import { generateMonitoringQuery } from '../apps/looker-dashboards/src/lib/monitoring-queries.js';
 
 /**
  * Demo: Basic OpenTelemetry setup and instrumentation

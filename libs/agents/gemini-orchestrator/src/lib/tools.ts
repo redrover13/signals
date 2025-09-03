@@ -9,7 +9,7 @@
  * @license MIT
  */
 
-import { query, insertRows, uploadString } from '@nx-monorepo/gcp';
+import { query, insertRows, uploadString } from '@dulce/gcp';
 import { FunctionDeclaration } from '@google/generative-ai';
 import { z } from 'zod';
 import { createGeminiErrorHandler } from './utils/error-handler';

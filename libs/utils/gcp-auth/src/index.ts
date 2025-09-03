@@ -41,7 +41,6 @@ export function getGoogleAuthClient(scopes?: string | string[]): GoogleAuth {
   clientCache.set(cacheKey, authClient);
   return authClient;
 }
-}
 
 /**
  * Get Secret Manager client

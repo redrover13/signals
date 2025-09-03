@@ -9,8 +9,7 @@
  * @license MIT
  */
 
-import React from 'react';
-import { createSignal, useSignal, createComputed, type Signal } from '../index';
+import { createSignal, useSignal, createComputed } from '../index.js';
 
 // Create some global signals
 const counterSignal = createSignal(0);

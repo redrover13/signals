@@ -10,7 +10,7 @@
  */
 
 import { RAGClient } from './rag && rag.client';
-import { VertexAIClient, DocumentChunk, RAGSearchOptions } from '@nx-monorepo/adk';
+import { VertexAIClient, DocumentChunk, RAGSearchOptions } from '@dulce/adk';
 import { errorHandler } from '../utils/error-handler';
 import { GeminiErrorCategory } from '../utils/error-handler';
 

@@ -4,7 +4,7 @@
     "composite": true,
     "declaration": true,
     "module": "NodeNext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "NodeNext",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "importHelpers": true,

@@ -9,4 +9,4 @@
  * @license MIT
  */
 
-export * from './lib/gcp-auth-bigquery';
+export * from './lib/gcp-auth-bigquery.js';

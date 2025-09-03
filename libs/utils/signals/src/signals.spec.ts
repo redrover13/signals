@@ -1,12 +1,12 @@
 import { 
   createSignal,
-  derivedSignal, 
+  createDerivedSignal as derivedSignal, 
   batch,
   persistentSignal,
   fromPromise
-} from '../index';
+} from '../index.js';
 import { renderHook, act } from '@testing-library/react';
-import { useSignal } from '../index';
+import { useSignal } from '../index.js';
 
 describe('Signal Library', () => {
   describe('createSignal', () => {
@@ -49,8 +49,7 @@ describe('Signal Library', () => {
       const lastName = createSignal('Doe');
       
       const fullName = derivedSignal(
-        [firstName, lastName],
-        (first, last) => `${first} ${last}`
+        () => `${firstName.get()} ${lastName.get()}`
       );
       
       expect(fullName?.get()).toBe('John Doe');
@@ -61,8 +60,7 @@ describe('Signal Library', () => {
       const height = createSignal(10);
       
       const area = derivedSignal(
-        [width, height],
-        (w, h) => w * h
+        () => width.get() * height.get()
       );
       
       expect(area?.get()).toBe(50);
@@ -76,7 +74,7 @@ describe('Signal Library', () => {
 
     it('should notify subscribers when derived value changes', () => {
       const count = createSignal(1);
-      const doubled = derivedSignal([count], (c) => c * 2);
+      const doubled = derivedSignal(() => count.get() * 2);
       
       const mockCallback = jest.fn();
       doubled?.subscribe(mockCallback);

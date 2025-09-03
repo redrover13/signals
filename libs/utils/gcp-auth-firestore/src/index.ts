@@ -9,4 +9,4 @@
  * @license MIT
  */
 
-export * from './lib/gcp-auth-firestore';
+export * from './lib/gcp-auth-firestore.js';

@@ -9,10 +9,7 @@
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "paths": {
-      "@dulce/gcp": ["../../../libs/gcp/src/index.ts"]
-    }
+    "noPropertyAccessFromIndexSignature": true
   },
   "files": [],
   "include": ["**/*.ts", "**/*.tsx"],

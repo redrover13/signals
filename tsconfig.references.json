@@ -83,7 +83,10 @@
     {
       "path": "./infra/workflows/cloud-workflows"
     },
-      ],
+    {
+      "path": "./infra/workflows/pubsub-workflows"
+    }
+  ],
   "exclude": [
     "node_modules",
     "tmp",

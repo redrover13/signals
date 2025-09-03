@@ -1,11 +1,11 @@
 # TypeScript Configuration Analysis
 
-Generated: 9/1/2025, 10:40:20 AM
+Generated: 9/3/2025, 2:56:01 PM
 
 ## Configuration Overview
 
-Total TypeScript configurations: 103
-Configurations extending another config: 98
+Total TypeScript configurations: 124
+Configurations extending another config: 119
 Configurations not extending any config: 4
 
 ## Inconsistent Settings
@@ -19,12 +19,19 @@ Configurations not extending any config: 4
 - Value: `"ESNext"`
   - Used in 1 configs: typescript-diagnostics/configs/tsconfig.base.template.json
 
+### module
+
+- Value: `"ESNext"`
+  - Used in 2 configs: apps/cloud-functions/rag-processor/tsconfig.json, typescript-diagnostics/configs/tsconfig.base.template.json
+- Value: `"NodeNext"`
+  - Used in 1 configs: tsconfig.base.json
+
 ### moduleResolution
 
 - Value: `"node"`
-  - Used in 2 configs: apps/cloud-functions/rag-processor/tsconfig.json, tsconfig.base.json
+  - Used in 1 configs: apps/cloud-functions/rag-processor/tsconfig.json
 - Value: `"NodeNext"`
-  - Used in 1 configs: typescript-diagnostics/configs/tsconfig.base.template.json
+  - Used in 2 configs: tsconfig.base.json, typescript-diagnostics/configs/tsconfig.base.template.json
 
 ### outDir
 
@@ -39,6 +46,13 @@ Configurations not extending any config: 4
   - Used in 1 configs: apps/cloud-functions/rag-processor/tsconfig.json
 - Value: `"."`
   - Used in 1 configs: tsconfig.base.json
+
+### paths
+
+- Value: `{"@dulce/gcp":["libs/gcp/src/index.ts"],"@dulce-de-saigon/security":["libs/security/src/index.ts"],"@dulce/*":["libs/*"],"@dulce/adk":["libs/adk/src/index.ts"],"@dulce/agents":["libs/agents/src/index.ts"],"@dulce/agents/gemini-orchestrator":["libs/agents/gemini-orchestrator/src/index.ts"],"@dulce/agents/bq-agent":["libs/agents/bq-agent/src/index.ts"],"@dulce/agents/content-agent":["libs/agents/content-agent/src/index.ts"],"@dulce/agents/crm-agent":["libs/agents/crm-agent/src/index.ts"],"@dulce/agents/looker-agent":["libs/agents/looker-agent/src/index.ts"],"@dulce/agents/reviews-agent":["libs/agents/reviews-agent/src/index.ts"],"@dulce/agents-sdk":["libs/agents-sdk/src/index.ts"],"@dulce/build-tools":["libs/build-tools/src/index.ts"],"@dulce/gcp/*":["libs/gcp/src/*"],"@dulce/mcp":["libs/mcp/src/index.ts"],"@dulce/utils/api-clients":["libs/utils/api-clients/src/index.ts"],"@dulce/utils/gcp-auth":["libs/utils/gcp-auth/src/index.ts"],"@dulce/utils/monitoring":["libs/utils/monitoring/src/index.ts"],"@dulce/utils/signals":["libs/utils/signals/src/index.ts"],"@dulce/data-models":["libs/data-models/schemas/src/index.ts"],"@dulce/data-models/dbt-models":["libs/data-models/dbt-models/src/index.ts"],"@dulce/data-models/schemas":["libs/data-models/schemas/src/index.ts"],"@dulce/env":["libs/env/src/index.ts"],"@dulce/security":["libs/security/src/index.ts"],"@dulce/ui/components":["libs/ui/components/src/index.ts"],"@dulce/utils/secrets-manager":["libs/utils/secrets-manager/src/index.ts"],"@dulce/utils/common-types":["libs/utils/common-types/src/index.ts"],"@dulce/gcp-core":["libs/gcp-core/src/index.ts"],"@dulce/utils/gcp-auth-bigquery":["libs/utils/gcp-auth-bigquery/src/index.ts"],"@dulce/utils/gcp-auth-firestore":["libs/utils/gcp-auth-firestore/src/index.ts"],"@dulce/utils/gcp-auth-pubsub":["libs/utils/gcp-auth-pubsub/src/index.ts"],"@dulce/utils/gcp-auth-secret-manager":["libs/utils/gcp-auth-secret-manager/src/index.ts"],"@dulce/utils/gcp-auth-storage":["libs/utils/gcp-auth-storage/src/index.ts"],"@dulce/utils/gcp-auth-vertex-ai":["libs/utils/gcp-auth-vertex-ai/src/index.ts"]}`
+  - Used in 1 configs: tsconfig.base.json
+- Value: `{"@dulce/*":["libs/*"],"@dulce/adk":["libs/adk/src/index.ts"],"@dulce/agents-sdk":["libs/agents-sdk/src/index.ts"],"@dulce/gcp":["libs/gcp/src/index.ts"],"@dulce/utils/signals":["libs/utils/signals/src/index.ts"],"@dulce/utils/common-types":["libs/utils/common-types/src/index.ts"],"@dulce/security":["libs/security/src/index.ts"]}`
+  - Used in 1 configs: typescript-diagnostics/configs/tsconfig.base.template.json
 
 ## Recommendations
 
@@ -60,26 +74,107 @@ Configurations not extending any config: 4
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
-      "@nx-monorepo/*": [
-        "libs/*"
-      ],
-      "@nx-monorepo/adk": [
-        "libs/adk/src/index.ts"
-      ],
-      "@nx-monorepo/agents-sdk": [
-        "libs/agents-sdk/src/index.ts"
-      ],
-      "@nx-monorepo/gcp": [
+      "@dulce/gcp": [
         "libs/gcp/src/index.ts"
       ],
-      "@nx-monorepo/utils/signals": [
+      "@dulce-de-saigon/security": [
+        "libs/security/src/index.ts"
+      ],
+      "@dulce/*": [
+        "libs/*"
+      ],
+      "@dulce/adk": [
+        "libs/adk/src/index.ts"
+      ],
+      "@dulce/agents": [
+        "libs/agents/src/index.ts"
+      ],
+      "@dulce/agents/gemini-orchestrator": [
+        "libs/agents/gemini-orchestrator/src/index.ts"
+      ],
+      "@dulce/agents/bq-agent": [
+        "libs/agents/bq-agent/src/index.ts"
+      ],
+      "@dulce/agents/content-agent": [
+        "libs/agents/content-agent/src/index.ts"
+      ],
+      "@dulce/agents/crm-agent": [
+        "libs/agents/crm-agent/src/index.ts"
+      ],
+      "@dulce/agents/looker-agent": [
+        "libs/agents/looker-agent/src/index.ts"
+      ],
+      "@dulce/agents/reviews-agent": [
+        "libs/agents/reviews-agent/src/index.ts"
+      ],
+      "@dulce/agents-sdk": [
+        "libs/agents-sdk/src/index.ts"
+      ],
+      "@dulce/build-tools": [
+        "libs/build-tools/src/index.ts"
+      ],
+      "@dulce/gcp/*": [
+        "libs/gcp/src/*"
+      ],
+      "@dulce/mcp": [
+        "libs/mcp/src/index.ts"
+      ],
+      "@dulce/utils/api-clients": [
+        "libs/utils/api-clients/src/index.ts"
+      ],
+      "@dulce/utils/gcp-auth": [
+        "libs/utils/gcp-auth/src/index.ts"
+      ],
+      "@dulce/utils/monitoring": [
+        "libs/utils/monitoring/src/index.ts"
+      ],
+      "@dulce/utils/signals": [
         "libs/utils/signals/src/index.ts"
       ],
-      "@nx-monorepo/utils/common-types": [
+      "@dulce/data-models": [
+        "libs/data-models/schemas/src/index.ts"
+      ],
+      "@dulce/data-models/dbt-models": [
+        "libs/data-models/dbt-models/src/index.ts"
+      ],
+      "@dulce/data-models/schemas": [
+        "libs/data-models/schemas/src/index.ts"
+      ],
+      "@dulce/env": [
+        "libs/env/src/index.ts"
+      ],
+      "@dulce/security": [
+        "libs/security/src/index.ts"
+      ],
+      "@dulce/ui/components": [
+        "libs/ui/components/src/index.ts"
+      ],
+      "@dulce/utils/secrets-manager": [
+        "libs/utils/secrets-manager/src/index.ts"
+      ],
+      "@dulce/utils/common-types": [
         "libs/utils/common-types/src/index.ts"
       ],
-      "@nx-monorepo/security": [
-        "libs/security/src/index.ts"
+      "@dulce/gcp-core": [
+        "libs/gcp-core/src/index.ts"
+      ],
+      "@dulce/utils/gcp-auth-bigquery": [
+        "libs/utils/gcp-auth-bigquery/src/index.ts"
+      ],
+      "@dulce/utils/gcp-auth-firestore": [
+        "libs/utils/gcp-auth-firestore/src/index.ts"
+      ],
+      "@dulce/utils/gcp-auth-pubsub": [
+        "libs/utils/gcp-auth-pubsub/src/index.ts"
+      ],
+      "@dulce/utils/gcp-auth-secret-manager": [
+        "libs/utils/gcp-auth-secret-manager/src/index.ts"
+      ],
+      "@dulce/utils/gcp-auth-storage": [
+        "libs/utils/gcp-auth-storage/src/index.ts"
+      ],
+      "@dulce/utils/gcp-auth-vertex-ai": [
+        "libs/utils/gcp-auth-vertex-ai/src/index.ts"
       ]
     }
   }

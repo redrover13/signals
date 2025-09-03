@@ -10,6 +10,8 @@
  */
 
 export * from './lib/gemini-orchestrator';
-export * from './lib/mcp && mcp.service';
+export * from './lib/mcp.service';
+export * from './lib/schemas';
+export * from './lib/tools';
 export * from './lib/config/environment-config';
-export * from './lib/config/mcp-config?.schema';
+export * from './lib/utils/error-handler';

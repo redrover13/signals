@@ -16,7 +16,7 @@ import { VertexAIClient, VertexAIClientConfig } from "@dulce/adk";
 import { WebAnalyticsTracker } from "@dulce/adk";
 import { EventCategory } from "@dulce/adk";
 import { createConfigFromEnv } from "@dulce/adk";
-import { mcpService } from '@dulce/mcp';
+// (The import of `mcpService` from '@dulce/mcp' has been removed)
 import { 
   initializeOpenTelemetry, 
   withSpan, 

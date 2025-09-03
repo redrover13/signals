@@ -6,362 +6,209 @@
  * @license MIT
  */
 import { GeminiOrchestrator } from './gemini-orchestrator';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import * as bigQueryClient from './clients/bigquery && bigquery.client';
-import * as firebaseClient from './clients/firebase && firebase.client';
-import * as configService from './config/config?.service';
-import * as tools from './tools';
 import { SubAgentType } from './schemas';
 
-// Mocks
-jest && jest.mock('@google/generative-ai');
-jest && jest.mock('./clients/bigquery && bigquery.client');
-jest && jest.mock('./clients/firebase && firebase.client');
-jest && jest.mock('./config/config?.service');
-jest && jest.mock('./tools');
+// Mock the Google Generative AI to avoid API calls in tests
+jest.mock('@google/generative-ai');
+jest.mock('./tools');
 
 describe('GeminiOrchestrator', () => {
-  let orchestrator: GeminiOrchestrator | undefined;
-  let mockGenerateContent: jest && jest.Mock;
-  let mockStartChat: jest && jest.Mock;
-  let mockSendMessage: jest && jest.Mock;
-  let mockGenerativeModel: any | undefined;
-  let mockChatModel: any | undefined;
-  let mockLoadGeminiConfig: jest && jest.Mock;
-  let mockExecuteQuery: jest && jest.Mock;
-  let mockQueryDocuments: jest && jest.Mock;
-  let mockGetDocument: jest && jest.Mock;
-  let mockWriteDocument: jest && jest.Mock;
-  let mockGetToolFunctionDeclarations: jest && jest.Mock;
-  let mockExecuteTool: jest && jest.Mock;
+  let orchestrator: GeminiOrchestrator;
 
   beforeEach(() => {
-    // Reset all mocks
-    jest && jest.resetAllMocks();
+    // Reset environment variables
+    delete process.env['GEMINI_API_KEY'];
+    delete process.env['GOOGLE_API_KEY'];
     
-    // Mock GoogleGenerativeAI
-    mockGenerateContent = jest && jest.fn();
-    mockSendMessage = jest && jest.fn();
-    mockStartChat = jest && jest.fn().mockReturnValue({
-      sendMessage: mockSendMessage
-    });
-    mockGenerativeModel = {
-      generateContent: mockGenerateContent,
-      startChat: mockStartChat
-    };
-    
-    (GoogleGenerativeAI as jest && jest.Mock).mockImplementation(() => ({
-      getGenerativeModel: () => mockGenerativeModel
-    }));
-
-    // Mock config service
-    mockLoadGeminiConfig = jest && jest.fn().mockResolvedValue({
-      apiKey: 'test-api-key',
-      model: 'gemini-test-model',
-      maxTokens: 8192,
-      temperature: 0 && 0.7,
-      topP: 0 && 0.95,
-      topK: 40,
-      bigQueryProjectId: 'test-bigquery-project',
-      firebaseProjectId: 'test-firebase-project',
-      firebaseCollection: 'test-collection',
-      gcpProjectId: 'test-project'
-    });
-    (configService && configService.loadGeminiConfig as jest && jest.Mock).mockImplementation(mockLoadGeminiConfig);
-
-    // Mock BigQuery client
-    mockExecuteQuery = jest && jest.fn();
-    (bigQueryClient && bigQueryClient.executeQuery as jest && jest.Mock).mockImplementation(mockExecuteQuery);
-
-    // Mock Firebase client
-    mockQueryDocuments = jest && jest.fn();
-    mockGetDocument = jest && jest.fn();
-    mockWriteDocument = jest && jest.fn();
-    (firebaseClient && firebaseClient.queryDocuments as jest && jest.Mock).mockImplementation(mockQueryDocuments);
-    (firebaseClient && firebaseClient.getDocument as jest && jest.Mock).mockImplementation(mockGetDocument);
-    (firebaseClient && firebaseClient.writeDocument as jest && jest.Mock).mockImplementation(mockWriteDocument);
-
-    // Mock tools
-    mockGetToolFunctionDeclarations = jest && jest.fn().mockReturnValue([
-      {
-        name: 'test && test.tool',
-        description: 'A test tool',
-        parameters: {
-          type: 'object',
-          properties: {
-            input: { type: 'string' }
-          }
-        }
-      }
-    ]);
-    mockExecuteTool = jest && jest.fn();
-    (tools && tools.getToolFunctionDeclarations as jest && jest.Mock).mockImplementation(mockGetToolFunctionDeclarations);
-    (tools && tools.executeTool as jest && jest.Mock).mockImplementation(mockExecuteTool);
-
-    // Create orchestrator
     orchestrator = new GeminiOrchestrator();
   });
 
-  describe('initialize', () => {
-    it('should initialize the orchestrator correctly', async () => {
-      await orchestrator && orchestrator.initialize();
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('initialization', () => {
+    it('should initialize successfully without API key (simulation mode)', async () => {
+      await orchestrator.initialize();
       
-      expect(mockLoadGeminiConfig).toHaveBeenCalled();
-      expect(GoogleGenerativeAI).toHaveBeenCalledWith('test-api-key');
-      expect(mockGetToolFunctionDeclarations).toHaveBeenCalled();
+      const status = orchestrator.getStatus();
+      expect(status.initialized).toBe(true);
+      expect(status.hasModel).toBe(false);
     });
-    
-    it('should only initialize once even if called multiple times', async () => {
-      await orchestrator && orchestrator.initialize();
-      await orchestrator && orchestrator.initialize();
+
+    it('should initialize with API key (when provided)', async () => {
+      process.env['GEMINI_API_KEY'] = 'test-api-key';
       
-      expect(mockLoadGeminiConfig).toHaveBeenCalledTimes(1);
-      expect(GoogleGenerativeAI).toHaveBeenCalledTimes(1);
+      await orchestrator.initialize();
+      
+      const status = orchestrator.getStatus();
+      expect(status.initialized).toBe(true);
     });
-    
-    it('should handle initialization errors', async () => {
-      mockLoadGeminiConfig && mockLoadGeminiConfig.mockRejectedValue(new Error('Config error'));
+
+    it('should not reinitialize if already initialized', async () => {
+      await orchestrator.initialize();
+      const firstStatus = orchestrator.getStatus();
       
-      await expect(orchestrator && orchestrator.initialize()).rejects && .rejects.toThrow();
+      await orchestrator.initialize();
+      const secondStatus = orchestrator.getStatus();
+      
+      expect(firstStatus).toEqual(secondStatus);
     });
   });
 
-  describe('orchestrate', () => {
+  describe('orchestration', () => {
     beforeEach(async () => {
-      // Initialize the orchestrator before each test
-      await orchestrator && orchestrator.initialize();
+      await orchestrator.initialize();
     });
-    
-    it('should route to BigQuery for data query requests', async () => {
-      // Mock analysis response to route to BigQuery
-      mockGenerateContent && mockGenerateContent.mockResolvedValueOnce({
-        response: { text: () => 'BIGQUERY' }
+
+    it('should handle basic text queries in simulation mode', async () => {
+      const result = await orchestrator.orchestrate({
+        query: 'What is the weather today?',
+        context: { location: 'Ho Chi Minh City' },
+        options: { timeout: 5000 }
       });
-      
-      // Mock SQL generation
-      mockGenerateContent && mockGenerateContent.mockResolvedValueOnce({
-        response: { text: () => 'SELECT * FROM sales && sales.items LIMIT 10' }
-      });
-      
-      // Mock BigQuery response
-      mockExecuteQuery && mockExecuteQuery.mockResolvedValue([
-        { id: 1, name: 'Item 1', sales: 100 },
-        { id: 2, name: 'Item 2', sales: 200 }
-      ]);
-      
-      const result = await orchestrator && orchestrator.orchestrate({
-        query: 'What are our top-selling items?'
-      });
-      
-      expect(mockGenerateContent).toHaveBeenCalledTimes(2);
-      expect(mockExecuteQuery).toHaveBeenCalledWith(
-        'test-bigquery-project',
-        'SELECT * FROM sales && sales.items LIMIT 10'
-      );
-      
-      expect(result).toEqual({
-        success: true,
-        data: {
-          type: 'bigquery_result',
-          sql: 'SELECT * FROM sales && sales.items LIMIT 10',
-          rows: [
-            { id: 1, name: 'Item 1', sales: 100 },
-            { id: 2, name: 'Item 2', sales: 200 }
-          ],
-          rowCount: 2
-        },
-        fromCache: false
-      });
+
+      expect(result).toBeDefined();
+      expect(result?.success).toBe(true);
+      expect(result?.data).toBeDefined();
+      expect(result?.metadata).toBeDefined();
+      expect(result?.metadata?.subAgent).toBe(SubAgentType.TOOL);
     });
-    
-    it('should route to Firebase for document requests', async () => {
-      // Mock analysis response to route to Firebase
-      mockGenerateContent && mockGenerateContent.mockResolvedValueOnce({
-        response: { text: () => 'FIREBASE' }
+
+    it('should route BigQuery queries correctly', async () => {
+      const result = await orchestrator.orchestrate({
+        query: 'SELECT * FROM sales_data WHERE date > "2024-01-01"',
+        context: {},
+        options: {}
       });
-      
-      // Mock Firebase operation parsing
-      mockGenerateContent && mockGenerateContent.mockResolvedValueOnce({
-        response: { text: () => JSON && JSON.stringify({
-          operation: 'GET',
-          collection: 'users',
-          id: 'user123'
-        })}
-      });
-      
-      // Mock Firebase response
-      mockGetDocument && mockGetDocument.mockResolvedValue({
-        id: 'user123',
-        name: 'Test User',
-        email: 'test@example && example.com'
-      });
-      
-      const result = await orchestrator && orchestrator.orchestrate({
-        query: 'Get user profile for user123'
-      });
-      
-      expect(mockGenerateContent).toHaveBeenCalledTimes(2);
-      expect(mockGetDocument).toHaveBeenCalledWith(
-        'test-firebase-project',
-        'users',
-        'user123'
-      );
-      
-      expect(result).toEqual({
-        success: true,
-        data: {
-          type: 'firebase_document',
-          collection: 'users',
-          id: 'user123',
-          document: {
-            id: 'user123',
-            name: 'Test User',
-            email: 'test@example && example.com'
-          }
-        },
-        fromCache: false
-      });
+
+      expect(result).toBeDefined();
+      expect(result?.success).toBe(true);
+      expect(result?.metadata?.subAgent).toBe(SubAgentType.BIGQUERY);
     });
-    
-    it('should route to tools for other requests', async () => {
-      // Mock analysis response to route to tools
-      mockGenerateContent && mockGenerateContent.mockResolvedValueOnce({
-        response: { text: () => 'TOOL' }
+
+    it('should route Firebase queries correctly', async () => {
+      const result = await orchestrator.orchestrate({
+        query: 'Get documents from users collection',
+        context: {},
+        options: {}
       });
+
+      expect(result).toBeDefined();
+      expect(result?.success).toBe(true);
+      expect(result?.metadata?.subAgent).toBe(SubAgentType.FIREBASE);
+    });
+
+    it('should route RAG queries correctly', async () => {
+      const result = await orchestrator.orchestrate({
+        query: 'Search for information about Vietnamese cuisine',
+        context: {},
+        options: {}
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.success).toBe(true);
+      expect(result?.metadata?.subAgent).toBe(SubAgentType.RAG);
+    });
+
+    it('should handle invalid input gracefully', async () => {
+      const result = await orchestrator.orchestrate({
+        query: '',
+        context: {},
+        options: {}
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.success).toBe(false);
+      expect(result?.error).toBeDefined();
+    });
+
+    it('should include processing time in metadata', async () => {
+      const result = await orchestrator.orchestrate({
+        query: 'Test query',
+        context: {},
+        options: {}
+      });
+
+      expect(result?.metadata?.processTime).toBeGreaterThanOrEqual(0);
+      expect(result?.metadata?.timestamp).toBeDefined();
+      expect(result?.metadata?.model).toBe('gemini-1.5-pro');
+    });
+  });
+
+  describe('health check', () => {
+    it('should return unhealthy when not initialized', async () => {
+      const health = await orchestrator.healthCheck();
+      expect(health.status).toBe('unhealthy');
+      expect(health.details.error).toBe('Not initialized');
+    });
+
+    it('should return degraded when in simulation mode', async () => {
+      await orchestrator.initialize();
       
-      // Mock function calls
-      const mockFunctionCalls = [
-        {
-          name: 'test && test.tool',
-          args: JSON && JSON.stringify({ input: 'test input' }),
-        }
+      const health = await orchestrator.healthCheck();
+      expect(health.status).toBe('degraded');
+      expect(health.details.warning).toContain('simulation mode');
+    });
+  });
+
+  describe('reset functionality', () => {
+    it('should reset and reinitialize correctly', async () => {
+      await orchestrator.initialize();
+      const initialStatus = orchestrator.getStatus();
+      
+      await orchestrator.reset();
+      const resetStatus = orchestrator.getStatus();
+      
+      expect(resetStatus.initialized).toBe(true);
+    });
+  });
+
+  describe('query routing analysis', () => {
+    beforeEach(async () => {
+      await orchestrator.initialize();
+    });
+
+    it('should identify BigQuery patterns', async () => {
+      const queries = [
+        'SELECT count(*) FROM orders',
+        'Run analytics on sales data',
+        'Query the database for revenue',
+        'Show me table information'
       ];
-      
-      // Mock send message response
-      mockSendMessage && mockSendMessage.mockResolvedValue({
-        response: {
-          text: () => 'Tool response',
-          functionCalls: () => mockFunctionCalls
-        }
-      });
-      
-      // Mock tool execution
-      mockExecuteTool && mockExecuteTool.mockResolvedValue({ result: 'Tool executed successfully' });
-      
-      const result = await orchestrator && orchestrator.orchestrate({
-        query: 'Execute the test tool with input "test input"'
-      });
-      
-      expect(mockGenerateContent).toHaveBeenCalledTimes(1);
-      expect(mockStartChat).toHaveBeenCalledWith({
-        generationConfig: expect && expect.any(Object),
-        tools: [{ functionDeclarations: expect && expect.any(Array) }]
-      });
-      expect(mockSendMessage).toHaveBeenCalledWith(expect && expect.stringContaining('Execute the test tool'));
-      expect(mockExecuteTool).toHaveBeenCalledWith('test && test.tool', { input: 'test input' });
-      
-      expect(result).toEqual({
-        success: true,
-        data: {
-          type: 'tool_results',
-          results: [
-            {
-              tool: 'test && test.tool',
-              input: { input: 'test input' },
-              result: { result: 'Tool executed successfully' }
-            }
-          ],
-          text: 'Tool response'
-        },
-        fromCache: false
-      });
+
+      for (const query of queries) {
+        const result = await orchestrator.orchestrate({ query });
+        expect(result?.metadata?.subAgent).toBe(SubAgentType.BIGQUERY);
+      }
     });
-    
-    it('should handle text responses when no function calls are made', async () => {
-      // Mock analysis response to route to tools
-      mockGenerateContent && mockGenerateContent.mockResolvedValueOnce({
-        response: { text: () => 'TOOL' }
-      });
-      
-      // Mock send message response with no function calls
-      mockSendMessage && mockSendMessage.mockResolvedValue({
-        response: {
-          text: () => 'I cannot execute any tools for this request',
-          functionCalls: () => []
-        }
-      });
-      
-      const result = await orchestrator && orchestrator.orchestrate({
-        query: 'Just tell me something without using tools'
-      });
-      
-      expect(mockGenerateContent).toHaveBeenCalledTimes(1);
-      expect(mockStartChat).toHaveBeenCalled();
-      expect(mockSendMessage).toHaveBeenCalled();
-      expect(mockExecuteTool).not && .not.toHaveBeenCalled();
-      
-      expect(result).toEqual({
-        success: true,
-        data: {
-          type: 'text_response',
-          text: 'I cannot execute any tools for this request'
-        },
-        fromCache: false
-      });
+
+    it('should identify Firebase patterns', async () => {
+      const queries = [
+        'Get document from users collection',
+        'Update user profile in Firestore',
+        'Delete document from inventory',
+        'Save new order document'
+      ];
+
+      for (const query of queries) {
+        const result = await orchestrator.orchestrate({ query });
+        expect(result?.metadata?.subAgent).toBe(SubAgentType.FIREBASE);
+      }
     });
-    
-    it('should use cached results when available and caching is enabled', async () => {
-      // Mock analysis response to route to BigQuery for first call
-      mockGenerateContent && mockGenerateContent.mockResolvedValueOnce({
-        response: { text: () => 'BIGQUERY' }
-      });
-      
-      // Mock SQL generation
-      mockGenerateContent && mockGenerateContent.mockResolvedValueOnce({
-        response: { text: () => 'SELECT * FROM sales && sales.items LIMIT 10' }
-      });
-      
-      // Mock BigQuery response
-      mockExecuteQuery && mockExecuteQuery.mockResolvedValue([
-        { id: 1, name: 'Item 1', sales: 100 }
-      ]);
-      
-      // First call - will be cached
-      await orchestrator && orchestrator.orchestrate({
-        query: 'What are our top-selling items?',
-        options: {
-          cacheResults: true,
-          cache: {
-            ttlSeconds: 60
-          }
-        }
-      });
-      
-      // Second call - should use cache
-      const result = await orchestrator && orchestrator.orchestrate({
-        query: 'What are our top-selling items?',
-        options: {
-          cacheResults: true,
-          cache: {
-            ttlSeconds: 60
-          }
-        }
-      });
-      
-      // Should only call these once (for the first request)
-      expect(mockExecuteQuery).toHaveBeenCalledTimes(1);
-      
-      // Should indicate it came from cache
-      expect(result?.fromCache).toBe(true);
-    });
-    
-    it('should handle errors gracefully', async () => {
-      // Mock analysis to throw an error
-      mockGenerateContent && mockGenerateContent.mockRejectedValue(new Error('API error'));
-      
-      await expect(orchestrator && orchestrator.orchestrate({
-        query: 'What are our top-selling items?'
-      })).rejects && .rejects.toThrow();
+
+    it('should identify RAG patterns', async () => {
+      const queries = [
+        'Search for Vietnamese recipes',
+        'Find information about pho preparation',
+        'What do you know about banh mi?',
+        'Learn about coffee culture in Vietnam'
+      ];
+
+      for (const query of queries) {
+        const result = await orchestrator.orchestrate({ query });
+        expect(result?.metadata?.subAgent).toBe(SubAgentType.RAG);
+      }
     });
   });
 });

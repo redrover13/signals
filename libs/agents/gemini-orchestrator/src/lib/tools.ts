@@ -9,13 +9,13 @@
  * @license MIT
  */
 
-import { query, insertRows, uploadString } from '@dulce/gcp';
+import { query, insertRows, uploadString } from '@nx-monorepo/gcp';
 import { FunctionDeclaration } from '@google/generative-ai';
 import { z } from 'zod';
 import { createGeminiErrorHandler } from './utils/error-handler';
 
 // Error handler for tools
-const errorHandler = createGeminiErrorHandler('Tools', 'tools && tools.ts');
+const errorHandler = createGeminiErrorHandler('Tools', 'tools.ts');
 
 /**
  * BigQuery input schema

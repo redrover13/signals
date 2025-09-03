@@ -2,21 +2,8 @@
  * @fileoverview vite.config module for the agent-frontend component
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
- * Contains implementation for TypeScript func      // Optimize dependencies
-    optimizeDeps: {
-      include: [
-        'react', 
-        'react-dom',
-        'lodash-es',
-        '@testing-library/react',
-        '@testing-library/user-event',
-      ],
-      exclude: ['@nx-monorepo/utils/signals', 'agents-sdk'],
-      esbuildOptions: {
-        target: 'esnext',
-        supported: { 
-          'top-level-await': true 
-        },* @author Dulce de Saigon Engineering
+ * Contains implementation for TypeScript func
+ * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
  */
@@ -51,7 +38,7 @@ export default defineConfig(async ({ mode }) => {
     define: {
       'process.env.NODE_ENV': JSON.stringify(mode),
       'process.env.VITE_APP_NAME': JSON.stringify(env.VITE_APP_NAME || 'Agent Frontend'),
-      'process.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL || 'http://localhost:3000'),
+      'process.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL || 'http://localhost:3000')
       // Add other specific environment variables as needed
       // Never expose the entire process.env object
     },
@@ -65,13 +52,13 @@ export default defineConfig(async ({ mode }) => {
         'X-Frame-Options': 'DENY',
         'X-XSS-Protection': '1; mode=block',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
-        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;",
-      },
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+      }
     },
     
     preview: {
       port: 4200,
-      host: 'localhost',
+      host: 'localhost'
     },
     
     plugins: [
@@ -93,7 +80,7 @@ export default defineConfig(async ({ mode }) => {
       mode === 'analyze' && visualizer({
         open: true,
         filename: 'dist/stats.html',
-        gzipSize: true,
+        gzipSize: true
       }),
       
       // Add PWA support
@@ -108,21 +95,21 @@ export default defineConfig(async ({ mode }) => {
             {
               src: '/pwa-192x192.png',
               sizes: '192x192',
-              type: 'image/png',
+              type: 'image/png'
             },
             {
               src: '/pwa-512x512.png',
               sizes: '512x512',
-              type: 'image/png',
-            },
-          ],
-        },
-      }),
+              type: 'image/png'
+            }
+          ]
+        }
+      })
     ],
     
     // Enable worker support
     worker: {
-      plugins: () => [nxViteTsPaths()],
+      plugins: () => [nxViteTsPaths()]
     },
     
     build: {
@@ -154,12 +141,11 @@ export default defineConfig(async ({ mode }) => {
               return 'vendor';
             }
           },
-          },
           // Optimize chunk loading
           chunkFileNames: 'assets/[name]-[hash].js',
           entryFileNames: 'assets/[name]-[hash].js',
-          assetFileNames: 'assets/[name]-[hash].[ext]',
-        },
+          assetFileNames: 'assets/[name]-[hash].[ext]'
+        }
       },
       commonjsOptions: {
         transformMixedEsModules: true,
@@ -197,7 +183,7 @@ export default defineConfig(async ({ mode }) => {
       define: {
         'window.jest': 'vi',
         'globalThis.jest': 'vi'
-      },
+      }
     },
     
     // Optimize dependencies
@@ -214,7 +200,7 @@ export default defineConfig(async ({ mode }) => {
         target: 'esnext',
         supported: { 
           'top-level-await': true 
-        },
+        }
       }
     },
     },

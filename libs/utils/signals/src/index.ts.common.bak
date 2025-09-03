@@ -1,7 +1,23 @@
 /**
+ * @fileoverview index module for the src component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
  * Angular Signals implementation
  */
-import { Signal, computed as angularComputed, effect as angularEffect, signal as angularSignal } from '@angular/core';
+import { computed as angularComputed, effect as angularEffect, signal as angularSignal, type Signal as AngularSignal } from '@angular/core';
+import { useState, useEffect } from 'react';
+import type { Signal } from '../index';
+
+// Re-export the Signal type for convenience
+export type { Signal } from '../index';
 
 /**
  * Create a signal with the given initial value
@@ -9,7 +25,31 @@ import { Signal, computed as angularComputed, effect as angularEffect, signal as
  * @returns Signal instance
  */
 export function createSignal<T>(initialValue: T): Signal<T> {
-  return angularSignal<T>(initialValue);
+  const signalInstance = angularSignal<T>(initialValue);
+  
+  // Extend with backward compatibility methods
+  const extendedSignal = signalInstance as Signal<T>;
+  
+  // Add get method
+  extendedSignal.get = () => signalInstance();
+  
+  // Add set method (already exists on WritableSignal, just for typing)
+  extendedSignal.set = signalInstance.set;
+  
+  // Add subscribe method
+  extendedSignal.subscribe = (callback: (value: T) => void) => {
+    // Use Angular effect for reactivity
+    const effectRef = angularEffect(() => {
+      callback(signalInstance());
+    });
+    
+    // Return unsubscribe function
+    return () => {
+      effectRef.destroy();
+    };
+  };
+  
+  return extendedSignal;
 }
 
 /**
@@ -18,6 +58,265 @@ export function createSignal<T>(initialValue: T): Signal<T> {
  * @returns Computed signal
  */
 export function createComputed<T>(derivationFn: () => T): Signal<T> {
+  const computedSignal = angularComputed(derivationFn) as Signal<T>;
+  
+  // Add compatibility methods
+  computedSignal.get = () => computedSignal();
+  
+  // Computed signals are read-only
+  computedSignal.set = () => { 
+    throw new Error('Cannot set a computed signal directly');
+  };
+  
+  computedSignal.subscribe = (callback: (value: T) => void) => {
+    const effectRef = angularEffect(() => {
+      callback(computedSignal());
+    });
+    
+    return () => {
+      effectRef.destroy();
+    };
+  };
+  
+  return computedSignal;
+}
+
+/**
+ * Register an effect that runs when dependencies change
+ * @param effectFn Effect function to run
+ * @returns Cleanup function
+ */
+export function createEffect(effectFn: () => void) {
+  const effectRef = angularEffect(effectFn);
+  return () => {
+    effectRef.destroy();
+  };
+}
+
+/**
+ * Create a derived signal from a set of input signals
+ * @param inputs Object of input signals
+ * @param derivationFn Function that computes the derived value
+ * @returns Derived signal
+ */
+export function derive<D extends Record<string, Signal<any>>, T>(
+  inputs: D,
+  derivationFn: (values: { [K in keyof D]: D[K] extends Signal<infer U> ? U : never }) => T
+): Signal<T> {
+  // Create the derived signal using Angular's computed
+  const derivedValue = angularComputed(() => {
+    // Map all signal values
+    const values = {} as any;
+    for (const key in inputs) {
+      if (Object.prototype.hasOwnProperty.call(inputs, key)) {
+        values[key] = inputs[key]();
+      }
+    }
+    
+    // Compute the derived value
+    return derivationFn(values);
+  }) as Signal<T>;
+  
+  // Add compatibility methods
+  derivedValue.get = () => derivedValue();
+  
+  // Derived signals are read-only
+  derivedValue.set = () => { 
+    throw new Error('Cannot set a derived signal directly');
+  };
+  
+  derivedValue.subscribe = (callback: (value: T) => void) => {
+    const effectRef = angularEffect(() => {
+      callback(derivedValue());
+    });
+    
+    return () => {
+      effectRef.destroy();
+    };
+  };
+  
+  return derivedValue;
+}
+
+/**
+ * Map all signal values in an object
+ * @param inputs Object of signals
+ * @returns Object with unwrapped signal values
+ */
+function mapSignalValues<T extends Record<string, Signal<any>>>(inputs: T): {
+  [K in keyof T]: T[K] extends Signal<infer U> ? U : never
+} {
+  const result = {} as any;
+  
+  for (const key in inputs) {
+    if (Object.prototype.hasOwnProperty.call(inputs, key)) {
+      const signal = inputs[key];
+      result[key] = signal();
+    }
+  }
+  
+  return result;
+}
+
+/**
+ * React hook to use a signal in a component
+ * @param signal The signal to use
+ * @returns [value, setValue] tuple
+ */
+export function useSignal<T>(signal: Signal<T>): [T, (value: T) => void] {
+  const [value, setValue] = useState<T>(signal());
+  
+  useEffect(() => {
+    const unsubscribe = signal.subscribe(newValue => {
+      setValue(newValue);
+    });
+    return unsubscribe;
+  }, [signal]);
+  
+  const handleSetValue = (newValue: T) => {
+    signal.set(newValue);
+  };
+  
+  return [value, handleSetValue];
+}
+
+/**
+ * Create a persistent signal that saves to localStorage
+ * @param key The localStorage key
+ * @param initialValue Initial value
+ * @returns Persistent signal
+ */
+export function persistentSignal<T>(key: string, initialValue: T): Signal<T> {
+  let savedValue: T | null = null;
+  
+  // Try to load from localStorage
+  try {
+    const storedValue = localStorage.getItem(key);
+    if (storedValue) {
+      savedValue = JSON.parse(storedValue);
+    }
+  } catch (error) {
+    console.error(`Error loading persisted value for key "${key}":`, error);
+  }
+  
+  // Create signal with either stored or initial value
+  const signal = createSignal<T>(savedValue !== null ? savedValue : initialValue);
+  
+  // Set up effect to save to localStorage when value changes
+  const originalSet = signal.set;
+  signal.set = (newValue: T) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(newValue));
+    } catch (error) {
+      console.error(`Error persisting value for key "${key}":`, error);
+    }
+    originalSet(newValue);
+  };
+  
+  return signal;
+}
+
+/**
+ * Create a signal that represents an async operation
+ * @param promise The promise to wrap
+ * @param initialValue Optional initial value
+ * @returns Signal with promise state
+ */
+export function fromPromise<T>(promise: Promise<T>, initialValue?: T): Signal<{
+  loading: boolean;
+  data?: T;
+  error?: Error;
+}> {
+  const signal = createSignal<{
+    loading: boolean;
+    data?: T;
+    error?: Error;
+  }>({
+    loading: true,
+    data: initialValue,
+    error: undefined
+  });
+  
+  promise.then(
+    data => {
+      signal.set({
+        loading: false,
+        data,
+        error: undefined
+      });
+    },
+    error => {
+      signal.set({
+        loading: false,
+        data: undefined,
+        error: error instanceof Error ? error : new Error(String(error))
+      });
+    }
+  );
+  
+  return signal;
+}
+
+/**
+ * Helper function to batch multiple signal updates
+ * @param updateFn Function that performs multiple updates
+ */
+export function batch(updateFn: () => void): void {
+  // In a real implementation, this would queue updates and apply them all at once
+  // For now, we just execute the function
+  updateFn();
+}
+
+// Demo signals for the demo components
+export const counterSignal = createSignal(0);
+export const userNameSignal = createSignal('Guest');
+export const isLoggedInSignal = createSignal(false);
+export const welcomeMessageSignal = createComputed(() => {
+  return isLoggedInSignal() 
+    ? `Welcome back, ${userNameSignal()}!` 
+    : 'Please log in';
+});
+
+/**
+ * Angular Signals implementation
+ */
+import { Signal, computed as angularComputed, effect as angularEffect, signal as angularSignal } from '@angular/core';
+import { useState, useEffect } from 'react';
+
+/**
+ * Create a signal with the given initial value
+ * @param initialValue Initial value for the signal
+ * @returns Signal instance
+ */
+export function createSignal<T>(initialValue: T) {
+  const signalInstance = angularSignal<T>(initialValue);
+  
+  // Extend with subscribe method for backward compatibility
+  const extendedSignal = signalInstance as Signal<T> & {
+    subscribe: (callback: (value: T) => void) => () => void;
+    get: () => T;
+    set: (value: T) => void;
+  };
+  
+  extendedSignal.subscribe = (callback: (value: T) => void) => {
+    const unsubscribe = angularEffect(() => {
+      callback(signalInstance());
+    });
+    return unsubscribe;
+  };
+  
+  extendedSignal.get = () => signalInstance();
+  extendedSignal.set = (value: T) => signalInstance.set(value);
+  
+  return extendedSignal;
+}
+
+/**
+ * Create a computed signal derived from other signals
+ * @param derivationFn Function that computes the derived value
+ * @returns Computed signal
+ */
+export function createComputed<T>(derivationFn: () => T) {
   return angularComputed<T>(derivationFn);
 }
 
@@ -26,7 +325,7 @@ export function createComputed<T>(derivationFn: () => T): Signal<T> {
  * @param effectFn Effect function to run
  * @returns Cleanup function
  */
-export function createEffect(effectFn: () => void): () => void {
+export function createEffect(effectFn: () => void) {
   return angularEffect(effectFn);
 }
 
@@ -46,15 +345,15 @@ export function derive<D extends Record<string, Signal<any>>, T>(
   );
   
   // Track dependencies
-  const dependencies = Object.values(inputs) as Signal<any>[];
+  const dependencies = Object.values(inputs);
   
   // Set up effect to update the derived value
   if (dependencies) {
-    dependencies.map((dep) => {
+    dependencies.forEach((dep) => {
       createEffect(() => {
         const values = mapSignalValues(inputs);
         const newValue = derivationFn(values);
-        (derivedValue as any).set(newValue);
+        derivedValue.set(newValue);
       });
     });
   }
@@ -90,17 +389,7 @@ function mapSignalValues<D extends Record<string, Signal<any>>>(
  */
 export function mutable<T>(initialValue: T): Signal<T> & { set: (newValue: T) => void } {
   const signal = createSignal<T>(initialValue);
-  
-  // Add set method
-  const mutableSignal = signal as Signal<T> & { set: (newValue: T) => void };
-  
-  if (mutableSignal) {
-    mutableSignal.set = (newValue: T) => {
-      (signal as any).set(newValue);
-    };
-  }
-  
-  return mutableSignal;
+  return signal;
 }
 
 /**
@@ -110,6 +399,125 @@ export function mutable<T>(initialValue: T): Signal<T> & { set: (newValue: T) =>
  */
 export function immutable<T>(initialValue: T): Signal<T> {
   return createSignal<T>(initialValue);
+}
+
+/**
+ * Create a derived signal from input signals
+ * @param inputs Array of input signals
+ * @param derivationFn Function to compute derived value
+ * @returns Derived signal
+ */
+export function derivedSignal<T extends any[], R>(
+  inputs: [...{ [K in keyof T]: Signal<T[K]> }],
+  derivationFn: (...args: T) => R
+) {
+  const derived = createSignal<R>(
+    derivationFn(...inputs.map(signal => signal.get()) as T)
+  );
+  
+  inputs.forEach(signal => {
+    signal.subscribe(() => {
+      derived.set(derivationFn(...inputs.map(s => s.get()) as T));
+    });
+  });
+  
+  return derived;
+}
+
+/**
+ * React hook to use a signal in a React component
+ * @param signal Signal to use
+ * @returns Tuple of [value, setter]
+ */
+export function useSignal<T>(signal: Signal<T> & { get: () => T, set: (value: T) => void }): [T, (value: T) => void] {
+  const [value, setValue] = useState<T>(signal.get());
+  
+  useEffect(() => {
+    const unsubscribe = signal.subscribe(newValue => {
+      setValue(newValue);
+    });
+    return unsubscribe;
+  }, [signal]);
+  
+  const setter = (newValue: T) => {
+    signal.set(newValue);
+  };
+  
+  return [value, setter];
+}
+
+/**
+ * Batch multiple signal updates
+ * @param fn Function that performs multiple updates
+ */
+export function batch(fn: () => void) {
+  fn();
+}
+
+/**
+ * Create a signal with persistent storage in localStorage
+ * @param key Storage key
+ * @param initialValue Initial value
+ * @returns Persistent signal
+ */
+export function persistentSignal<T>(key: string, initialValue: T) {
+  let savedValue: T | null = null;
+  
+  // Try to load from localStorage
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const item = window.localStorage.getItem(key);
+      if (item) {
+        savedValue = JSON.parse(item);
+      }
+    }
+  } catch (e) {
+    console.error('Error loading from localStorage:', e);
+  }
+  
+  const signal = createSignal<T>(savedValue !== null ? savedValue : initialValue);
+  
+  // Subscribe to changes and persist to localStorage
+  signal.subscribe(value => {
+    if (typeof window !== 'undefined' && window.localStorage && key) {
+      window.localStorage.setItem(key, JSON.stringify(value));
+    }
+  });
+  
+  return signal;
+}
+
+/**
+ * Create a signal from a Promise
+ * @param promise Promise to convert to signal
+ * @param initialValue Optional initial value
+ * @returns Signal with promise state
+ */
+export function fromPromise<T>(promise: Promise<T>, initialValue?: T) {
+  const signal = createSignal<{ loading: boolean, data?: T, error?: Error }>({
+    loading: true,
+    data: initialValue,
+    error: undefined
+  });
+  
+  promise.then(
+    data => {
+      signal.set({
+        loading: false,
+        data,
+        error: undefined
+      });
+    },
+    error => {
+      signal.set({
+        loading: false,
+        data: undefined,
+        error: error instanceof Error ? error : new Error(String(error))
+      });
+    }
+  );
+  
+  return signal;
 }
 
 export { Signal, angularComputed as computed, angularEffect as effect, angularSignal as signal };

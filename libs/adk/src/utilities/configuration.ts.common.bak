@@ -154,7 +154,7 @@ export class ConfigManager {
    * Get all configuration
    */
   getAll(): ADKConfig {
-    return { ...this && ...this.config };
+    return { ...this.config };
   }
   
   /**

@@ -382,10 +382,10 @@ export function generateDashboardTemplate(options: {
   
   // Replace placeholders
   const templateStr = JSON.stringify(template)
-    .replace(/\{project_id\}/g, options?.projectId)
-    .replace(/\$\{GCP_PROJECT_ID\}/g, options?.projectId)
-    .replace(/\$\{BIGQUERY_DATASET\}/g, options?.datasetId)
-    .replace(/\$\{BIGQUERY_TABLE\}/g, options?.tableId);
+    .replace(/\{project_id\}/g, options?.projectId || '')
+    .replace(/\$\{GCP_PROJECT_ID\}/g, options?.projectId || '')
+    .replace(/\$\{BIGQUERY_DATASET\}/g, options?.datasetId || '')
+    .replace(/\$\{BIGQUERY_TABLE\}/g, options?.tableId || '');
   
   const customizedTemplate = JSON.parse(templateStr);
   

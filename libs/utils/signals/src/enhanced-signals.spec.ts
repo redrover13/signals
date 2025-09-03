@@ -48,6 +48,33 @@ describe('Enhanced Signals Library', () => {
       // Now update with a different value
       objSignal.set({ a: 1, b: 3 });
       expect(objSignal.get()).toEqual({ a: 1, b: 3 });
+=======
+      
+      // Create a spy to track the set method calls
+      const setMethodSpy = jest.fn();
+      
+      // Create signal with deepEqual option
+      const objSignal = createSignal(obj, { deepEqual: true });
+      
+      // Replace the original set method with our spy
+      const originalSet = objSignal.set;
+      objSignal.set = (value: any) => {
+        setMethodSpy(value);
+        return originalSet(value);
+      };
+      
+      // This should be skipped due to deep equality
+      objSignal.set({ ...obj });
+      
+      // Verify the original value remains and our spy wasn't called with a new value
+      expect(objSignal.get()).toEqual(obj);
+      expect(setMethodSpy).toHaveBeenCalledTimes(1); // Called but update skipped internally
+      
+      // Now update with a different value
+      objSignal.set({ a: 1, b: 3 });
+      expect(objSignal.get()).toEqual({ a: 1, b: 3 });
+      expect(setMethodSpy).toHaveBeenCalledTimes(2); // Called again
+>>>>>>> origin/issue-42-perf-optimization
     });
     
     it('should support custom equality functions', () => {
@@ -170,4 +197,8 @@ describe('Enhanced Signals Library', () => {
       expect(unwrapped.name).toBe('unwrapped');
     });
   });
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> origin/issue-42-perf-optimization

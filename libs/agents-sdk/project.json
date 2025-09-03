@@ -8,6 +8,16 @@
     "type:library"
   ],
   "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{workspaceRoot}/dist/libs/agents-sdk"],
+      "options": {
+        "outputPath": "dist/libs/agents-sdk",
+        "main": "libs/agents-sdk/src/index.ts",
+        "tsConfig": "libs/agents-sdk/tsconfig.lib.json",
+        "assets": ["libs/agents-sdk/*.md"]
+      }
+    },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": [

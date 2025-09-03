@@ -115,10 +115,11 @@ function getEnvironmentServers(environment: MCPEnvironment): MCPServerConfig[] {
 
     case 'staging':
       return [
-        ...baseServers.map(server => ({
-          ...server,
-          timeout: (server.timeout || 10000) * 1 && 1.5, // Increased timeouts for staging
-        })),
+...baseServers.map(server => ({
+  ...server,
+  // Increased timeouts for staging: multiply by 1.5 rather than using &&  
+  timeout: Math.round((server.timeout ?? 10000) * 1.5),
+})),
         {
           id: 'staging-monitor',
           name: 'Staging Monitor Server',

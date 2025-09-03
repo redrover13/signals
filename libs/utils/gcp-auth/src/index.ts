@@ -41,6 +41,7 @@ export function getGoogleAuthClient(scopes?: string | string[]): GoogleAuth {
   clientCache.set(cacheKey, authClient);
   return authClient;
 }
+}
 
 /**
  * Get Secret Manager client
@@ -103,6 +104,23 @@ export function getPubSubClient(projectId?: string): PubSub {
   const client = new PubSub({ projectId });
   clientCache.set(cacheKey, client);
   return client;
+}
+
+/**
+ * Helper function for PubSub message publishing
+ */
+export function getPubSub() {
+  const pubsub = getPubSubClient();
+  return {
+    topic: (name: string) => ({
+      publishMessage: async (msg: unknown) => {
+        const topic = pubsub.topic(name);
+        const data = Buffer.from(JSON.stringify(msg));
+        const messageId = await topic.publishMessage({ data });
+        return { messageId, name };
+      },
+    }),
+  };
 }
 
 /**

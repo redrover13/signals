@@ -16,16 +16,12 @@
     },
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/agents",
         "main": "apps/agents/src/main.ts",
         "tsConfig": "apps/agents/tsconfig.app.json",
-        "assets": [
-          "apps/agents/src/assets"
-        ]
+        "assets": ["apps/agents/src/assets"]
       },
       "configurations": {
         "production": {

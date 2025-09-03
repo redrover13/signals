@@ -203,7 +203,6 @@ export default defineConfig(async ({ mode }) => {
         }
       }
     },
-    },
     
     // Add alias for development fallbacks
     resolve: {

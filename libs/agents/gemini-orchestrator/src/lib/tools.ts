@@ -15,7 +15,7 @@ import { z } from 'zod';
 import { createGeminiErrorHandler } from './utils/error-handler';
 
 // Error handler for tools
-const errorHandler = createGeminiErrorHandler('Tools', 'tools && tools.ts');
+const errorHandler = createGeminiErrorHandler('Tools', 'tools.ts');
 
 /**
  * BigQuery input schema

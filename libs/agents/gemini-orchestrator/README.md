@@ -27,6 +27,31 @@ The Gemini Orchestrator acts as a central hub for coordinating different data op
 ### Basic Usage
 
 ```typescript
+import { GeminiOrchestrator } from '@nx-monorepo/agents/gemini-orchestrator';
+
+async function main() {
+  const orchestrator = new GeminiOrchestrator();
+  await orchestrator.initialize();
+  
+  const result = await orchestrator.orchestrate({
+    query: "What were our top-selling menu items last month?",
+    context: {
+      restaurantId: "dds-central",
+      timePeriod: "last-month"
+    },
+    options: {
+      timeout: 30000,
+      cacheResults: false
+    }
+  });
+  
+  console.log(result);
+}
+```
+
+### Using with MCP Service
+
+```typescript
 import { MCPService } from '@nx-monorepo/agents/gemini-orchestrator';
 
 async function main() {
@@ -38,6 +63,11 @@ async function main() {
     {
       restaurantId: "dds-central",
       timePeriod: "last-month"
+    },
+    {
+      streaming: false,
+      timeout: 60000,
+      cacheResults: true
     }
   );
   
@@ -48,22 +78,72 @@ async function main() {
 ### Advanced Options
 
 ```typescript
-const result = await mcpService.orchestrateWithGemini(
-  "What were our top-selling menu items last month?",
-  {
+const result = await orchestrator.orchestrate({
+  query: "Analyze sales data for the past quarter",
+  context: {
     restaurantId: "dds-central",
-    timePeriod: "last-month"
+    timePeriod: "Q1-2024",
+    includeComparisons: true
   },
-  {
+  options: {
     streaming: false,
     timeout: 60000,
-    cacheResults: true,
-    cache: {
-      ttlSeconds: 3600,
-      refreshOnRead: false
-    }
+    cacheResults: true
   }
-);
+});
+```
+
+### Query Routing Examples
+
+The orchestrator automatically routes queries to appropriate sub-agents:
+
+#### BigQuery Routing
+```typescript
+// These queries will be routed to BigQuery sub-agent
+await orchestrator.orchestrate({
+  query: "SELECT sales_amount FROM orders WHERE date > '2024-01-01'"
+});
+
+await orchestrator.orchestrate({
+  query: "What are our analytics for menu performance?"
+});
+```
+
+#### Firebase Routing
+```typescript
+// These queries will be routed to Firebase sub-agent
+await orchestrator.orchestrate({
+  query: "Get documents from the users collection"
+});
+
+await orchestrator.orchestrate({
+  query: "Update customer profile in Firestore"
+});
+```
+
+#### RAG Routing
+```typescript
+// These queries will be routed to RAG sub-agent
+await orchestrator.orchestrate({
+  query: "Search for information about Vietnamese coffee culture"
+});
+
+await orchestrator.orchestrate({
+  query: "Find recipes for traditional pho"
+});
+```
+
+### Health Monitoring
+
+```typescript
+// Check orchestrator health
+const health = await orchestrator.healthCheck();
+console.log('Health status:', health.status);
+
+// Get current status
+const status = orchestrator.getStatus();
+console.log('Initialized:', status.initialized);
+console.log('Has model:', status.hasModel);
 ```
 
 ## Architecture
@@ -98,18 +178,41 @@ The orchestrator implements comprehensive error handling with:
 
 ## Environment Variables
 
-The following environment variables can be configured:
+The Gemini Orchestrator requires the following environment variables:
 
-- `GEMINI_API_KEY`: Gemini API key (recommended to use Secret Manager)
-- `GEMINI_MODEL`: Gemini model name (default: gemini-1.5-pro-latest)
-- `GEMINI_MAX_TOKENS`: Maximum output tokens (default: 8192)
-- `GEMINI_TEMPERATURE`: Temperature parameter (default: 0.7)
-- `GEMINI_TOP_P`: Top-p parameter (default: 0.95)
-- `GEMINI_TOP_K`: Top-k parameter (default: 40)
-- `BIGQUERY_PROJECT_ID`: BigQuery project ID
-- `FIREBASE_PROJECT_ID`: Firebase project ID
-- `FIREBASE_COLLECTION`: Default Firebase collection (default: gemini-orchestrator)
-- `GCP_PROJECT_ID`: Google Cloud project ID
+### Required
+- `GEMINI_API_KEY` or `GOOGLE_API_KEY`: Google AI API key for Gemini access
+
+### Optional
+- `GCP_PROJECT_ID`: Google Cloud project ID for BigQuery and other GCP services
+- `NODE_ENV`: Environment (development, staging, production)
+
+## Features
+
+### Smart Query Routing
+The orchestrator analyzes incoming queries and automatically routes them to the appropriate sub-agent:
+
+- **BigQuery**: SQL queries, analytics requests, data operations
+- **Firebase**: Document operations, Firestore queries, collection management  
+- **RAG**: Search queries, knowledge retrieval, information requests
+- **Tools**: General tool execution and utility operations
+
+### Supported Tools
+- `bq.query`: Execute BigQuery SQL queries
+- `bq.insert`: Insert data into BigQuery tables
+- `storage.uploadString`: Upload content to Cloud Storage
+
+### Error Handling
+- Comprehensive error categorization
+- Vietnamese-friendly error messages
+- Automatic retry logic with exponential backoff
+- Graceful degradation when services are unavailable
+
+### Performance Features
+- Automatic initialization management
+- Health monitoring and status checks
+- Processing time tracking
+- Simulation mode for development without API keys
 
 ## Building
 

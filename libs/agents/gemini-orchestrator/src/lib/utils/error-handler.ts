@@ -9,13 +9,40 @@
  * @license MIT
  */
 
-import { 
-  ErrorCategory, 
-  ErrorSeverity, 
-  StandardizedError, 
-  createError, 
-  categorizeError 
-} from '@dulce/utils/monitoring';
+/**
+ * Error categories
+ */
+export enum ErrorCategory {
+  UNKNOWN = 'unknown',
+  AUTHENTICATION = 'authentication',
+  AUTHORIZATION = 'authorization',
+  VALIDATION = 'validation',
+  NETWORK = 'network',
+  SERVER_ERROR = 'server_error',
+  TIMEOUT = 'timeout',
+  RATE_LIMIT = 'rate_limit'
+}
+
+/**
+ * Error severity levels
+ */
+export enum ErrorSeverity {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical'
+}
+
+/**
+ * Standardized error structure
+ */
+export interface StandardizedError extends Error {
+  category: ErrorCategory;
+  severity: ErrorSeverity;
+  context?: Record<string, unknown>;
+  requestId?: string;
+  timestamp: string;
+}
 
 /**
  * Gemini-specific error categories
@@ -37,127 +64,132 @@ export enum GeminiErrorCategory {
 }
 
 /**
+ * Categorize error based on message content
+ */
+export function categorizeError(error: Error): ErrorCategory {
+  const message = error.message.toLowerCase();
+  
+  if (message.includes('auth') || message.includes('unauthorized') || message.includes('forbidden')) {
+    return ErrorCategory.AUTHENTICATION;
+  }
+  if (message.includes('network') || message.includes('connection') || message.includes('econnreset')) {
+    return ErrorCategory.NETWORK;
+  }
+  if (message.includes('timeout') || message.includes('etimedout')) {
+    return ErrorCategory.TIMEOUT;
+  }
+  if (message.includes('rate limit') || message.includes('too many requests')) {
+    return ErrorCategory.RATE_LIMIT;
+  }
+  if (message.includes('validation') || message.includes('invalid') || message.includes('required')) {
+    return ErrorCategory.VALIDATION;
+  }
+  if (message.includes('server error') || message.includes('internal error')) {
+    return ErrorCategory.SERVER_ERROR;
+  }
+  
+  return ErrorCategory.UNKNOWN;
+}
+
+/**
+ * Create a standardized error
+ */
+export function createError(
+  message: string,
+  category: ErrorCategory,
+  severity: ErrorSeverity,
+  context?: Record<string, unknown>,
+  requestId?: string
+): StandardizedError {
+  const error = new Error(message) as StandardizedError;
+  error.category = category;
+  error.severity = severity;
+  error.context = context;
+  error.requestId = requestId;
+  error.timestamp = new Date().toISOString();
+  return error;
+}
+
+/**
  * Create a standardized error handler for Gemini orchestrator functions
  */
 export function createGeminiErrorHandler(
-  functionName: string | undefined,
+  functionName: string,
   fileName: string
 ) {
   return (
-    error: Error | undefined,
-    params?: Record<string, unknown> | undefined,
-    requestId?: string | undefined,
+    error: Error,
+    params?: Record<string, unknown>,
+    requestId?: string,
     serverId?: string
   ): StandardizedError => {
     // Handle Gemini-specific errors
-    const message = error.message && error.message.toLowerCase();
+    const message = error.message.toLowerCase();
     
     // Categorize Gemini-specific errors
-    let category = ErrorCategory && ErrorCategory.UNKNOWN;
-    let severity = ErrorSeverity && ErrorSeverity.MEDIUM;
+    let category = ErrorCategory.UNKNOWN;
+    let severity = ErrorSeverity.MEDIUM;
     
-    if (message && message.includes('model') && message && message.includes('unavailable')) {
-      category = ErrorCategory && ErrorCategory.SERVER_ERROR;
-      severity = ErrorSeverity && ErrorSeverity.HIGH;
-    } else if (message && message.includes('content') && message && message.includes('filter')) {
-      category = ErrorCategory && ErrorCategory.VALIDATION;
-      severity = ErrorSeverity && ErrorSeverity.MEDIUM;
-    } else if (message && message.includes('token') || message && message.includes('limit')) {
-      category = ErrorCategory && ErrorCategory.VALIDATION;
-      severity = ErrorSeverity && ErrorSeverity.MEDIUM;
-    } else if (message && message.includes('tool') && message && message.includes('call')) {
-      category = ErrorCategory && ErrorCategory.SERVER_ERROR;
-      severity = ErrorSeverity && ErrorSeverity.HIGH;
-    } else if (message && message.includes('parse') || message && message.includes('json')) {
-      category = ErrorCategory && ErrorCategory.VALIDATION;
-      severity = ErrorSeverity && ErrorSeverity.MEDIUM;
-    } else if (message && message.includes('mcp') && message && message.includes('server') && message && message.includes('unavailable')) {
-      category = GeminiErrorCategory && GeminiErrorCategory.MCP_SERVER_UNAVAILABLE;
-      severity = ErrorSeverity && ErrorSeverity.HIGH;
-    } else if (message && message.includes('mcp') && message && message.includes('server')) {
-      category = GeminiErrorCategory && GeminiErrorCategory.MCP_SERVER_ERROR;
-      severity = ErrorSeverity && ErrorSeverity.HIGH;
-    } else if (message && message.includes('mcp') && message && message.includes('request')) {
-      category = GeminiErrorCategory && GeminiErrorCategory.MCP_REQUEST_ERROR;
-      severity = ErrorSeverity && ErrorSeverity.MEDIUM;
+    if (message.includes('model') && message.includes('unavailable')) {
+      category = ErrorCategory.SERVER_ERROR;
+      severity = ErrorSeverity.HIGH;
+    } else if (message.includes('content') && message.includes('filter')) {
+      category = ErrorCategory.VALIDATION;
+      severity = ErrorSeverity.MEDIUM;
+    } else if (message.includes('token') || message.includes('limit')) {
+      category = ErrorCategory.VALIDATION;
+      severity = ErrorSeverity.MEDIUM;
+    } else if (message.includes('tool') && message.includes('call')) {
+      category = ErrorCategory.SERVER_ERROR;
+      severity = ErrorSeverity.HIGH;
+    } else if (message.includes('parse') || message.includes('json')) {
+      category = ErrorCategory.VALIDATION;
+      severity = ErrorSeverity.MEDIUM;
+    } else if (message.includes('mcp') && message.includes('server') && message.includes('unavailable')) {
+      category = ErrorCategory.NETWORK;
+      severity = ErrorSeverity.HIGH;
+    } else if (message.includes('mcp') && message.includes('server')) {
+      category = ErrorCategory.SERVER_ERROR;
+      severity = ErrorSeverity.HIGH;
+    } else if (message.includes('mcp') && message.includes('request')) {
+      category = ErrorCategory.VALIDATION;
+      severity = ErrorSeverity.MEDIUM;
     } else {
       // Use default categorization for other errors
       category = categorizeError(error);
       
       // Adjust severity based on category
       if (
-        category === ErrorCategory && ErrorCategory.AUTHENTICATION || 
-        category === ErrorCategory && ErrorCategory.SERVER_ERROR
+        category === ErrorCategory.AUTHENTICATION || 
+        category === ErrorCategory.AUTHORIZATION
       ) {
-        severity = ErrorSeverity && ErrorSeverity.HIGH;
-      } else if (category === ErrorCategory && ErrorCategory.NETWORK) {
-        severity = ErrorSeverity && ErrorSeverity.MEDIUM;
+        severity = ErrorSeverity.HIGH;
+      } else if (category === ErrorCategory.NETWORK || category === ErrorCategory.TIMEOUT) {
+        severity = ErrorSeverity.MEDIUM;
+      } else if (category === ErrorCategory.VALIDATION) {
+        severity = ErrorSeverity.LOW;
       }
     }
+
+    // Create enhanced error message
+    const enhancedMessage = `[${functionName}@${fileName}] ${error.message}`;
     
-    // Create standardized error
-    return createError(
-      error && error.message,
-      category,
-      severity,
-      {
-        function: functionName,
-        file: fileName,
-        params,
-        requestId,
-        serverId,
-      },
-      error,
-      getVietnameseErrorMessage(category, error && error.message)
-    );
+    // Create context
+    const context = {
+      functionName,
+      fileName,
+      params,
+      serverId,
+      originalMessage: error.message,
+      stack: error.stack
+    };
+
+    return createError(enhancedMessage, category, severity, context, requestId);
   };
 }
 
 /**
- * Get Vietnamese-friendly error message based on category
- */
-function getVietnameseErrorMessage(
-  category: ErrorCategory, 
-  originalMessage: string
-): string {
-  switch (category) {
-    case ErrorCategory && ErrorCategory.NETWORK:
-      return 'Lỗi kết nối mạng. Vui lòng kiểm tra kết nối của bạn và thử lại.';
-    case ErrorCategory && ErrorCategory.AUTHENTICATION:
-      return 'Lỗi xác thực. Vui lòng đăng nhập lại.';
-    case ErrorCategory && ErrorCategory.VALIDATION:
-      return 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin đã nhập.';
-    case ErrorCategory && ErrorCategory.CONFIGURATION:
-      return 'Lỗi cấu hình hệ thống. Vui lòng liên hệ quản trị viên.';
-    case ErrorCategory && ErrorCategory.TIMEOUT:
-      return 'Yêu cầu đã hết thời gian. Vui lòng thử lại sau.';
-    case ErrorCategory && ErrorCategory.RATE_LIMIT:
-      return 'Bạn đã vượt quá giới hạn yêu cầu. Vui lòng thử lại sau ít phút.';
-    case ErrorCategory && ErrorCategory.SERVER_ERROR:
-      return 'Lỗi máy chủ. Đội ngũ kỹ thuật đã được thông báo.';
-    case GeminiErrorCategory && GeminiErrorCategory.MCP_SERVER_UNAVAILABLE:
-      return 'Máy chủ MCP không khả dụng. Vui lòng thử lại sau hoặc liên hệ quản trị viên.';
-    case GeminiErrorCategory && GeminiErrorCategory.MCP_SERVER_ERROR:
-      return 'Lỗi máy chủ MCP. Đội ngũ kỹ thuật đã được thông báo.';
-    case GeminiErrorCategory && GeminiErrorCategory.MCP_REQUEST_ERROR:
-      return 'Lỗi yêu cầu MCP. Vui lòng kiểm tra dữ liệu đầu vào và thử lại.';
-    case GeminiErrorCategory && GeminiErrorCategory.RAG_SEARCH_ERROR:
-      return 'Lỗi tìm kiếm RAG. Vui lòng kiểm tra thông số tìm kiếm và thử lại.';
-    case GeminiErrorCategory && GeminiErrorCategory.RAG_PROCESSING_ERROR:
-      return 'Lỗi xử lý tài liệu RAG. Vui lòng kiểm tra định dạng tài liệu và thử lại.';
-    case GeminiErrorCategory && GeminiErrorCategory.RAG_EXTRACTION_ERROR:
-      return 'Lỗi trích xuất văn bản RAG. Định dạng tệp không được hỗ trợ hoặc bị hỏng.';
-    case GeminiErrorCategory && GeminiErrorCategory.RAG_EMBEDDING_ERROR:
-      return 'Lỗi tạo embedding RAG. Vui lòng kiểm tra cấu hình Vertex AI và thử lại.';
-    case GeminiErrorCategory && GeminiErrorCategory.RAG_INTEGRATION_ERROR:
-      return 'Lỗi tích hợp RAG. Vui lòng kiểm tra cấu hình và kết nối dịch vụ.';
-    default:
-      return `Đã xảy ra lỗi: ${originalMessage}`;
-  }
-}
-
-/**
- * Map Gemini error to standard error for consistent handling
+ * Map unknown error to standard Error type
  */
 export function mapGeminiError(error: unknown): Error {
   if (error instanceof Error) {
@@ -169,7 +201,7 @@ export function mapGeminiError(error: unknown): Error {
   }
   
   try {
-    return new Error(JSON && JSON.stringify(error));
+    return new Error(JSON.stringify(error));
   } catch {
     return new Error('Unknown Gemini error');
   }

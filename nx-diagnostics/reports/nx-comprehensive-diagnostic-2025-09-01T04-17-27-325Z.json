@@ -1,0 +1,4130 @@
+{
+  "timestamp": "2025-09-01T04-17-27-325Z",
+  "summary": {
+    "totalProjects": 33,
+    "totalIssues": 47,
+    "totalRecommendations": 6,
+    "dependencyAnalysis": {
+      "projects": 0,
+      "circularDependencies": 0,
+      "missingDependencies": 0,
+      "isolatedProjects": 0
+    },
+    "testAnalysis": {
+      "projects": 33,
+      "projectsWithTests": 26,
+      "projectsWithoutTests": 7,
+      "coveragePercentage": "84.6"
+    },
+    "buildAnalysis": {
+      "projects": 33,
+      "issues": 40,
+      "projectsWithBuild": 31,
+      "projectsWithLint": 17,
+      "projectsWithTest": 24
+    },
+    "recommendations": {
+      "dependencies": [],
+      "tests": [
+        {
+          "type": "add-tests-high-priority",
+          "priority": "high",
+          "title": "Add Unit Tests for Applications (5 projects)",
+          "description": "Critical applications are missing unit tests. Applications should have comprehensive test coverage.",
+          "actions": [
+            "Generate Jest/Vitest configuration for each application",
+            "Create basic test files for main functionality",
+            "Set up test runners in project.json targets",
+            "Add test scripts to package.json"
+          ],
+          "affectedProjects": [
+            "frontend-agents",
+            "cms-api",
+            "reviews-api",
+            "crm-api",
+            "social-api"
+          ],
+          "fixScript": "nx-diagnostics/scripts/fixes/add-tests-apps.sh"
+        },
+        {
+          "type": "add-tests-medium-priority",
+          "priority": "medium",
+          "title": "Add Unit Tests for Libraries (2 projects)",
+          "description": "Shared libraries should have unit tests to ensure reliability and prevent regressions.",
+          "actions": [
+            "Generate Jest/Vitest configuration for each library",
+            "Create unit tests for exported functions and classes",
+            "Set up test coverage reporting",
+            "Add test targets to project.json"
+          ],
+          "affectedProjects": [
+            "gcp-core",
+            "gcp"
+          ],
+          "fixScript": "nx-diagnostics/scripts/fixes/add-tests-libs.sh"
+        }
+      ],
+      "builds": [
+        {
+          "type": "add-missing-build-targets",
+          "priority": "high",
+          "title": "Add Missing Build Targets (2 projects)",
+          "description": "Several projects are missing build targets in their project.json files.",
+          "actions": [
+            "Add build targets with appropriate executors",
+            "Configure output directories",
+            "Set up proper caching and inputs",
+            "Test build process for each project"
+          ],
+          "affectedProjects": [
+            "agents-sdk",
+            "build-tools"
+          ],
+          "fixScript": "nx-diagnostics/scripts/fixes/add-build-targets.sh"
+        },
+        {
+          "type": "add-missing-test-configs",
+          "priority": "high",
+          "title": "Add Missing Test Configurations (9 projects)",
+          "description": "Several projects are missing test configurations.",
+          "actions": [
+            "Add test targets to project.json files",
+            "Choose appropriate test executor (Jest or Vitest)",
+            "Configure test file patterns",
+            "Set up test environment and dependencies"
+          ],
+          "affectedProjects": [
+            "frontend-agents",
+            "agents",
+            "cms-api",
+            "reviews-api",
+            "crm-api",
+            "social-api",
+            "gcp-core",
+            "agents-lib",
+            "gcp"
+          ],
+          "fixScript": "nx-diagnostics/scripts/fixes/add-test-configs.sh"
+        },
+        {
+          "type": "add-missing-lint-configs",
+          "priority": "medium",
+          "title": "Add Missing Lint Configurations (15 projects)",
+          "description": "Several projects are missing ESLint configurations.",
+          "actions": [
+            "Add lint targets to project.json files",
+            "Configure ESLint with appropriate rules",
+            "Set up lint caching and inputs",
+            "Integrate with Nx lint command"
+          ],
+          "affectedProjects": [
+            "cms-api",
+            "reviews-api",
+            "crm-api",
+            "social-api",
+            "bq-agent",
+            "looker-agent",
+            "gemini-orchestrator",
+            "crm-agent",
+            "reviews-agent",
+            "content-agent",
+            "api-clients",
+            "gcp-auth",
+            "dbt-models",
+            "schemas",
+            "env"
+          ],
+          "fixScript": "nx-diagnostics/scripts/fixes/add-lint-configs.sh"
+        },
+        {
+          "type": "standardize-executors",
+          "priority": "low",
+          "title": "Standardize Build Executors",
+          "description": "Multiple build executors are being used across projects.",
+          "actions": [
+            "Choose a primary build executor for each project type",
+            "Migrate projects to use consistent executors",
+            "Update documentation and CI/CD configurations",
+            "Ensure all executors are properly configured"
+          ],
+          "affectedProjects": [
+            "looker-dashboards",
+            "agents",
+            "api",
+            "gcp-core",
+            "ui-components",
+            "adk",
+            "bq-agent",
+            "looker-agent",
+            "agents-lib",
+            "gemini-orchestrator",
+            "crm-agent",
+            "reviews-agent",
+            "content-agent",
+            "api-clients",
+            "gcp-auth",
+            "monitoring",
+            "common-types",
+            "security",
+            "dbt-models",
+            "schemas",
+            "env",
+            "mcp",
+            "gcp",
+            "frontend-agents",
+            "event-parser",
+            "cms-api",
+            "reviews-api",
+            "crm-api",
+            "social-api",
+            "signals",
+            "utils-secrets-manager"
+          ],
+          "fixScript": "nx-diagnostics/scripts/fixes/standardize-executors.sh"
+        }
+      ]
+    }
+  },
+  "implementationPlan": {
+    "phases": [
+      {
+        "name": "Phase 1: Critical Fixes",
+        "priority": "high",
+        "description": "Fix critical issues that prevent the workspace from functioning properly",
+        "issues": [
+          "Add missing test configurations"
+        ],
+        "estimatedTime": "2-4 hours",
+        "scripts": [
+          "nx-diagnostics/scripts/implementation/phase1-critical-fixes.sh"
+        ]
+      },
+      {
+        "name": "Phase 2: Test Coverage Implementation",
+        "priority": "high",
+        "description": "Add comprehensive unit tests to all projects missing test coverage",
+        "issues": [
+          "Add tests to 7 projects without tests",
+          "Configure test runners and frameworks",
+          "Set up test environments and dependencies"
+        ],
+        "estimatedTime": "4-8 hours",
+        "scripts": [
+          "nx-diagnostics/scripts/implementation/phase2-test-coverage.sh"
+        ]
+      },
+      {
+        "name": "Phase 3: Build Configuration Fixes",
+        "priority": "medium",
+        "description": "Fix build configuration issues and standardize executors",
+        "issues": [
+          "Fix 40 configuration issues",
+          "Standardize build, lint, and test executors",
+          "Add missing targets and configurations"
+        ],
+        "estimatedTime": "3-6 hours",
+        "scripts": [
+          "nx-diagnostics/scripts/implementation/phase3-build-config.sh"
+        ]
+      },
+      {
+        "name": "Phase 5: Quality Assurance",
+        "priority": "medium",
+        "description": "Run comprehensive tests and validate all fixes",
+        "issues": [
+          "Run all tests and ensure they pass",
+          "Validate build configurations",
+          "Test dependency resolution",
+          "Run linting and formatting checks"
+        ],
+        "estimatedTime": "1-2 hours",
+        "scripts": [
+          "nx-diagnostics/scripts/implementation/phase5-qa-validation.sh"
+        ]
+      }
+    ],
+    "totalEstimatedTime": 15,
+    "riskAssessment": {
+      "level": "medium",
+      "factors": [
+        "Moderate number of issues to fix"
+      ],
+      "mitigationStrategies": [
+        "Create backup branch before implementing changes",
+        "Implement fixes incrementally, testing after each phase",
+        "Run comprehensive tests after each phase",
+        "Have rollback plan ready"
+      ]
+    }
+  },
+  "individualReports": {
+    "dependencies": {
+      "analysis": {
+        "totalProjects": 0
+      },
+      "recommendations": []
+    },
+    "testCoverage": {
+      "timestamp": "2025-09-01T04-17-29-379Z",
+      "analysis": {
+        "totalProjects": 33,
+        "projectsWithTests": [
+          {
+            "name": "looker-dashboards",
+            "type": "app",
+            "testFiles": [
+              "apps/looker-dashboards/src/lib/looker-dashboards.spec.ts",
+              "apps/looker-dashboards/src/lib/looker-dashboards.spec.ts",
+              "apps/looker-dashboards/src/lib/looker-dashboards.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "apps/looker-dashboards/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "agents",
+            "type": "app",
+            "testFiles": [
+              "apps/agents/src/main.spec.ts",
+              "apps/agents/src/main.spec.ts",
+              "apps/agents/src/main.spec.ts"
+            ],
+            "testConfig": null,
+            "coverage": "partial"
+          },
+          {
+            "name": "event-parser",
+            "type": "app",
+            "testFiles": [],
+            "testConfig": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "echo 'No tests defined for event-parser'"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "none"
+          },
+          {
+            "name": "api",
+            "type": "app",
+            "testFiles": [
+              "apps/api/src/routes/agents.spec.ts",
+              "apps/api/src/integration/agents-flow.spec.ts",
+              "apps/api/src/routes/agents.spec.ts",
+              "apps/api/src/integration/agents-flow.spec.ts",
+              "apps/api/src/routes/agents.spec.ts",
+              "apps/api/src/integration/agents-flow.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "echo 'test placeholder'"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "ui-components",
+            "type": "lib",
+            "testFiles": [],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/ui/components/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "none"
+          },
+          {
+            "name": "adk",
+            "type": "lib",
+            "testFiles": [
+              "libs/adk/src/services/vertex.spec.ts",
+              "libs/adk/src/agents/base-agent.spec.ts",
+              "libs/adk/src/services/vertex.spec.ts",
+              "libs/adk/src/agents/base-agent.spec.ts",
+              "libs/adk/src/services/vertex.spec.ts",
+              "libs/adk/src/agents/base-agent.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/adk/jest.config.ts"
+              }
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "agents-sdk",
+            "type": "lib",
+            "testFiles": [
+              "libs/agents-sdk/src/lib/main-agent.spec.ts",
+              "libs/agents-sdk/src/lib/agents-sdk.spec.ts",
+              "libs/agents-sdk/src/lib/main-agent.spec.ts",
+              "libs/agents-sdk/src/lib/agents-sdk.spec.ts",
+              "libs/agents-sdk/src/lib/main-agent.spec.ts",
+              "libs/agents-sdk/src/lib/agents-sdk.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents-sdk/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "bq-agent",
+            "type": "lib",
+            "testFiles": [
+              "libs/agents/bq-agent/src/lib/bq-agent.spec.ts",
+              "libs/agents/bq-agent/src/lib/bq-agent.spec.ts",
+              "libs/agents/bq-agent/src/lib/bq-agent.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/bq-agent/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "looker-agent",
+            "type": "lib",
+            "testFiles": [
+              "libs/agents/looker-agent/src/lib/looker-agent.spec.ts",
+              "libs/agents/looker-agent/src/lib/looker-agent.spec.ts",
+              "libs/agents/looker-agent/src/lib/looker-agent.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/looker-agent/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "agents-lib",
+            "type": "lib",
+            "testFiles": [
+              "libs/agents/bq-agent/src/lib/bq-agent.spec.ts",
+              "libs/agents/looker-agent/src/lib/looker-agent.spec.ts",
+              "libs/agents/gemini-orchestrator/src/lib/gemini-orchestrator.spec.ts",
+              "libs/agents/crm-agent/src/lib/crm-agent.spec.ts",
+              "libs/agents/reviews-agent/src/lib/reviews-agent.spec.ts",
+              "libs/agents/content-agent/src/lib/content-agent.spec.ts",
+              "libs/agents/bq-agent/src/lib/bq-agent.spec.ts",
+              "libs/agents/looker-agent/src/lib/looker-agent.spec.ts",
+              "libs/agents/gemini-orchestrator/src/lib/gemini-orchestrator.spec.ts",
+              "libs/agents/crm-agent/src/lib/crm-agent.spec.ts",
+              "libs/agents/reviews-agent/src/lib/reviews-agent.spec.ts",
+              "libs/agents/content-agent/src/lib/content-agent.spec.ts",
+              "libs/agents/bq-agent/src/lib/bq-agent.spec.ts",
+              "libs/agents/looker-agent/src/lib/looker-agent.spec.ts",
+              "libs/agents/gemini-orchestrator/src/lib/gemini-orchestrator.spec.ts",
+              "libs/agents/crm-agent/src/lib/crm-agent.spec.ts",
+              "libs/agents/reviews-agent/src/lib/reviews-agent.spec.ts",
+              "libs/agents/content-agent/src/lib/content-agent.spec.ts"
+            ],
+            "testConfig": null,
+            "coverage": "partial"
+          },
+          {
+            "name": "gemini-orchestrator",
+            "type": "lib",
+            "testFiles": [
+              "libs/agents/gemini-orchestrator/src/lib/gemini-orchestrator.spec.ts",
+              "libs/agents/gemini-orchestrator/src/lib/gemini-orchestrator.spec.ts",
+              "libs/agents/gemini-orchestrator/src/lib/gemini-orchestrator.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/gemini-orchestrator/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "crm-agent",
+            "type": "lib",
+            "testFiles": [
+              "libs/agents/crm-agent/src/lib/crm-agent.spec.ts",
+              "libs/agents/crm-agent/src/lib/crm-agent.spec.ts",
+              "libs/agents/crm-agent/src/lib/crm-agent.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/crm-agent/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "reviews-agent",
+            "type": "lib",
+            "testFiles": [
+              "libs/agents/reviews-agent/src/lib/reviews-agent.spec.ts",
+              "libs/agents/reviews-agent/src/lib/reviews-agent.spec.ts",
+              "libs/agents/reviews-agent/src/lib/reviews-agent.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/reviews-agent/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "content-agent",
+            "type": "lib",
+            "testFiles": [
+              "libs/agents/content-agent/src/lib/content-agent.spec.ts",
+              "libs/agents/content-agent/src/lib/content-agent.spec.ts",
+              "libs/agents/content-agent/src/lib/content-agent.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/content-agent/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "utils-secrets-manager",
+            "type": "lib",
+            "testFiles": [],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/secrets-manager/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "coverage": true
+                }
+              }
+            },
+            "coverage": "none"
+          },
+          {
+            "name": "api-clients",
+            "type": "lib",
+            "testFiles": [
+              "libs/utils/api-clients/src/lib/api-clients.spec.ts",
+              "libs/utils/api-clients/src/lib/api-clients.spec.ts",
+              "libs/utils/api-clients/src/lib/api-clients.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/api-clients/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "gcp-auth",
+            "type": "lib",
+            "testFiles": [
+              "libs/utils/gcp-auth/src/lib/gcp-auth.spec.ts",
+              "libs/utils/gcp-auth/src/lib/gcp-auth.spec.ts",
+              "libs/utils/gcp-auth/src/lib/gcp-auth.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/gcp-auth/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "monitoring",
+            "type": "lib",
+            "testFiles": [
+              "libs/utils/monitoring/src/lib/monitoring.spec.ts",
+              "libs/utils/monitoring/src/lib/monitoring.spec.ts",
+              "libs/utils/monitoring/src/lib/monitoring.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/monitoring/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "signals",
+            "type": "lib",
+            "testFiles": [
+              "libs/utils/signals/src/signals.spec.ts",
+              "libs/utils/signals/src/signals.spec.ts",
+              "libs/utils/signals/src/signals.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/signals/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "common-types",
+            "type": "lib",
+            "testFiles": [],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/common-types/jest.config.ts"
+              }
+            },
+            "coverage": "none"
+          },
+          {
+            "name": "security",
+            "type": "lib",
+            "testFiles": [
+              "libs/security/src/e2e-security.test.ts",
+              "libs/security/src/security.test.ts",
+              "libs/security/src/e2e-security.test.ts",
+              "libs/security/src/security.test.ts",
+              "libs/security/src/e2e-security.test.ts",
+              "libs/security/src/security.test.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/security/jest.config.ts",
+                "passWithNoTests": true
+              }
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "build-tools",
+            "type": "lib",
+            "testFiles": [
+              "libs/build-tools/src/lib/build-tools.spec.ts",
+              "libs/build-tools/src/lib/build-tools.spec.ts",
+              "libs/build-tools/src/lib/build-tools.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/build-tools/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "dbt-models",
+            "type": "lib",
+            "testFiles": [
+              "libs/data-models/dbt-models/src/lib/dbt-models.spec.ts",
+              "libs/data-models/dbt-models/src/lib/dbt-models.spec.ts",
+              "libs/data-models/dbt-models/src/lib/dbt-models.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/data-models/dbt-models/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "schemas",
+            "type": "lib",
+            "testFiles": [
+              "libs/data-models/schemas/src/lib/schemas.spec.ts",
+              "libs/data-models/schemas/src/lib/schemas.spec.ts",
+              "libs/data-models/schemas/src/lib/schemas.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/data-models/schemas/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "env",
+            "type": "lib",
+            "testFiles": [
+              "libs/env/src/env.spec.ts",
+              "libs/env/src/env.spec.ts",
+              "libs/env/src/env.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/env/jest.config.ts"
+              }
+            },
+            "coverage": "partial"
+          },
+          {
+            "name": "mcp",
+            "type": "lib",
+            "testFiles": [
+              "libs/mcp/src/lib/performance-optimization.spec.ts",
+              "libs/mcp/src/lib/test-suite-validation.spec.ts",
+              "libs/mcp/src/lib/mcp.service.spec.ts",
+              "libs/mcp/src/lib/completed-implementations.spec.ts",
+              "libs/mcp/src/lib/utils/mcp-utils.spec.ts",
+              "libs/mcp/src/lib/error-handling.spec.ts",
+              "libs/mcp/src/lib/vietnamese-functionality.spec.ts",
+              "libs/mcp/src/lib/mcp-integration.spec.ts",
+              "libs/mcp/src/lib/performance-optimization.spec.ts",
+              "libs/mcp/src/lib/test-suite-validation.spec.ts",
+              "libs/mcp/src/lib/mcp.service.spec.ts",
+              "libs/mcp/src/lib/completed-implementations.spec.ts",
+              "libs/mcp/src/lib/utils/mcp-utils.spec.ts",
+              "libs/mcp/src/lib/error-handling.spec.ts",
+              "libs/mcp/src/lib/vietnamese-functionality.spec.ts",
+              "libs/mcp/src/lib/mcp-integration.spec.ts",
+              "libs/mcp/src/lib/performance-optimization.spec.ts",
+              "libs/mcp/src/lib/test-suite-validation.spec.ts",
+              "libs/mcp/src/lib/mcp.service.spec.ts",
+              "libs/mcp/src/lib/completed-implementations.spec.ts",
+              "libs/mcp/src/lib/utils/mcp-utils.spec.ts",
+              "libs/mcp/src/lib/error-handling.spec.ts",
+              "libs/mcp/src/lib/vietnamese-functionality.spec.ts",
+              "libs/mcp/src/lib/mcp-integration.spec.ts"
+            ],
+            "testConfig": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/mcp/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            },
+            "coverage": "partial"
+          }
+        ],
+        "projectsWithoutTests": [
+          {
+            "name": "frontend-agents",
+            "type": "app",
+            "root": "apps/frontend-agents",
+            "reason": "No test configuration or test files found"
+          },
+          {
+            "name": "cms-api",
+            "type": "app",
+            "root": "apps/cloud-functions/cms-api",
+            "reason": "No test configuration or test files found"
+          },
+          {
+            "name": "reviews-api",
+            "type": "app",
+            "root": "apps/cloud-functions/reviews-api",
+            "reason": "No test configuration or test files found"
+          },
+          {
+            "name": "crm-api",
+            "type": "app",
+            "root": "apps/cloud-functions/crm-api",
+            "reason": "No test configuration or test files found"
+          },
+          {
+            "name": "social-api",
+            "type": "app",
+            "root": "apps/cloud-functions/social-api",
+            "reason": "No test configuration or test files found"
+          },
+          {
+            "name": "gcp-core",
+            "type": "lib",
+            "root": "libs/gcp-core",
+            "reason": "No test configuration or test files found"
+          },
+          {
+            "name": "gcp",
+            "type": "lib",
+            "root": "libs/gcp",
+            "reason": "No test configuration or test files found"
+          }
+        ],
+        "testConfigurations": [
+          {
+            "project": "looker-dashboards",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "apps/looker-dashboards/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "event-parser",
+            "config": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "echo 'No tests defined for event-parser'"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "api",
+            "config": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "echo 'test placeholder'"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "ui-components",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/ui/components/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "adk",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/adk/jest.config.ts"
+              }
+            }
+          },
+          {
+            "project": "agents-sdk",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents-sdk/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "bq-agent",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/bq-agent/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "looker-agent",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/looker-agent/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "gemini-orchestrator",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/gemini-orchestrator/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "crm-agent",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/crm-agent/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "reviews-agent",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/reviews-agent/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "content-agent",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/content-agent/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "utils-secrets-manager",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/secrets-manager/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "coverage": true
+                }
+              }
+            }
+          },
+          {
+            "project": "api-clients",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/api-clients/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "gcp-auth",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/gcp-auth/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "monitoring",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/monitoring/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "signals",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/signals/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "common-types",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/common-types/jest.config.ts"
+              }
+            }
+          },
+          {
+            "project": "security",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/security/jest.config.ts",
+                "passWithNoTests": true
+              }
+            }
+          },
+          {
+            "project": "build-tools",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/build-tools/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "dbt-models",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/data-models/dbt-models/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "schemas",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/data-models/schemas/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "env",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/env/jest.config.ts"
+              }
+            }
+          },
+          {
+            "project": "mcp",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/mcp/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          }
+        ],
+        "coverage": {
+          "totalTestedProjects": 26,
+          "fullCoverage": 0,
+          "partialCoverage": 22,
+          "noneCoverage": 0,
+          "coveragePercentage": "84.6"
+        }
+      },
+      "recommendations": [
+        {
+          "type": "add-tests-high-priority",
+          "priority": "high",
+          "title": "Add Unit Tests for Applications (5 projects)",
+          "description": "Critical applications are missing unit tests. Applications should have comprehensive test coverage.",
+          "actions": [
+            "Generate Jest/Vitest configuration for each application",
+            "Create basic test files for main functionality",
+            "Set up test runners in project.json targets",
+            "Add test scripts to package.json"
+          ],
+          "affectedProjects": [
+            "frontend-agents",
+            "cms-api",
+            "reviews-api",
+            "crm-api",
+            "social-api"
+          ],
+          "fixScript": "nx-diagnostics/scripts/fixes/add-tests-apps.sh"
+        },
+        {
+          "type": "add-tests-medium-priority",
+          "priority": "medium",
+          "title": "Add Unit Tests for Libraries (2 projects)",
+          "description": "Shared libraries should have unit tests to ensure reliability and prevent regressions.",
+          "actions": [
+            "Generate Jest/Vitest configuration for each library",
+            "Create unit tests for exported functions and classes",
+            "Set up test coverage reporting",
+            "Add test targets to project.json"
+          ],
+          "affectedProjects": [
+            "gcp-core",
+            "gcp"
+          ],
+          "fixScript": "nx-diagnostics/scripts/fixes/add-tests-libs.sh"
+        }
+      ],
+      "fixes": [
+        {
+          "type": "add-tests-high-priority",
+          "title": "Add Unit Tests for Applications (5 projects)",
+          "script": "nx-diagnostics/scripts/fixes/add-tests-apps.sh",
+          "priority": "high",
+          "affectedProjects": [
+            "frontend-agents",
+            "cms-api",
+            "reviews-api",
+            "crm-api",
+            "social-api"
+          ]
+        },
+        {
+          "type": "add-tests-medium-priority",
+          "title": "Add Unit Tests for Libraries (2 projects)",
+          "script": "nx-diagnostics/scripts/fixes/add-tests-libs.sh",
+          "priority": "medium",
+          "affectedProjects": [
+            "gcp-core",
+            "gcp"
+          ]
+        }
+      ]
+    },
+    "buildConfig": {
+      "timestamp": "2025-09-01T04-17-30-051Z",
+      "analysis": {
+        "totalProjects": 33,
+        "issues": [
+          {
+            "type": "missing-test-target",
+            "severity": "high",
+            "message": "Missing test target in project.json",
+            "suggestion": "Add test target for unit testing",
+            "project": "frontend-agents"
+          },
+          {
+            "type": "missing-cache-inputs",
+            "severity": "low",
+            "message": "Build target could benefit from explicit cache inputs",
+            "suggestion": "Add inputs array for better caching",
+            "project": "agents"
+          },
+          {
+            "type": "missing-test-target",
+            "severity": "high",
+            "message": "Missing test target in project.json",
+            "suggestion": "Add test target for unit testing",
+            "project": "agents"
+          },
+          {
+            "type": "invalid-executor",
+            "severity": "medium",
+            "message": "Unknown build executor: nx:run-commands",
+            "suggestion": "Use a standard Nx executor or custom executor",
+            "project": "event-parser"
+          },
+          {
+            "type": "missing-outputs",
+            "severity": "medium",
+            "message": "Build target missing output configuration",
+            "suggestion": "Add outputs array to specify build artifacts",
+            "project": "event-parser"
+          },
+          {
+            "type": "invalid-test-executor",
+            "severity": "medium",
+            "message": "Unknown test executor: nx:run-commands",
+            "suggestion": "Use @nx/jest:jest or @nx/vite:test",
+            "project": "event-parser"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "cms-api"
+          },
+          {
+            "type": "missing-test-target",
+            "severity": "high",
+            "message": "Missing test target in project.json",
+            "suggestion": "Add test target for unit testing",
+            "project": "cms-api"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "reviews-api"
+          },
+          {
+            "type": "missing-test-target",
+            "severity": "high",
+            "message": "Missing test target in project.json",
+            "suggestion": "Add test target for unit testing",
+            "project": "reviews-api"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "crm-api"
+          },
+          {
+            "type": "missing-test-target",
+            "severity": "high",
+            "message": "Missing test target in project.json",
+            "suggestion": "Add test target for unit testing",
+            "project": "crm-api"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "social-api"
+          },
+          {
+            "type": "missing-test-target",
+            "severity": "high",
+            "message": "Missing test target in project.json",
+            "suggestion": "Add test target for unit testing",
+            "project": "social-api"
+          },
+          {
+            "type": "missing-cache-inputs",
+            "severity": "low",
+            "message": "Build target could benefit from explicit cache inputs",
+            "suggestion": "Add inputs array for better caching",
+            "project": "api"
+          },
+          {
+            "type": "invalid-test-executor",
+            "severity": "medium",
+            "message": "Unknown test executor: nx:run-commands",
+            "suggestion": "Use @nx/jest:jest or @nx/vite:test",
+            "project": "api"
+          },
+          {
+            "type": "missing-test-target",
+            "severity": "high",
+            "message": "Missing test target in project.json",
+            "suggestion": "Add test target for unit testing",
+            "project": "gcp-core"
+          },
+          {
+            "type": "missing-build-target",
+            "severity": "high",
+            "message": "Missing build target in project.json",
+            "suggestion": "Add a build target with appropriate executor",
+            "project": "agents-sdk"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "bq-agent"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "looker-agent"
+          },
+          {
+            "type": "missing-test-target",
+            "severity": "high",
+            "message": "Missing test target in project.json",
+            "suggestion": "Add test target for unit testing",
+            "project": "agents-lib"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "gemini-orchestrator"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "crm-agent"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "reviews-agent"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "content-agent"
+          },
+          {
+            "type": "missing-cache-inputs",
+            "severity": "low",
+            "message": "Build target could benefit from explicit cache inputs",
+            "suggestion": "Add inputs array for better caching",
+            "project": "utils-secrets-manager"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "api-clients"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "gcp-auth"
+          },
+          {
+            "type": "missing-cache-inputs",
+            "severity": "low",
+            "message": "Build target could benefit from explicit cache inputs",
+            "suggestion": "Add inputs array for better caching",
+            "project": "common-types"
+          },
+          {
+            "type": "missing-cache-inputs",
+            "severity": "low",
+            "message": "Build target could benefit from explicit cache inputs",
+            "suggestion": "Add inputs array for better caching",
+            "project": "security"
+          },
+          {
+            "type": "missing-build-target",
+            "severity": "high",
+            "message": "Missing build target in project.json",
+            "suggestion": "Add a build target with appropriate executor",
+            "project": "build-tools"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "build-tools"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "dbt-models"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "schemas"
+          },
+          {
+            "type": "missing-cache-inputs",
+            "severity": "low",
+            "message": "Build target could benefit from explicit cache inputs",
+            "suggestion": "Add inputs array for better caching",
+            "project": "env"
+          },
+          {
+            "type": "missing-lint-target",
+            "severity": "medium",
+            "message": "Missing lint target in project.json",
+            "suggestion": "Add ESLint target for code quality",
+            "project": "env"
+          },
+          {
+            "type": "missing-test-target",
+            "severity": "high",
+            "message": "Missing test target in project.json",
+            "suggestion": "Add test target for unit testing",
+            "project": "gcp"
+          },
+          {
+            "type": "inconsistent-build-executors",
+            "severity": "low",
+            "message": "Multiple build executors used: @nx/js:tsc, @nx/next:build, nx:run-commands, @nx/esbuild:esbuild, @nx/rollup:rollup",
+            "suggestion": "Consider standardizing build executors across similar projects",
+            "affectedProjects": [
+              "looker-dashboards",
+              "agents",
+              "api",
+              "gcp-core",
+              "ui-components",
+              "adk",
+              "bq-agent",
+              "looker-agent",
+              "agents-lib",
+              "gemini-orchestrator",
+              "crm-agent",
+              "reviews-agent",
+              "content-agent",
+              "api-clients",
+              "gcp-auth",
+              "monitoring",
+              "common-types",
+              "security",
+              "dbt-models",
+              "schemas",
+              "env",
+              "mcp",
+              "gcp",
+              "frontend-agents",
+              "event-parser",
+              "cms-api",
+              "reviews-api",
+              "crm-api",
+              "social-api",
+              "signals",
+              "utils-secrets-manager"
+            ]
+          },
+          {
+            "type": "missing-lint-configs",
+            "severity": "medium",
+            "message": "15 projects missing lint configuration",
+            "suggestion": "Add ESLint configuration to all projects",
+            "affectedProjects": [
+              "cms-api",
+              "reviews-api",
+              "crm-api",
+              "social-api",
+              "bq-agent",
+              "looker-agent",
+              "gemini-orchestrator",
+              "crm-agent",
+              "reviews-agent",
+              "content-agent",
+              "api-clients",
+              "gcp-auth",
+              "dbt-models",
+              "schemas",
+              "env"
+            ]
+          },
+          {
+            "type": "missing-test-configs",
+            "severity": "high",
+            "message": "9 projects missing test configuration",
+            "suggestion": "Add test configuration to all projects",
+            "affectedProjects": [
+              "frontend-agents",
+              "agents",
+              "cms-api",
+              "reviews-api",
+              "crm-api",
+              "social-api",
+              "gcp-core",
+              "agents-lib",
+              "gcp"
+            ]
+          }
+        ],
+        "buildConfigs": [
+          {
+            "project": "looker-dashboards",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/apps/looker-dashboards",
+                "main": "apps/looker-dashboards/src/index.ts",
+                "tsConfig": "apps/looker-dashboards/tsconfig.lib.json",
+                "assets": [
+                  "apps/looker-dashboards/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "frontend-agents",
+            "config": {
+              "executor": "@nx/next:build",
+              "outputs": [
+                "{projectRoot}/dist"
+              ],
+              "defaultConfiguration": "production",
+              "options": {},
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "agents",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/apps/agents",
+                "main": "apps/agents/src/main.ts",
+                "tsConfig": "apps/agents/tsconfig.app.json",
+                "assets": [
+                  "apps/agents/src/assets"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                }
+              },
+              "defaultConfiguration": "production"
+            }
+          },
+          {
+            "project": "event-parser",
+            "config": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "echo 'No build step for event-parser (Node.js Cloud Function)'"
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "cms-api",
+            "config": {
+              "executor": "@nx/esbuild:esbuild",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "defaultConfiguration": "production",
+              "options": {
+                "platform": "node",
+                "outputPath": "dist/apps/cloud-functions/cms-api",
+                "format": [
+                  "cjs"
+                ],
+                "bundle": false,
+                "main": "apps/cloud-functions/cms-api/src/main.ts",
+                "tsConfig": "apps/cloud-functions/cms-api/tsconfig.app.json",
+                "assets": [
+                  "apps/cloud-functions/cms-api/src/assets"
+                ],
+                "generatePackageJson": true,
+                "esbuildOptions": {
+                  "sourcemap": true,
+                  "outExtension": {
+                    ".js": ".js"
+                  }
+                }
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "reviews-api",
+            "config": {
+              "executor": "@nx/esbuild:esbuild",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "defaultConfiguration": "production",
+              "options": {
+                "platform": "node",
+                "outputPath": "dist/apps/cloud-functions/reviews-api",
+                "format": [
+                  "cjs"
+                ],
+                "bundle": false,
+                "main": "apps/cloud-functions/reviews-api/src/main.ts",
+                "tsConfig": "apps/cloud-functions/reviews-api/tsconfig.app.json",
+                "assets": [
+                  "apps/cloud-functions/reviews-api/src/assets"
+                ],
+                "generatePackageJson": true,
+                "esbuildOptions": {
+                  "sourcemap": true,
+                  "outExtension": {
+                    ".js": ".js"
+                  }
+                }
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "crm-api",
+            "config": {
+              "executor": "@nx/esbuild:esbuild",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "defaultConfiguration": "production",
+              "options": {
+                "platform": "node",
+                "outputPath": "dist/apps/cloud-functions/crm-api",
+                "format": [
+                  "cjs"
+                ],
+                "bundle": false,
+                "main": "apps/cloud-functions/crm-api/src/main.ts",
+                "tsConfig": "apps/cloud-functions/crm-api/tsconfig.app.json",
+                "assets": [
+                  "apps/cloud-functions/crm-api/src/assets"
+                ],
+                "generatePackageJson": true,
+                "esbuildOptions": {
+                  "sourcemap": true,
+                  "outExtension": {
+                    ".js": ".js"
+                  }
+                }
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "social-api",
+            "config": {
+              "executor": "@nx/esbuild:esbuild",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "defaultConfiguration": "production",
+              "options": {
+                "platform": "node",
+                "outputPath": "dist/apps/cloud-functions/social-api",
+                "format": [
+                  "cjs"
+                ],
+                "bundle": false,
+                "main": "apps/cloud-functions/social-api/src/main.ts",
+                "tsConfig": "apps/cloud-functions/social-api/tsconfig.app.json",
+                "assets": [
+                  "apps/cloud-functions/social-api/src/assets"
+                ],
+                "generatePackageJson": true,
+                "esbuildOptions": {
+                  "sourcemap": true,
+                  "outExtension": {
+                    ".js": ".js"
+                  }
+                }
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "api",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/apps/api",
+                "main": "apps/api/src/main.ts",
+                "tsConfig": "apps/api/tsconfig.app.json",
+                "assets": [
+                  "apps/api/src/routes"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                }
+              },
+              "defaultConfiguration": "production"
+            }
+          },
+          {
+            "project": "gcp-core",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/gcp-core",
+                "main": "libs/gcp-core/src/index.ts",
+                "tsConfig": "libs/gcp-core/tsconfig.lib.json",
+                "assets": [
+                  "libs/gcp-core/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "ui-components",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/ui/components",
+                "main": "libs/ui/components/src/index.ts",
+                "tsConfig": "libs/ui/components/tsconfig.lib.json",
+                "assets": [
+                  "libs/ui/components/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "adk",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/adk",
+                "main": "libs/adk/src/index.ts",
+                "tsConfig": "libs/adk/tsconfig.lib.json",
+                "assets": [
+                  "libs/adk/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "bq-agent",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/agents/bq-agent",
+                "main": "libs/agents/bq-agent/src/index.ts",
+                "tsConfig": "libs/agents/bq-agent/tsconfig.lib.json",
+                "assets": [
+                  "libs/agents/bq-agent/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "looker-agent",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/agents/looker-agent",
+                "main": "libs/agents/looker-agent/src/index.ts",
+                "tsConfig": "libs/agents/looker-agent/tsconfig.lib.json",
+                "assets": [
+                  "libs/agents/looker-agent/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "agents-lib",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/agents",
+                "main": "libs/agents/src/index.ts",
+                "tsConfig": "libs/agents/tsconfig.lib.json",
+                "assets": [
+                  "libs/agents/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "gemini-orchestrator",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/agents/gemini-orchestrator",
+                "main": "libs/agents/gemini-orchestrator/src/index.ts",
+                "tsConfig": "libs/agents/gemini-orchestrator/tsconfig.lib.json",
+                "assets": [
+                  "libs/agents/gemini-orchestrator/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "crm-agent",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/agents/crm-agent",
+                "main": "libs/agents/crm-agent/src/index.ts",
+                "tsConfig": "libs/agents/crm-agent/tsconfig.lib.json",
+                "assets": [
+                  "libs/agents/crm-agent/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "reviews-agent",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/agents/reviews-agent",
+                "main": "libs/agents/reviews-agent/src/index.ts",
+                "tsConfig": "libs/agents/reviews-agent/tsconfig.lib.json",
+                "assets": [
+                  "libs/agents/reviews-agent/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "content-agent",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/agents/content-agent",
+                "main": "libs/agents/content-agent/src/index.ts",
+                "tsConfig": "libs/agents/content-agent/tsconfig.lib.json",
+                "assets": [
+                  "libs/agents/content-agent/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "utils-secrets-manager",
+            "config": {
+              "executor": "@nx/rollup:rollup",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/utils/secrets-manager",
+                "tsConfig": "libs/utils/secrets-manager/tsconfig.lib.json",
+                "project": "libs/utils/secrets-manager/package.json",
+                "entryFile": "libs/utils/secrets-manager/src/index.ts",
+                "external": [
+                  "rxjs",
+                  "@google-cloud/secret-manager"
+                ],
+                "rollupConfig": "@nx/react/plugins/bundle-rollup"
+              }
+            }
+          },
+          {
+            "project": "api-clients",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/utils/api-clients",
+                "main": "libs/utils/api-clients/src/index.ts",
+                "tsConfig": "libs/utils/api-clients/tsconfig.lib.json",
+                "assets": [
+                  "libs/utils/api-clients/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "gcp-auth",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/utils/gcp-auth",
+                "main": "libs/utils/gcp-auth/src/index.ts",
+                "tsConfig": "libs/utils/gcp-auth/tsconfig.lib.json",
+                "assets": [
+                  "libs/utils/gcp-auth/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "monitoring",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/utils/monitoring",
+                "main": "libs/utils/monitoring/src/index.ts",
+                "tsConfig": "libs/utils/monitoring/tsconfig.lib.json",
+                "assets": [
+                  "libs/utils/monitoring/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "signals",
+            "config": {
+              "executor": "@nx/esbuild:esbuild",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/utils/signals",
+                "main": "libs/utils/signals/index.ts",
+                "tsConfig": "libs/utils/signals/tsconfig.json",
+                "assets": [
+                  "libs/utils/signals/*.md"
+                ],
+                "generatePackageJson": true
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "common-types",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/utils/common-types",
+                "main": "libs/utils/common-types/src/index.ts",
+                "tsConfig": "libs/utils/common-types/tsconfig.lib.json",
+                "assets": [
+                  "libs/utils/common-types/*.md"
+                ]
+              }
+            }
+          },
+          {
+            "project": "security",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/security",
+                "tsConfig": "libs/security/tsconfig.lib.json",
+                "packageJson": "libs/security/package.json"
+              }
+            }
+          },
+          {
+            "project": "dbt-models",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/data-models/dbt-models",
+                "main": "libs/data-models/dbt-models/src/index.ts",
+                "tsConfig": "libs/data-models/dbt-models/tsconfig.lib.json",
+                "assets": [
+                  "libs/data-models/dbt-models/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "schemas",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/data-models/schemas",
+                "main": "libs/data-models/schemas/src/index.ts",
+                "tsConfig": "libs/data-models/schemas/tsconfig.lib.json",
+                "assets": [
+                  "libs/data-models/schemas/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "env",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/env",
+                "main": "libs/env/src/index.ts",
+                "tsConfig": "libs/env/tsconfig.lib.json",
+                "assets": [
+                  "libs/env/*.md"
+                ]
+              }
+            }
+          },
+          {
+            "project": "mcp",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/mcp",
+                "main": "libs/mcp/src/index.ts",
+                "tsConfig": "libs/mcp/tsconfig.lib.json",
+                "assets": [
+                  "libs/mcp/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          },
+          {
+            "project": "gcp",
+            "config": {
+              "executor": "@nx/js:tsc",
+              "outputs": [
+                "{options.outputPath}"
+              ],
+              "options": {
+                "outputPath": "dist/libs/gcp",
+                "main": "libs/gcp/src/index.ts",
+                "tsConfig": "libs/gcp/tsconfig.lib.json",
+                "assets": [
+                  "libs/gcp/*.md"
+                ]
+              },
+              "configurations": {
+                "production": {
+                  "optimization": true,
+                  "extractLicenses": true,
+                  "generatePackageJson": true,
+                  "sourceMap": false
+                },
+                "development": {
+                  "optimization": false,
+                  "sourceMap": true
+                }
+              },
+              "defaultConfiguration": "production",
+              "cache": true,
+              "dependsOn": [
+                "^build"
+              ],
+              "inputs": [
+                "production",
+                "^production"
+              ]
+            }
+          }
+        ],
+        "lintConfigs": [
+          {
+            "project": "looker-dashboards",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "options": {
+                "lintFilePatterns": [
+                  "apps/looker-dashboards/**/*.{ts,tsx,js,jsx}"
+                ]
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "frontend-agents",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "options": {
+                "lintFilePatterns": [
+                  "apps/frontend-agents/**/*.{ts,tsx,js,jsx}"
+                ]
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "agents",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "options": {
+                "lintFilePatterns": [
+                  "apps/agents/**/*.{ts,tsx,js,jsx}"
+                ]
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "event-parser",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "options": {
+                "lintFilePatterns": [
+                  "apps/event-parser/**/*.{ts,tsx,js,jsx}"
+                ]
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "api",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "options": {
+                "args": [
+                  "**/*.{ts,tsx,js,jsx}"
+                ]
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "gcp-core",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "options": {
+                "lintFilePatterns": [
+                  "libs/gcp-core/**/*.ts"
+                ]
+              }
+            }
+          },
+          {
+            "project": "ui-components",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "options": {
+                "lintFilePatterns": [
+                  "libs/ui/components/**/*.{ts,tsx,js,jsx}"
+                ]
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "adk",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "options": {
+                "lintFilePatterns": [
+                  "libs/adk/**/*.{ts,tsx,js,jsx}"
+                ]
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "agents-sdk",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "options": {
+                "lintFilePatterns": [
+                  "libs/agents-sdk/**/*.{ts,tsx,js,jsx}"
+                ]
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "agents-lib",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "options": {
+                "lintFilePatterns": [
+                  "libs/agents/**/*.{ts,tsx,js,jsx}"
+                ]
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "utils-secrets-manager",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "libs/utils/secrets-manager/**/*.ts"
+                ]
+              }
+            }
+          },
+          {
+            "project": "monitoring",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "libs/utils/monitoring/**/*.ts",
+                  "libs/utils/monitoring/**/*.tsx",
+                  "libs/utils/monitoring/**/*.js",
+                  "libs/utils/monitoring/**/*.jsx"
+                ]
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "signals",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "libs/utils/signals/**/*.ts"
+                ]
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "common-types",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ]
+            }
+          },
+          {
+            "project": "security",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "libs/security/**/*.ts"
+                ]
+              }
+            }
+          },
+          {
+            "project": "mcp",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "outputs": [
+                "{options.outputFile}"
+              ],
+              "options": {
+                "lintFilePatterns": [
+                  "libs/mcp/**/*.ts"
+                ]
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "gcp",
+            "config": {
+              "executor": "@nx/eslint:lint",
+              "options": {
+                "lintFilePatterns": [
+                  "libs/gcp/**/*.{ts,tsx,js,jsx}"
+                ]
+              },
+              "inputs": [
+                "default",
+                "{workspaceRoot}/.eslintrc.json"
+              ],
+              "cache": true
+            }
+          }
+        ],
+        "testConfigs": [
+          {
+            "project": "looker-dashboards",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "apps/looker-dashboards/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "event-parser",
+            "config": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "echo 'No tests defined for event-parser'"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "api",
+            "config": {
+              "executor": "nx:run-commands",
+              "options": {
+                "command": "echo 'test placeholder'"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "ui-components",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/ui/components/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "adk",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/adk/jest.config.ts"
+              }
+            }
+          },
+          {
+            "project": "agents-sdk",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents-sdk/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "bq-agent",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/bq-agent/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "looker-agent",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/looker-agent/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "gemini-orchestrator",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/gemini-orchestrator/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "crm-agent",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/crm-agent/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "reviews-agent",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/reviews-agent/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "content-agent",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/agents/content-agent/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "utils-secrets-manager",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/secrets-manager/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "coverage": true
+                }
+              }
+            }
+          },
+          {
+            "project": "api-clients",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/api-clients/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "gcp-auth",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/gcp-auth/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "monitoring",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/monitoring/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "signals",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/signals/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "common-types",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/utils/common-types/jest.config.ts"
+              }
+            }
+          },
+          {
+            "project": "security",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/security/jest.config.ts",
+                "passWithNoTests": true
+              }
+            }
+          },
+          {
+            "project": "build-tools",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/build-tools/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "dbt-models",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/data-models/dbt-models/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "schemas",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/data-models/schemas/jest.config.ts"
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          },
+          {
+            "project": "env",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/env/jest.config.ts"
+              }
+            }
+          },
+          {
+            "project": "mcp",
+            "config": {
+              "executor": "@nx/jest:jest",
+              "outputs": [
+                "{workspaceRoot}/coverage/{projectRoot}"
+              ],
+              "options": {
+                "jestConfig": "libs/mcp/jest.config.ts",
+                "passWithNoTests": true
+              },
+              "configurations": {
+                "ci": {
+                  "ci": true,
+                  "codeCoverage": true
+                }
+              },
+              "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/jest.preset.js"
+              ],
+              "cache": true
+            }
+          }
+        ],
+        "consistencyAnalysis": {
+          "buildExecutorDistribution": {
+            "@nx/js:tsc": 23,
+            "@nx/next:build": 1,
+            "nx:run-commands": 1,
+            "@nx/esbuild:esbuild": 5,
+            "@nx/rollup:rollup": 1
+          },
+          "lintExecutorDistribution": {
+            "@nx/eslint:lint": 17
+          },
+          "testExecutorDistribution": {
+            "@nx/jest:jest": 22,
+            "nx:run-commands": 2
+          },
+          "configurationCompleteness": {
+            "withBuild": 31,
+            "withLint": 17,
+            "withTest": 24
+          }
+        }
+      },
+      "recommendations": [
+        {
+          "type": "add-missing-build-targets",
+          "priority": "high",
+          "title": "Add Missing Build Targets (2 projects)",
+          "description": "Several projects are missing build targets in their project.json files.",
+          "actions": [
+            "Add build targets with appropriate executors",
+            "Configure output directories",
+            "Set up proper caching and inputs",
+            "Test build process for each project"
+          ],
+          "affectedProjects": [
+            "agents-sdk",
+            "build-tools"
+          ],
+          "fixScript": "nx-diagnostics/scripts/fixes/add-build-targets.sh"
+        },
+        {
+          "type": "add-missing-test-configs",
+          "priority": "high",
+          "title": "Add Missing Test Configurations (9 projects)",
+          "description": "Several projects are missing test configurations.",
+          "actions": [
+            "Add test targets to project.json files",
+            "Choose appropriate test executor (Jest or Vitest)",
+            "Configure test file patterns",
+            "Set up test environment and dependencies"
+          ],
+          "affectedProjects": [
+            "frontend-agents",
+            "agents",
+            "cms-api",
+            "reviews-api",
+            "crm-api",
+            "social-api",
+            "gcp-core",
+            "agents-lib",
+            "gcp"
+          ],
+          "fixScript": "nx-diagnostics/scripts/fixes/add-test-configs.sh"
+        },
+        {
+          "type": "add-missing-lint-configs",
+          "priority": "medium",
+          "title": "Add Missing Lint Configurations (15 projects)",
+          "description": "Several projects are missing ESLint configurations.",
+          "actions": [
+            "Add lint targets to project.json files",
+            "Configure ESLint with appropriate rules",
+            "Set up lint caching and inputs",
+            "Integrate with Nx lint command"
+          ],
+          "affectedProjects": [
+            "cms-api",
+            "reviews-api",
+            "crm-api",
+            "social-api",
+            "bq-agent",
+            "looker-agent",
+            "gemini-orchestrator",
+            "crm-agent",
+            "reviews-agent",
+            "content-agent",
+            "api-clients",
+            "gcp-auth",
+            "dbt-models",
+            "schemas",
+            "env"
+          ],
+          "fixScript": "nx-diagnostics/scripts/fixes/add-lint-configs.sh"
+        },
+        {
+          "type": "standardize-executors",
+          "priority": "low",
+          "title": "Standardize Build Executors",
+          "description": "Multiple build executors are being used across projects.",
+          "actions": [
+            "Choose a primary build executor for each project type",
+            "Migrate projects to use consistent executors",
+            "Update documentation and CI/CD configurations",
+            "Ensure all executors are properly configured"
+          ],
+          "affectedProjects": [
+            "looker-dashboards",
+            "agents",
+            "api",
+            "gcp-core",
+            "ui-components",
+            "adk",
+            "bq-agent",
+            "looker-agent",
+            "agents-lib",
+            "gemini-orchestrator",
+            "crm-agent",
+            "reviews-agent",
+            "content-agent",
+            "api-clients",
+            "gcp-auth",
+            "monitoring",
+            "common-types",
+            "security",
+            "dbt-models",
+            "schemas",
+            "env",
+            "mcp",
+            "gcp",
+            "frontend-agents",
+            "event-parser",
+            "cms-api",
+            "reviews-api",
+            "crm-api",
+            "social-api",
+            "signals",
+            "utils-secrets-manager"
+          ],
+          "fixScript": "nx-diagnostics/scripts/fixes/standardize-executors.sh"
+        }
+      ],
+      "fixes": [
+        {
+          "type": "add-missing-build-targets",
+          "title": "Add Missing Build Targets (2 projects)",
+          "script": "nx-diagnostics/scripts/fixes/add-build-targets.sh",
+          "priority": "high",
+          "affectedProjects": [
+            "agents-sdk",
+            "build-tools"
+          ]
+        },
+        {
+          "type": "add-missing-test-configs",
+          "title": "Add Missing Test Configurations (9 projects)",
+          "script": "nx-diagnostics/scripts/fixes/add-test-configs.sh",
+          "priority": "high",
+          "affectedProjects": [
+            "frontend-agents",
+            "agents",
+            "cms-api",
+            "reviews-api",
+            "crm-api",
+            "social-api",
+            "gcp-core",
+            "agents-lib",
+            "gcp"
+          ]
+        },
+        {
+          "type": "add-missing-lint-configs",
+          "title": "Add Missing Lint Configurations (15 projects)",
+          "script": "nx-diagnostics/scripts/fixes/add-lint-configs.sh",
+          "priority": "medium",
+          "affectedProjects": [
+            "cms-api",
+            "reviews-api",
+            "crm-api",
+            "social-api",
+            "bq-agent",
+            "looker-agent",
+            "gemini-orchestrator",
+            "crm-agent",
+            "reviews-agent",
+            "content-agent",
+            "api-clients",
+            "gcp-auth",
+            "dbt-models",
+            "schemas",
+            "env"
+          ]
+        },
+        {
+          "type": "standardize-executors",
+          "title": "Standardize Build Executors",
+          "script": "nx-diagnostics/scripts/fixes/standardize-executors.sh",
+          "priority": "low",
+          "affectedProjects": [
+            "looker-dashboards",
+            "agents",
+            "api",
+            "gcp-core",
+            "ui-components",
+            "adk",
+            "bq-agent",
+            "looker-agent",
+            "agents-lib",
+            "gemini-orchestrator",
+            "crm-agent",
+            "reviews-agent",
+            "content-agent",
+            "api-clients",
+            "gcp-auth",
+            "monitoring",
+            "common-types",
+            "security",
+            "dbt-models",
+            "schemas",
+            "env",
+            "mcp",
+            "gcp",
+            "frontend-agents",
+            "event-parser",
+            "cms-api",
+            "reviews-api",
+            "crm-api",
+            "social-api",
+            "signals",
+            "utils-secrets-manager"
+          ]
+        }
+      ]
+    }
+  }
+}

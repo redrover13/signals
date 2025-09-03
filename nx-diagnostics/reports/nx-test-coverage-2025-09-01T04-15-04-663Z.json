@@ -1,0 +1,1387 @@
+{
+  "timestamp": "2025-09-01T04-15-04-663Z",
+  "analysis": {
+    "totalProjects": 33,
+    "projectsWithTests": [
+      {
+        "name": "looker-dashboards",
+        "type": "app",
+        "testFiles": [
+          "apps/looker-dashboards/src/lib/looker-dashboards.spec.ts",
+          "apps/looker-dashboards/src/lib/looker-dashboards.spec.ts",
+          "apps/looker-dashboards/src/lib/looker-dashboards.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "apps/looker-dashboards/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "agents",
+        "type": "app",
+        "testFiles": [
+          "apps/agents/src/main.spec.ts",
+          "apps/agents/src/main.spec.ts",
+          "apps/agents/src/main.spec.ts"
+        ],
+        "testConfig": null,
+        "coverage": "partial"
+      },
+      {
+        "name": "event-parser",
+        "type": "app",
+        "testFiles": [],
+        "testConfig": {
+          "executor": "nx:run-commands",
+          "options": {
+            "command": "echo 'No tests defined for event-parser'"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "none"
+      },
+      {
+        "name": "api",
+        "type": "app",
+        "testFiles": [
+          "apps/api/src/routes/agents.spec.ts",
+          "apps/api/src/integration/agents-flow.spec.ts",
+          "apps/api/src/routes/agents.spec.ts",
+          "apps/api/src/integration/agents-flow.spec.ts",
+          "apps/api/src/routes/agents.spec.ts",
+          "apps/api/src/integration/agents-flow.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "nx:run-commands",
+          "options": {
+            "command": "echo 'test placeholder'"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "ui-components",
+        "type": "lib",
+        "testFiles": [],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/ui/components/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "none"
+      },
+      {
+        "name": "adk",
+        "type": "lib",
+        "testFiles": [
+          "libs/adk/src/services/vertex.spec.ts",
+          "libs/adk/src/agents/base-agent.spec.ts",
+          "libs/adk/src/services/vertex.spec.ts",
+          "libs/adk/src/agents/base-agent.spec.ts",
+          "libs/adk/src/services/vertex.spec.ts",
+          "libs/adk/src/agents/base-agent.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/adk/jest.config.ts"
+          }
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "agents-sdk",
+        "type": "lib",
+        "testFiles": [
+          "libs/agents-sdk/src/lib/main-agent.spec.ts",
+          "libs/agents-sdk/src/lib/agents-sdk.spec.ts",
+          "libs/agents-sdk/src/lib/main-agent.spec.ts",
+          "libs/agents-sdk/src/lib/agents-sdk.spec.ts",
+          "libs/agents-sdk/src/lib/main-agent.spec.ts",
+          "libs/agents-sdk/src/lib/agents-sdk.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/agents-sdk/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "bq-agent",
+        "type": "lib",
+        "testFiles": [
+          "libs/agents/bq-agent/src/lib/bq-agent.spec.ts",
+          "libs/agents/bq-agent/src/lib/bq-agent.spec.ts",
+          "libs/agents/bq-agent/src/lib/bq-agent.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/agents/bq-agent/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "looker-agent",
+        "type": "lib",
+        "testFiles": [
+          "libs/agents/looker-agent/src/lib/looker-agent.spec.ts",
+          "libs/agents/looker-agent/src/lib/looker-agent.spec.ts",
+          "libs/agents/looker-agent/src/lib/looker-agent.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/agents/looker-agent/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "agents-lib",
+        "type": "lib",
+        "testFiles": [
+          "libs/agents/bq-agent/src/lib/bq-agent.spec.ts",
+          "libs/agents/looker-agent/src/lib/looker-agent.spec.ts",
+          "libs/agents/gemini-orchestrator/src/lib/gemini-orchestrator.spec.ts",
+          "libs/agents/crm-agent/src/lib/crm-agent.spec.ts",
+          "libs/agents/reviews-agent/src/lib/reviews-agent.spec.ts",
+          "libs/agents/content-agent/src/lib/content-agent.spec.ts",
+          "libs/agents/bq-agent/src/lib/bq-agent.spec.ts",
+          "libs/agents/looker-agent/src/lib/looker-agent.spec.ts",
+          "libs/agents/gemini-orchestrator/src/lib/gemini-orchestrator.spec.ts",
+          "libs/agents/crm-agent/src/lib/crm-agent.spec.ts",
+          "libs/agents/reviews-agent/src/lib/reviews-agent.spec.ts",
+          "libs/agents/content-agent/src/lib/content-agent.spec.ts",
+          "libs/agents/bq-agent/src/lib/bq-agent.spec.ts",
+          "libs/agents/looker-agent/src/lib/looker-agent.spec.ts",
+          "libs/agents/gemini-orchestrator/src/lib/gemini-orchestrator.spec.ts",
+          "libs/agents/crm-agent/src/lib/crm-agent.spec.ts",
+          "libs/agents/reviews-agent/src/lib/reviews-agent.spec.ts",
+          "libs/agents/content-agent/src/lib/content-agent.spec.ts"
+        ],
+        "testConfig": null,
+        "coverage": "partial"
+      },
+      {
+        "name": "gemini-orchestrator",
+        "type": "lib",
+        "testFiles": [
+          "libs/agents/gemini-orchestrator/src/lib/gemini-orchestrator.spec.ts",
+          "libs/agents/gemini-orchestrator/src/lib/gemini-orchestrator.spec.ts",
+          "libs/agents/gemini-orchestrator/src/lib/gemini-orchestrator.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/agents/gemini-orchestrator/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "crm-agent",
+        "type": "lib",
+        "testFiles": [
+          "libs/agents/crm-agent/src/lib/crm-agent.spec.ts",
+          "libs/agents/crm-agent/src/lib/crm-agent.spec.ts",
+          "libs/agents/crm-agent/src/lib/crm-agent.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/agents/crm-agent/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "reviews-agent",
+        "type": "lib",
+        "testFiles": [
+          "libs/agents/reviews-agent/src/lib/reviews-agent.spec.ts",
+          "libs/agents/reviews-agent/src/lib/reviews-agent.spec.ts",
+          "libs/agents/reviews-agent/src/lib/reviews-agent.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/agents/reviews-agent/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "content-agent",
+        "type": "lib",
+        "testFiles": [
+          "libs/agents/content-agent/src/lib/content-agent.spec.ts",
+          "libs/agents/content-agent/src/lib/content-agent.spec.ts",
+          "libs/agents/content-agent/src/lib/content-agent.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/agents/content-agent/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "utils-secrets-manager",
+        "type": "lib",
+        "testFiles": [],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/utils/secrets-manager/jest.config.ts",
+            "passWithNoTests": true
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "coverage": true
+            }
+          }
+        },
+        "coverage": "none"
+      },
+      {
+        "name": "api-clients",
+        "type": "lib",
+        "testFiles": [
+          "libs/utils/api-clients/src/lib/api-clients.spec.ts",
+          "libs/utils/api-clients/src/lib/api-clients.spec.ts",
+          "libs/utils/api-clients/src/lib/api-clients.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/utils/api-clients/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "gcp-auth",
+        "type": "lib",
+        "testFiles": [
+          "libs/utils/gcp-auth/src/lib/gcp-auth.spec.ts",
+          "libs/utils/gcp-auth/src/lib/gcp-auth.spec.ts",
+          "libs/utils/gcp-auth/src/lib/gcp-auth.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/utils/gcp-auth/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "monitoring",
+        "type": "lib",
+        "testFiles": [
+          "libs/utils/monitoring/src/lib/monitoring.spec.ts",
+          "libs/utils/monitoring/src/lib/monitoring.spec.ts",
+          "libs/utils/monitoring/src/lib/monitoring.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/utils/monitoring/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "signals",
+        "type": "lib",
+        "testFiles": [
+          "libs/utils/signals/src/signals.spec.ts",
+          "libs/utils/signals/src/signals.spec.ts",
+          "libs/utils/signals/src/signals.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/utils/signals/jest.config.ts",
+            "passWithNoTests": true
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "common-types",
+        "type": "lib",
+        "testFiles": [],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/utils/common-types/jest.config.ts"
+          }
+        },
+        "coverage": "none"
+      },
+      {
+        "name": "security",
+        "type": "lib",
+        "testFiles": [
+          "libs/security/src/e2e-security.test.ts",
+          "libs/security/src/security.test.ts",
+          "libs/security/src/e2e-security.test.ts",
+          "libs/security/src/security.test.ts",
+          "libs/security/src/e2e-security.test.ts",
+          "libs/security/src/security.test.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/security/jest.config.ts",
+            "passWithNoTests": true
+          }
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "build-tools",
+        "type": "lib",
+        "testFiles": [
+          "libs/build-tools/src/lib/build-tools.spec.ts",
+          "libs/build-tools/src/lib/build-tools.spec.ts",
+          "libs/build-tools/src/lib/build-tools.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/build-tools/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "dbt-models",
+        "type": "lib",
+        "testFiles": [
+          "libs/data-models/dbt-models/src/lib/dbt-models.spec.ts",
+          "libs/data-models/dbt-models/src/lib/dbt-models.spec.ts",
+          "libs/data-models/dbt-models/src/lib/dbt-models.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/data-models/dbt-models/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "schemas",
+        "type": "lib",
+        "testFiles": [
+          "libs/data-models/schemas/src/lib/schemas.spec.ts",
+          "libs/data-models/schemas/src/lib/schemas.spec.ts",
+          "libs/data-models/schemas/src/lib/schemas.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/data-models/schemas/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "env",
+        "type": "lib",
+        "testFiles": [
+          "libs/env/src/env.spec.ts",
+          "libs/env/src/env.spec.ts",
+          "libs/env/src/env.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/env/jest.config.ts"
+          }
+        },
+        "coverage": "partial"
+      },
+      {
+        "name": "mcp",
+        "type": "lib",
+        "testFiles": [
+          "libs/mcp/src/lib/performance-optimization.spec.ts",
+          "libs/mcp/src/lib/test-suite-validation.spec.ts",
+          "libs/mcp/src/lib/mcp.service.spec.ts",
+          "libs/mcp/src/lib/completed-implementations.spec.ts",
+          "libs/mcp/src/lib/utils/mcp-utils.spec.ts",
+          "libs/mcp/src/lib/error-handling.spec.ts",
+          "libs/mcp/src/lib/vietnamese-functionality.spec.ts",
+          "libs/mcp/src/lib/mcp-integration.spec.ts",
+          "libs/mcp/src/lib/performance-optimization.spec.ts",
+          "libs/mcp/src/lib/test-suite-validation.spec.ts",
+          "libs/mcp/src/lib/mcp.service.spec.ts",
+          "libs/mcp/src/lib/completed-implementations.spec.ts",
+          "libs/mcp/src/lib/utils/mcp-utils.spec.ts",
+          "libs/mcp/src/lib/error-handling.spec.ts",
+          "libs/mcp/src/lib/vietnamese-functionality.spec.ts",
+          "libs/mcp/src/lib/mcp-integration.spec.ts",
+          "libs/mcp/src/lib/performance-optimization.spec.ts",
+          "libs/mcp/src/lib/test-suite-validation.spec.ts",
+          "libs/mcp/src/lib/mcp.service.spec.ts",
+          "libs/mcp/src/lib/completed-implementations.spec.ts",
+          "libs/mcp/src/lib/utils/mcp-utils.spec.ts",
+          "libs/mcp/src/lib/error-handling.spec.ts",
+          "libs/mcp/src/lib/vietnamese-functionality.spec.ts",
+          "libs/mcp/src/lib/mcp-integration.spec.ts"
+        ],
+        "testConfig": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/mcp/jest.config.ts",
+            "passWithNoTests": true
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        },
+        "coverage": "partial"
+      }
+    ],
+    "projectsWithoutTests": [
+      {
+        "name": "frontend-agents",
+        "type": "app",
+        "root": "apps/frontend-agents",
+        "reason": "No test configuration or test files found"
+      },
+      {
+        "name": "cms-api",
+        "type": "app",
+        "root": "apps/cloud-functions/cms-api",
+        "reason": "No test configuration or test files found"
+      },
+      {
+        "name": "reviews-api",
+        "type": "app",
+        "root": "apps/cloud-functions/reviews-api",
+        "reason": "No test configuration or test files found"
+      },
+      {
+        "name": "crm-api",
+        "type": "app",
+        "root": "apps/cloud-functions/crm-api",
+        "reason": "No test configuration or test files found"
+      },
+      {
+        "name": "social-api",
+        "type": "app",
+        "root": "apps/cloud-functions/social-api",
+        "reason": "No test configuration or test files found"
+      },
+      {
+        "name": "gcp-core",
+        "type": "lib",
+        "root": "libs/gcp-core",
+        "reason": "No test configuration or test files found"
+      },
+      {
+        "name": "gcp",
+        "type": "lib",
+        "root": "libs/gcp",
+        "reason": "No test configuration or test files found"
+      }
+    ],
+    "testConfigurations": [
+      {
+        "project": "looker-dashboards",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "apps/looker-dashboards/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "event-parser",
+        "config": {
+          "executor": "nx:run-commands",
+          "options": {
+            "command": "echo 'No tests defined for event-parser'"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "api",
+        "config": {
+          "executor": "nx:run-commands",
+          "options": {
+            "command": "echo 'test placeholder'"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "ui-components",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/ui/components/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "adk",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/adk/jest.config.ts"
+          }
+        }
+      },
+      {
+        "project": "agents-sdk",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/agents-sdk/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "bq-agent",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/agents/bq-agent/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "looker-agent",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/agents/looker-agent/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "gemini-orchestrator",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/agents/gemini-orchestrator/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "crm-agent",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/agents/crm-agent/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "reviews-agent",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/agents/reviews-agent/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "content-agent",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/agents/content-agent/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "utils-secrets-manager",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/utils/secrets-manager/jest.config.ts",
+            "passWithNoTests": true
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "coverage": true
+            }
+          }
+        }
+      },
+      {
+        "project": "api-clients",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/utils/api-clients/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "gcp-auth",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/utils/gcp-auth/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "monitoring",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/utils/monitoring/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "signals",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/utils/signals/jest.config.ts",
+            "passWithNoTests": true
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "common-types",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/utils/common-types/jest.config.ts"
+          }
+        }
+      },
+      {
+        "project": "security",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/security/jest.config.ts",
+            "passWithNoTests": true
+          }
+        }
+      },
+      {
+        "project": "build-tools",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/build-tools/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "dbt-models",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/data-models/dbt-models/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "schemas",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/data-models/schemas/jest.config.ts"
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      },
+      {
+        "project": "env",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/env/jest.config.ts"
+          }
+        }
+      },
+      {
+        "project": "mcp",
+        "config": {
+          "executor": "@nx/jest:jest",
+          "outputs": [
+            "{workspaceRoot}/coverage/{projectRoot}"
+          ],
+          "options": {
+            "jestConfig": "libs/mcp/jest.config.ts",
+            "passWithNoTests": true
+          },
+          "configurations": {
+            "ci": {
+              "ci": true,
+              "codeCoverage": true
+            }
+          },
+          "inputs": [
+            "default",
+            "^default",
+            "{workspaceRoot}/jest.preset.js"
+          ],
+          "cache": true
+        }
+      }
+    ],
+    "coverage": {
+      "totalTestedProjects": 26,
+      "fullCoverage": 0,
+      "partialCoverage": 22,
+      "noneCoverage": 0,
+      "coveragePercentage": "84.6"
+    }
+  },
+  "recommendations": [
+    {
+      "type": "add-tests-high-priority",
+      "priority": "high",
+      "title": "Add Unit Tests for Applications (5 projects)",
+      "description": "Critical applications are missing unit tests. Applications should have comprehensive test coverage.",
+      "actions": [
+        "Generate Jest/Vitest configuration for each application",
+        "Create basic test files for main functionality",
+        "Set up test runners in project.json targets",
+        "Add test scripts to package.json"
+      ],
+      "affectedProjects": [
+        "frontend-agents",
+        "cms-api",
+        "reviews-api",
+        "crm-api",
+        "social-api"
+      ],
+      "fixScript": "nx-diagnostics/scripts/fixes/add-tests-apps.sh"
+    },
+    {
+      "type": "add-tests-medium-priority",
+      "priority": "medium",
+      "title": "Add Unit Tests for Libraries (2 projects)",
+      "description": "Shared libraries should have unit tests to ensure reliability and prevent regressions.",
+      "actions": [
+        "Generate Jest/Vitest configuration for each library",
+        "Create unit tests for exported functions and classes",
+        "Set up test coverage reporting",
+        "Add test targets to project.json"
+      ],
+      "affectedProjects": [
+        "gcp-core",
+        "gcp"
+      ],
+      "fixScript": "nx-diagnostics/scripts/fixes/add-tests-libs.sh"
+    }
+  ],
+  "fixes": [
+    {
+      "type": "add-tests-high-priority",
+      "title": "Add Unit Tests for Applications (5 projects)",
+      "script": "nx-diagnostics/scripts/fixes/add-tests-apps.sh",
+      "priority": "high",
+      "affectedProjects": [
+        "frontend-agents",
+        "cms-api",
+        "reviews-api",
+        "crm-api",
+        "social-api"
+      ]
+    },
+    {
+      "type": "add-tests-medium-priority",
+      "title": "Add Unit Tests for Libraries (2 projects)",
+      "script": "nx-diagnostics/scripts/fixes/add-tests-libs.sh",
+      "priority": "medium",
+      "affectedProjects": [
+        "gcp-core",
+        "gcp"
+      ]
+    }
+  ]
+}

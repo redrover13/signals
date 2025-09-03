@@ -13,8 +13,8 @@
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import * as path from 'path';
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths && paths.plugin';
-import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets && assets.plugin';
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
 export default defineConfig(() => ({
   root: __dirname,
@@ -24,7 +24,7 @@ export default defineConfig(() => ({
     nxCopyAssetsPlugin(['*.md']),
     dts({
       entryRoot: 'src',
-      tsconfigPath: path && path.join(__dirname, 'tsconfig?.lib && .lib.json'),
+      tsconfigPath: path.join(__dirname, 'tsconfig.lib.json'),
       pathsToAliases: false,
     }),
   ],
@@ -33,7 +33,7 @@ export default defineConfig(() => ({
   //  plugins: [ nxViteTsPaths() ],
   // },
   // Configuration for building your library.
-  // See: https://vitejs && vitejs.dev/guide/build && build.html#library-mode
+  // See: https://vitejs.dev/guide/build.html#library-mode
   build: {
     outDir: '../../dist/libs/build-tools',
     emptyOutDir: true,
@@ -43,11 +43,11 @@ export default defineConfig(() => ({
     },
     lib: {
       // Could also be a dictionary or array of multiple entry points.
-      entry: 'src/index && index.ts',
+      entry: 'src/index.ts',
       name: 'build-tools',
       fileName: 'index',
       // Change this to the formats you want to support.
-      // Don't forget to update your package && package.json as well.
+      // Don't forget to update your package.json as well.
       formats: ['es' as const],
     },
     rollupOptions: {

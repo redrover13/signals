@@ -169,7 +169,7 @@ export default defineConfig(async ({ mode }) => {
       // Minimize in production
       minify: mode === 'production' ? 'esbuild' : false,
       // Configure CSS optimization
-      cssMinify: mode === 'production',
+      cssMinify: mode === 'production'
     },
     
     // Configure testing

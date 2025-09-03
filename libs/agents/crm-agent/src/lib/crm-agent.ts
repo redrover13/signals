@@ -15,9 +15,9 @@ import {
   BigQueryQueryTool,
   HttpRequestTool,
   InvocationContext
-} from '@nx-monorepo/adk';
+} from '@dulce/adk';
 
-import { CustomerData } from '@nx-monorepo/data-models';
+import { CustomerData } from '@dulce/data-models';
 
 /**
  * CRM-specialized agent for customer relationship management

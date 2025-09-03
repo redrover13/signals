@@ -9,8 +9,7 @@
  * @license MIT
  */
 
-import { computed as angularComputed, effect as angularEffect, signal as angularSignal } from '@angular/core';
-import type { Signal } from '@angular/core';
+import type { Signal } from '../index.js';
 
 /**
  * Enhanced signal interface that includes methods for our implementation
@@ -19,13 +18,13 @@ export interface EnhancedSignal<T> extends Signal<T> {
   /**
    * Update the signal value
    */
-  set: (value: T) => void;
-  
+  set: (value: T | ((prev: T) => T)) => void;
+
   /**
-   * Get the current value of the signal
+   * Get the current value of the signal value
    */
   get: () => T;
-  
+
   /**
    * Subscribe to changes in the signal value
    */
@@ -38,25 +37,27 @@ export interface EnhancedSignal<T> extends Signal<T> {
  * @returns Signal instance
  */
 export function createSignal<T>(initialValue: T): EnhancedSignal<T> {
-  const writable = angularSignal<T>(initialValue);
-  
-  // Create enhanced signal object
-  const enhanced = (() => writable()) as EnhancedSignal<T>;
-  
-  // Add standard Angular signal methods and properties
-  Object.defineProperties(enhanced, Object.getOwnPropertyDescriptors(writable));
-  
-  // Add our extended API
-  enhanced.set = (value: T) => writable.set(value);
-  enhanced.get = () => writable();
-  enhanced.subscribe = (callback: (value: T) => void) => {
-    const effectRef = angularEffect(() => {
-      callback(writable());
-    });
-    return () => effectRef.destroy();
+  let currentValue = initialValue;
+  const subscribers = new Set<(value: T) => void>();
+
+  const signalFunction = (() => currentValue) as EnhancedSignal<T>;
+
+  signalFunction.set = (value: T | ((prev: T) => T)) => {
+    const nextValue = typeof value === 'function' ? (value as (prev: T) => T)(currentValue) : value;
+    if (nextValue !== currentValue) {
+      currentValue = nextValue;
+      subscribers.forEach(callback => callback(currentValue));
+    }
   };
-  
-  return enhanced;
+
+  signalFunction.get = () => currentValue;
+
+  signalFunction.subscribe = (callback: (value: T) => void) => {
+    subscribers.add(callback);
+    return () => subscribers.delete(callback);
+  };
+
+  return signalFunction;
 }
 
 /**
@@ -65,27 +66,36 @@ export function createSignal<T>(initialValue: T): EnhancedSignal<T> {
  * @returns Computed signal
  */
 export function createComputed<T>(derivationFn: () => T): EnhancedSignal<T> {
-  const computed = angularComputed<T>(derivationFn);
-  
-  // Create enhanced signal object
-  const enhanced = (() => computed()) as EnhancedSignal<T>;
-  
-  // Add standard Angular signal methods and properties
-  Object.defineProperties(enhanced, Object.getOwnPropertyDescriptors(computed));
-  
-  // Add our extended API
-  enhanced.get = () => computed();
-  enhanced.set = (_: T) => {
+  let currentValue: T;
+  let isDirty = true;
+  const subscribers = new Set<(value: T) => void>();
+
+  const computedSignal = (() => {
+    if (isDirty) {
+      currentValue = derivationFn();
+      isDirty = false;
+    }
+    return currentValue;
+  }) as EnhancedSignal<T>;
+
+  computedSignal.get = () => {
+    if (isDirty) {
+      currentValue = derivationFn();
+      isDirty = false;
+    }
+    return currentValue;
+  };
+
+  computedSignal.set = () => {
     throw new Error('Cannot set value of computed signal');
   };
-  enhanced.subscribe = (callback: (value: T) => void) => {
-    const effectRef = angularEffect(() => {
-      callback(computed());
-    });
-    return () => effectRef.destroy();
+
+  computedSignal.subscribe = (callback: (value: T) => void) => {
+    subscribers.add(callback);
+    return () => subscribers.delete(callback);
   };
-  
-  return enhanced;
+
+  return computedSignal;
 }
 
 /**
@@ -94,9 +104,9 @@ export function createComputed<T>(derivationFn: () => T): EnhancedSignal<T> {
  * @returns A function to clean up the effect
  */
 export function createEffect(effectFn: () => void): () => void {
-  const effectRef = angularEffect(effectFn);
-  return () => effectRef.destroy();
+  effectFn(); // Run immediately for now
+  return (): void => {}; // No-op cleanup
 }
 
 export type { Signal };
-export { angularComputed as computed, angularEffect as effect, angularSignal as signal };
+export { createComputed as computed, createEffect as effect, createSignal as signal };

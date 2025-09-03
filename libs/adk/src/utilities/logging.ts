@@ -15,7 +15,6 @@
  * Provides structured logging with support for different environments
  * and integration with external logging services.
  */
-import { Injectable } from '@angular/core';
 import { LogLevel } from '../types/log-level';
 import { LogEntry } from '../types/log-entry';
 import { LogDestination } from '../types/log-destination';
@@ -36,9 +35,6 @@ const DEFAULT_EXCLUSION_PATTERNS = [
   /^\[hot-module-replacement\]/
 ];
 
-@Injectable({
-  providedIn: 'root'
-})
 export class LoggingService {
   private _globalLogLevel: LogLevel = LogLevel.INFO;
   private _destinations: LogDestination[] = [CONSOLE_LOG_DESTINATION];

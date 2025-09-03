@@ -9,9 +9,9 @@
  * @license MIT
  */
 
-export * from '@nx-monorepo/bq-agent';
-export * from '@nx-monorepo/content-agent';
-export * from '@nx-monorepo/crm-agent';
-export * from '@nx-monorepo/looker-agent';
-export * from '@nx-monorepo/reviews-agent';
+export * from '@dulce/bq-agent';
+export * from '@dulce/content-agent';
+export * from '@dulce/crm-agent';
+export * from '@dulce/looker-agent';
+export * from '@dulce/reviews-agent';
 // Note: gemini-orchestrator is not re-exported to avoid circular dependencies

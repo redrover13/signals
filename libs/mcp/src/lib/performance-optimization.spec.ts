@@ -3,7 +3,7 @@
  * Tests for caching, connection pooling, and query optimization
  */
 
-import { MCPService, CacheService, PerformanceMetricsService, ConnectionPoolService } from '@nx-monorepo/mcp';
+import { MCPService, CacheService, PerformanceMetricsService, ConnectionPoolService } from '@dulce/mcp';
 
 describe('Performance Optimizations', () => {
   let mcpService: MCPService | undefined;

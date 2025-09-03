@@ -17,7 +17,6 @@ import { SpanKind, SpanStatusCode, Tracer, trace } from '@opentelemetry/api';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { BigQueryLogger } from './bigquery-logger';
 import { CloudTraceExporter } from './cloud-trace-exporter';
-import { Signal, computed, effect, signal } from '@angular/core';
 
 // Default OpenTelemetry configuration
 export const DEFAULT_CONFIG = {

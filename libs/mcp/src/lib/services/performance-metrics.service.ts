@@ -14,8 +14,6 @@
  * 
  * Tracks and analyzes API request performance metrics.
  */
-import { Injectable } from '@angular/core';
-
 export interface RequestMetrics {
   id: string;
   url: string;
@@ -51,9 +49,6 @@ export interface ServerPerformanceStats extends PerformanceStats {
   lastUpdated: number;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
 export class PerformanceMetricsService {
   private activeRequests = new Map<string, RequestMetrics>();
   private completedRequests: RequestMetrics[] = [];

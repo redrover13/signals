@@ -9,4 +9,4 @@
  * @license MIT
  */
 
-import('./bootstrap');
+import('./bootstrap.tsx');

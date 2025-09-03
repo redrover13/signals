@@ -9,4 +9,4 @@
  * @license MIT
  */
 
-export * from './lib/gcp-auth-secret-manager';
+export * from './lib/gcp-auth-secret-manager.js';

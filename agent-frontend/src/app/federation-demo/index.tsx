@@ -15,10 +15,10 @@ import MockAgentInterface from '../mocks/AgentInterface';
 
 // Lazy load the remote component with fallback to mock
 const RemoteAgentInterface = lazy(() => {
-  return new Promise<typeof import('../mocks/AgentInterface')>((resolve, reject) => {
+  return new Promise<typeof import('../mocks/AgentInterface.tsx')>((resolve, reject) => {
     const timeout = setTimeout(() => {
       console.warn('Timeout loading remote component, using mock implementation');
-      import('../mocks/AgentInterface')
+      import('../mocks/AgentInterface.tsx')
         .then(resolve)
         .catch(reject);
     }, 5000);
@@ -33,7 +33,7 @@ const RemoteAgentInterface = lazy(() => {
         console.warn('Failed to load remote component, using mock implementation', error);
         clearTimeout(timeout);
         // Fallback to mock implementation
-        import('../mocks/AgentInterface')
+        import('../mocks/AgentInterface.tsx')
           .then(resolve)
           .catch(reject);
       });
@@ -57,14 +57,14 @@ export default function FederationDemo({ agentId = 'gemini-orchestrator' }: Fede
   };
 
   return (
-    <div className={styles.federationDemo}>
-      <h1 className={styles.title}>Module Federation Demo</h1>
-      <p className={styles.description}>
+    <div className={styles['federationDemo']}>
+      <h1 className={styles['title']}>Module Federation Demo</h1>
+      <p className={styles['description']}>
         This component demonstrates module federation by loading a component from another app.
       </p>
       
-      <div className={styles.remoteComponentContainer}>
-        <h2 className={styles.remoteComponentTitle}>Remote Agent Interface</h2>
+      <div className={styles['remoteComponentContainer']}>
+        <h2 className={styles['remoteComponentTitle']}>Remote Agent Interface</h2>
         
         {loadError ? (
           <div>
@@ -72,7 +72,7 @@ export default function FederationDemo({ agentId = 'gemini-orchestrator' }: Fede
             <button onClick={handleRetry}>Retry</button>
           </div>
         ) : (
-          <Suspense fallback={<div className={styles.loadingIndicator}>Loading remote component...</div>}>
+          <Suspense fallback={<div className={styles['loadingIndicator']}>Loading remote component...</div>}>
             <ErrorCatcher onError={setLoadError}>
               <RemoteAgentInterface agentId={agentId} isFederated={true} />
             </ErrorCatcher>

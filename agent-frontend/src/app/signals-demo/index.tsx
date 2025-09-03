@@ -10,7 +10,7 @@
  */
 
 import React, { useCallback, memo } from 'react';
-import { createSignal, useSignal } from '@nx-monorepo/utils/signals';
+import { createSignal, useSignal } from '@dulce/utils/signals';
 import { sharedCountSignal } from '../../bootstrap';
 import styles from './signals-demo.module.css';
 
@@ -37,21 +37,21 @@ const SignalsDemo = memo(() => {
   }, [setLocalValue]);
 
   return (
-    <div className={styles.signalsDemo}>
-      <h2 className={styles.title}>Signals Demo (Federated Module)</h2>
+    <div className={styles['signalsDemo']}>
+      <h2 className={styles['title']}>Signals Demo (Federated Module)</h2>
       
-      <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Shared Count: {count}</h3>
-        <div className={styles.buttonGroup}>
+      <div className={styles['section']}>
+        <h3 className={styles['sectionTitle']}>Shared Count: {count}</h3>
+        <div className={styles['buttonGroup']}>
           <button 
-            className={`${styles.button} ${styles.incrementButton}`}
+            className={`${styles['button']} ${styles['incrementButton']}`}
             onClick={handleIncrement}
             aria-label="Increment shared count"
           >
             Increment
           </button>
           <button 
-            className={`${styles.button} ${styles.decrementButton}`}
+            className={`${styles['button']} ${styles['decrementButton']}`}
             onClick={handleDecrement}
             aria-label="Decrement shared count"
           >
@@ -60,18 +60,18 @@ const SignalsDemo = memo(() => {
         </div>
       </div>
 
-      <div className={styles.section}>
-        <h3 className={styles.sectionTitle}>Local Value: {localValue}</h3>
+      <div className={styles['section']}>
+        <h3 className={styles['sectionTitle']}>Local Value: {localValue}</h3>
         <input
           type="text"
           value={localValue}
           onChange={handleLocalValueChange}
-          className={styles.input}
+          className={styles['input']}
           aria-label="Local value input"
         />
       </div>
 
-      <p className={styles.footer}>
+      <p className={styles['footer']}>
         This component is exposed via Module Federation and can be consumed by other micro-frontends.
       </p>
     </div>

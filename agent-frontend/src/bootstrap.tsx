@@ -11,7 +11,7 @@
 
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { createSignal } from '@nx-monorepo/utils/signals';
+import { createSignal } from '@dulce/utils/signals';
 
 import App from './app/app';
 

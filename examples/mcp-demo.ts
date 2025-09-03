@@ -19,7 +19,7 @@ import {
   createMCPClient,
   validateMCPEnvironment,
   testMCPConnectivity,
-} from '@nx-monorepo/mcp';
+} from '@dulce/mcp';
 
 async function runMCPDemo() {
   console.log('🚀 Starting MCP Integration Demo...\n');

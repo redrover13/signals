@@ -1,4 +1,15 @@
 /**
+ * @fileoverview server-health.service module for the lib component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
  * Service to monitor the health of MCP servers
  */
 import { MCPServerConfig } from './interfaces';

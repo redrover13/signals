@@ -14,7 +14,7 @@ const moduleFederationConfig = {
   shared: (name, config) => {
     // List shared dependencies here to avoid duplicating them
     const sharedLibs = {
-      '@nx-monorepo/utils/signals': {
+      '@dulce/utils/signals': {
         singleton: true,
         eager: true,
         requiredVersion: false,

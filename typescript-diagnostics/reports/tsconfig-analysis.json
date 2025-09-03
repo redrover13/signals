@@ -1060,7 +1060,7 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true,
         "paths": {
-          "@nx-monorepo/gcp": [
+          "@dulce/gcp": [
             "../../../libs/gcp/src/index.ts"
           ]
         }
@@ -2567,25 +2567,25 @@
         "declarationMap": true,
         "sourceMap": true,
         "paths": {
-          "@nx-monorepo/*": [
+          "@dulce/*": [
             "libs/*"
           ],
-          "@nx-monorepo/adk": [
+          "@dulce/adk": [
             "libs/adk/src/index.ts"
           ],
-          "@nx-monorepo/agents-sdk": [
+          "@dulce/agents-sdk": [
             "libs/agents-sdk/src/index.ts"
           ],
-          "@nx-monorepo/gcp": [
+          "@dulce/gcp": [
             "libs/gcp/src/index.ts"
           ],
-          "@nx-monorepo/utils/signals": [
+          "@dulce/utils/signals": [
             "libs/utils/signals/src/index.ts"
           ],
-          "@nx-monorepo/utils/common-types": [
+          "@dulce/utils/common-types": [
             "libs/utils/common-types/src/index.ts"
           ],
-          "@nx-monorepo/security": [
+          "@dulce/security": [
             "libs/security/src/index.ts"
           ]
         },
@@ -2727,25 +2727,25 @@
         "forceConsistentCasingInFileNames": true,
         "allowSyntheticDefaultImports": true,
         "paths": {
-          "@nx-monorepo/*": [
+          "@dulce/*": [
             "libs/*"
           ],
-          "@nx-monorepo/adk": [
+          "@dulce/adk": [
             "libs/adk/src/index.ts"
           ],
-          "@nx-monorepo/agents-sdk": [
+          "@dulce/agents-sdk": [
             "libs/agents-sdk/src/index.ts"
           ],
-          "@nx-monorepo/gcp": [
+          "@dulce/gcp": [
             "libs/gcp/src/index.ts"
           ],
-          "@nx-monorepo/utils/signals": [
+          "@dulce/utils/signals": [
             "libs/utils/signals/src/index.ts"
           ],
-          "@nx-monorepo/utils/common-types": [
+          "@dulce/utils/common-types": [
             "libs/utils/common-types/src/index.ts"
           ],
-          "@nx-monorepo/security": [
+          "@dulce/security": [
             "libs/security/src/index.ts"
           ]
         }
@@ -2841,25 +2841,25 @@
     },
     "paths": {
       "value": {
-        "@nx-monorepo/*": [
+        "@dulce/*": [
           "libs/*"
         ],
-        "@nx-monorepo/adk": [
+        "@dulce/adk": [
           "libs/adk/src/index.ts"
         ],
-        "@nx-monorepo/agents-sdk": [
+        "@dulce/agents-sdk": [
           "libs/agents-sdk/src/index.ts"
         ],
-        "@nx-monorepo/gcp": [
+        "@dulce/gcp": [
           "libs/gcp/src/index.ts"
         ],
-        "@nx-monorepo/utils/signals": [
+        "@dulce/utils/signals": [
           "libs/utils/signals/src/index.ts"
         ],
-        "@nx-monorepo/utils/common-types": [
+        "@dulce/utils/common-types": [
           "libs/utils/common-types/src/index.ts"
         ],
-        "@nx-monorepo/security": [
+        "@dulce/security": [
           "libs/security/src/index.ts"
         ]
       },
@@ -2974,25 +2974,25 @@
         "forceConsistentCasingInFileNames": true,
         "allowSyntheticDefaultImports": true,
         "paths": {
-          "@nx-monorepo/*": [
+          "@dulce/*": [
             "libs/*"
           ],
-          "@nx-monorepo/adk": [
+          "@dulce/adk": [
             "libs/adk/src/index.ts"
           ],
-          "@nx-monorepo/agents-sdk": [
+          "@dulce/agents-sdk": [
             "libs/agents-sdk/src/index.ts"
           ],
-          "@nx-monorepo/gcp": [
+          "@dulce/gcp": [
             "libs/gcp/src/index.ts"
           ],
-          "@nx-monorepo/utils/signals": [
+          "@dulce/utils/signals": [
             "libs/utils/signals/src/index.ts"
           ],
-          "@nx-monorepo/utils/common-types": [
+          "@dulce/utils/common-types": [
             "libs/utils/common-types/src/index.ts"
           ],
-          "@nx-monorepo/security": [
+          "@dulce/security": [
             "libs/security/src/index.ts"
           ]
         }

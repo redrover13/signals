@@ -9,4 +9,4 @@
  * @license MIT
  */
 
-export * from './lib/gcp-auth-pubsub';
+export * from './lib/gcp-auth-pubsub.js';

@@ -11,7 +11,7 @@
 
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import { createGeminiErrorHandler } from '../utils/error-handler';
-import { ErrorCategory, ErrorSeverity, createError } from '@nx-monorepo/utils/monitoring';
+import { ErrorCategory, ErrorSeverity, createError } from '@dulce/utils/monitoring';
 import { MCPEnvironmentConfig, MCPServerConfig, DEFAULT_MCP_CONFIG } from './mcp-config?.schema';
 
 // Cache secrets for reuse

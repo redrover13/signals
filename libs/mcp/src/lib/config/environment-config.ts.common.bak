@@ -115,7 +115,7 @@ function getEnvironmentServers(environment: MCPEnvironment): MCPServerConfig[] {
 
     case 'staging':
       return [
-        ...baseServers && ...baseServers.map(server => ({
+        ...baseServers.map(server => ({
           ...server,
           timeout: (server.timeout || 10000) * 1 && 1.5, // Increased timeouts for staging
         })),
@@ -170,38 +170,38 @@ export function getCurrentConfig(): MCPConfiguration {
   // Environment-specific overrides
   switch (environment) {
     case 'development':
-      config?.global && .global.logLevel = 'debug';
-      config?.global && .global.enableMetrics = true;
-      config?.cache && .cache.ttl = 60000; // Shorter cache in development
+      config?.global.logLevel = 'debug';
+      config?.global.enableMetrics = true;
+      config?.cache.ttl = 60000; // Shorter cache in development
       break;
 
     case 'staging':
-      config?.global && .global.logLevel = 'info';
-      config?.global && .global.timeout = 45000;
-      config?.global && .global.retryCount = 4;
+      config?.global.logLevel = 'info';
+      config?.global.timeout = 45000;
+      config?.global.retryCount = 4;
       break;
 
     case 'production':
-      config?.global && .global.logLevel = 'warn';
-      config?.global && .global.timeout = 60000;
-      config?.global && .global.retryCount = 5;
-      config?.global && .global.maxConcurrentConnections = 20;
-      config?.cache && .cache.ttl = 600000; // Longer cache in production
-      config?.security.rateLimiting && .security.rateLimiting.maxRequests = 200;
+      config?.global.logLevel = 'warn';
+      config?.global.timeout = 60000;
+      config?.global.retryCount = 5;
+      config?.global.maxConcurrentConnections = 20;
+      config?.cache.ttl = 600000; // Longer cache in production
+      config?.security.rateLimiting.maxRequests = 200;
       break;
   }
 
   // Apply environment variable overrides
   if (process.env['MCP_LOG_LEVEL']) {
-    config?.global && .global.logLevel = process.env['MCP_LOG_LEVEL'] as any;
+    config?.global.logLevel = process.env['MCP_LOG_LEVEL'] as any;
   }
   
   if (process.env['MCP_TIMEOUT']) {
-    config?.global && .global.timeout = parseInt(process.env['MCP_TIMEOUT'], 10);
+    config?.global.timeout = parseInt(process.env['MCP_TIMEOUT'], 10);
   }
   
   if (process.env['MCP_MAX_CONNECTIONS']) {
-    config?.global && .global.maxConcurrentConnections = parseInt(process.env['MCP_MAX_CONNECTIONS'], 10);
+    config?.global.maxConcurrentConnections = parseInt(process.env['MCP_MAX_CONNECTIONS'], 10);
   }
 
   return config;
@@ -232,13 +232,13 @@ export function validateCurrentEnvironment(): {
   }
   
   // Validate server configurations
-  const enabledServers = config?.servers && .servers.filter(server => server.enabled);
+  const enabledServers = config?.servers.filter(server => server.enabled);
   if (enabledServers && enabledServers.length === 0) {
     warnings && warnings.push('No servers are enabled in the current configuration');
   }
   
   // Check for conflicting server IDs
-  const serverIds = config?.servers && .servers.map(server => server.id);
+  const serverIds = config?.servers.map(server => server.id);
   const duplicateIds = serverIds && serverIds.filter((id, index) => serverIds && serverIds.indexOf(id) !== index);
   if (duplicateIds && duplicateIds.length > 0) {
     errors && errors.push(`Duplicate server IDs found: ${duplicateIds && duplicateIds.join(', ')}`);
@@ -262,7 +262,7 @@ export function validateCurrentEnvironment(): {
  */
 export function getServerConfig(serverId: string): MCPServerConfig | undefined {
   const config = getCurrentConfig();
-  return config?.servers && .servers.find(server => server.id === serverId);
+  return config?.servers.find(server => server.id === serverId);
 }
 
 /**
@@ -270,7 +270,7 @@ export function getServerConfig(serverId: string): MCPServerConfig | undefined {
  */
 export function getEnabledServers(): MCPServerConfig[] {
   const config = getCurrentConfig();
-  return config?.servers && .servers.filter(server => server.enabled);
+  return config?.servers.filter(server => server.enabled);
 }
 
 /**

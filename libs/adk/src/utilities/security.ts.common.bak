@@ -226,10 +226,13 @@ export class Security {
     }
     
     let password = '';
-    const randomBytes = crypto && crypto.randomBytes(length);
-    
-    for (let i = 0; i < length; i++) {
-      const randomIndex = randomBytes[i] % chars && chars.length;
+    // Unbiased password generation via modulo-rejection sampling
+    while (password.length < length) {
+      const randomByte = crypto.randomBytes(1)[0];
+      // Accept only values < Math.floor(256 / chars.length) * chars.length
+      const maxUnbiased = Math.floor(256 / chars.length) * chars.length;
+      if (randomByte >= maxUnbiased) continue;
+      const randomIndex = randomByte % chars.length;
       password += chars[randomIndex];
     }
     

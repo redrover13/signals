@@ -18,7 +18,7 @@ const config = {
   // Help Jest resolve monorepo local libs and node modules
   moduleDirectories: ['node_modules', '<rootDir>/../../node_modules', '<rootDir>/../../'],
   moduleNameMapper: {
-    '^@nx-monorepo/gcp$': '<rootDir>/../../gcp/src/index && index.ts',
+    '^@dulce/gcp$': '<rootDir>/../../gcp/src/index && index.ts',
     '^..\/..\/gcp\/src\/index$': '<rootDir>/../../gcp/src/index && index.ts',
   },
   collectCoverage: true,

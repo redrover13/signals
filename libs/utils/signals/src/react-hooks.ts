@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import type { EnhancedSignal } from './angular-signal-adapter';
+import type { EnhancedSignal } from './angular-signal-adapter.js';
 
 /**
  * React hook for using signals in React components

@@ -1,131 +1,145 @@
 /**
- * Signals implementation for Dulce Saigon
+ * @fileoverview index module for the signals component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
  */
 
-/**
- * Signal interface for reactive state management
- */
-export interface Signal<T> {
-  /**
-   * Get the current value of the signal
-   */
-  (): T;
-  
-  /**
-   * Set a new value for the signal
-   */
+import { computed, signal, type Signal as AngularSignal } from '@angular/core';
+
+// Define a custom Signal type that extends Angular's Signal
+export type Signal<T> = AngularSignal<T> & {
+  // Add additional methods for backward compatibility
+  get: () => T;
   set: (value: T) => void;
-  
-  /**
-   * Subscribe to value changes
-   */
   subscribe: (callback: (value: T) => void) => () => void;
-  
+};
+
+export interface CreateSignalOptions {
   /**
-   * Get the name of the signal (for debugging)
+   * Enable debugging for this signal by logging updates to console
+   */
+  debug?: boolean;
+  /**
+   * Name for debugging output
    */
   name?: string;
 }
 
 /**
- * Creates a signal with the given initial value
- * @param initialValue The initial value of the signal
- * @param name Optional name for debugging
+ * Creates a signal with the provided initial value and options
+ * @param initialValue The initial value for the signal
+ * @param options Optional configuration
+ * @returns A signal with the provided value
  */
-export function createSignal<T>(initialValue: T, name?: string): Signal<T> {
-  let value = initialValue;
-  const subscribers: ((value: T) => void)[] = [];
+export function createSignal<T>(initialValue: T, options?: CreateSignalOptions): Signal<T> {
+  const internalSignal = signal<T>(initialValue);
   
-  const signal = (() => value) as Signal<T>;
+  // Create extended signal with additional methods
+  const extendedSignal = internalSignal as Signal<T>;
   
-  signal.set = (newValue: T) => {
-    if (value !== newValue) {
-      value = newValue;
-      subscribers.forEach(callback => callback(value));
-    }
-  };
+  // Add get method
+  extendedSignal.get = () => internalSignal();
   
-  signal.subscribe = (callback: (value: T) => void) => {
-    subscribers.push(callback);
+  // Keep reference to original set method
+  const originalSet = internalSignal.set;
+  
+  // Add debugging if enabled
+  if (options?.debug) {
+    const name = options.name || 'Signal';
+    console.log(`${name} created with initial value:`, initialValue);
     
-    // Return unsubscribe function
-    return () => {
-      const index = subscribers.indexOf(callback);
-      if (index !== -1) {
-        subscribers.splice(index, 1);
-      }
+    extendedSignal.set = (newValue: T) => {
+      console.log(`${name} updating:`, {
+        previous: internalSignal(),
+        new: newValue,
+      });
+      originalSet(newValue);
     };
-  };
-  
-  if (name) {
-    signal.name = name;
+  } else {
+    extendedSignal.set = originalSet;
   }
   
-  return signal;
-}
-
-/**
- * Creates a derived signal that depends on other signals
- * @param dependencies The signals that this signal depends on
- * @param derivationFn Function that computes the derived value
- */
-export function derived<T, D extends Record<string, Signal<any>>>(
-  dependencies: D,
-  derivationFn: (values: { [K in keyof D]: D[K] extends Signal<infer U> ? U : never }) => T
-): Omit<Signal<T>, 'set'> {
-  // Create a signal with the initial derived value
-  const derivedValue = createSignal<T>(
-    derivationFn(getDependencyValues(dependencies))
-  );
-  
-  // Subscribe to all dependencies
-  Object.values(dependencies).forEach(dep => {
-    dep.subscribe(() => {
-      derivedValue.set(derivationFn(getDependencyValues(dependencies)));
+  // Add subscribe method
+  extendedSignal.subscribe = (callback: (value: T) => void) => {
+    const effectRef = computed(() => {
+      const value = internalSignal();
+      callback(value);
+      return value;
     });
-  });
-  
-  // Return readonly signal (without set method)
-  return {
-    name: derivedValue.name,
-    subscribe: derivedValue.subscribe,
-    // Using function call operator to get the value
-    return derivedValue;
+    return () => { /* Effect cleanup would go here */ };
   };
+  
+  return extendedSignal;
 }
 
 /**
- * Helper to get current values from dependency signals
- * @param dependencies Object with signal dependencies
+ * Creates a persistent signal that saves its value to localStorage
+ * @param key The localStorage key to use
+ * @param initialValue The initial value (used if nothing exists in localStorage)
+ * @returns A signal that persists its value
  */
-function getDependencyValues<D extends Record<string, Signal<any>>>(dependencies: D): 
-  { [K in keyof D]: D[K] extends Signal<infer U> ? U : never } {
-  
-  const values = {} as { [K in keyof D]: D[K] extends Signal<infer U> ? U : never };
-  
-  for (const key in dependencies) {
-    if (Object.prototype.hasOwnProperty.call(dependencies, key)) {
-      const signal = dependencies[key];
-      values[key] = signal();
-    }
+export function createPersistentSignal<T>(key: string, initialValue: T): Signal<T> {
+  // Get the stored value from localStorage
+  let storedValue: T;
+  try {
+    const item = window.localStorage.getItem(key || "");
+    storedValue = item ? JSON.parse(item) : initialValue | undefined;
+  } catch (error) {
+    console.error('Error reading from localStorage:', error);
+    storedValue = initialValue;
   }
   
-  return values;
+  // Create a signal with the stored or initial value
+  const persistentSignal = createSignal<T>(storedValue);
+  
+  // Create a wrapped signal with a custom setter that updates localStorage
+  const originalSet = persistentSignal.set;
+  persistentSignal.set = (newValue: T) => {
+    try {
+      window.localStorage.setItem(key || "", JSON.stringify(newValue));
+    } catch (error) {
+      console.error('Error writing to localStorage:', error);
+    }
+    originalSet(newValue);
+  };
+  
+  return persistentSignal;
 }
 
 /**
- * Creates a computed signal that depends on other signals
- * Alias for derived
+ * Creates a derived signal based on a computation function
+ * @param computeFn Function that derives a new value
+ * @returns A computed signal
  */
-export const computed = derived;
+export function createDerivedSignal<T>(computeFn: () => T): Signal<T> {
+  const derivedValue = computed(computeFn) as Signal<T>;
+  
+  // Add compatibility methods
+  derivedValue.get = () => derivedValue();
+  derivedValue.set = () => { 
+    throw new Error('Cannot set a derived signal directly');
+  };
+  derivedValue.subscribe = (callback: (value: T) => void) => {
+    callback(derivedValue());
+    return () => { /* No cleanup needed */ };
+  };
+  
+  return derivedValue;
+}
 
 /**
- * Batch multiple signal updates to trigger subscriptions only once at the end
- * @param updateFn Function that performs multiple signal updates
+ * Creates a signal with a value and a setter function
+ * @param initialValue The initial value
+ * @returns A tuple containing the signal and its setter
  */
-export function batch(updateFn: () => void): void {
-  // In a more advanced implementation, this would
-  // temporarily disable subscription notifications
-  // For now, we just execute the function
-  updateFn();
+export function createStateSignal<T>(initialValue: T): [Signal<T>, (value: T) => void] {
+  const signal = createSignal<T>(initialValue);
+  return [signal, signal.set];
 }
+
+export * from './src/index';

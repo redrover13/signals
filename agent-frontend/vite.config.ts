@@ -2,8 +2,7 @@
  * @fileoverview vite.config module for the agent-frontend component
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
- * Contains implementation for TypeScript functionality.
- *
+ * Contains implementation for TypeScript func
  * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
@@ -40,6 +39,7 @@ export default defineConfig(async ({ mode }) => {
       'process.env.NODE_ENV': JSON.stringify(mode),
       'process.env.VITE_APP_NAME': JSON.stringify(env.VITE_APP_NAME || 'Agent Frontend'),
       'process.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL || 'http://localhost:3000'),
+      'process.env': {},
       // Add other specific environment variables as needed
       // Never expose the entire process.env object
     },
@@ -53,13 +53,13 @@ export default defineConfig(async ({ mode }) => {
         'X-Frame-Options': 'DENY',
         'X-XSS-Protection': '1; mode=block',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
-        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;",
-      },
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+      }
     },
     
     preview: {
       port: 4200,
-      host: 'localhost',
+      host: 'localhost'
     },
     
     plugins: [
@@ -81,62 +81,88 @@ export default defineConfig(async ({ mode }) => {
       mode === 'analyze' && visualizer({
         open: true,
         filename: 'dist/stats.html',
-        gzipSize: true,
+        gzipSize: true
       }),
       
       // Add PWA support
-      VitePWA({
-        registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
-        manifest: {
-          name: 'Dulce de Saigon Agent Frontend',
-          short_name: 'Agent Frontend',
-          theme_color: '#4CAF50',
-          icons: [
-            {
-              src: '/pwa-192x192.png',
-              sizes: '192x192',
-              type: 'image/png',
-            },
-            {
-              src: '/pwa-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-            },
-          ],
-        },
-      }),
+      // Temporarily disabled due to stream-browserify issue
+      // VitePWA({
+      //   registerType: 'autoUpdate',
+      //   includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
+      //   manifest: {
+      //     name: 'Dulce de Saigon Agent Frontend',
+      //     short_name: 'Agent Frontend',
+      //     theme_color: '#4CAF50',
+      //     icons: [
+      //       {
+      //         src: '/pwa-192x192.png',
+      //         sizes: '192x192',
+      //         type: 'image/png'
+      //       },
+      //       {
+      //         src: '/pwa-512x512.png',
+      //         sizes: '512x512',
+      //         type: 'image/png'
+      //       }
+      //     ]
+      //   }
+      // })
     ],
     
     // Enable worker support
     worker: {
-      plugins: () => [nxViteTsPaths()],
+      plugins: () => [nxViteTsPaths()]
     },
     
     build: {
       outDir: '../dist/agent-frontend',
       emptyOutDir: true,
       reportCompressedSize: true,
-      target: 'esnext',
+      target: 'es2020',
       // Optimize chunks
       rollupOptions: {
+        external: [],
         output: {
-          manualChunks: {
-            vendor: ['react', 'react-dom'],
-            signals: ['@nx-monorepo/utils/signals'],
-            lodash: ['lodash-es'],
+          manualChunks: (id) => {
+            // Create vendor chunks for better caching
+            if (id.includes('node_modules')) {
+              if (id.includes('react') || id.includes('react-dom')) {
+                return 'vendor-react';
+              }
+              if (id.includes('@dulce/utils-signals')) {
+                return 'signals';
+              }
+              if (id.includes('agents-sdk')) {
+                return 'agents-sdk';
+              }
+              // Group other dependencies by their top-level module
+              const match = id.match(/node_modules\/(@[^/]+\/[^/]+|[^/]+)/);
+              if (match) {
+                return `vendor-${match[1].replace('@', '')}`;
+              }
+              return 'vendor';
+            }
           },
-        },
+          // Optimize chunk loading
+          chunkFileNames: 'assets/[name]-[hash].js',
+          entryFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash].[ext]'
+        }
       },
       commonjsOptions: {
         transformMixedEsModules: true,
+        // Add custom module resolution for problematic packages
+        include: [
+          /node_modules\/fetch-blob/,
+          /node_modules\/node-fetch/
+        ]
       },
       // Enable source maps in development
       sourcemap: mode !== 'production',
       // Minimize in production
-      minify: mode === 'production',
+      minify: mode === 'production' ? 'esbuild' : false,
       // Configure CSS optimization
-      cssMinify: mode === 'production',
+      cssMinify: mode === 'production'
     },
     
     // Configure testing
@@ -164,15 +190,49 @@ export default defineConfig(async ({ mode }) => {
       define: {
         'window.jest': 'vi',
         'globalThis.jest': 'vi'
-      },
+      }
     },
     
     // Optimize dependencies
     optimizeDeps: {
-      include: ['react', 'react-dom', 'lodash-es'],
-      exclude: ['@nx-monorepo/utils/signals'],
-      // Enable dependency pre-bundling only when explicitly requested
-      force: env.VITE_FORCE_OPTIMIZE === 'true',
+      include: [
+        'react', 
+        'react-dom',
+        'lodash-es',
+        '@testing-library/react',
+        '@testing-library/user-event',
+        'node-fetch',
+        'stream-browserify'
+      ],
+      exclude: [
+        '@dulce/utils-signals',
+        'fetch-blob',
+        'stream-http',
+        'https-browserify'
+      ],
+      esbuildOptions: {
+        target: 'es2020',
+        supported: { 
+          'top-level-await': true 
+        }
+      }
     },
+    
+    // Add alias for development fallbacks and Node.js polyfills
+    resolve: {
+      alias: {
+        // When federation fails, use local mock implementation
+        'frontend-agents/AgentInterface': '/src/app/mocks/AgentInterface.tsx',
+        // Node.js polyfills for browser
+        'node:util': 'util',
+        'node:buffer': 'buffer',
+        'node:url': 'url',
+        'node:path': 'path-browserify',
+        'node:crypto': 'crypto-browserify',
+        'node:stream': 'stream-browserify',
+        'stream': 'stream-browserify',
+        'stream-browserify/web': 'stream-browserify'
+      }
+    }
   };
 });

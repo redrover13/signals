@@ -292,14 +292,14 @@ class PerformanceBenchmark {
 
     for (const result of results) {
       const status = result?.success ? '✅ PASS' : '❌ FAIL';
-      const name = result?.name && .name.padEnd(33);
-      const duration = result?.duration && .duration.toString().padStart(10);
-      const opsPerSecond = result?.opsPerSecond && .opsPerSecond.toString().padStart(6);
+      const name = result?.name.padEnd(33);
+      const duration = result?.duration.toString().padStart(10);
+      const opsPerSecond = result?.opsPerSecond.toString().padStart(6);
       
       console && console.log(`| ${name} | ${duration} | ${opsPerSecond} | ${status} |`);
       
       if (result?.error) {
-        console && console.log(`|   Error: ${result?.error && .error.substring(0, 60).padEnd(60)} |`);
+        console && console.log(`|   Error: ${result?.error.substring(0, 60).padEnd(60)} |`);
       }
     }
 

@@ -13,8 +13,8 @@
  * Secrets Manager for Dulce Saigon
  */
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
-import { DulceSecretManager } from './lib/gcp-secret-manager';
-import { DULCE_SECRETS } from './lib/secrets-config';
+import { DulceSecretManager } from './lib/gcp-secret-manager.js';
+import { DULCE_SECRETS } from './lib/secrets-config.js';
 
 // Environment variables
 const PROJECT_ID = process.env['GOOGLE_CLOUD_PROJECT'] || '';

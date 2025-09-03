@@ -29,20 +29,20 @@ const FrontendAgentsFallback: React.FC<FrontendAgentsFallbackProps> = ({ error }
   };
   
   return (
-    <div className={styles.fallbackContainer}>
-      <div className={styles.fallbackContent}>
-        <h2 className={styles.fallbackTitle}>Agent Module Unavailable</h2>
-        <p className={styles.fallbackMessage}>
+    <div className={styles['fallbackContainer']}>
+      <div className={styles['fallbackContent']}>
+        <h2 className={styles['fallbackTitle']}>Agent Module Unavailable</h2>
+        <p className={styles['fallbackMessage']}>
           The agent module could not be loaded. This might be due to network issues
           or the service being temporarily unavailable.
         </p>
         {error && (
-          <div className={styles.errorDetails}>
-            <p className={styles.errorMessage}>{error.message}</p>
+          <div className={styles['errorDetails']}>
+            <p className={styles['errorMessage']}>{error.message}</p>
           </div>
         )}
         <button
-          className={styles.retryButton}
+          className={styles['retryButton']}
           onClick={handleRetry}
           disabled={isRetrying}
           aria-label="Retry loading the agent module"

@@ -14,7 +14,7 @@ import userEvent from '@testing-library/user-event';
 import { SignalsDemo } from './index';
 
 // Mock the signals library
-jest.mock('@nx-monorepo/utils/signals', () => {
+jest.mock('@dulce/utils/signals', () => {
   let sharedValue = 0;
   let localValue = 'Local Value';
   

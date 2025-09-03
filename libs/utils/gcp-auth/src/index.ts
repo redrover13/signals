@@ -106,6 +106,23 @@ export function getPubSubClient(projectId?: string): PubSub {
 }
 
 /**
+ * Helper function for PubSub message publishing
+ */
+export function getPubSub() {
+  const pubsub = getPubSubClient();
+  return {
+    topic: (name: string) => ({
+      publishMessage: async (msg: unknown) => {
+        const topic = pubsub.topic(name);
+        const data = Buffer.from(JSON.stringify(msg));
+        const messageId = await topic.publishMessage({ data });
+        return { messageId, name };
+      },
+    }),
+  };
+}
+
+/**
  * Get Firestore client
  * @param projectId Optional project ID
  */

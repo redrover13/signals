@@ -183,7 +183,17 @@ export class GeminiOrchestrator {
         lowerQuery.includes('data') ||
         lowerQuery.includes('analytics') ||
         lowerQuery.includes('select') ||
-        lowerQuery.includes('table')) {
+        lowerQuery.includes('table') ||
+        lowerQuery.includes('sales') ||
+        lowerQuery.includes('revenue') ||
+        lowerQuery.includes('orders') ||
+        lowerQuery.includes('selling') ||
+        lowerQuery.includes('performance') ||
+        lowerQuery.includes('metrics') ||
+        lowerQuery.includes('report') ||
+        lowerQuery.includes('count') ||
+        lowerQuery.includes('top') ||
+        lowerQuery.includes('best')) {
       return SubAgentType.BIGQUERY;
     }
 
@@ -193,7 +203,9 @@ export class GeminiOrchestrator {
         lowerQuery.includes('firestore') ||
         lowerQuery.includes('save') ||
         lowerQuery.includes('update') ||
-        lowerQuery.includes('delete')) {
+        lowerQuery.includes('delete') ||
+        lowerQuery.includes('get ') ||
+        lowerQuery.includes('fetch')) {
       return SubAgentType.FIREBASE;
     }
 
@@ -202,7 +214,11 @@ export class GeminiOrchestrator {
         lowerQuery.includes('find') ||
         lowerQuery.includes('knowledge') ||
         lowerQuery.includes('information') ||
-        lowerQuery.includes('learn')) {
+        lowerQuery.includes('learn') ||
+        lowerQuery.includes('about') ||
+        lowerQuery.includes('recipe') ||
+        lowerQuery.includes('how to') ||
+        lowerQuery.includes('what is')) {
       return SubAgentType.RAG;
     }
 
@@ -289,10 +305,39 @@ Please analyze the user's query and determine if you need to use any tools, then
   private createSimulationResponse(input: OrchestratorInput, startTime: number): Record<string, unknown> {
     const subAgent = this.analyzeQueryForRouting(input.query);
     
-    return this.createSuccessResponse({
-      type: 'text_response' as const,
-      text: `Simulation response for: "${input.query}". This would normally be processed by the ${subAgent} sub-agent with Gemini AI.`
-    }, subAgent, startTime);
+    // Create response data based on the sub-agent type
+    let responseData;
+    switch (subAgent) {
+      case SubAgentType.BIGQUERY:
+        responseData = {
+          type: 'bigquery_result' as const,
+          sql: 'SIMULATED_SQL_QUERY',
+          rows: [{ simulated: true, message: 'This would contain BigQuery results' }],
+          rowCount: 1
+        };
+        break;
+      case SubAgentType.FIREBASE:
+        responseData = {
+          type: 'firebase_document' as const,
+          collection: 'simulated_collection',
+          id: 'simulated_id',
+          document: { simulated: true, message: 'This would contain Firebase document' }
+        };
+        break;
+      case SubAgentType.RAG:
+        responseData = {
+          type: 'text_response' as const,
+          text: `RAG search simulation for: "${input.query}". This would return relevant knowledge base results.`
+        };
+        break;
+      default:
+        responseData = {
+          type: 'text_response' as const,
+          text: `Tool execution simulation for: "${input.query}". This would execute the appropriate tools.`
+        };
+    }
+    
+    return this.createSuccessResponse(responseData, subAgent, startTime);
   }
 
   /**

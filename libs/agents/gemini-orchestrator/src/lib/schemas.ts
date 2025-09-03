@@ -50,7 +50,7 @@ export const orchestratorOptionsSchema = z.object({
   streaming: z.boolean().default(false),
   timeout: z.number().positive().optional(),
   cacheResults: z.boolean().default(false),
-  cache: cacheOptionsSchema && cacheOptionsSchema.optional(),
+  cache: cacheOptionsSchema.optional(),
   mcpServerId: z.string().optional()
 });
 
@@ -60,7 +60,7 @@ export const orchestratorOptionsSchema = z.object({
 export const orchestratorInputSchema = z.object({
   query: z.string().min(1, "Query cannot be empty"),
   context: z.record(z.unknown()).optional().default({}),
-  options: orchestratorOptionsSchema && orchestratorOptionsSchema.optional().default({})
+  options: orchestratorOptionsSchema.optional().default({})
 });
 
 /**
@@ -166,7 +166,7 @@ export const orchestratorOutputSchema = z.object({
   data: orchestratorOutputDataSchema,
   error: z.string().optional(),
   fromCache: z.boolean().optional().default(false),
-  metadata: orchestratorMetadataSchema && orchestratorMetadataSchema.optional()
+  metadata: orchestratorMetadataSchema.optional()
 });
 
 /**
@@ -175,10 +175,10 @@ export const orchestratorOutputSchema = z.object({
 export const orchestratorStreamOutputSchema = z.object({
   success: z.boolean(),
   content: z.string().optional(),
-  data: orchestratorOutputDataSchema && orchestratorOutputDataSchema.optional(),
+  data: orchestratorOutputDataSchema.optional(),
   error: z.string().optional(),
   done: z.boolean(),
-  metadata: orchestratorMetadataSchema && orchestratorMetadataSchema.optional(),
+  metadata: orchestratorMetadataSchema.optional(),
   chunkIndex: z.number().optional()
 });
 

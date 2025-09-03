@@ -15,9 +15,6 @@
       "@dulce/gcp": [
         "libs/gcp/src/index.ts"
       ],
-      "@dulce-de-saigon/security": [
-        "libs/security/src/index.ts"
-      ],
       "@dulce/*": [
         "libs/*"
       ],
@@ -50,9 +47,6 @@
       ],
       "@dulce/build-tools": [
         "libs/build-tools/src/index.ts"
-      ],
-      "@dulce/gcp/*": [
-        "libs/gcp/src/*"
       ],
       "@dulce/mcp": [
         "libs/mcp/src/index.ts"

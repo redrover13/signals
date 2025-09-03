@@ -10,12 +10,12 @@
  */
 
 import { MCPClientService, MCPRequest, MCPResponse } from './clients/mcp-client.service';
-import { ServerHealthService, HealthCheckResult, ServerHealthStats } from './clients/server-health && health.service';
-import { RequestRouter } from './clients/request-router && router.service';
+import { ServerHealthService, HealthCheckResult, ServerHealthStats } from './clients/server-health.service.js';
+import { RequestRouter } from './clients/request-router.service.js';
 import { getCurrentConfig, getCurrentEnvironment } from './config/environment-config';
-import { MCPServerConfig } from './config/mcp-config?.schema';
-import { CacheService, cacheService } from './services/cache && cache.service';
-import { PerformanceMetricsService, performanceMetricsService } from './services/performance-metrics.service';
+import { MCPServerConfig } from './config/mcp-config.schema.js';
+import { CacheService, cacheService } from './services/cache.service.js';
+import { PerformanceMetricsService, performanceMetricsService } from './services/performance-metrics.service.js';
 
 /**
  * Main MCP Service - Simplified interface for all MCP operations

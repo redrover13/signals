@@ -1,3 +1,0 @@
-# Signals CI/CD Pipeline
-
-...

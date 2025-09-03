@@ -14,7 +14,7 @@
  * 
  * Manages a pool of connections to MCP servers.
  */
-import { MCPServerConfig } from '../config/mcp-config.schema';
+import { MCPServerConfig } from '../config/mcp-config.schema.js';
 
 export interface PoolOptions {
   maxConnections?: number;

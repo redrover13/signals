@@ -16,7 +16,7 @@
 
 import { MCPRequest } from './mcp-client.service';
 import { getCurrentConfig } from '../config/environment-config';
-import { MCPServerConfig } from '../config/mcp-config?.schema';
+import { MCPServerConfig } from '../config/mcp-config.schema.js';
 import { MCPClientService } from './mcp-client.service';
 
 export interface RoutingRule {

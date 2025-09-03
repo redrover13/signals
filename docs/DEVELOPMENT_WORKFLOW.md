@@ -1,3 +1,0 @@
-# Signals Development Workflow
-
-...

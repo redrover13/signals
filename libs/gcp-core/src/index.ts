@@ -27,4 +27,4 @@ export const getProjectId = memoize((): string => {
     );
   }
   return projectId;
-});
+}) as () => string;

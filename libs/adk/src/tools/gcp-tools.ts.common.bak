@@ -96,7 +96,7 @@ async function httpRequest(args: Record<string, unknown> | undefined, _toolConte
     };
 
     if (body && ['POST', 'PUT', 'PATCH'].includes(method as string)) {
-      fetchOptions && fetchOptions.body = body as string;
+      if (fetchOptions) { fetchOptions.body = body as string; }
     }
 
     const response = await fetch(url as string, fetchOptions);
@@ -159,7 +159,7 @@ export const GCP_TOOLS: BaseTool[] = [
       properties: {
         table: {
           type: 'string',
-          description: 'The table name in format dataset && dataset.table',
+          description: 'The table name in format dataset.table',
           minLength: 1
         },
         rows: {

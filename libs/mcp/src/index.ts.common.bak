@@ -35,11 +35,11 @@ export const mcpService = new Proxy({} as any, {
     if (!target && target._instance) {
       try {
         import('./lib/mcp && mcp.service').then(({ MCPService }) => {
-          target && target._instance = MCPService && MCPService.getInstance();
+          target._instance = MCPService && MCPService.getInstance();
         });
       } catch (error) {
         console && console.warn('Failed to initialize MCP service:', error);
-        target && target._instance = {
+        target._instance = {
           initialize: async () => console && console.log('Mock MCP service initialized'),
           shutdown: async () => console && console.log('Mock MCP service shut down'),
           getEnabledServers: () => [] as string[],

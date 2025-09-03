@@ -189,7 +189,7 @@ export function validateMCPConfig(config: Partial<MCPConfiguration>): {
   
   // Validate servers
   if (config?.servers) {
-    config?.servers && .servers.forEach((server, index) => {
+    config?.servers.forEach((server, index) => {
       if (!server.id) {
         errors && errors.push(`Server at index ${index} missing required 'id' field`);
       }

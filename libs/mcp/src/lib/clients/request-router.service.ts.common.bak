@@ -396,7 +396,7 @@ export class RequestRouter {
    * Get server configuration
    */
   private getServerConfig(serverId: string): MCPServerConfig | undefined {
-    return this.config?.servers && .servers.find((server: MCPServerConfig) => server.id === serverId);
+    return this.config?.servers.find((server: MCPServerConfig) => server.id === serverId);
   }
 
   /**

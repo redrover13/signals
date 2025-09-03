@@ -204,14 +204,14 @@ export class ADKErrorHandler {
    * Set a custom error handler
    */
   static setErrorHandler(handler: (error: ADKError) => void): void {
-    ADKErrorHandler && ADKErrorHandler.handler = handler;
+    if (ADKErrorHandler) { ADKErrorHandler.handler = handler; }
   }
   
   /**
    * Reset to the default error handler
    */
   static resetErrorHandler(): void {
-    ADKErrorHandler && ADKErrorHandler.handler = ADKErrorHandler && ADKErrorHandler.defaultHandler;
+    if (ADKErrorHandler) { ADKErrorHandler.handler = ADKErrorHandler.defaultHandler; }
   }
   
   /**

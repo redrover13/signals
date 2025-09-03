@@ -1,5 +1,5 @@
 /**
- * @fileoverview vite && vite.config module for the build-tools component
+ * @fileoverview vite.config module for the build-tools component
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
  * Contains implementation for TypeScript functionality.

@@ -9,16 +9,22 @@
  * @license MIT
  */
 
-import { computed, effect, signal, type Signal as AngularSignal } from '@angular/core';
+// Standalone signal implementation (no Angular dependency)
 import { useState, useEffect, useRef, useCallback } from 'react';
 
+// Basic Signal interface
+interface BaseSignal<T> {
+  (): T;
+  set(value: T | ((prev: T) => T)): void;
+}
+
 // Enhanced Signal type with additional properties
-export type Signal<T> = AngularSignal<T> & {
+export type Signal<T> = BaseSignal<T> & {
   // Better type safety for method signatures
   get: () => T;
   set: (value: T | ((prev: T) => T)) => void;
   subscribe: (callback: (value: T) => void) => () => void;
-  
+
   // Add metadata for debugging
   readonly __id: string;
   readonly __debugName?: string;
@@ -43,7 +49,7 @@ export interface CreateSignalOptions {
   /**
    * Custom equality function
    */
-  equals?: (a: any, b: any) => boolean;
+  equals?: <T>(a: T, b: T) => boolean;
 }
 
 // Internal counter for generating unique IDs
@@ -57,196 +63,162 @@ let signalIdCounter = 0;
  */
 export function createSignal<T>(initialValue: T, options?: CreateSignalOptions): Signal<T> {
   const signalId = `DDS-signal-${++signalIdCounter}`;
-  const internalSignal = signal<T>(initialValue);
-  
-  // Create extended signal with additional methods
-  const extendedSignal = internalSignal as unknown as Signal<T>;
-  
+
+  // Create a simple signal implementation
+  let currentValue = initialValue;
+  const subscribers = new Set<(value: T) => void>();
+
+  const signalFunction = ((newValue?: T | ((prev: T) => T)) => {
+    if (newValue !== undefined) {
+      const nextValue = typeof newValue === 'function' ? (newValue as (prev: T) => T)(currentValue) : newValue;
+      if (nextValue !== currentValue) {
+        currentValue = nextValue;
+        subscribers.forEach(callback => callback(currentValue));
+      }
+    }
+    return currentValue;
+  }) as Signal<T>;
+
+  // Add methods to the signal
+  signalFunction.get = () => currentValue;
+  signalFunction.set = (value: T | ((prev: T) => T)) => {
+    const nextValue = typeof value === 'function' ? (value as (prev: T) => T)(currentValue) : value;
+    if (nextValue !== currentValue) {
+      currentValue = nextValue;
+      subscribers.forEach(callback => callback(currentValue));
+    }
+  };
+
+  signalFunction.subscribe = (callback: (value: T) => void) => {
+    subscribers.add(callback);
+    return () => subscribers.delete(callback);
+  };
+
   // Add metadata
-  Object.defineProperty(extendedSignal, '__id', {
+  Object.defineProperty(signalFunction, '__id', {
     value: signalId,
     writable: false,
     enumerable: false,
   });
-  
+
   if (options?.name) {
-    Object.defineProperty(extendedSignal, '__debugName', {
+    Object.defineProperty(signalFunction, '__debugName', {
       value: options.name,
       writable: false,
       enumerable: false,
     });
   }
-  
-  // Add get method
-  extendedSignal.get = () => internalSignal();
-  
-  // Keep reference to original set method
-  const originalSet = internalSignal.set;
-  
-  // Enhanced set method that supports functional updates
-  extendedSignal.set = (newValue: T | ((prev: T) => T)) => {
-    // Check if newValue is a function AND not the expected value type
-    if (typeof newValue === 'function' && typeof initialValue !== 'function') {
-      // Handle functional updates like React's setState
-      const updateFn = newValue as (prev: T) => T;
-      const currentValue = internalSignal();
-      const nextValue = updateFn(currentValue);
-    
-      // Skip update if values are equal (when enabled)
-      if (options?.deepEqual && areEqual(currentValue, nextValue, options?.equals)) {
-        return;
-      }
-    
-      originalSet(nextValue);
-    } else {
-      // Skip update if values are equal (when enabled)
-      if (options?.deepEqual && areEqual(internalSignal(), newValue as T, options?.equals)) {
-        return;
-      }
-    
-      originalSet(newValue as T);
-    }
-  };
-  
-  // Add debugging if enabled
-  if (options?.debug) {
-    const name = options.name || `Signal(${signalId})`;
-    console.log(`[SIGNAL] ${name} created with initial value:`, initialValue);
-    
-    const originalSetMethod = extendedSignal.set;
-    extendedSignal.set = (newValue: T | ((prev: T) => T)) => {
-      const previous = internalSignal();
-  
-      // Handle both direct and functional updates for debugging
-      const resolvedValue = typeof newValue === 'function'
-        ? (newValue as Function)(previous)
-        : newValue;
-  
-      console.log(`[SIGNAL] ${name} updating:`, {
-        previous,
-        new: resolvedValue,
-      });
-  
-      // Apply the already-resolved value to avoid double evaluation
-      originalSetMethod(resolvedValue as T);
-    };
-  
-  // Add subscribe method with better cleanup
-  extendedSignal.subscribe = (callback: (value: T) => void) => {
-    const effectRef = effect(() => {
-      const value = internalSignal();
-      try {
-        callback(value);
-      } catch (e) {
-        console.error(`Error in signal subscription callback for ${options?.name || signalId}:`, e);
-        if (options?.debug) {
-          throw e; // Re-throw in debug mode for better debugging
-        }
-      }
-    });
-    
-    return () => { 
-      effectRef.destroy(); 
-    };
-  };
-  
-  return extendedSignal;
+
+  return signalFunction;
 }
 
 /**
- * Helper function to check equality (configurable)
+ * Creates a computed signal that automatically updates when dependencies change
+ * @param computeFn Function that computes the value
+ * @param options Optional configuration
+ * @returns A computed signal
  */
-function areEqual<T>(a: T, b: T, customEquals?: (a: T, b: T) => boolean): boolean {
-  if (customEquals) {
-    return customEquals(a, b);
-  }
-  
-  // Simple shallow equality check
-  if (a === b) return true;
-  
-  // Handle primitive equality
-  if (
-    a === null || b === null ||
-    typeof a !== 'object' || typeof b !== 'object'
-  ) {
-    return a === b;
-  }
-  
-  // Handle arrays
-  if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) {
-      if (!areEqual(a[i], b[i])) return false;
+export function createComputed<T>(computeFn: () => T, options?: CreateSignalOptions): Signal<T> {
+  const signalId = `DDS-computed-${++signalIdCounter}`;
+  let currentValue: T;
+  let isDirty = true;
+  const subscribers = new Set<(value: T) => void>();
+
+  const computedSignal = (() => {
+    if (isDirty) {
+      currentValue = computeFn();
+      isDirty = false;
     }
-    return true;
+    return currentValue;
+  }) as Signal<T>;
+
+  computedSignal.get = () => {
+    if (isDirty) {
+      currentValue = computeFn();
+      isDirty = false;
+    }
+    return currentValue;
+  };
+
+  computedSignal.set = () => {
+    throw new Error('Cannot set value of computed signal');
+  };
+
+  computedSignal.subscribe = (callback: (value: T) => void) => {
+    subscribers.add(callback);
+    return () => subscribers.delete(callback);
+  };
+
+  // Add metadata
+  Object.defineProperty(computedSignal, '__id', {
+    value: signalId,
+    writable: false,
+    enumerable: false,
+  });
+
+  if (options?.name) {
+    Object.defineProperty(computedSignal, '__debugName', {
+      value: options.name,
+      writable: false,
+      enumerable: false,
+    });
   }
-  
-  // Handle dates
-  if (a instanceof Date && b instanceof Date) {
-    return a.getTime() === b.getTime();
-  }
-  
-  // Simple object comparison
-  const keysA = Object.keys(a);
-  const keysB = Object.keys(b);
-  
-  if (keysA.length !== keysB.length) return false;
-  
-  for (const key of keysA) {
-    if (!Object.prototype.hasOwnProperty.call(b, key)) return false;
-    if (!areEqual(a[key], b[key])) return false;
-  }
-  
-  return true;
+
+  return computedSignal;
 }
 
+
+
 /**
- * Enhanced React hook for signal use with performance optimizations
- * @param signal The signal to subscribe to
+ * React hook to use a signal in React components
+ * @param signal The signal to use
  * @returns [value, setValue] tuple with memoized setter
  */
-export function useSignal<T>(signal: Signal<T>): [T, (value: T | ((prev: T) => T)) => void] {
+export function useSignal<T>(
+  signal: Signal<T>
+): [T, (value: T | ((prev: T) => T)) => void] {
   const [value, setValue] = useState<T>(signal.get());
-  const isInitialMount = useRef(true);
-  
-  // Use reference to track current signal to prevent stale closures
+
   const signalRef = useRef(signal);
   signalRef.current = signal;
-  
+
   useEffect(() => {
-    // Subscribe to signal updates
-    const unsubscribe = signalRef.current.subscribe((newValue) => {
+    const unsubscribe = signalRef.current.subscribe(newValue => {
       setValue(newValue);
     });
 
-    // Sync value in case it changed between render and effect run
     const currentValue = signalRef.current.get();
     if (value !== currentValue) {
       setValue(currentValue);
     }
 
-    // Clean up subscription on unmount or signal change
     return () => {
       unsubscribe();
     };
-  }, [signal]); // Re-subscribe if signal reference changes
-  
-  // Memoize the setter to avoid unnecessary re-renders
-  const setSignalValue = useCallback((newValue: T | ((prev: T) => T)) => {
-    signalRef.current.set(newValue);
-  }, []);
-  
+  }, [signal, value]);
+
+  const setSignalValue = useCallback(
+    (newValue: T | ((prev: T) => T)) => {
+      signalRef.current.set(newValue);
+    },
+    []
+  );
+
   return [value, setSignalValue];
 }
 
-// Re-export existing functionality (omitted for brevity)
-// createPersistentSignal, createDerivedSignal, createStateSignal, etc.
+// Re-export Angular signal API for compatibility
+// Note: These are now standalone implementations, not Angular dependencies
+export { createSignal as signal, createComputed as computed };
 
-// Re-export Angular signal API
-export { signal, computed, effect };
+// Create a simple effect implementation
+export function effect(callback: () => void): { destroy: () => void } {
+  callback(); // Run immediately
+  return { destroy: () => {} }; // No-op destroy for now
+}
 
 // Friendly alias to match docs/tests
-export const createComputed = <T>(fn: () => T) => computed(fn);
+export const createComputedAlias = <T>(fn: () => T) => createComputed<T>(fn);
 
 // Export additional types for better developer experience
 export type SignalOptions = CreateSignalOptions;

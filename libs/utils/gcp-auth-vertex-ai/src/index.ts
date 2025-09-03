@@ -9,4 +9,4 @@
  * @license MIT
  */
 
-export * from './lib/gcp-auth-vertex-ai';
+export * from './lib/gcp-auth-vertex-ai.js';

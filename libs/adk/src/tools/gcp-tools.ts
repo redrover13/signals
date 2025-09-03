@@ -9,7 +9,7 @@
  * @license MIT
  */
 
-import { query as bqQuery, insertRows, uploadString } from '@nx-monorepo/gcp';
+import { query as bqQuery, insertRows, uploadString } from '@dulce/gcp';
 import { BaseTool, FunctionTool, ToolContext } from '@waldzellai/adk-typescript';
 
 /**

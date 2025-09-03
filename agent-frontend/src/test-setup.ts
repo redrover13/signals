@@ -18,10 +18,10 @@ const isVitest = typeof vi !== 'undefined';
 // Import the appropriate setup file based on the detected environment
 if (isVitest) {
   console.log('Detected Vitest environment - loading Vitest setup');
-  import('./vitest-setup');
+  import('./vitest-setup.ts');
 } else {
   console.log('Detected Jest environment - loading Jest setup');
-  import('./jest-setup');
+  import('./jest-setup.ts');
 }
 
 // Export common testing utilities and mocks that work in both environments
@@ -101,13 +101,13 @@ Object.defineProperty(window, 'sessionStorage', { value: localStorageMock });
 if (isVitest) {
   // Import Vitest specific setup if needed
   // This ensures proper TypeScript imports for Vitest
-  import('./vitest-specific-setup').catch(e => {
+  import('./vitest-specific-setup.ts').catch(e => {
     console.log('No Vitest specific setup found. This is OK.');
   });
 } else {
   try {
     // Import Jest specific setup if needed
-    import('./jest-specific-setup');
+    import('./jest-specific-setup.ts');
   } catch (e) {
     // This is OK if file doesn't exist
   }

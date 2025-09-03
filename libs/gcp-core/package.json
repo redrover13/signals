@@ -1,5 +1,5 @@
 {
-  "name": "@nx-monorepo/gcp-core",
+  "name": "@dulce/gcp-core",
   "version": "0.0.1",
   
   "main": "./src/index.ts",

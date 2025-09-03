@@ -20,9 +20,7 @@
         "outputPath": "dist/apps/api",
         "main": "apps/api/src/main.ts",
         "tsConfig": "apps/api/tsconfig.app.json",
-        "assets": [
-          { "glob": "**/*", "input": "apps/api/src/routes", "output": "routes" }
-        ]
+        "assets": ["apps/api/src/routes"]
       },
       "configurations": {
         "production": {

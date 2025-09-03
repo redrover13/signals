@@ -14,7 +14,6 @@
  * 
  * Manages a pool of connections to MCP servers.
  */
-import { Injectable } from '@angular/core';
 import { MCPServerConfig } from '../config/mcp-config.schema';
 
 export interface PoolOptions {
@@ -60,9 +59,6 @@ export interface ConnectionPoolStats {
   averageLifetime: number;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
 export class ConnectionPoolService {
   private pools = new Map<string, PooledConnection[]>();
   private waitingQueues = new Map<string, ConnectionRequest[]>();

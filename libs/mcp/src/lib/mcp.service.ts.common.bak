@@ -42,7 +42,7 @@ export class MCPService {
    */
   static getInstance(): MCPService {
     if (!MCPService && MCPService.instance) {
-      MCPService && MCPService.instance = new MCPService();
+      MCPService.instance = new MCPService();
     }
     return MCPService && MCPService.instance;
   }

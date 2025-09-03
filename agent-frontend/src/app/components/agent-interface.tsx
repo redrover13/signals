@@ -10,7 +10,7 @@
  */
 
 import React, { useState, useCallback, memo } from 'react';
-import { MainAgent } from 'agents-sdk';
+import { MainAgent } from '@dulce/agents-sdk';
 import { AgentConfig, AgentResponse } from '../../types/firebase';
 import styles from './agent-interface.module.css';
 
@@ -47,11 +47,11 @@ export const AgentInterface: React.FC<AgentInterfaceProps> = memo(({ config }) =
   }, []);
 
   return (
-    <div className={styles.agentInterface}>
+    <div className={styles['agentInterface']}>
       <h2>AI Agent Interface</h2>
       <form onSubmit={handleSubmit} aria-label="Agent query form">
-        <div className={styles.inputGroup}>
-          <label htmlFor="agent-query" className={styles.visuallyHidden}>Query</label>
+        <div className={styles['inputGroup']}>
+          <label htmlFor="agent-query" className={styles['visuallyHidden']}>Query</label>
           <textarea
             id="agent-query"
             value={query}
@@ -62,14 +62,14 @@ export const AgentInterface: React.FC<AgentInterfaceProps> = memo(({ config }) =
             disabled={loading}
             aria-describedby="query-instructions"
           />
-          <div id="query-instructions" className={styles.visuallyHidden}>
+          <div id="query-instructions" className={styles['visuallyHidden']}>
             Enter a natural language query to interact with the AI agent
           </div>
         </div>
         <button 
           type="submit" 
           disabled={loading || !query.trim()}
-          className={styles.submitButton}
+          className={styles['submitButton']}
           aria-busy={loading}
         >
           {loading ? 'Processing...' : 'Send Query'}
@@ -77,14 +77,14 @@ export const AgentInterface: React.FC<AgentInterfaceProps> = memo(({ config }) =
       </form>
 
       {response && (
-        <div className={styles.responseSection} aria-live="polite">
+        <div className={styles['responseSection']} aria-live="polite">
           <h3>Response:</h3>
-          <div className={`${styles.response} ${response.success ? styles.success : styles.error}`}>
+          <div className={`${styles['response']} ${response.success ? styles['success'] : styles['error']}`}>
             {response.success ? (
               <div>
                 <p><strong>Success!</strong></p>
                 {response.data && (
-                  <pre className={styles.jsonDisplay}>{JSON.stringify(response.data, null, 2)}</pre>
+                  <pre className={styles['jsonDisplay']}>{JSON.stringify(response.data, null, 2)}</pre>
                 )}
                 {response.message && <p>{response.message}</p>}
               </div>

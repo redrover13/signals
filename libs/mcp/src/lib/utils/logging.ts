@@ -10,6 +10,27 @@
  */
 
 /**
+ * @fileovervimport { BehaviorSubject, Observable } from 'rxjs';
+
+// Define log levels
+export enum LogLevel {
+  DEBUG = 0,
+  INFO = 1,
+  WARN = 2,
+  ERROR = 3,
+  FATAL = 4,
+  NONE = 5
+}module for the utils component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
  * Logging utility for MCP
  * 
  * Provides a flexible logging system with multiple levels, 
@@ -146,9 +167,6 @@ export class MemoryLogOutput implements LogOutput {
 }
 
 // Logging service
-@Injectable({
-  providedIn: 'root'
-})
 export class LoggingService {
   private minLevel: LogLevel = LogLevel.INFO;
   private categoryLevels = new Map<string, LogLevel>();

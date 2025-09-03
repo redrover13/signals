@@ -9,4 +9,4 @@
  * @license MIT
  */
 
-export * from './lib/ui-components';
+export * from './lib/ui-components.js';

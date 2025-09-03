@@ -12,18 +12,18 @@
 import Fastify, { FastifyInstance, FastifyRequest } from 'fastify';
 import { runAgent } from "@dulce-de-saigon/agents-lib";
 import { registerSecurity, loadAppConfig } from "@dulce-de-saigon/security";
-import { VertexAIClient, VertexAIClientConfig } from "@nx-monorepo/adk";
-import { WebAnalyticsTracker } from "@nx-monorepo/adk";
-import { EventCategory } from "@nx-monorepo/adk";
-import { createConfigFromEnv } from "@nx-monorepo/adk";
-import { mcpService } from '@nx-monorepo/mcp';
+import { VertexAIClient, VertexAIClientConfig } from "@dulce/adk";
+import { WebAnalyticsTracker } from "@dulce/adk";
+import { EventCategory } from "@dulce/adk";
+import { createConfigFromEnv } from "@dulce/adk";
+import { mcpService } from '@dulce/mcp';
 import { 
   initializeOpenTelemetry, 
   withSpan, 
   logEvent, 
   instrument,
   getTracer 
-} from '@nx-monorepo/utils/monitoring';
+} from '@dulce/utils/monitoring';
 import { SpanKind } from '@opentelemetry/api';
 
 // Initialize OpenTelemetry before any other imports

@@ -10,5 +10,5 @@
  */
 
 // ESM exports
-export { getConfig, getServerConfig, getWebConfig, getViteConfig, type Target } from './load && load.js';
-export { serverSchema, webSchema, viteSchema, type ServerConfig, type WebConfig, type ViteConfig } from './schema && schema.js';
+export { getConfig, getServerConfig, getWebConfig, getViteConfig, type Target } from './load';
+export { serverSchema, webSchema, viteSchema, type ServerConfig, type WebConfig, type ViteConfig } from './schema';

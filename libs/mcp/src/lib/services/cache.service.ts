@@ -14,7 +14,6 @@
  * 
  * Provides caching functionality with TTL, LRU eviction, and hierarchical invalidation.
  */
-import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -42,9 +41,6 @@ export interface CacheStats {
   averageAccessTime: number;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
 export class CacheService {
   private cache = new Map<string, CacheEntry<unknown>>();
   private defaultOptions: Required<CacheOptions> = {

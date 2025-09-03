@@ -24,7 +24,7 @@ import {
   withSpan,
   logEvent,
   instrument
-} from '@nx-monorepo/utils/monitoring';
+} from '@dulce/utils/monitoring';
 
 // Initialize OpenTelemetry for Cloud Function
 initializeOpenTelemetry({

@@ -10,7 +10,7 @@
  */
 
 import React from 'react';
-import { SignalsDemo } from '@nx-monorepo/utils/signals/src/demo-components';
+import { SignalsDemo } from '@dulce/utils/signals/src/demo-components';
 
 export function App() {
   return (

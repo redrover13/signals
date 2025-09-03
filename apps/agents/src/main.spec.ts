@@ -21,7 +21,7 @@ jest.mock('gcp-auth', () => ({
 }));
 
 // Mock MCP service
-jest.mock('@nx-monorepo/mcp', () => ({
+jest.mock('@dulce/mcp', () => ({
   mcpService: {
     initialize: jest.fn(),
     getEnabledServers: jest.fn(() => ['test-server'])
@@ -29,7 +29,7 @@ jest.mock('@nx-monorepo/mcp', () => ({
 }));
 
 // Mock Vertex AI client
-jest.mock('@nx-monorepo/adk', () => ({
+jest.mock('@dulce/adk', () => ({
   VertexAIClient: jest.fn().mockImplementation(() => ({
     predict: jest.fn().mockResolvedValue('mock prediction')
   })),

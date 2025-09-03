@@ -9,11 +9,22 @@ const moduleFederationConfig = {
     './Module': './src/remote-entry.ts',
     './SignalsDemo': './src/app/signals-demo/remote-entry.ts',
   },
-  remotes: ['frontend-agents'],
+  // Configure remotes with a development fallback
+  remotes: {
+    'frontend-agents': {
+      external: 'Promise.resolve({})',
+      externalType: 'promise'
+    }
+  },
   shared: (name, config) => {
     // List shared dependencies here to avoid duplicating them
     const sharedLibs = {
-      '@nx-monorepo/utils/signals': {
+      '@dulce/utils/signals': {
+        singleton: true,
+        eager: true,
+        requiredVersion: false,
+      },
+      'agents-sdk': {
         singleton: true,
         eager: true,
         requiredVersion: false,
@@ -28,6 +39,11 @@ const moduleFederationConfig = {
         eager: true,
         requiredVersion: false,
       },
+      'lodash-es': {
+        singleton: true,
+        eager: false,
+        requiredVersion: false,
+      }
     };
 
     return sharedLibs[name] || config.default;

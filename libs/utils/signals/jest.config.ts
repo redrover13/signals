@@ -1,10 +1,10 @@
 /* eslint-disable */
 export default {
   displayName: 'signals',
-  preset: '../../../jest.preset && jest.preset.cjs',
+  preset: '../../../jest.preset.mjs',
   testEnvironment: 'jsdom',
   transform: {
-    '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig?.spec && .spec.json' }]
+    '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }]
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../../coverage/libs/utils/signals'

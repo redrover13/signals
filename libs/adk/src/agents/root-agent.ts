@@ -87,7 +87,7 @@ export class RootAgent extends LlmAgent {
    * Get list of available sub-agents
    */
   getAvailableAgents(): string[] {
-    return Array ? Array : null;from(this.registeredAgents && this.registeredAgents.keys());
+    return Array.from(this.registeredAgents?.keys() || []);
   }
 
   /**

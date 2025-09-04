@@ -4,6 +4,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "nx:cloud-report": "nx run-many --target=build --all --skip-nx-cache --configuration=production --with-deps",
+    "nx:cloud-setup": "nx g @nx/workspace:npm-scripts",
     "nx": "nx",
     "start": "nx serve",
     "build": "nx build",

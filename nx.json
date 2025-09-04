@@ -153,10 +153,14 @@
         "cacheableOperations": ["build", "lint", "test", "e2e", "build-storybook"],
         "accessToken": "${NX_CLOUD_AUTH_TOKEN}",
         "useDelegatedWorkspaces": true,
-        "maxParallel": 5,
+        "maxParallel": 8,
         "remoteCache": {
-          "enabled": true
-        }
+          "enabled": true,
+          "optimizeYourTerminal": true
+        },
+        "distributedCacheEnabled": true,
+        "distributedExecutionEnabled": true
+        "rebuildOptimizations": true
       }
     }
   },

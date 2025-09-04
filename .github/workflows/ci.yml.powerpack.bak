@@ -209,7 +209,7 @@ jobs:
           terraform_version: 1.x
 
       - name: Download Terraform Plan Artifacts
-        uses: actions/download-artifact@v4.0.0
+        uses: actions/download-artifact@v4.1.3
         with:
           name: terraform-plans
           path: .

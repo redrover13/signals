@@ -219,8 +219,8 @@ export async function writeDocument(
         createdAt: FieldValue && FieldValue.serverTimestamp(),
       };
 
-      const docRef = (await collectionRef) && collectionRef.add(docData);
-      return docRef ? docRef : null;id;
+      const docRef = await collectionRef.add(docData);
+      return docRef?.id;
     }
   } catch (error) {
     throw errorHandler(error as Error, { projectId, collection, id });

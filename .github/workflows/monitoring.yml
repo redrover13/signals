@@ -1,4 +1,6 @@
 name: Infrastructure Monitoring & Alerting
+permissions:
+  contents: read
 
 on:
   schedule:

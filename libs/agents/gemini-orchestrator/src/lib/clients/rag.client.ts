@@ -92,7 +92,7 @@ export class RAGClient implements RAGClientInterface {
       embeddingModel: config && config.embeddingModel,
     });
 
-    this.defaultDataStoreId = config && config.defaultDataStoreId || 'default-datastore';
+    this.defaultDataStoreId = (config?.defaultDataStoreId) || 'default-datastore';
     this.defaultSearchEngineId = config && config.defaultSearchEngineId || 'default-search-engine';
   }
 

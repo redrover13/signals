@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "name": "signals-agent-maestro",
+  "description": "Agent Maestro configuration for Signals project",
+  "config": {
+    "mcpServers": [
+      {
+        "id": "github",
+        "name": "GitHub MCP Server",
+        "description": "Integrates with GitHub repositories",
+        "envVar": "GITHUB_PERSONAL_ACCESS_TOKEN"
+      },
+      {
+        "id": "codacy",
+        "name": "Codacy MCP Server",
+        "description": "Integrates with Codacy code quality analysis",
+        "envVar": "CODACY_API_TOKEN"
+      }
+    ],
+    "aiProviders": [
+      {
+        "id": "anthropic",
+        "name": "Anthropic Claude",
+        "apiKey": "${ANTHROPIC_API_KEY}",
+        "baseUrl": "https://api.anthropic.com"
+      }
+    ],
+    "defaultProvider": "anthropic"
+  }
+}

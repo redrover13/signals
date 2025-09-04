@@ -8,6 +8,8 @@
     "start": "nx serve",
     "build": "nx build",
     "test": "nx test",
+    "test:coverage": "nx run-many --target=test --all --coverage",
+    "test:coverage:combine": "./scripts/combine-coverage.sh",
     "lint": "nx run-many --target=lint --all",
     "lint:ci": "nx affected --target=lint --parallel=3 --max-warnings=0",
     "affected": "nx affected --target=build",

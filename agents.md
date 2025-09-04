@@ -165,6 +165,16 @@ GitHub Copilot is configured with:
 - General agent settings via `.github/copilot-agent.yml`
 - Domain-specific instructions in `.github/instructions/` (transitioning to this centralized document)
 
+### Agent Maestro
+
+Agent Maestro is a headless VS Code AI integration that works with the MCP servers in our project:
+
+- **Configuration:** `.agent-maestro.json` and settings in `.vscode/settings.json`
+- **Documentation:** See [AGENT_MAESTRO.md](docs/AGENT_MAESTRO.md) for setup and usage
+- **Example Commands:** See [agent-maestro-examples.js](docs/agent-maestro-examples.js) for example prompts
+- **Integration:** Works with our existing MCP servers (Codacy, Nx, etc.)
+- **Requirements:** Requires environment variables for authentication tokens
+
 ### MCP Servers
 
 The following Model Context Protocol (MCP) servers are configured:

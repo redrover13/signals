@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+          run_install: false
+      
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Lint
+        run: pnpm lint:ci
+      
+      - name: Build
+        run: pnpm build
+      
+      - name: Test with Coverage
+        run: pnpm nx run-many --target=test --all --coverage
+      
+      - name: Create combined coverage report
+        run: |
+          mkdir -p ./coverage/combined
+          npx nyc merge ./coverage ./coverage/combined/coverage.json
+          npx nyc report --reporter=lcov --report-dir=./coverage/combined --temp-dir=./coverage/combined
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./coverage/combined
+          fail_ci_if_error: false
+          verbose: true

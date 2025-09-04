@@ -1,0 +1,57 @@
+codecov:
+  require_ci_to_pass: true
+  notify:
+    wait_for_ci: true
+  max_report_age: 24h
+
+coverage:
+  precision: 2
+  round: down
+  range: "70...90"
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 2%
+        base: auto
+        if_ci_failed: error
+        informational: false
+        only_pulls: false
+    patch:
+      default:
+        target: auto
+        threshold: 2%
+        base: auto
+        if_ci_failed: error
+        only_pulls: true
+    changes: false
+
+parsers:
+  gcov:
+    branch_detection:
+      conditional: true
+      loop: true
+      method: false
+      macro: false
+
+comment:
+  layout: "reach,diff,flags,files,footer"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+  after_n_builds: 1
+  show_carryforward_flags: true
+
+ignore:
+  - "**/*.spec.ts"
+  - "**/*.test.ts"
+  - "**/test/**"
+  - "**/tests/**"
+  - "**/e2e/**"
+  - "**/*.d.ts"
+  - "**/mock/**"
+  - "**/mocks/**"
+  - "**/jest.config.ts"
+  - "**/jest.setup.ts"
+  - "**/coverage/**"

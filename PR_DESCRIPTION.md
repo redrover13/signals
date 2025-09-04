@@ -16,6 +16,9 @@ This PR provides a comprehensive review of the TypeScript and Nx environment con
 ### Fixes
 - Fixed syntax error in nx.json (missing comma)
 - Added scripts to package.json for running analysis tools
+- Updated all GitHub workflows to use pnpm version 10.0.0 to match package.json
+- Fixed GitHub workflows with missing pnpm store path steps
+- Created automation script (fix-workflows.sh) to ensure consistent workflow configurations
 
 ## 🚀 How to Use
 

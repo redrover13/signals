@@ -10,11 +10,9 @@
  */
 
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
-// Cache clients to avoid creating multiple instances
-const clientCache = new Map<string, SecretManagerServiceClient>();
 
 // Cache clients to avoid creating multiple instances
-const clientCache = new Map<string, any>();
+const clientCache = new Map<string, SecretManagerServiceClient>();
 
 /**
  * Get Secret Manager client

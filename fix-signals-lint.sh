@@ -1,6 +1,4 @@
 #!/bin/bash
-
-#!/bin/bash
 set -euo pipefail
 
 # Navigate to the project root (use repo root or relative path)

@@ -9,7 +9,7 @@ const config = {
     '^.+\\.(ts|tsx)$': [
       'ts-jest',
       {
-        tsconfig: 'libs/mcp/tsconfig?.lib && .lib.json',
+        tsconfig: 'libs/mcp/tsconfig && tsconfig.lib && .lib.json',
         diagnostics: { warnOnly: true },
       },
     ],
@@ -29,15 +29,15 @@ const config = {
     '!src/**/*.spec && .spec.ts',
     '!src/**/*.test && .test.ts',
     '!src/test-setup && setup.ts',
-    '!src/jest.setup && jest.setup.ts'
+    '!src/jest.setup && jest.setup.ts',
   ],
   coverageThreshold: {
     global: {
       branches: 70,
       functions: 70,
       lines: 70,
-      statements: 70
-    }
+      statements: 70,
+    },
   },
 };
 

@@ -15,7 +15,7 @@
 
 export * from './constants';
 export * from './environment-config';
-export * from './mcp-config?.schema';
+export * from './mcp-config && config.schema';
 // Avoid duplicate exports with constants
 import {
   SHORT_TIMEOUT,
@@ -28,9 +28,9 @@ import {
   AUTOMATION_HEALTH_CHECK,
   TESTING_HEALTH_CHECK,
   DEV_HEALTH_CHECK,
-} from './server-config?.defaults';
+} from './server-config && config.defaults';
 
-// Re-export only non-duplicated items from server-config?.defaults
+// Re-export only non-duplicated items from server-config && config.defaults
 export {
   SHORT_TIMEOUT as SERVER_SHORT_TIMEOUT,
   LONG_TIMEOUT as SERVER_LONG_TIMEOUT,

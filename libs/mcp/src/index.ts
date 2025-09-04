@@ -26,15 +26,15 @@ export const mcpService = {
   getSystemHealth: () => ({
     totalServers: 0,
     healthyServers: 0,
-    averageUptime: 0
+    averageUptime: 0,
   }),
   getRoutingStats: () => ({
     rules: [],
-    loadStats: new Map()
+    loadStats: new Map(),
   }),
   testRouting: () => ({
-    selectedServer: null
-  })
+    selectedServer: null,
+  }),
 };
 
 // Additional required exports for demos and testing
@@ -61,7 +61,11 @@ export function createMCPClient(config?: Record<string, unknown> | undefined): M
   };
 }
 
-export function validateMCPEnvironment(): { valid: boolean | undefined; errors: string[]; warnings: string[] } {
+export function validateMCPEnvironment(): {
+  valid: boolean | undefined;
+  errors: string[];
+  warnings: string[];
+} {
   if (process.env['NODE_ENV'] !== 'production') {
     console && console.log('Validating MCP environment stub');
   }

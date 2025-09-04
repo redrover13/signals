@@ -43,7 +43,9 @@ class MCPOrchestrator extends EventEmitter {
       return this.config;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        throw new Error(`Invalid configuration: ${error.errors.map(e => `${e.path.join('.')} - ${e.message}`).join(', ')}`);
+        throw new Error(
+          `Invalid configuration: ${error.errors.map((e) => `${e.path.join('.')} - ${e.message}`).join(', ')}`,
+        );
       }
       throw new Error(`Failed to load config from ${this.configPath}: ${error.message}`);
     }
@@ -80,7 +82,7 @@ class MCPOrchestrator extends EventEmitter {
       const process = spawn(config.command, config.args || [], {
         stdio: ['pipe', 'pipe', 'pipe'],
         env: { ...process.env, ...config.env },
-        cwd: config.cwd || process.cwd()
+        cwd: config.cwd || process.cwd(),
       });
 
       const server = {
@@ -90,7 +92,7 @@ class MCPOrchestrator extends EventEmitter {
         config,
         status: 'starting',
         startTime: Date.now(),
-        pid: process.pid
+        pid: process.pid,
       };
 
       // Monitor process events
@@ -134,7 +136,11 @@ class MCPOrchestrator extends EventEmitter {
         }, 10000);
 
         const onOutput = (output) => {
-          if (output.includes('running') || output.includes('started') || output.includes('listening')) {
+          if (
+            output.includes('running') ||
+            output.includes('started') ||
+            output.includes('listening')
+          ) {
             clearTimeout(timeout);
             server.status = 'running';
             resolve();
@@ -142,7 +148,7 @@ class MCPOrchestrator extends EventEmitter {
         };
 
         this.once('serverOutput', onOutput);
-        
+
         // For immediate resolution if no output expected
         setTimeout(() => {
           clearTimeout(timeout);
@@ -153,7 +159,6 @@ class MCPOrchestrator extends EventEmitter {
 
       this.servers.set(name, server);
       console.log(`✅ Server "${name}" started (PID: ${process.pid})`);
-
     } else if (config.type === 'http') {
       // HTTP servers are external, just validate connectivity
       const server = {
@@ -161,9 +166,9 @@ class MCPOrchestrator extends EventEmitter {
         type: config.type,
         config,
         status: 'external',
-        startTime: Date.now()
+        startTime: Date.now(),
       };
-      
+
       this.servers.set(name, server);
       console.log(`✅ HTTP server "${name}" registered`);
     }
@@ -177,11 +182,11 @@ class MCPOrchestrator extends EventEmitter {
     this.isRunning = false;
 
     const stopPromises = Array.from(this.servers.values())
-      .filter(server => server.process)
-      .map(server => this.stopServer(server.name));
+      .filter((server) => server.process)
+      .map((server) => this.stopServer(server.name));
 
     await Promise.allSettled(stopPromises);
-    
+
     this.servers.clear();
     console.log('✅ All MCP servers stopped');
     this.emit('serversStopped');
@@ -219,9 +224,9 @@ class MCPOrchestrator extends EventEmitter {
       orchestrator: {
         running: this.isRunning,
         serverCount: this.servers.size,
-        configSource: this.configPath
+        configSource: this.configPath,
       },
-      servers: {}
+      servers: {},
     };
 
     for (const [name, server] of this.servers) {
@@ -231,7 +236,7 @@ class MCPOrchestrator extends EventEmitter {
         pid: server.pid,
         uptime: server.startTime ? Date.now() - server.startTime : 0,
         error: server.error,
-        exitCode: server.exitCode
+        exitCode: server.exitCode,
       };
     }
 
@@ -296,17 +301,17 @@ async function main() {
         // Keep process alive
         await new Promise(() => {});
         break;
-        
+
       case 'status':
         await orchestrator.loadConfig();
         const status = orchestrator.getStatus();
         console.log(JSON.stringify(status, null, 2));
         break;
-        
+
       case 'stop':
         await orchestrator.stopServers();
         break;
-        
+
       default:
         console.log(`
 MCP Server Orchestrator

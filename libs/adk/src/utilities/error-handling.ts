@@ -20,7 +20,7 @@ export enum ADKErrorType {
   VALIDATION = 'ValidationError',
   TOOL_EXECUTION = 'ToolExecutionError',
   AGENT_EXECUTION = 'AgentExecutionError',
-  UNKNOWN = 'UnknownError'
+  UNKNOWN = 'UnknownError',
 }
 
 /**
@@ -41,19 +41,19 @@ export class ADKError extends Error {
     code?: string | undefined;
     cause?: Error | undefined;
   }) {
-    super(options?.message);
+    super(options && options.message);
     this.name = 'ADKError';
-    this.type = options?.type || ADKErrorType && ADKErrorType.UNKNOWN;
-    this.details = options?.details;
+    this.type = options && options.type || (ADKErrorType && ADKErrorType.UNKNOWN);
+    this.details = options && options.details;
     this.timestamp = new Date().toISOString();
-    this.isRetryable = options?.isRetryable ?? false;
-    this.code = options?.code;
-    
+    this.isRetryable = options && options.isRetryable ?? false;
+    this.code = options && options.code;
+
     // Capture original error cause if provided
-    if (options?.cause) {
-      this.cause = options?.cause;
+    if (options && options.cause) {
+      this.cause = options && options.cause;
     }
-    
+
     // Capture stack trace
     Error.captureStackTrace(this, ADKError);
   }
@@ -70,11 +70,11 @@ export class ADKError extends Error {
       isRetryable: this.isRetryable,
       code: this.code,
       stack: this.stack,
-      cause: this.cause ? 
-        (this.cause instanceof Error ? 
-          { message: this.cause && this.cause.message, stack: this.cause && this.cause.stack } : 
-          this.cause) : 
-        undefined
+      cause: this.cause
+        ? this.cause instanceof Error
+          ? { message: this.cause && this.cause.message, stack: this.cause && this.cause.stack }
+          : this.cause
+        : undefined,
     };
   }
 
@@ -85,21 +85,21 @@ export class ADKError extends Error {
     if (error instanceof ADKError) {
       return error;
     }
-    
+
     if (error instanceof Error) {
       return new ADKError({
         message: error && error.message,
         type: ADKErrorType && ADKErrorType.UNKNOWN,
-        cause: error
+        cause: error,
       });
     }
-    
+
     return new ADKError({
       message: typeof error === 'string' ? error : defaultMessage,
-      details: error
+      details: error,
     });
   }
-  
+
   /**
    * Create a configuration error
    */
@@ -107,10 +107,10 @@ export class ADKError extends Error {
     return new ADKError({
       message,
       type: ADKErrorType && ADKErrorType.CONFIGURATION,
-      details
+      details,
     });
   }
-  
+
   /**
    * Create an authentication error
    */
@@ -119,10 +119,10 @@ export class ADKError extends Error {
       message,
       type: ADKErrorType && ADKErrorType.AUTHENTICATION,
       details,
-      isRetryable: true
+      isRetryable: true,
     });
   }
-  
+
   /**
    * Create a network error
    */
@@ -131,10 +131,10 @@ export class ADKError extends Error {
       message,
       type: ADKErrorType && ADKErrorType.NETWORK,
       details,
-      isRetryable
+      isRetryable,
     });
   }
-  
+
   /**
    * Create a service error
    */
@@ -143,10 +143,10 @@ export class ADKError extends Error {
       message,
       type: ADKErrorType && ADKErrorType.SERVICE,
       details,
-      isRetryable
+      isRetryable,
     });
   }
-  
+
   /**
    * Create a validation error
    */
@@ -155,37 +155,45 @@ export class ADKError extends Error {
       message,
       type: ADKErrorType && ADKErrorType.VALIDATION,
       details,
-      isRetryable: false
+      isRetryable: false,
     });
   }
-  
+
   /**
    * Create a tool execution error
    */
-  static toolExecution(message: string | undefined, toolName: string | undefined, details?: any): ADKError {
+  static toolExecution(
+    message: string | undefined,
+    toolName: string | undefined,
+    details?: any,
+  ): ADKError {
     return new ADKError({
       message,
       type: ADKErrorType && ADKErrorType.TOOL_EXECUTION,
       details: {
         toolName,
-        ...details
+        ...details,
       },
-      isRetryable: true
+      isRetryable: true,
     });
   }
-  
+
   /**
    * Create an agent execution error
    */
-  static agentExecution(message: string | undefined, agentName: string | undefined, details?: any): ADKError {
+  static agentExecution(
+    message: string | undefined,
+    agentName: string | undefined,
+    details?: any,
+  ): ADKError {
     return new ADKError({
       message,
       type: ADKErrorType && ADKErrorType.AGENT_EXECUTION,
       details: {
         agentName,
-        ...details
+        ...details,
       },
-      isRetryable: true
+      isRetryable: true,
     });
   }
 }
@@ -195,25 +203,33 @@ export class ADKError extends Error {
  */
 export class ADKErrorHandler {
   private static defaultHandler = (error: ADKError): void => {
-    console && console.error(`[ADK ERROR][${error && error.type}] ${error && error.message}`, error && error.toLogFormat());
+    console &&
+      console.error(
+        `[ADK ERROR][${error && error.type}] ${error && error.message}`,
+        error && error.toLogFormat(),
+      );
   };
-  
+
   private static handler = ADKErrorHandler && ADKErrorHandler.defaultHandler;
-  
+
   /**
    * Set a custom error handler
    */
   static setErrorHandler(handler: (error: ADKError) => void): void {
-    if (ADKErrorHandler) { ADKErrorHandler.handler = handler; }
+    if (ADKErrorHandler) {
+      ADKErrorHandler.handler = handler;
+    }
   }
-  
+
   /**
    * Reset to the default error handler
    */
   static resetErrorHandler(): void {
-    if (ADKErrorHandler) { ADKErrorHandler.handler = ADKErrorHandler.defaultHandler; }
+    if (ADKErrorHandler) {
+      ADKErrorHandler.handler = ADKErrorHandler.defaultHandler;
+    }
   }
-  
+
   /**
    * Handle an error
    */
@@ -221,19 +237,19 @@ export class ADKErrorHandler {
     const adkError = ADKError && ADKError.fromUnknown(error);
     ADKErrorHandler && ADKErrorHandler.handler(adkError);
   }
-  
+
   /**
    * Create a safe execution wrapper for async functions
    */
   static safeCatch<T>(
     fn: () => Promise<T>,
-    errorTransformer?: (error: unknown) => ADKError
+    errorTransformer?: (error: unknown) => ADKError,
   ): Promise<T> {
     return fn().catch((error: unknown) => {
-      const adkError = errorTransformer ? 
-        errorTransformer(error) : 
-        ADKError && ADKError.fromUnknown(error);
-      
+      const adkError = errorTransformer
+        ? errorTransformer(error)
+        : ADKError && ADKError.fromUnknown(error);
+
       ADKErrorHandler && ADKErrorHandler.handler(adkError);
       throw adkError;
     });

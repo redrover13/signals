@@ -1,10 +1,10 @@
 #!/usr/bin/env tsx
 /**
  * @fileoverview Import validation script
- * 
+ *
  * This script validates all import paths in the codebase to ensure they point to existing modules
  * and are correctly mapped in tsconfig.json
- * 
+ *
  * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
@@ -55,7 +55,7 @@ class ImportValidator {
     // Handle relative imports
     if (importPath.startsWith('./') || importPath.startsWith('../')) {
       const resolvedPath = resolve(dirname(fromFile), importPath);
-      
+
       // Check for .ts, .tsx, .js, .jsx extensions
       const extensions = ['.ts', '.tsx', '.js', '.jsx', '/index.ts', '/index.tsx'];
       for (const ext of extensions) {
@@ -75,13 +75,13 @@ class ImportValidator {
           for (const mappedPath of paths) {
             const resolvedPath = join(
               this.projectRoot,
-              mappedPath.replace('*', suffix).replace(/^\.\//, '')
+              mappedPath.replace('*', suffix).replace(/^\.\//, ''),
             );
-            
+
             if (existsSync(resolvedPath)) {
               return resolvedPath;
             }
-            
+
             // Try with extensions
             const extensions = ['.ts', '.tsx', '.js', '.jsx'];
             for (const ext of extensions) {
@@ -117,13 +117,13 @@ class ImportValidator {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      
+
       // Match ES6 imports
       const importMatch = line.match(/import\s+.*?\s+from\s+['"`]([^'"`]+)['"`]/);
       if (importMatch) {
         imports.push({
           importPath: importMatch[1],
-          line: i + 1
+          line: i + 1,
         });
         continue;
       }
@@ -133,7 +133,7 @@ class ImportValidator {
       if (dynamicImportMatch) {
         imports.push({
           importPath: dynamicImportMatch[1],
-          line: i + 1
+          line: i + 1,
         });
         continue;
       }
@@ -143,7 +143,7 @@ class ImportValidator {
       if (requireMatch) {
         imports.push({
           importPath: requireMatch[1],
-          line: i + 1
+          line: i + 1,
         });
       }
     }
@@ -163,14 +163,14 @@ class ImportValidator {
         }
 
         const resolvedPath = this.resolveImportPath(importPath, filePath);
-        
+
         if (!resolvedPath) {
           this.issues.push({
             file: filePath,
             line,
             importPath,
             issue: 'Import path cannot be resolved',
-            severity: 'error'
+            severity: 'error',
           });
         } else if (resolvedPath === 'node_modules') {
           // Node modules import - could validate against package.json
@@ -178,13 +178,16 @@ class ImportValidator {
         }
 
         // Check for CommonJS usage
-        if (content.includes(`require('${importPath}')`) || content.includes(`require("${importPath}")`)) {
+        if (
+          content.includes(`require('${importPath}')`) ||
+          content.includes(`require("${importPath}")`)
+        ) {
           this.issues.push({
             file: filePath,
             line,
             importPath,
             issue: 'CommonJS require() detected - should use ESM import',
-            severity: 'warning'
+            severity: 'warning',
           });
         }
       }
@@ -199,7 +202,7 @@ class ImportValidator {
               line: i + 1,
               importPath: '',
               issue: 'CommonJS module.exports detected - should use ESM export',
-              severity: 'warning'
+              severity: 'warning',
             });
           }
         }
@@ -210,7 +213,7 @@ class ImportValidator {
         line: 0,
         importPath: '',
         issue: `Failed to read file: ${error}`,
-        severity: 'error'
+        severity: 'error',
       });
     }
   }
@@ -218,8 +221,20 @@ class ImportValidator {
   private shouldSkipImport(importPath: string): boolean {
     // Skip built-in Node.js modules
     const builtinModules = [
-      'fs', 'path', 'crypto', 'http', 'https', 'url', 'util', 'events',
-      'stream', 'buffer', 'os', 'child_process', 'cluster', 'worker_threads'
+      'fs',
+      'path',
+      'crypto',
+      'http',
+      'https',
+      'url',
+      'util',
+      'events',
+      'stream',
+      'buffer',
+      'os',
+      'child_process',
+      'cluster',
+      'worker_threads',
     ];
 
     if (builtinModules.includes(importPath)) {
@@ -228,11 +243,21 @@ class ImportValidator {
 
     // Skip common external libraries that we know exist
     const knownLibraries = [
-      'react', 'react-dom', 'fastify', 'axios', 'lodash-es', 'uuid',
-      'chalk', 'glob', 'zod', 'jest', 'vitest', '@testing-library/react'
+      'react',
+      'react-dom',
+      'fastify',
+      'axios',
+      'lodash-es',
+      'uuid',
+      'chalk',
+      'glob',
+      'zod',
+      'jest',
+      'vitest',
+      '@testing-library/react',
     ];
 
-    return knownLibraries.some(lib => importPath.startsWith(lib));
+    return knownLibraries.some((lib) => importPath.startsWith(lib));
   }
 
   public async validate(): Promise<ValidationResult> {
@@ -241,14 +266,7 @@ class ImportValidator {
     // Find all TypeScript and JavaScript files
     const files = await glob('**/*.{ts,tsx,js,jsx}', {
       cwd: this.projectRoot,
-      ignore: [
-        'node_modules/**',
-        'dist/**',
-        'build/**',
-        'coverage/**',
-        '.nx/**',
-        '**/*.d.ts'
-      ]
+      ignore: ['node_modules/**', 'dist/**', 'build/**', 'coverage/**', '.nx/**', '**/*.d.ts'],
     });
 
     console.log(chalk.gray(`Found ${files.length} files to validate`));
@@ -257,7 +275,7 @@ class ImportValidator {
     for (const file of files) {
       const fullPath = join(this.projectRoot, file);
       this.validateFile(fullPath);
-      
+
       // Count imports for statistics
       try {
         const content = readFileSync(fullPath, 'utf-8');
@@ -267,26 +285,26 @@ class ImportValidator {
       }
     }
 
-    const success = this.issues.filter(issue => issue.severity === 'error').length === 0;
+    const success = this.issues.filter((issue) => issue.severity === 'error').length === 0;
 
     return {
       totalFiles: files.length,
       totalImports,
       issues: this.issues,
-      success
+      success,
     };
   }
 
   public printResults(result: ValidationResult): void {
     console.log('\n' + chalk.bold('📊 Import Validation Results'));
     console.log(chalk.gray('─'.repeat(50)));
-    
+
     console.log(`Files scanned: ${chalk.cyan(result.totalFiles)}`);
     console.log(`Imports checked: ${chalk.cyan(result.totalImports)}`);
-    
-    const errors = result.issues.filter(issue => issue.severity === 'error');
-    const warnings = result.issues.filter(issue => issue.severity === 'warning');
-    
+
+    const errors = result.issues.filter((issue) => issue.severity === 'error');
+    const warnings = result.issues.filter((issue) => issue.severity === 'warning');
+
     console.log(`Errors: ${chalk.red(errors.length)}`);
     console.log(`Warnings: ${chalk.yellow(warnings.length)}`);
 
@@ -296,24 +314,27 @@ class ImportValidator {
     }
 
     // Group issues by file
-    const issuesByFile = result.issues.reduce((acc, issue) => {
-      if (!acc[issue.file]) {
-        acc[issue.file] = [];
-      }
-      acc[issue.file].push(issue);
-      return acc;
-    }, {} as Record<string, ImportIssue[]>);
+    const issuesByFile = result.issues.reduce(
+      (acc, issue) => {
+        if (!acc[issue.file]) {
+          acc[issue.file] = [];
+        }
+        acc[issue.file].push(issue);
+        return acc;
+      },
+      {} as Record<string, ImportIssue[]>,
+    );
 
     console.log('\n' + chalk.bold('🚨 Issues Found:'));
-    
+
     for (const [file, issues] of Object.entries(issuesByFile)) {
       console.log(`\n${chalk.cyan(file.replace(this.projectRoot, '.'))}`);
-      
+
       for (const issue of issues) {
         const severity = issue.severity === 'error' ? chalk.red('ERROR') : chalk.yellow('WARN');
         const line = issue.line > 0 ? `:${issue.line}` : '';
         const importPath = issue.importPath ? ` "${issue.importPath}"` : '';
-        
+
         console.log(`  ${severity}${line}${importPath} - ${issue.issue}`);
       }
     }
@@ -331,7 +352,7 @@ class ImportValidator {
 async function main() {
   const projectRoot = process.cwd();
   const validator = new ImportValidator(projectRoot);
-  
+
   try {
     const result = await validator.validate();
     validator.printResults(result);

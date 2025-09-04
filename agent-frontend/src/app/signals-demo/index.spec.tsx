@@ -17,7 +17,7 @@ import { SignalsDemo } from './index';
 jest.mock('@dulce/signals', () => {
   let sharedValue = 0;
   let localValue = 'Local Value';
-  
+
   return {
     createSignal: jest.fn().mockImplementation((initialValue) => {
       if (typeof initialValue === 'string') {
@@ -36,7 +36,7 @@ jest.mock('@dulce/signals', () => {
             } else {
               sharedValue = newValueOrFn;
             }
-          }
+          },
         ];
       }
       // If the signal is for the local value
@@ -44,15 +44,15 @@ jest.mock('@dulce/signals', () => {
         localValue,
         (newValue) => {
           localValue = newValue;
-        }
+        },
       ];
-    })
+    }),
   };
 });
 
 // Mock the sharedCountSignal
 jest.mock('../../bootstrap', () => ({
-  sharedCountSignal: { __isSharedCount: true }
+  sharedCountSignal: { __isSharedCount: true },
 }));
 
 describe('SignalsDemo Component', () => {
@@ -73,24 +73,24 @@ describe('SignalsDemo Component', () => {
 
   it('increments the count when the increment button is clicked', async () => {
     render(<SignalsDemo />);
-    
+
     const incrementButton = screen.getByText('Increment');
     await userEvent.click(incrementButton);
-    
+
     expect(screen.getByText(/Shared Count: 1/)).toBeInTheDocument();
   });
 
   it('decrements the count when the decrement button is clicked', async () => {
     render(<SignalsDemo />);
-    
+
     // First increment to ensure we have a positive value
     const incrementButton = screen.getByText('Increment');
     await userEvent.click(incrementButton);
-    
+
     // Then decrement
     const decrementButton = screen.getByText('Decrement');
     await userEvent.click(decrementButton);
-    
+
     expect(screen.getByText(/Shared Count: 0/)).toBeInTheDocument();
   });
 
@@ -101,11 +101,11 @@ describe('SignalsDemo Component', () => {
 
   it('updates the local value when input changes', async () => {
     render(<SignalsDemo />);
-    
+
     const input = screen.getByLabelText('Local value input');
     await userEvent.clear(input);
     await userEvent.type(input, 'New Local Value');
-    
+
     expect(screen.getByText(/Local Value: New Local Value/)).toBeInTheDocument();
   });
 });

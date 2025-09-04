@@ -2,7 +2,7 @@ name: AI Models Validation
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
       - 'apps/agents/**'
       - 'libs/agents/**'
@@ -14,7 +14,7 @@ jobs:
     name: Validate AI Models and Agents
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: ""
+      STORE_PATH: ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -24,16 +24,16 @@ jobs:
         with:
           node-version: '20'
           cache: 'pnpm'
-          
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.1.0
         with:
           version: 10.0.0
           run_install: false
-          
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --frozen-lockfile
-        
+
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v2.1.2
         with:
@@ -48,22 +48,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-          
+
       - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@v2.1.0
-        
+
       - name: Run agent validation tests
         run: |
           echo "Running AI model validation tests..."
           # Execute tests specific to AI agent functionality
           pnpm nx test agents
-          
+
       - name: Run agent integration tests
         run: |
           echo "Running AI agent integration tests..."
           # Execute integration tests against a test environment
           # pnpm nx run agents:integration-test
-          
+
       - name: Validate agent configurations
         run: |
           echo "Validating agent configurations..."

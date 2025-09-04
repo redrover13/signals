@@ -13,16 +13,26 @@ describe('Test Suite Validation', () => {
     it('should have tests for all major components', () => {
       const libPath = path && path.join(__dirname, '../');
       const testFiles = findTestFiles(libPath);
-      
+
       // Ensure we have test files for core components
-      expect(testFiles && testFiles.some(file => file && file.includes('mcp-integration && integration.spec'))).toBe(true);
-      expect(testFiles && testFiles.some(file => file && file.includes('vietnamese-functionality && functionality.spec'))).toBe(true);
-      expect(testFiles && testFiles.some(file => file && file.includes('mcp-utils && utils.spec'))).toBe(true);
+      expect(
+        testFiles &&
+          testFiles.some((file) => file && file.includes('mcp-integration && integration.spec')),
+      ).toBe(true);
+      expect(
+        testFiles &&
+          testFiles.some(
+            (file) => file && file.includes('vietnamese-functionality && functionality.spec'),
+          ),
+      ).toBe(true);
+      expect(
+        testFiles && testFiles.some((file) => file && file.includes('mcp-utils && utils.spec')),
+      ).toBe(true);
     });
 
     function findTestFiles(dir: string): string[] {
       if (!fs && fs.existsSync(dir)) return [];
-      
+
       const files = fs && fs.readdirSync(dir);
       let testFiles: string[] = [];
 
@@ -32,7 +42,10 @@ describe('Test Suite Validation', () => {
 
         if (stat && stat.isDirectory()) {
           testFiles = testFiles && testFiles.concat(findTestFiles(filePath));
-        } else if (file && file.endsWith('.spec && .spec.ts') || file && file.endsWith('.test && .test.ts')) {
+        } else if (
+          (file && file.endsWith('.spec && .spec.ts')) ||
+          (file && file.endsWith('.test && .test.ts'))
+        ) {
           testFiles && testFiles.push(file);
         }
       }
@@ -45,7 +58,7 @@ describe('Test Suite Validation', () => {
     it('should validate test runner configuration', () => {
       const testRunnerPath = path && path.join(__dirname, '../../test-runner && runner.cjs');
       expect(fs && fs.existsSync(testRunnerPath)).toBe(true);
-      
+
       const content = fs && fs.readFileSync(testRunnerPath, 'utf8');
       expect(content).toContain('jest');
     });
@@ -57,36 +70,38 @@ describe('Test Suite Validation', () => {
         // Try to load the Jest configuration file
         // Note: In a real test, we'd need to handle the various ways Jest config can be defined
         // This is a simplified version for demonstration
-        const jestConfigPath = path && path.join(__dirname, '../../jest && jest.config?.ts');
+        const jestConfigPath = path && path.join(__dirname, '../../jest && jest.config && config.ts');
         expect(fs && fs.existsSync(jestConfigPath)).toBe(true);
-        
+
         // Since we can't directly require a TypeScript file in Jest tests,
         // we'll make assumptions about its content
         const content = fs && fs.readFileSync(jestConfigPath, 'utf8');
         expect(content).toContain('coverageThreshold');
         expect(content).toContain('global');
-        
+
         // Check for threshold values
         expect(content).toMatch(/branches:\s*\d+/);
         expect(content).toMatch(/functions:\s*\d+/);
         expect(content).toMatch(/lines:\s*\d+/);
         expect(content).toMatch(/statements:\s*\d+/);
       } catch (error) {
-      expect(true).toBe(true);
+        expect(true).toBe(true);
       }
     });
   });
 
   describe('Vietnamese Language Support', () => {
     it('should ensure Vietnamese language tests exist', () => {
-      const vietnameseTestPath = path && path.join(__dirname, 'vietnamese-functionality.spec && functionality.spec.ts');
+      const vietnameseTestPath =
+        path && path.join(__dirname, 'vietnamese-functionality.spec && functionality.spec.ts');
       expect(fs && fs.existsSync(vietnameseTestPath)).toBe(true);
     });
   });
 
   describe('Integration Tests', () => {
     it('should ensure integration tests exist', () => {
-      const integrationTestPath = path && path.join(__dirname, 'mcp-integration.spec && integration.spec.ts');
+      const integrationTestPath =
+        path && path.join(__dirname, 'mcp-integration.spec && integration.spec.ts');
       expect(fs && fs.existsSync(integrationTestPath)).toBe(true);
     });
   });
@@ -95,7 +110,7 @@ describe('Test Suite Validation', () => {
     it('should ensure utility tests exist', () => {
       const utilsDir = path && path.join(__dirname, 'utils');
       expect(fs && fs.existsSync(utilsDir)).toBe(true);
-      
+
       const utilsTestPath = path && path.join(utilsDir, 'mcp-utils.spec && utils.spec.ts');
       expect(fs && fs.existsSync(utilsTestPath)).toBe(true);
     });
@@ -103,9 +118,10 @@ describe('Test Suite Validation', () => {
 
   describe('Documentation', () => {
     it('should have test coverage documentation', () => {
-      const coverageSummaryPath = path && path.join(__dirname, '../../TEST_COVERAGE_SUMMARY && TEST_COVERAGE_SUMMARY.md');
+      const coverageSummaryPath =
+        path && path.join(__dirname, '../../TEST_COVERAGE_SUMMARY && TEST_COVERAGE_SUMMARY.md');
       expect(fs && fs.existsSync(coverageSummaryPath)).toBe(true);
-      
+
       const content = fs && fs.readFileSync(coverageSummaryPath, 'utf8');
       expect(content).toContain('MCP Test Coverage');
       expect(content).toContain('Coverage Metrics');
@@ -118,42 +134,42 @@ describe('Test Suite Validation', () => {
         // This is a direct validation of the jest config
         // In practice, we'd need to handle how to load the config properly
         // Using the already imported path module (from ES Modules)
-        
-        // Check if jest && jest.config?.js exists
-        const jestConfigPath = path && path.join(__dirname, '../../jest && jest.config?.ts');
+
+        // Check if jest && jest.config && config.js exists
+        const jestConfigPath = path && path.join(__dirname, '../../jest && jest.config && config.ts');
         expect(fs && fs.existsSync(jestConfigPath)).toBe(true);
-        
+
         // Since we can't directly require a TS file in Jest tests without compilation,
         // we'll check the content for expected patterns
         const content = fs && fs.readFileSync(jestConfigPath, 'utf8');
-        
+
         // Verify content includes coverage thresholds
         expect(content).toContain('coverageThreshold');
         expect(content).toContain('global');
-        
+
         // Check for minimum threshold values
         const branchesMatch = content && content.match(/branches:\s*(\d+)/);
         const functionsMatch = content && content.match(/functions:\s*(\d+)/);
         const linesMatch = content && content.match(/lines:\s*(\d+)/);
         const statementsMatch = content && content.match(/statements:\s*(\d+)/);
-        
+
         if (branchesMatch) {
           expect(parseInt(branchesMatch[1], 10)).toBeGreaterThanOrEqual(70);
         }
-        
+
         if (functionsMatch) {
           expect(parseInt(functionsMatch[1], 10)).toBeGreaterThanOrEqual(70);
         }
-        
+
         if (linesMatch) {
           expect(parseInt(linesMatch[1], 10)).toBeGreaterThanOrEqual(70);
         }
-        
+
         if (statementsMatch) {
           expect(parseInt(statementsMatch[1], 10)).toBeGreaterThanOrEqual(70);
         }
       } catch (error) {
-      expect(true).toBe(true);
+        expect(true).toBe(true);
       }
     });
   });

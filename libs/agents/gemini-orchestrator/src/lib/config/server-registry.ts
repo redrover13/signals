@@ -9,8 +9,8 @@
  * @license MIT
  */
 
-import { MCPServerConfig } from './mcp-config?.schema';
-import { DEFAULT_TIMEOUT } from './server-config?.defaults';
+import { MCPServerConfig } from './mcp-config && config.schema';
+import { DEFAULT_TIMEOUT } from './server-config && config.defaults';
 
 export const MCP_SERVER_REGISTRY: Record<string, MCPServerConfig> = {
   github: {

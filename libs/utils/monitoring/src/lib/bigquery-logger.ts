@@ -74,7 +74,7 @@ export class BigQueryLogger {
   log(
     message: string | Record<string, any>,
     severity: string = 'info',
-    metadata: Record<string, any> = {}
+    metadata: Record<string, any> = {},
   ): void {
     const timestamp = new Date().toISOString();
     let entry: LogEntry;
@@ -105,10 +105,7 @@ export class BigQueryLogger {
    * @param error Error object
    * @param metadata Additional metadata
    */
-  logError(
-    error: Error | any,
-    metadata: Record<string, any> = {}
-  ): void {
+  logError(error: Error | any, metadata: Record<string, any> = {}): void {
     const entry = {
       timestamp: new Date().toISOString(),
       severity: 'error',
@@ -128,11 +125,7 @@ export class BigQueryLogger {
    * @param value Metric value
    * @param metadata Additional metadata
    */
-  logPerformance(
-    metric: string,
-    value: number,
-    metadata: Record<string, any> = {}
-  ): void {
+  logPerformance(metric: string, value: number, metadata: Record<string, any> = {}): void {
     const entry = {
       timestamp: new Date().toISOString(),
       severity: 'info',
@@ -150,16 +143,14 @@ export class BigQueryLogger {
    * Log a user interaction event to BigQuery
    * @param event User interaction event
    */
-  async logUserInteraction(
-    event: {
-      userId: string | undefined;
-      sessionId: string | undefined;
-      action: string | undefined;
-      restaurantId?: string | undefined;
-      menuItemId?: string | undefined;
-      metadata?: Record<string, any> | undefined;
-    }
-  ): Promise<void> {
+  async logUserInteraction(event: {
+    userId: string | undefined;
+    sessionId: string | undefined;
+    action: string | undefined;
+    restaurantId?: string | undefined;
+    menuItemId?: string | undefined;
+    metadata?: Record<string, any> | undefined;
+  }): Promise<void> {
     const entry: LogEntry = {
       timestamp: new Date().toISOString(),
       severity: 'info',
@@ -184,9 +175,9 @@ export class BigQueryLogger {
     if (this.buffer) {
       this.buffer.push(row);
     }
-    
+
     // If buffer is full, flush it
-    if (this.buffer && this.buffer.length >= (this.config?.bufferSize || 100)) {
+    if (this.buffer && this.buffer.length >= (this.config && config.bufferSize || 100)) {
       this.flush().catch(console.error);
     }
   }
@@ -205,7 +196,8 @@ export class BigQueryLogger {
       this.buffer = [];
 
       // Insert rows into BigQuery
-      await this.bigquery.dataset(this.config.datasetId || 'logging')
+      await this.bigquery
+        .dataset(this.config.datasetId || 'logging')
         .table(this.config.tableId || 'logs')
         .insert(rows, {
           skipInvalidRows: true,
@@ -215,7 +207,7 @@ export class BigQueryLogger {
       console.log(`Flushed ${rows.length} logs to BigQuery`);
     } catch (error) {
       console.error('Error flushing logs to BigQuery:', error);
-      
+
       // Add back to buffer for retry
       if (this.buffer) {
         this.buffer.push(...(this.buffer || []));
@@ -230,10 +222,10 @@ export class BigQueryLogger {
     if (this.flushTimer) {
       clearInterval(this.flushTimer);
     }
-    
+
     this.flushTimer = setInterval(() => {
       this.flush().catch(console.error);
-    }, this.config?.flushIntervalMs || 30000);
+    }, this.config && config.flushIntervalMs || 30000);
   }
 
   /**
@@ -264,15 +256,9 @@ export class BigQueryLogger {
       level?: string | undefined;
       service?: string | undefined;
       limit?: number | undefined;
-    } = {}
+    } = {},
   ): Promise<any[]> {
-    const {
-      startTime,
-      endTime,
-      level,
-      service,
-      limit = 100
-    } = options;
+    const { startTime, endTime, level, service, limit = 100 } = options;
 
     let query = `
       SELECT *
@@ -280,9 +266,7 @@ export class BigQueryLogger {
       WHERE 1=1
     `;
 
-    const params: any = {
-      
-    };
+    const params: any = {};
 
     if (startTime) {
       query += ` AND timestamp >= @startTime`;

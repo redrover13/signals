@@ -39,11 +39,11 @@ This library is part of the Dulce de Saigon monorepo and automatically available
 
 ```typescript
 // Import GCP utilities
-import { 
-  getPubSub, 
-  ensureTopic, 
+import {
+  getPubSub,
+  ensureTopic,
   getBigQueryClient,
-  getVietnameseComplianceConfig 
+  getVietnameseComplianceConfig,
 } from '@dulce/gcp';
 ```
 
@@ -53,7 +53,7 @@ import {
 // Initialize Vietnamese-compliant GCP services
 const pubsub = getPubSub({
   region: 'asia-southeast1',
-  vietnameseCompliance: true
+  vietnameseCompliance: true,
 });
 
 // Ensure topic exists with Vietnamese naming
@@ -63,7 +63,7 @@ await ensureTopic('dulce.vietnam.menu-updates');
 const bq = getBigQueryClient({
   location: 'asia-southeast1',
   datasetPrefix: 'vietnam_',
-  currencyFormat: 'VND'
+  currencyFormat: 'VND',
 });
 ```
 
@@ -76,12 +76,12 @@ All GCP services are configured for Vietnamese data residency:
 ```typescript
 // Vietnamese data localization configuration
 const vietnameseConfig = {
-  region: 'asia-southeast1',        // Vietnam region
-  dataResidency: 'vietnam',         // Vietnamese data only
-  crossBorderTransfer: false,       // Prevent data export
-  auditLogging: true,               // Full audit trail
-  encryptionAtRest: 'CMEK',        // Customer-managed encryption
-  complianceMode: 'PDPL'           // Vietnamese PDPL compliance
+  region: 'asia-southeast1', // Vietnam region
+  dataResidency: 'vietnam', // Vietnamese data only
+  crossBorderTransfer: false, // Prevent data export
+  auditLogging: true, // Full audit trail
+  encryptionAtRest: 'CMEK', // Customer-managed encryption
+  complianceMode: 'PDPL', // Vietnamese PDPL compliance
 };
 ```
 
@@ -106,10 +106,8 @@ const detectVietnamesePII = (data: any): boolean => {
     /84\d{8,9}/, // Vietnamese phone numbers
     /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/, // Email
   ];
-  
-  return vietnamesePatterns.some(pattern => 
-    pattern.test(JSON.stringify(data))
-  );
+
+  return vietnamesePatterns.some((pattern) => pattern.test(JSON.stringify(data)));
 };
 ```
 
@@ -128,21 +126,21 @@ const vietnameseBigQueryConfig = {
       tables: {
         vietnamese_dishes: {
           clustering: ['region', 'dish_type', 'price_vnd'],
-          partitioning: 'order_date'
+          partitioning: 'order_date',
         },
         customer_preferences: {
           clustering: ['location', 'age_group'],
-          privacy: 'high' // Vietnamese PDPL compliance
-        }
-      }
-    }
+          privacy: 'high', // Vietnamese PDPL compliance
+        },
+      },
+    },
   },
   currencyColumns: {
     type: 'NUMERIC',
     precision: 15,
     scale: 0, // VND has no decimal places
-    description: 'Vietnamese Dong (VND) amounts'
-  }
+    description: 'Vietnamese Dong (VND) amounts',
+  },
 };
 
 // Vietnamese F&B specific queries
@@ -159,7 +157,7 @@ const vietnameseQueries = {
     GROUP BY dish_name_vi, region_vi
     ORDER BY so_luong_dat DESC
   `,
-  
+
   seasonalTrends: `
     SELECT 
       EXTRACT(MONTH FROM order_date) as thang,
@@ -170,7 +168,7 @@ const vietnameseQueries = {
     WHERE EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM CURRENT_DATE())
     GROUP BY thang, loai_mon
     ORDER BY thang, doanh_thu_vnd DESC
-  `
+  `,
 };
 ```
 
@@ -185,7 +183,7 @@ const vietnameseTopics = {
   orderProcessing: 'dulce.vietnam.orders',
   customerFeedback: 'dulce.vietnam.feedback',
   paymentEvents: 'dulce.vietnam.payments.vnd',
-  complianceAlerts: 'dulce.vietnam.compliance'
+  complianceAlerts: 'dulce.vietnam.compliance',
 };
 
 // Vietnamese message structure
@@ -212,29 +210,29 @@ interface VietnameseMessage {
 
 // Pub/Sub with Vietnamese compliance
 export const publishVietnameseMessage = async (
-  topic: string, 
-  data: any, 
-  vietnameseContext?: any
+  topic: string,
+  data: any,
+  vietnameseContext?: any,
 ) => {
   const message: VietnameseMessage = {
     messageId: generateVietnameseId(),
     timestamp: new Date().toLocaleString('vi-VN', {
-      timeZone: 'Asia/Ho_Chi_Minh'
+      timeZone: 'Asia/Ho_Chi_Minh',
     }),
     locale: 'vi-VN',
     currency: 'VND',
     region: detectVietnameseRegion(data),
     data: {
       content: data,
-      vietnamese_specific: vietnameseContext
+      vietnamese_specific: vietnameseContext,
     },
     compliance: {
       data_residency: 'asia-southeast1',
       pii_detected: detectVietnamesePII(data),
-      consent_required: requiresConsent(data)
-    }
+      consent_required: requiresConsent(data),
+    },
   };
-  
+
   return pubsub.topic(topic).publish(Buffer.from(JSON.stringify(message)));
 };
 ```
@@ -251,33 +249,33 @@ const vietnameseStorageConfig = {
   storageClass: 'REGIONAL',
   encryption: {
     type: 'CMEK', // Customer-managed encryption keys
-    keyName: 'vietnam-data-encryption-key'
+    keyName: 'vietnam-data-encryption-key',
   },
   lifecycle: {
     vietnamese_pii: {
       deleteAfter: '7years', // Vietnamese legal requirement
-      archiveAfter: '1year'
+      archiveAfter: '1year',
     },
     menu_images: {
       deleteAfter: '3years',
-      coldStorageAfter: '1year'
-    }
+      coldStorageAfter: '1year',
+    },
   },
   iamPolicy: {
     dataResidency: 'asia-southeast1',
-    crossBorderTransfer: 'denied'
-  }
+    crossBorderTransfer: 'denied',
+  },
 };
 
 // Vietnamese file naming conventions
 export const generateVietnameseFilename = (
   type: 'menu' | 'receipt' | 'analytics' | 'user_data',
-  context: any
+  context: any,
 ): string => {
   const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   const region = context.region || 'vietnam';
   const id = context.id || generateVietnameseId();
-  
+
   return `${type}/${region}/${timestamp}/${id}.json`;
 };
 
@@ -285,23 +283,23 @@ export const generateVietnameseFilename = (
 const uploadVietnameseMenu = async (menuData: any, restaurant: any) => {
   const filename = generateVietnameseFilename('menu', {
     region: restaurant.region,
-    id: restaurant.id
+    id: restaurant.id,
   });
-  
+
   const vietnameseMetadata = {
     language: 'vi-VN',
     currency: 'VND',
     region: restaurant.region,
     compliance: 'PDPL',
-    cultural_context: restaurant.cultural_context
+    cultural_context: restaurant.cultural_context,
   };
-  
+
   return storage
     .bucket(vietnameseStorageConfig.bucket)
     .file(filename)
     .save(JSON.stringify(menuData), {
       metadata: vietnameseMetadata,
-      resumable: false
+      resumable: false,
     });
 };
 ```
@@ -318,53 +316,52 @@ const vietnameseAIConfig = {
     vietnamese_nlp: 'vietnamese-language-model-v2',
     food_classification: 'vietnamese-food-classifier',
     sentiment_analysis: 'vietnamese-sentiment-analyzer',
-    price_prediction: 'vietnamese-price-predictor'
+    price_prediction: 'vietnamese-price-predictor',
   },
   culturalContext: {
     regions: ['north', 'central', 'south'],
     festivals: ['tet', 'mid_autumn', 'teachers_day'],
-    foodCategories: ['mon_chinh', 'mon_phu', 'do_uong', 'trang_mieng']
-  }
+    foodCategories: ['mon_chinh', 'mon_phu', 'do_uong', 'trang_mieng'],
+  },
 };
 
 // Vietnamese text processing
 export const processVietnameseText = async (
-  text: string, 
-  context: 'menu' | 'review' | 'order' | 'support'
+  text: string,
+  context: 'menu' | 'review' | 'order' | 'support',
 ) => {
   const request = {
     endpoint: `projects/${PROJECT_ID}/locations/asia-southeast1/endpoints/${VIETNAMESE_NLP_ENDPOINT}`,
-    instances: [{
-      content: text,
-      language: 'vi',
-      context: context,
-      cultural_params: {
-        region: 'vietnam',
-        business_type: 'fnb',
-        formality_level: 'polite' // Vietnamese cultural norm
-      }
-    }]
+    instances: [
+      {
+        content: text,
+        language: 'vi',
+        context: context,
+        cultural_params: {
+          region: 'vietnam',
+          business_type: 'fnb',
+          formality_level: 'polite', // Vietnamese cultural norm
+        },
+      },
+    ],
   };
-  
+
   return aiplatform.predict(request);
 };
 
 // Vietnamese menu analysis
 export const analyzeVietnameseMenu = async (menuItems: any[]) => {
-  const analysis = await processVietnameseText(
-    JSON.stringify(menuItems), 
-    'menu'
-  );
-  
+  const analysis = await processVietnameseText(JSON.stringify(menuItems), 'menu');
+
   return {
     popularity_predictions: analysis.popularity_scores,
-    price_recommendations: analysis.price_suggestions.map(price => ({
+    price_recommendations: analysis.price_suggestions.map((price) => ({
       ...price,
       currency: 'VND',
-      formatted: formatVND(price.amount)
+      formatted: formatVND(price.amount),
     })),
     cultural_insights: analysis.cultural_relevance,
-    regional_variations: analysis.regional_preferences
+    regional_variations: analysis.regional_preferences,
   };
 };
 ```
@@ -383,26 +380,26 @@ export const VND = {
       style: 'currency',
       currency: 'VND',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   },
-  
+
   parse: (vndString: string): number => {
     return parseInt(vndString.replace(/[₫.,\s]/g, ''), 10);
   },
-  
+
   validate: (amount: number): boolean => {
     return amount > 0 && amount % 1000 === 0; // VND typically in thousands
   },
-  
+
   convertToStandard: (amount: number): number => {
     return Math.round(amount / 1000) * 1000; // Round to nearest thousand
-  }
+  },
 };
 
 // Example usage
 console.log(VND.format(150000)); // "₫150.000"
-console.log(VND.parse("₫150.000")); // 150000
+console.log(VND.parse('₫150.000')); // 150000
 console.log(VND.validate(150000)); // true
 console.log(VND.validate(150001)); // false (not in thousands)
 ```
@@ -417,18 +414,18 @@ export const vietnameseBusinessHours = {
   standard: {
     open: '06:00',
     close: '22:00',
-    lunch_break: { start: '14:00', end: '17:00' } // Common in Vietnam
+    lunch_break: { start: '14:00', end: '17:00' }, // Common in Vietnam
   },
   street_food: {
     open: '05:30',
     close: '23:00',
-    peak_hours: ['06:00-08:00', '11:30-13:30', '17:30-20:00']
+    peak_hours: ['06:00-08:00', '11:30-13:30', '17:30-20:00'],
   },
   formal_restaurant: {
     open: '10:00',
     close: '22:00',
-    reservation_required: true
-  }
+    reservation_required: true,
+  },
 };
 
 // Vietnamese payment methods priority
@@ -437,7 +434,7 @@ export const vietnamesePaymentMethods = [
   { method: 'zalopay', priority: 2, usage: '45%' },
   { method: 'cash', priority: 3, usage: '80%' },
   { method: 'bank_transfer', priority: 4, usage: '30%' },
-  { method: 'vnpay', priority: 5, usage: '25%' }
+  { method: 'vnpay', priority: 5, usage: '25%' },
 ];
 
 // Vietnamese regional preferences
@@ -446,20 +443,20 @@ export const vietnameseRegionalPreferences = {
     taste_profile: 'balanced',
     preferred_dishes: ['pho', 'bun_cha', 'nem_ran'],
     spice_level: 'mild',
-    sweetness: 'low'
+    sweetness: 'low',
   },
   central: {
     taste_profile: 'spicy',
     preferred_dishes: ['bun_bo_hue', 'mi_quang', 'cao_lau'],
     spice_level: 'high',
-    sweetness: 'medium'
+    sweetness: 'medium',
   },
   south: {
     taste_profile: 'sweet',
     preferred_dishes: ['hu_tieu', 'banh_mi', 'che'],
     spice_level: 'mild',
-    sweetness: 'high'
-  }
+    sweetness: 'high',
+  },
 };
 ```
 
@@ -490,14 +487,10 @@ interface VietnameseLogEntry {
   };
 }
 
-export const logVietnameseEvent = (
-  level: string,
-  message: string,
-  context?: any
-) => {
+export const logVietnameseEvent = (level: string, message: string, context?: any) => {
   const logEntry: VietnameseLogEntry = {
     timestamp: new Date().toLocaleString('vi-VN', {
-      timeZone: 'Asia/Ho_Chi_Minh'
+      timeZone: 'Asia/Ho_Chi_Minh',
     }),
     level: level as any,
     service: 'dulce-gcp',
@@ -508,10 +501,10 @@ export const logVietnameseEvent = (
       request_id: context?.request_id || generateVietnameseId(),
       user_id: context?.user_id ? hashPII(context.user_id) : undefined,
       session_id: context?.session_id,
-      ip_address: context?.ip_address ? anonymizeIP(context.ip_address) : undefined
-    }
+      ip_address: context?.ip_address ? anonymizeIP(context.ip_address) : undefined,
+    },
   };
-  
+
   console.log(JSON.stringify(logEntry));
 };
 ```
@@ -528,41 +521,41 @@ export const vietnameseTestData = {
       name: 'Phở Hà Nội',
       region: 'north',
       specialties: ['phở bò', 'chả cá'],
-      price_range_vnd: [50000, 80000]
+      price_range_vnd: [50000, 80000],
     },
     {
       name: 'Bún Bò Huế Authentic',
       region: 'central',
       specialties: ['bún bò huế', 'bánh bèo'],
-      price_range_vnd: [40000, 70000]
+      price_range_vnd: [40000, 70000],
     },
     {
       name: 'Bánh Mì Sài Gòn',
       region: 'south',
       specialties: ['bánh mì thịt nướng', 'chè'],
-      price_range_vnd: [25000, 45000]
-    }
+      price_range_vnd: [25000, 45000],
+    },
   ],
   customers: [
     {
       id: 'VN-CUST-001',
       region: 'hanoi',
       preferences: ['món_bắc', 'không_cay'],
-      payment_method: 'momo'
-    }
+      payment_method: 'momo',
+    },
   ],
   orders: [
     {
       id: 'VN-ORDER-001',
       items: [
         { name: 'Phở bò tái', price_vnd: 65000, quantity: 1 },
-        { name: 'Chả cá', price_vnd: 55000, quantity: 1 }
+        { name: 'Chả cá', price_vnd: 55000, quantity: 1 },
       ],
       total_vnd: 120000,
       payment_method: 'momo',
-      timestamp: '2024-01-15T12:30:00+07:00' // ICT timezone
-    }
-  ]
+      timestamp: '2024-01-15T12:30:00+07:00', // ICT timezone
+    },
+  ],
 };
 
 // Test Vietnamese GCP integrations
@@ -573,31 +566,28 @@ describe('Vietnamese GCP Integration', () => {
       FROM test_dataset.vietnamese_menu 
       WHERE dish_name_vi LIKE '%phở%'
     `;
-    
+
     const [rows] = await bq.query(query);
     expect(rows[0].dish_name_vi).toContain('ở'); // Vietnamese character
   });
-  
+
   test('Pub/Sub processes Vietnamese messages', async () => {
     const message = {
       content: 'Đặt món phở bò tái',
       price_vnd: 65000,
-      region: 'hanoi'
+      region: 'hanoi',
     };
-    
-    const messageId = await publishVietnameseMessage(
-      'test-topic', 
-      message
-    );
+
+    const messageId = await publishVietnameseMessage('test-topic', message);
     expect(messageId).toBeDefined();
   });
-  
+
   test('Storage handles Vietnamese file names', async () => {
     const filename = generateVietnameseFilename('menu', {
       region: 'saigon',
-      restaurant: 'Phở Sài Gòn'
+      restaurant: 'Phở Sài Gòn',
     });
-    
+
     expect(filename).toMatch(/^menu\/saigon\/\d{4}-\d{2}-\d{2}\//);
   });
 });

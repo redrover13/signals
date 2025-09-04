@@ -23,17 +23,19 @@ export function App() {
   const agentConfig = getAgentConfig();
 
   const toggleFederationDemo = useCallback(() => {
-    setShowFederationDemo(prevState => !prevState);
+    setShowFederationDemo((prevState) => !prevState);
   }, []);
 
   return (
     <div className={styles['app']}>
       <header className={styles['header']}>
         <h1 className={styles['title']}>Dulce de Saigon Agent Frontend</h1>
-        <p className={styles['subtitle']}>Interact with AI agents for BigQuery and Firebase operations</p>
+        <p className={styles['subtitle']}>
+          Interact with AI agents for BigQuery and Firebase operations
+        </p>
       </header>
       <nav className={styles['nav']}>
-        <button 
+        <button
           onClick={toggleFederationDemo}
           className={styles['button']}
           aria-pressed={showFederationDemo}
@@ -57,5 +59,3 @@ export function App() {
 }
 
 export default App;
-
-

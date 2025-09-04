@@ -1,94 +1,97 @@
-#!/usr/bin/env node
-
 /**
- * Fix for TS2304: Cannot find name
- * 
- * This script attempts to fix name not found errors by:
- * 1. Adding missing imports
- * 2. Declaring missing variables
+ * Script to fix common "Cannot find name X" errors in TypeScript
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const ROOT_DIR = path.resolve(__dirname, '../../..');
-
-console.log('🔧 Fixing name not found errors...');
+const fs = require('fs');
+const path = require('path');
 
 // Common missing names and their imports
 const COMMON_IMPORTS = {
-  'React': 'import React from 'react';',
-  'useState': 'import { useState } from 'react';',
-  'useEffect': 'import { useEffect } from 'react';',
-  'useMemo': 'import { useMemo } from 'react';',
-  'useCallback': 'import { useCallback } from 'react';',
-  'useRef': 'import { useRef } from 'react';',
-  'map': 'import { map } from 'lodash-es';',
-  'filter': 'import { filter } from 'lodash-es';',
-  'find': 'import { find } from 'lodash-es';',
-  // Add more common names and their imports
+  'React': "import React from 'react';",
+  'useState': "import { useState } from 'react';",
+  'useEffect': "import { useEffect } from 'react';",
+  'useMemo': "import { useMemo } from 'react';",
+  'useCallback': "import { useCallback } from 'react';",
+  'useRef': "import { useRef } from 'react';",
+  'map': "import { map } from 'lodash-es';",
+  'filter': "import { filter } from 'lodash-es';",
+  'forEach': "import { forEach } from 'lodash-es';",
+  'find': "import { find } from 'lodash-es';",
+  'isEqual': "import { isEqual } from 'lodash-es';"
 };
 
-// Find all TypeScript files with name not found errors
-function findFilesWithErrors() {
-  try {
-    const output = require('child_process').execSync(
-      'npx tsc --noEmit 2>&1 | grep -E "error TS2304: Cannot find name"',
-      { encoding: 'utf8', stdio: 'pipe' }
-    );
-    
-    // Parse file paths and missing names
-    const errors = [];
-    const pattern = /^(.+?)(d+,d+): error TS2304: Cannot find name '(.+?)'/;
-    
-    for (const line of output.split('\n')) {
-      const match = line.match(pattern);
-      if (match) {
-        const [_, filePath, missingName] = match;
-        errors.push({ filePath, missingName });
-      }
-    }
-    
-    return errors;
-  } catch (error) {
-    // If grep doesn't find anything, it returns non-zero exit code
-    return [];
-  }
-}
-
-// Fix name not found errors
-const errors = findFilesWithErrors();
-const processedFiles = new Set();
-let fixedFiles = 0;
-
-for (const { filePath, missingName } of errors) {
-  if (processedFiles.has(filePath)) continue;
-  processedFiles.add(filePath);
+// Function to fix a file
+function fixNameNotFoundInFile(filePath) {
+  console.log(`Checking file: ${filePath}`);
   
+  let content;
   try {
-    let content = fs.readFileSync(filePath, 'utf8');
-    let fileModified = false;
-    
-    // Check if the missing name has a common import
-    if (COMMON_IMPORTS[missingName] && !content.includes(COMMON_IMPORTS[missingName])) {
-      // Add the import at the top of the file
-      content = COMMON_IMPORTS[missingName] + '\n' + content;
-      fileModified = true;
-    }
-    
-    // Save changes if file was modified
-    if (fileModified) {
-      fs.writeFileSync(filePath, content);
-      fixedFiles++;
-      console.log(`Fixed missing name '${missingName}' in ${filePath.replace(ROOT_DIR + '/', '')}`);
-    }
+    content = fs.readFileSync(filePath, 'utf8');
   } catch (error) {
-    console.error(`Error processing ${filePath}:`, error.message);
+    console.error(`Error reading file ${filePath}: ${error.message}`);
+    return false;
   }
+  
+  // Check for missing names
+  let modified = false;
+  let importsToAdd = new Set();
+  
+  Object.keys(COMMON_IMPORTS).forEach(name => {
+    // Only add import if the name is used but not already imported
+    const nameRegex = new RegExp(`\\b${name}\\b`, 'g');
+    const importRegex = new RegExp(`import.*\\b${name}\\b.*from`, 'g');
+    
+    if (nameRegex.test(content) && !importRegex.test(content)) {
+      importsToAdd.add(COMMON_IMPORTS[name]);
+      modified = true;
+      console.log(`  Adding import for: ${name}`);
+    }
+  });
+  
+  // Add the imports to the beginning of the file
+  if (importsToAdd.size > 0) {
+    // Convert Set to Array and join with newlines
+    const newImports = Array.from(importsToAdd).join('\n');
+    
+    // Check if the file already has imports
+    if (/^import /m.test(content)) {
+      // Add after the last import
+      const lastImportIndex = content.lastIndexOf('import ');
+      const nextLineAfterLastImport = content.indexOf('\n', lastImportIndex) + 1;
+      content = content.slice(0, nextLineAfterLastImport) + newImports + '\n' + content.slice(nextLineAfterLastImport);
+    } else {
+      // Add to the beginning of the file
+      content = newImports + '\n\n' + content;
+    }
+    
+    try {
+      fs.writeFileSync(filePath, content, 'utf8');
+      console.log(`  ✅ Updated file: ${filePath}`);
+      return true;
+    } catch (error) {
+      console.error(`  ❌ Error writing file ${filePath}: ${error.message}`);
+      return false;
+    }
+  }
+  
+  return false;
 }
 
-console.log(`Fixed name not found errors in ${fixedFiles} files`);
-console.log('\n✅ Name not found fixes completed!');
+// Function to process a list of files
+function fixNameNotFoundErrors(fileList) {
+  let fixedCount = 0;
+  
+  fileList.forEach(filePath => {
+    if (fixNameNotFoundInFile(filePath)) {
+      fixedCount++;
+    }
+  });
+  
+  console.log(`\nFixed "cannot find name" errors in ${fixedCount} files.`);
+  return fixedCount;
+}
+
+module.exports = {
+  fixNameNotFoundInFile,
+  fixNameNotFoundErrors
+};

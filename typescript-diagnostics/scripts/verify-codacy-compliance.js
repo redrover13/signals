@@ -2,13 +2,13 @@
 
 /**
  * Codacy Compliance Verification
- * 
+ *
  * This script runs Codacy analysis on TypeScript files that have been modified
  * by the TypeScript diagnostic tools to ensure they comply with Codacy rules.
- * 
+ *
  * Usage:
  *   node typescript-diagnostics/scripts/verify-codacy-compliance.js [--files=file1,file2,...]
- * 
+ *
  * Options:
  *   --files   Comma-separated list of files to verify (optional)
  */
@@ -46,33 +46,32 @@ console.log('=================================');
  */
 async function verifyCodacyCompliance() {
   console.log('\n📊 Running Codacy analysis...');
-  
+
   // If no files specified, use recently modified files
   if (filesToVerify.length === 0) {
     console.log('No files specified, analyzing recently modified TypeScript files...');
-    
+
     try {
       // Get files modified in the last day
       const gitOutput = execSync(
         'git diff --name-only --diff-filter=M HEAD~5..HEAD | grep -E "\\.ts$"',
-        { encoding: 'utf8', cwd: ROOT_DIR }
+        { encoding: 'utf8', cwd: ROOT_DIR },
       );
-      
+
       filesToVerify = gitOutput.trim().split('\n').filter(Boolean);
-      
+
       if (filesToVerify.length === 0) {
         console.log('No recently modified TypeScript files found.');
         return;
       }
-      
+
       console.log(`Found ${filesToVerify.length} recently modified TypeScript files.`);
-      
     } catch (error) {
       console.error('Error getting modified files:', error.message);
       return;
     }
   }
-  
+
   // Results object to store Codacy findings
   const results = {
     timestamp: new Date().toISOString(),
@@ -83,52 +82,47 @@ async function verifyCodacyCompliance() {
     summary: {
       error: 0,
       warning: 0,
-      info: 0
-    }
+      info: 0,
+    },
   };
-  
+
   // Process each file
   for (const filePath of filesToVerify) {
     const fullPath = path.isAbsolute(filePath) ? filePath : path.join(ROOT_DIR, filePath);
     const relativeFilePath = path.relative(ROOT_DIR, fullPath);
-    
+
     if (!fs.existsSync(fullPath)) {
       console.log(`File not found: ${relativeFilePath}`);
       continue;
     }
-    
+
     console.log(`Analyzing ${relativeFilePath}...`);
-    
+
     try {
       // Run Codacy CLI analyze
       const codacyOutput = execFileSync(
         'codacy-analysis-cli',
-        [
-          'analyze',
-          '--directory', ROOT_DIR,
-          '--files', relativeFilePath,
-          '--format', 'json'
-        ],
-        { encoding: 'utf8', cwd: ROOT_DIR, stdio: ['pipe', 'pipe', 'pipe'] }
+        ['analyze', '--directory', ROOT_DIR, '--files', relativeFilePath, '--format', 'json'],
+        { encoding: 'utf8', cwd: ROOT_DIR, stdio: ['pipe', 'pipe', 'pipe'] },
       );
-      
+
       // Parse the JSON output
       try {
         const issues = JSON.parse(codacyOutput);
-        
+
         if (issues.length > 0) {
           results.filesWithIssues++;
           results.totalIssues += issues.length;
           results.issuesByFile[relativeFilePath] = [];
-          
+
           for (const issue of issues) {
             results.issuesByFile[relativeFilePath].push({
               level: issue.level,
               message: issue.message,
               line: issue.location?.line,
-              pattern: issue.patternId
+              pattern: issue.patternId,
             });
-            
+
             // Update summary
             if (issue.level in results.summary) {
               results.summary[issue.level]++;
@@ -138,21 +132,20 @@ async function verifyCodacyCompliance() {
       } catch (parseError) {
         console.error(`Error parsing Codacy output for ${relativeFilePath}:`, parseError.message);
       }
-      
     } catch (execError) {
       console.error(`Error running Codacy analysis on ${relativeFilePath}:`, execError.message);
     }
   }
-  
+
   // Generate report
   console.log('\n📝 Generating Codacy compliance report...');
-  
+
   // Save JSON report
   fs.writeFileSync(
     path.join(REPORTS_DIR, 'codacy-compliance.json'),
-    JSON.stringify(results, null, 2)
+    JSON.stringify(results, null, 2),
   );
-  
+
   // Generate human-readable report
   const markdownReport = [
     '# Codacy Compliance Report',
@@ -172,44 +165,47 @@ async function verifyCodacyCompliance() {
     `- Info: ${results.summary.info}`,
     '',
     '## Issues by File',
-    ''
+    '',
   ];
-  
+
   // Add details for each file with issues
   for (const [file, issues] of Object.entries(results.issuesByFile)) {
     markdownReport.push(`### ${file}`);
     markdownReport.push('');
     markdownReport.push('| Level | Line | Message | Pattern |');
     markdownReport.push('|-------|------|---------|---------|');
-    
+
     for (const issue of issues) {
-      markdownReport.push(`| ${issue.level} | ${issue.line || 'N/A'} | ${issue.message} | ${issue.pattern} |`);
+      markdownReport.push(
+        `| ${issue.level} | ${issue.line || 'N/A'} | ${issue.message} | ${issue.pattern} |`,
+      );
     }
-    
+
     markdownReport.push('');
   }
-  
+
   // Add recommendations
   markdownReport.push('## Recommendations');
   markdownReport.push('');
-  
+
   if (results.totalIssues > 0) {
     markdownReport.push('Based on the Codacy analysis, consider the following actions:');
     markdownReport.push('');
     markdownReport.push('1. Review and fix error-level issues first');
     markdownReport.push('2. Address warning-level issues in frequently modified files');
-    markdownReport.push('3. Consider configuring Codacy to ignore specific patterns if they conflict with project standards');
-    markdownReport.push('4. Update TypeScript diagnostic tools to prevent introducing new Codacy issues');
+    markdownReport.push(
+      '3. Consider configuring Codacy to ignore specific patterns if they conflict with project standards',
+    );
+    markdownReport.push(
+      '4. Update TypeScript diagnostic tools to prevent introducing new Codacy issues',
+    );
   } else {
     markdownReport.push('✅ No Codacy issues found in the analyzed files. Great job!');
   }
-  
+
   // Save markdown report
-  fs.writeFileSync(
-    path.join(REPORTS_DIR, 'codacy-compliance.md'),
-    markdownReport.join('\n')
-  );
-  
+  fs.writeFileSync(path.join(REPORTS_DIR, 'codacy-compliance.md'), markdownReport.join('\n'));
+
   // Print summary
   console.log('\n📊 Codacy Compliance Summary:');
   console.log(`- Total Files Analyzed: ${results.totalFiles}`);
@@ -218,7 +214,7 @@ async function verifyCodacyCompliance() {
   console.log(`  - Error: ${results.summary.error}`);
   console.log(`  - Warning: ${results.summary.warning}`);
   console.log(`  - Info: ${results.summary.info}`);
-  
+
   if (results.totalIssues > 0) {
     console.log('\nSee typescript-diagnostics/reports/codacy-compliance.md for details.');
   } else {
@@ -227,6 +223,6 @@ async function verifyCodacyCompliance() {
 }
 
 // Run verification
-verifyCodacyCompliance().catch(error => {
+verifyCodacyCompliance().catch((error) => {
   console.error('Error:', error);
 });

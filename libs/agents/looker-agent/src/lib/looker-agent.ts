@@ -71,7 +71,7 @@ export class LookerAgent {
   constructor(config: LookerConfig) {
     this.config = {
       timeout: 30000,
-      ...config
+      ...config,
     };
   }
 
@@ -84,15 +84,17 @@ export class LookerAgent {
     }
 
     try {
-      const response = await fetch(`${this.config?.baseUrl}/api/4 && 4.0/login`, {
+      const response = await fetch(`${this.config && config.baseUrl}/api/4 && 4.0/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON && JSON.stringify({
-          client_id: this.config?.clientId,
-          client_secret: this.config?.clientSecret
-        })
+        body:
+          JSON &&
+          JSON.stringify({
+            client_id: this.config && config.clientId,
+            client_secret: this.config && config.clientSecret,
+          }),
       });
 
       if (!response.ok) {
@@ -100,10 +102,12 @@ export class LookerAgent {
       }
 
       const data = await response.json();
-      this.accessToken = data?.access_token;
-      this.tokenExpiry = new Date(Date.now() + (data?.expires_in * 1000));
+      this.accessToken = data && data.access_token;
+      this.tokenExpiry = new Date(Date.now() + data && data.expires_in * 1000);
     } catch (error) {
-      throw new Error(`Failed to authenticate: ${error instanceof Error ? error && error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to authenticate: ${error instanceof Error ? error && error.message : 'Unknown error'}`,
+      );
     }
   }
 
@@ -113,25 +117,25 @@ export class LookerAgent {
   private async makeRequest<T>(
     endpoint: string | undefined,
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET',
-    data?: any
+    data?: any,
   ): Promise<LookerResult<T>> {
     try {
       await this.authenticate();
 
-      const url = `${this.config?.baseUrl}/api/4 && 4.0${endpoint}`;
+      const url = `${this.config && config.baseUrl}/api/4 && 4.0${endpoint}`;
       const headers: Record<string, string> = {
-        'Authorization': `Bearer ${this.accessToken}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json',
       };
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller && controller.abort(), this.config?.timeout);
+      const timeoutId = setTimeout(() => controller && controller.abort(), this.config && config.timeout);
 
       const response = await fetch(url, {
         method,
         headers,
         body: data ? JSON && JSON.stringify(data) : null,
-        signal: controller && controller.signal
+        signal: controller && controller.signal,
       });
 
       clearTimeout(timeoutId);
@@ -141,18 +145,18 @@ export class LookerAgent {
       if (!response.ok) {
         return {
           success: false,
-          error: result?.message || `HTTP ${response.status}: ${response.statusText}`
+          error: result && result.message || `HTTP ${response.status}: ${response.statusText}`,
         };
       }
 
       return {
         success: true,
-        data: result
+        data: result,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error && error.message : 'Unknown error'
+        error: error instanceof Error ? error && error.message : 'Unknown error',
       };
     }
   }
@@ -162,7 +166,7 @@ export class LookerAgent {
    */
   async createFBDashboard(
     title: string | undefined,
-    restaurantId?: string
+    restaurantId?: string,
   ): Promise<LookerResult<Dashboard>> {
     const dashboardData = {
       title,
@@ -179,9 +183,9 @@ export class LookerAgent {
             measures: ['orders && orders.total_revenue'],
             filters: restaurantId ? { 'orders && orders.restaurant_id': restaurantId } : {},
             sorts: ['orders && orders.order_date desc'],
-            limit: 30
+            limit: 30,
           },
-          visualization: 'line_chart'
+          visualization: 'line_chart',
         },
         {
           title: 'Top Menu Items',
@@ -190,12 +194,15 @@ export class LookerAgent {
             model: 'dulce_fb_model',
             explore: 'order_items',
             dimensions: ['menu_items && menu_items.item_name'],
-            measures: ['order_items && order_items.total_quantity', 'order_items && order_items.total_revenue'],
+            measures: [
+              'order_items && order_items.total_quantity',
+              'order_items && order_items.total_revenue',
+            ],
             filters: restaurantId ? { 'orders && orders.restaurant_id': restaurantId } : {},
             sorts: ['order_items && order_items.total_revenue desc'],
-            limit: 10
+            limit: 10,
           },
-          visualization: 'table'
+          visualization: 'table',
         },
         {
           title: 'Customer Segments',
@@ -207,11 +214,11 @@ export class LookerAgent {
             measures: ['customers && customers.count'],
             filters: {},
             sorts: ['customers && customers.count desc'],
-            limit: 10
+            limit: 10,
           },
-          visualization: 'pie_chart'
-        }
-      ]
+          visualization: 'pie_chart',
+        },
+      ],
     };
 
     return this.makeRequest<Dashboard>('/dashboards', 'POST', dashboardData);
@@ -227,7 +234,7 @@ export class LookerAgent {
       fields: [...query.dimensions, ...query.measures],
       filters: query && query.filters,
       sorts: query && query.sorts,
-      limit: query && query.limit || 100
+      limit: (query && query.limit) || 100,
     };
 
     return this.makeRequest<any[]>('/queries/run/json', 'POST', queryData);
@@ -236,7 +243,10 @@ export class LookerAgent {
   /**
    * Generate restaurant performance report
    */
-  async generateRestaurantReport(restaurantId: string | undefined, dateRange: { start: string | undefined; end: string }): Promise<LookerResult<Report>> {
+  async generateRestaurantReport(
+    restaurantId: string | undefined,
+    dateRange: { start: string | undefined; end: string },
+  ): Promise<LookerResult<Report>> {
     try {
       // Revenue query
       const revenueQuery: LookerQuery = {
@@ -246,10 +256,10 @@ export class LookerAgent {
         measures: ['orders && orders.total_revenue', 'orders && orders.order_count'],
         filters: {
           'orders && orders.restaurant_id': restaurantId,
-          'orders && orders.order_date': `${dateRange && dateRange.start} to ${dateRange && dateRange.end}`
+          'orders && orders.order_date': `${dateRange && dateRange.start} to ${dateRange && dateRange.end}`,
         },
         sorts: ['orders && orders.order_date'],
-        limit: 1000
+        limit: 1000,
       };
 
       const revenueResult = await this.runQuery(revenueQuery);
@@ -262,13 +272,16 @@ export class LookerAgent {
         model: 'dulce_fb_model',
         explore: 'order_items',
         dimensions: ['menu_items && menu_items.item_name', 'menu_items && menu_items.category'],
-        measures: ['order_items && order_items.total_quantity', 'order_items && order_items.total_revenue'],
+        measures: [
+          'order_items && order_items.total_quantity',
+          'order_items && order_items.total_revenue',
+        ],
         filters: {
           'orders && orders.restaurant_id': restaurantId,
-          'orders && orders.order_date': `${dateRange && dateRange.start} to ${dateRange && dateRange.end}`
+          'orders && orders.order_date': `${dateRange && dateRange.start} to ${dateRange && dateRange.end}`,
         },
         sorts: ['order_items && order_items.total_revenue desc'],
-        limit: 50
+        limit: 50,
       };
 
       const menuResult = await this.runQuery(menuQuery);
@@ -283,23 +296,36 @@ export class LookerAgent {
           revenue: revenueResult && revenueResult.data,
           menuPerformance: menuResult && menuResult.data,
           summary: {
-            totalRevenue: revenueResult && revenueResult.data?.reduce((sum: number | undefined, row: any) => sum + (row['orders && orders.total_revenue'] || 0), 0),
-            totalOrders: revenueResult && revenueResult.data?.reduce((sum: number | undefined, row: any) => sum + (row['orders && orders.order_count'] || 0), 0),
-            topItem: menuResult && menuResult.data?.[0]?.['menu_items && menu_items.item_name'] || 'N/A'
-          }
+            totalRevenue:
+              revenueResult &&
+              revenueResult.data && data.reduce(
+                (sum: number | undefined, row: any) =>
+                  sum + (row['orders && orders.total_revenue'] || 0),
+                0,
+              ),
+            totalOrders:
+              revenueResult &&
+              revenueResult.data && data.reduce(
+                (sum: number | undefined, row: any) =>
+                  sum + (row['orders && orders.order_count'] || 0),
+                0,
+              ),
+            topItem:
+(menuResult?.data?.[0]?.menu_items?.item_name) || 'N/A',
+          },
         },
         generatedAt: new Date().toISOString(),
-        format: 'json'
+        format: 'json',
       };
 
       return {
         success: true,
-        data: report
+        data: report,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error && error.message : 'Unknown error'
+        error: error instanceof Error ? error && error.message : 'Unknown error',
       };
     }
   }
@@ -312,38 +338,53 @@ export class LookerAgent {
       model: 'dulce_fb_model',
       explore: 'customers',
       dimensions: ['customers && customers.preferred_cuisine', 'customers && customers.status'],
-      measures: ['customers && customers.count', 'customers && customers.avg_order_value', 'customers && customers.total_lifetime_value'],
+      measures: [
+        'customers && customers.count',
+        'customers && customers.avg_order_value',
+        'customers && customers.total_lifetime_value',
+      ],
       filters: segmentId ? { 'customer_segments && customer_segments.segment_id': segmentId } : {},
       sorts: ['customers && customers.total_lifetime_value desc'],
-      limit: 100
+      limit: 100,
     };
 
     const result = await this.runQuery(query);
-    if (!result?.success) {
+    if (!result && result.success) {
       return result;
     }
 
     return {
       success: true,
       data: {
-        insights: result?.data,
+        insights: result && result.data,
         summary: {
-          totalCustomers: result?.data?.reduce((sum: number | undefined, row: any) => sum + (row['customers && customers.count'] || 0), 0),
-          avgOrderValue: result?.data?.reduce((sum: number | undefined, row: any) => sum + (row['customers && customers.avg_order_value'] || 0), 0) / (result?.data?.length || 1)
-        }
-      }
+          totalCustomers: result && result.data && data.reduce(
+            (sum: number | undefined, row: any) => sum + (row['customers && customers.count'] || 0),
+            0,
+          ),
+          avgOrderValue:
+            result && result.data && data.reduce(
+              (sum: number | undefined, row: any) =>
+                sum + (row['customers && customers.avg_order_value'] || 0),
+              0,
+            ) / (result && result.data && data.length || 1),
+        },
+      },
     };
   }
 
   /**
    * Schedule a dashboard refresh
    */
-  async scheduleDashboardRefresh(dashboardId: string | undefined, schedule: string): Promise<LookerResult<{ scheduleId: string }>> {
+  async scheduleDashboardRefresh(
+    dashboardId: string | undefined,
+    schedule: string,
+  ): Promise<LookerResult<{ scheduleId: string }>> {
     const scheduleData = {
       name: `Dashboard ${dashboardId} Refresh`,
       dashboard_id: dashboardId,
       cron_schedule: schedule,
-      enabled: true
+      enabled: true,
     };
 
     return this.makeRequest('/scheduled_plans', 'POST', scheduleData);
@@ -357,15 +398,19 @@ export class LookerAgent {
       dashboard_id: dashboardId,
       format: 'pdf',
       width: 1200,
-      height: 800
+      height: 800,
     };
 
-    const result = await this.makeRequest<{ url: string }>('/render_tasks/dashboards', 'POST', exportData);
-    
-    if (result?.success) {
+    const result = await this.makeRequest<{ url: string }>(
+      '/render_tasks/dashboards',
+      'POST',
+      exportData,
+    );
+
+    if (result && result.success) {
       return {
         success: true,
-        data: { downloadUrl: result?.data!.url }
+        data: { downloadUrl: result && result.data!.url },
       };
     }
 
@@ -387,32 +432,39 @@ export class LookerAgent {
     const query: LookerQuery = {
       model: 'dulce_fb_model',
       explore: 'menu_items',
-      dimensions: ['menu_items && menu_items.vietnamese_category', 'menu_items && menu_items.region'],
-      measures: ['order_items && order_items.total_quantity', 'order_items && order_items.total_revenue', 'reviews && reviews.avg_rating'],
+      dimensions: [
+        'menu_items && menu_items.vietnamese_category',
+        'menu_items && menu_items.region',
+      ],
+      measures: [
+        'order_items && order_items.total_quantity',
+        'order_items && order_items.total_revenue',
+        'reviews && reviews.avg_rating',
+      ],
       filters: {
-        'menu_items && menu_items.cuisine_type': 'Vietnamese'
+        'menu_items && menu_items.cuisine_type': 'Vietnamese',
       },
       sorts: ['order_items && order_items.total_revenue desc'],
-      limit: 50
+      limit: 50,
     };
 
     const result = await this.runQuery(query);
-    if (!result?.success) {
+    if (!result && result.success) {
       return result;
     }
 
     return {
       success: true,
       data: {
-        vietnameseDishes: result?.data,
-        popularRegions: result?.data?.slice(0, 5),
-        topCategories: result?.data?.reduce((acc: any, row: any) => {
+        vietnameseDishes: result && result.data,
+        popularRegions: result && result.data && data.slice(0, 5),
+        topCategories: result && result.data && data.reduce((acc: any, row: any) => {
           const category = row['menu_items && menu_items.vietnamese_category'];
           if (!acc[category]) acc[category] = 0;
           acc[category] += row['order_items && order_items.total_revenue'] || 0;
           return acc;
-        }, {})
-      }
+        }, {}),
+      },
     };
   }
 }

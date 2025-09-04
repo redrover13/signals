@@ -30,7 +30,7 @@ window.IntersectionObserver = mockIntersectionObserver;
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: vi.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -50,7 +50,7 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 }));
 
 // Mock for requestAnimationFrame
-global.requestAnimationFrame = vi.fn(callback => {
+global.requestAnimationFrame = vi.fn((callback) => {
   setTimeout(callback, 0);
   return 0;
 });
@@ -58,7 +58,7 @@ global.requestAnimationFrame = vi.fn(callback => {
 // Mock for Web Crypto API
 Object.defineProperty(global.self, 'crypto', {
   value: {
-    getRandomValues: arr => {
+    getRandomValues: (arr) => {
       return crypto.randomBytes(arr.length);
     },
     subtle: {
@@ -73,9 +73,8 @@ Object.defineProperty(global.self, 'crypto', {
 const originalConsoleError = console.error;
 console.error = (...args) => {
   if (
-    typeof args[0] === 'string' && 
-    (args[0].includes('React does not recognize the') || 
-     args[0].includes('Warning:'))
+    typeof args[0] === 'string' &&
+    (args[0].includes('React does not recognize the') || args[0].includes('Warning:'))
   ) {
     return;
   }
@@ -83,20 +82,20 @@ console.error = (...args) => {
 };
 
 // Mock localStorage and sessionStorage
-const localStorageMock = (function() {
+const localStorageMock = (function () {
   let store = {};
   return {
-    getItem: vi.fn(key => store[key] || null),
+    getItem: vi.fn((key) => store[key] || null),
     setItem: vi.fn((key, value) => {
       store[key] = value.toString();
     }),
-    removeItem: vi.fn(key => {
+    removeItem: vi.fn((key) => {
       delete store[key];
     }),
     clear: vi.fn(() => {
       store = {};
     }),
-    key: vi.fn(index => {
+    key: vi.fn((index) => {
       return Object.keys(store)[index] || null;
     }),
     get length() {

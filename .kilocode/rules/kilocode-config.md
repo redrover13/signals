@@ -12,7 +12,7 @@ This directory contains configuration files and rules for Kilocode.ai, tailored 
 
 ## Example Rule Structure (Conceptual)
 
-```markdown
+````markdown
 ---
 id: no-direct-bigquery-access-from-frontend
 name: No Direct BigQuery Access from Frontend
@@ -36,6 +36,7 @@ import { BigQuery } from '@google-cloud/bigquery';
 const bq = new BigQuery();
 // ... direct BigQuery operations ...
 ```
+````
 
 ## Compliant Example
 
@@ -52,8 +53,10 @@ async function fetchData() {
 ## Remediation
 
 Refactor direct BigQuery access to go through a dedicated backend API (e.g., a Cloud Function) that handles authentication, authorization, and data retrieval securely.
+
 ```
 
 ## Document Owner
 
 This document is owned by `garretnelson368@gmail.com`.
+```

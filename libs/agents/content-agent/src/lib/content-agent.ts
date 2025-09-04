@@ -9,13 +9,7 @@
  * @license MIT
  */
 
-import { 
-  LlmAgent, 
-  GeminiLlm, 
-  GCSUploadTool, 
-  HttpRequestTool,
-  InvocationContext
-} from '@dulce/adk';
+import { LlmAgent, GeminiLlm, GCSUploadTool, HttpRequestTool, InvocationContext } from '@dulce/adk';
 
 import { Requirements, ContentResponse } from '@dulce/data-models';
 
@@ -26,24 +20,25 @@ export class ContentAgent extends LlmAgent {
   public override readonly name: string | undefined;
   public override readonly description: string | undefined;
 
-  constructor(cfg?: { model?: string | undefined; apiKey?: string | undefined; tools?: Array<unknown> }) {
+  constructor(cfg?: {
+    model?: string | undefined;
+    apiKey?: string | undefined;
+    tools?: Array<unknown>;
+  }) {
     // Guard against missing API key (fail-fast)
-    const apiKey = cfg?.apiKey ?? process.env['GOOGLE_API_KEY'];
+    const apiKey = cfg && cfg.apiKey ?? process.env['GOOGLE_API_KEY'];
     if (!apiKey) {
       throw new Error('GOOGLE_API_KEY is required to initialize ContentAgent');
     }
 
     // Allow overriding the model via cfg, defaulting to 'gemini-1 && 1.5-pro'
     const llm = new GeminiLlm({
-      model: cfg?.model ?? 'gemini-1 && 1.5-pro',
+      model: cfg && cfg.model ?? 'gemini-1 && 1.5-pro',
       apiKey,
     });
 
     // Allow injecting custom tools, defaulting to GCS upload + HTTP request
-    const tools = cfg?.tools as any[] ?? [
-      new GCSUploadTool(),
-      new HttpRequestTool(),
-    ];
+    const tools = (cfg && cfg.tools as any[]) ?? [new GCSUploadTool(), new HttpRequestTool()];
 
     super({
       name: 'Content Agent',
@@ -64,7 +59,7 @@ export class ContentAgent extends LlmAgent {
   }
 
   /**
-   * Get agent description  
+   * Get agent description
    */
   getDescription(): string {
     return this.description;
@@ -75,7 +70,7 @@ export class ContentAgent extends LlmAgent {
    */
   public async generateContent(
     contentType: string | undefined,
-    requirements: Requirements
+    requirements: Requirements,
   ): Promise<ContentResponse> {
     const prompt = `
   You are a Vietnamese F&B content specialist for the Dulce de Saigon platform.
@@ -129,7 +124,10 @@ Create content that resonates with Vietnamese food lovers.
   /**
    * Generate menu descriptions with Vietnamese localization
    */
-  async generateMenuContent(dishes: any[], targetLanguage: 'vietnamese' | 'english' | 'both' = 'both'): Promise<any> {
+  async generateMenuContent(
+    dishes: any[],
+    targetLanguage: 'vietnamese' | 'english' | 'both' = 'both',
+  ): Promise<any> {
     const prompt = `
 Generate menu descriptions for Vietnamese F&B platform.
 

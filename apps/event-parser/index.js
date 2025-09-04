@@ -19,12 +19,7 @@ import { Storage } from '@google-cloud/storage';
 import { v4 as uuidv4 } from 'uuid';
 
 // OpenTelemetry imports
-import { 
-  initializeOpenTelemetry,
-  withSpan,
-  logEvent,
-  instrument
-} from '@dulce/utils/monitoring';
+import { initializeOpenTelemetry, withSpan, logEvent, instrument } from '@dulce/utils/monitoring';
 
 // Initialize OpenTelemetry for Cloud Function
 initializeOpenTelemetry({
@@ -42,25 +37,29 @@ const BIGQUERY_TABLE = process.env.BIGQUERY_TABLE;
 const STAGING_BUCKET = process.env.STAGING_BUCKET;
 const DEADLETTER_BUCKET = process.env.DEADLETTER_BUCKET;
 
-const bigquery = new BigQuery({projectId: GCP_PROJECT_ID});
-const storage = new Storage({projectId: GCP_PROJECT_ID});
+const bigquery = new BigQuery({ projectId: GCP_PROJECT_ID });
+const storage = new Storage({ projectId: GCP_PROJECT_ID });
 
-const validatePayload = instrument('validate-payload', (payload) => {
-  if (!payload) {
-    throw new Error('Payload is null or undefined.');
-  }
-  const requiredFields = ['event_id', 'agent_id', 'timestamp'];
-  for (const field of requiredFields) {
-    if (!payload[field]) {
-      throw new Error(`Missing required field in payload: "${field}"`);
+const validatePayload = instrument(
+  'validate-payload',
+  (payload) => {
+    if (!payload) {
+      throw new Error('Payload is null or undefined.');
     }
-  }
-}, {
-  attributes: {
-    'component': 'event-parser',
-    'operation': 'validation',
-  }
-});
+    const requiredFields = ['event_id', 'agent_id', 'timestamp'];
+    for (const field of requiredFields) {
+      if (!payload[field]) {
+        throw new Error(`Missing required field in payload: "${field}"`);
+      }
+    }
+  },
+  {
+    attributes: {
+      component: 'event-parser',
+      operation: 'validation',
+    },
+  },
+);
 
 export const parseAgentEvent = async (pubSubMessage, context) => {
   return withSpan('parse-agent-event', async (span) => {
@@ -72,7 +71,7 @@ export const parseAgentEvent = async (pubSubMessage, context) => {
       'event.id': eventId,
       'event.size_bytes': rawMessageBuffer.length,
       'gcp.project_id': GCP_PROJECT_ID,
-      'component': 'event-parser',
+      component: 'event-parser',
     });
 
     await logEvent('event_processing_started', {
@@ -105,7 +104,7 @@ export const parseAgentEvent = async (pubSubMessage, context) => {
       // Stage raw data in GCS
       const stagingFileName = await withSpan('stage-to-gcs', async (stageSpan) => {
         const fileName = `${new Date().toISOString()}_${eventPayload.event_id}.json`;
-        
+
         stageSpan.setAttributes({
           'gcs.bucket': STAGING_BUCKET.replace('gs://', ''),
           'gcs.file_name': fileName,
@@ -144,10 +143,7 @@ export const parseAgentEvent = async (pubSubMessage, context) => {
           'processing.status': 'PROCESSED',
         });
 
-        await bigquery
-          .dataset(BIGQUERY_DATASET)
-          .table(BIGQUERY_TABLE)
-          .insert([row]);
+        await bigquery.dataset(BIGQUERY_DATASET).table(BIGQUERY_TABLE).insert([row]);
 
         await logEvent('event_processed_successfully', {
           eventId: eventPayload.event_id,
@@ -161,12 +157,11 @@ export const parseAgentEvent = async (pubSubMessage, context) => {
         'processing.success': true,
         'processing.status': 'PROCESSED',
       });
-
     } catch (_error) {
       // Handle processing errors
       await withSpan('handle-processing-error', async (errorSpan) => {
         const deadLetterFileName = `${new Date().toISOString()}_${eventId}.json`;
-        
+
         errorSpan.setAttributes({
           'error.type': _error.constructor.name,
           'error.message': _error.message,
@@ -174,11 +169,15 @@ export const parseAgentEvent = async (pubSubMessage, context) => {
           'processing.success': false,
         });
 
-        await logEvent('event_processing_failed', {
-          eventId,
-          error: _error.message,
-          deadLetterFile: deadLetterFileName,
-        }, 'error');
+        await logEvent(
+          'event_processing_failed',
+          {
+            eventId,
+            error: _error.message,
+            deadLetterFile: deadLetterFileName,
+          },
+          'error',
+        );
 
         try {
           await storage
@@ -186,27 +185,34 @@ export const parseAgentEvent = async (pubSubMessage, context) => {
             .file(deadLetterFileName)
             .save(rawMessageBuffer);
 
-          await logEvent('message_sent_to_deadletter', {
-            eventId,
-            deadLetterFile: deadLetterFileName,
-            bucket: DEADLETTER_BUCKET,
-          }, 'warn');
+          await logEvent(
+            'message_sent_to_deadletter',
+            {
+              eventId,
+              deadLetterFile: deadLetterFileName,
+              bucket: DEADLETTER_BUCKET,
+            },
+            'warn',
+          );
 
           errorSpan.setAttributes({
             'deadletter.success': true,
           });
-
         } catch (_dlqError) {
           errorSpan.setAttributes({
             'deadletter.success': false,
             'deadletter.error': _dlqError.message,
           });
 
-          await logEvent('deadletter_failed', {
-            eventId,
-            originalError: _error.message,
-            deadletterError: _dlqError.message,
-          }, 'error');
+          await logEvent(
+            'deadletter_failed',
+            {
+              eventId,
+              originalError: _error.message,
+              deadletterError: _dlqError.message,
+            },
+            'error',
+          );
 
           // In a production scenario, this might trigger a high-priority alert (e.g., via PagerDuty).
         }

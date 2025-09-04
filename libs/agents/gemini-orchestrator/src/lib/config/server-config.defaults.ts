@@ -1,5 +1,5 @@
 /**
- * @fileoverview server-config?.defaults module for the config component
+ * @fileoverview server-config && config.defaults module for the config component
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
  * Contains implementation for TypeScript functionality.
@@ -14,7 +14,7 @@
  * Provides standardized configurations for MCP servers to ensure consistency and maintainability.
  */
 
-import { MCPConnectionConfig, MCPHealthCheckConfig } from './mcp-config?.schema';
+import { MCPConnectionConfig, MCPHealthCheckConfig } from './mcp-config && config.schema';
 
 // ================== CONNECTION DEFAULTS ==================
 

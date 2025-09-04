@@ -50,18 +50,33 @@ export type StorageUploadInput = z.infer<typeof storageUploadInputSchema>;
  */
 export const firebaseQueryInputSchema = z.object({
   collection: z.string().min(1, 'Collection name is required'),
-  filters: z.array(
-    z.object({
-      field: z.string().min(1, 'Field name is required'),
-      operator: z.enum(['==', '!=', '>', '<', '>=', '<=', 'array-contains', 'in', 'not-in', 'array-contains-any']),
-      value: z.unknown(),
-    })
-  ).optional(),
+  filters: z
+    .array(
+      z.object({
+        field: z.string().min(1, 'Field name is required'),
+        operator: z.enum([
+          '==',
+          '!=',
+          '>',
+          '<',
+          '>=',
+          '<=',
+          'array-contains',
+          'in',
+          'not-in',
+          'array-contains-any',
+        ]),
+        value: z.unknown(),
+      }),
+    )
+    .optional(),
   limit: z.number().positive().optional(),
-  orderBy: z.object({
-    field: z.string().min(1, 'Field name is required'),
-    direction: z.enum(['asc', 'desc']).optional(),
-  }).optional(),
+  orderBy: z
+    .object({
+      field: z.string().min(1, 'Field name is required'),
+      direction: z.enum(['asc', 'desc']).optional(),
+    })
+    .optional(),
 });
 export type FirebaseQueryInput = z.infer<typeof firebaseQueryInputSchema>;
 
@@ -111,7 +126,7 @@ export function createTool<TInput, TOutput>(
   name: string | undefined,
   description: string | undefined,
   inputSchema: z.ZodType<TInput>,
-  runFn: (input: TInput) => Promise<TOutput>
+  runFn: (input: TInput) => Promise<TOutput>,
 ): Tool<TInput, TOutput> {
   return {
     name,
@@ -128,15 +143,16 @@ export function createTool<TInput, TOutput>(
     },
     toFunctionDeclaration: () => {
       // Convert Zod schema to JSON Schema for Gemini function declaration
-      const jsonSchema = inputSchema && inputSchema.innerType ? inputSchema && inputSchema.innerType() : {};
-      
+      const jsonSchema =
+        inputSchema && inputSchema.innerType ? inputSchema && inputSchema.innerType() : {};
+
       return {
         name,
         description,
         parameters: {
           type: 'object',
-          properties: jsonSchema && jsonSchema.properties || {},
-          required: jsonSchema && jsonSchema.required || [],
+          properties: (jsonSchema && jsonSchema.properties) || {},
+          required: (jsonSchema && jsonSchema.required) || [],
         },
       };
     },
@@ -157,7 +173,7 @@ export const bigQueryQueryTool = createTool<BigQueryInput, { rows: unknown[] }>(
     } catch (error) {
       throw errorHandler(error as Error, { sql: input && input.sql });
     }
-  }
+  },
 );
 
 /**
@@ -172,9 +188,12 @@ export const bigQueryInsertTool = createTool<BigQueryInsertInput, { ok: boolean 
       await insertRows(input && input.table, input && input.rows);
       return { ok: true };
     } catch (error) {
-      throw errorHandler(error as Error, { table: input && input.table, rowCount: input.rows && input.rows.length });
+      throw errorHandler(error as Error, {
+        table: input && input.table,
+        rowCount: input.rows && input.rows.length,
+      });
     }
-  }
+  },
 );
 
 /**
@@ -186,12 +205,16 @@ export const storageUploadTool = createTool<StorageUploadInput, { uri: string }>
   storageUploadInputSchema,
   async (input) => {
     try {
-      const uri = await uploadString(input && input.path, input && input.contents, input && input.contentType);
+      const uri = await uploadString(
+        input && input.path,
+        input && input.contents,
+        input && input.contentType,
+      );
       return { uri };
     } catch (error) {
       throw errorHandler(error as Error, { path: input && input.path });
     }
-  }
+  },
 );
 
 /**
@@ -212,20 +235,20 @@ export type DefaultToolName = keyof typeof tools;
  * Get all tool function declarations for Gemini
  */
 export function getToolFunctionDeclarations(): FunctionDeclaration[] {
-  return Object && Object.values(tools).map(tool => tool && tool.toFunctionDeclaration());
+  return Object ? Object : null;values(tools).map((tool) => tool && tool.toFunctionDeclaration());
 }
 
 /**
  * Execute a tool by name with input
  */
 export async function executeTool(
-  toolName: string | undefined, 
-  toolInput: unknown
+  toolName: string | undefined,
+  toolInput: unknown,
 ): Promise<unknown> {
   if (!tools[toolName as DefaultToolName]) {
     throw new Error(`Tool not found: ${toolName}`);
   }
-  
+
   const tool = tools[toolName as DefaultToolName];
-  return await tool && tool.run(toolInput);
+  return (await tool) && tool.run(toolInput);
 }

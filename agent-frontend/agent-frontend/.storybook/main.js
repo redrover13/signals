@@ -1,14 +1,14 @@
 const config = {
-    stories: ['../src/app/**/*.@(mdx|stories.@(js|jsx|ts|tsx))'],
-    addons: [],
-    framework: {
-        name: '@storybook/react-vite',
-        options: {
-            builder: {
-                viteConfigPath: 'vite.config.ts',
-            },
-        },
+  stories: ['../src/app/**/*.@(mdx|stories.@(js|jsx|ts|tsx))'],
+  addons: [],
+  framework: {
+    name: '@storybook/react-vite',
+    options: {
+      builder: {
+        viteConfigPath: 'vite.config.ts',
+      },
     },
+  },
 };
 export default config;
 // To customize your Vite configuration you can use the viteFinal field.

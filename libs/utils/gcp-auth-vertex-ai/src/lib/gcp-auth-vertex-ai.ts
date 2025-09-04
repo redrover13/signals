@@ -19,9 +19,9 @@ const clientCache = new Map<string, any>();
  * Get Vertex AI Prediction Service client
  * @param options Client options
  */
-export function getPredictionServiceClient(
-  options: { location: string }
-): v1.PredictionServiceClient {
+export function getPredictionServiceClient(options: {
+  location: string;
+}): v1.PredictionServiceClient {
   const cacheKey = `vertex:prediction:${options.location}`;
 
   if (clientCache.has(cacheKey)) {

@@ -2,22 +2,22 @@ name: NX Cloud Cache Warming
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   schedule:
-    - cron: '0 0 * * 0'  # Run at midnight every Sunday
+    - cron: '0 0 * * 0' # Run at midnight every Sunday
 
 jobs:
   nx-cache-warming:
     name: Warm NX Cloud Cache
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: ""
+      STORE_PATH: ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-        
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.1.0
         with:
@@ -32,21 +32,21 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: pnpm
-          
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        
+
       - name: NX Cloud Warm Cache - Build
         run: pnpm nx run-many --target=build --all --parallel=5
-        
+
       - name: NX Cloud Warm Cache - Lint
         run: pnpm nx run-many --target=lint --all --parallel=5
-        
+
       - name: NX Cloud Warm Cache - Test
         run: pnpm nx run-many --target=test --all --parallel=5

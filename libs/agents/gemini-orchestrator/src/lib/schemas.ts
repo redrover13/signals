@@ -17,7 +17,7 @@ export enum SubAgentType {
   BIGQUERY = 'BIGQUERY',
   FIREBASE = 'FIREBASE',
   TOOL = 'TOOL',
-  RAG = 'RAG'
+  RAG = 'RAG',
 }
 
 /**
@@ -30,7 +30,7 @@ export const ragOptionsSchema = z.object({
   filter: z.record(z.any()).optional(),
   chunkSize: z.number().positive().default(1000),
   overlap: z.number().positive().default(200),
-  generateEmbeddings: z.boolean().default(true)
+  generateEmbeddings: z.boolean().default(true),
 });
 
 export type RAGOptions = z.infer<typeof ragOptionsSchema>;
@@ -40,7 +40,7 @@ export type RAGOptions = z.infer<typeof ragOptionsSchema>;
  */
 export const cacheOptionsSchema = z.object({
   ttlSeconds: z.number().positive().default(300),
-  refreshOnRead: z.boolean().default(false)
+  refreshOnRead: z.boolean().default(false),
 });
 
 /**
@@ -51,16 +51,16 @@ export const orchestratorOptionsSchema = z.object({
   timeout: z.number().positive().optional(),
   cacheResults: z.boolean().default(false),
   cache: cacheOptionsSchema.optional(),
-  mcpServerId: z.string().optional()
+  mcpServerId: z.string().optional(),
 });
 
 /**
  * The schema for the orchestrator input.
  */
 export const orchestratorInputSchema = z.object({
-  query: z.string().min(1, "Query cannot be empty"),
+  query: z.string().min(1, 'Query cannot be empty'),
   context: z.record(z.unknown()).optional().default({}),
-  options: orchestratorOptionsSchema.optional().default({})
+  options: orchestratorOptionsSchema.optional().default({}),
 });
 
 /**
@@ -70,7 +70,7 @@ export const bigQueryResultSchema = z.object({
   type: z.literal('bigquery_result'),
   sql: z.string(),
   rows: z.array(z.record(z.unknown())),
-  rowCount: z.number()
+  rowCount: z.number(),
 });
 
 /**
@@ -80,7 +80,7 @@ export const firebaseQueryResultSchema = z.object({
   type: z.literal('firebase_query_result'),
   collection: z.string(),
   documents: z.array(z.record(z.unknown())),
-  documentCount: z.number()
+  documentCount: z.number(),
 });
 
 /**
@@ -90,7 +90,7 @@ export const firebaseDocumentSchema = z.object({
   type: z.literal('firebase_document'),
   collection: z.string(),
   id: z.string(),
-  document: z.record(z.unknown()).nullable()
+  document: z.record(z.unknown()).nullable(),
 });
 
 /**
@@ -100,7 +100,7 @@ export const firebaseWriteResultSchema = z.object({
   type: z.literal('firebase_write_result'),
   collection: z.string(),
   id: z.string(),
-  success: z.boolean()
+  success: z.boolean(),
 });
 
 /**
@@ -110,7 +110,7 @@ export const firebaseDeleteResultSchema = z.object({
   type: z.literal('firebase_delete_result'),
   collection: z.string(),
   id: z.string(),
-  success: z.boolean()
+  success: z.boolean(),
 });
 
 /**
@@ -118,12 +118,14 @@ export const firebaseDeleteResultSchema = z.object({
  */
 export const toolResultsSchema = z.object({
   type: z.literal('tool_results'),
-  results: z.array(z.object({
-    tool: z.string(),
-    input: z.record(z.unknown()),
-    result: z.unknown()
-  })),
-  text: z.string().optional()
+  results: z.array(
+    z.object({
+      tool: z.string(),
+      input: z.record(z.unknown()),
+      result: z.unknown(),
+    }),
+  ),
+  text: z.string().optional(),
 });
 
 /**
@@ -131,7 +133,7 @@ export const toolResultsSchema = z.object({
  */
 export const textResponseSchema = z.object({
   type: z.literal('text_response'),
-  text: z.string()
+  text: z.string(),
 });
 
 /**
@@ -145,7 +147,7 @@ export const orchestratorOutputDataSchema = z.union([
   firebaseDeleteResultSchema,
   toolResultsSchema,
   textResponseSchema,
-  z.record(z.string(), z.unknown())
+  z.record(z.string(), z.unknown()),
 ]);
 
 /**
@@ -155,7 +157,7 @@ export const orchestratorMetadataSchema = z.object({
   model: z.string(),
   processTime: z.number(),
   subAgent: z.nativeEnum(SubAgentType),
-  timestamp: z.string()
+  timestamp: z.string(),
 });
 
 /**
@@ -166,7 +168,7 @@ export const orchestratorOutputSchema = z.object({
   data: orchestratorOutputDataSchema,
   error: z.string().optional(),
   fromCache: z.boolean().optional().default(false),
-  metadata: orchestratorMetadataSchema.optional()
+  metadata: orchestratorMetadataSchema.optional(),
 });
 
 /**
@@ -179,7 +181,7 @@ export const orchestratorStreamOutputSchema = z.object({
   error: z.string().optional(),
   done: z.boolean(),
   metadata: orchestratorMetadataSchema.optional(),
-  chunkIndex: z.number().optional()
+  chunkIndex: z.number().optional(),
 });
 
 /**

@@ -24,6 +24,7 @@ The infrastructure is organized into modular components:
    - Application Default Credentials
 
 3. **Required Tools**:
+
    ```bash
    # Install Terraform
    curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
@@ -39,11 +40,13 @@ The infrastructure is organized into modular components:
 ### Setup
 
 1. **Clone and Navigate**:
+
    ```bash
    cd infra/terraform
    ```
 
 2. **Run Setup Script**:
+
    ```bash
    ./setup.sh
    ```
@@ -51,6 +54,7 @@ The infrastructure is organized into modular components:
    Or manually:
 
 3. **Manual Setup**:
+
    ```bash
    # Copy configuration files
    cp terraform.tfvars.example terraform.tfvars
@@ -74,13 +78,15 @@ The infrastructure is organized into modular components:
 ## 📁 Module Details
 
 ### Root Module
+
 - **Purpose**: Foundation setup, API enablement, state management
-- **Resources**: 
+- **Resources**:
   - GCS bucket for Terraform state
   - Required API enablement
   - Optional GitHub Actions service account
 
 ### BigQuery Module
+
 - **Purpose**: Data warehousing and analytics
 - **Resources**:
   - Analytics, Social Media, CRM, and Reviews datasets
@@ -89,6 +95,7 @@ The infrastructure is organized into modular components:
 - **Key Outputs**: Dataset and table IDs
 
 ### Functions Module
+
 - **Purpose**: Serverless compute and APIs
 - **Resources**:
   - Cloud Functions for each API (social, CRM, CMS, reviews)
@@ -98,6 +105,7 @@ The infrastructure is organized into modular components:
 - **Key Outputs**: Function URLs and service account
 
 ### Vertex Agents Module
+
 - **Purpose**: AI agents and orchestration
 - **Resources**:
   - Cloud Functions for each agent
@@ -107,6 +115,7 @@ The infrastructure is organized into modular components:
 - **Key Outputs**: Agent URLs and orchestration topic
 
 ### Looker Module
+
 - **Purpose**: Business intelligence and reporting
 - **Resources**:
   - Looker integration function
@@ -116,6 +125,7 @@ The infrastructure is organized into modular components:
 - **Key Outputs**: Integration URL and export bucket
 
 ### RAG Pipeline Module
+
 - **Purpose**: Retrieval-Augmented Generation data ingestion
 - **Resources**:
   - Vertex AI Search data store and engine
@@ -224,16 +234,19 @@ cd .. && terraform destroy
 ### Common Issues
 
 1. **API Not Enabled**:
+
    ```bash
    gcloud services enable <service-name>
    ```
 
 2. **Permission Denied**:
+
    ```bash
    gcloud auth application-default login
    ```
 
 3. **State Lock**:
+
    ```bash
    terraform force-unlock <lock-id>
    ```
@@ -272,6 +285,7 @@ terraform plan | grep -i "warning\|error"
 ## 📞 Support
 
 For infrastructure issues:
+
 1. Check the troubleshooting section
 2. Review Terraform and GCP logs
 3. Create an issue with full error details

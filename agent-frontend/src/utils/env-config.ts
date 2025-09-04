@@ -30,7 +30,7 @@ export const getEnvVar = (key: string | undefined, fallback: string = ''): strin
  */
 export const getAgentConfig = (): AgentConfig => {
   const config = getViteConfig();
-  
+
   return {
     apiKey: config?.VITE_GEMINI_API_KEY,
     projectId: config?.VITE_GCP_PROJECT_ID,
@@ -40,8 +40,8 @@ export const getAgentConfig = (): AgentConfig => {
       projectId: config?.VITE_FIREBASE_PROJECT_ID,
       storageBucket: config?.VITE_FIREBASE_STORAGE_BUCKET,
       messagingSenderId: config?.VITE_FIREBASE_MESSAGING_SENDER_ID,
-      appId: config?.VITE_FIREBASE_APP_ID
-    }
+      appId: config?.VITE_FIREBASE_APP_ID,
+    },
   };
 };
 

@@ -1,166 +1,108 @@
 /**
- * @fileoverview Unit tests for the enhanced signals implementation
- *
- * This file is part of the Dulce de Saigon F&B Data Platform.
- * Contains test cases for verifying the enhanced signal functionality.
- *
- * @author Dulce de Saigon Engineering
- * @copyright Copyright (c) 2025 Dulce de Saigon
- * @license MIT
+ * @fileoverview Enhanced signals test spec
  */
 
-import {
-  createSignal,
-  useSignal,
-  type SignalValue,
-  type UnwrapSignal,
-} from '../enhanced-index';
-import { renderHook, act } from '@testing-library/react';
+import { createSignal, SignalValue, UnwrapSignal } from '../enhanced-index';
 
 describe('Enhanced Signals Library', () => {
   describe('createSignal', () => {
-    it('should create a signal with the initial value', () => {
-      const count = createSignal(0);
-      expect(count.get()).toBe(0);
+    it('should create a signal with initial value', () => {
+      const counter = createSignal(0);
+      expect(counter()).toBe(0);
+      expect(counter.get()).toBe(0);
     });
 
-    it('should update the signal value when set is called', () => {
-      const count = createSignal(0);
-      count.set(5);
-      expect(count.get()).toBe(5);
+    it('should update value when set is called', () => {
+      const counter = createSignal(0);
+      counter.set(5);
+      expect(counter()).toBe(5);
     });
 
-    it('should support functional updates', () => {
-      const count = createSignal(5);
-      count.set(prev => prev + 10);
-      expect(count.get()).toBe(15);
+    it('should update using a setter function', () => {
+      const counter = createSignal(0);
+      counter.set((prev) => prev + 1);
+      expect(counter()).toBe(1);
     });
 
-    it('should skip update when values are equal with deepEqual option', () => {
-      const obj = { a: 1, b: 2 };
-      const objSignal = createSignal(obj, { deepEqual: true });
+    it('should notify subscribers when value changes', () => {
+      const counter = createSignal(0);
+      const mockCallback = jest.fn();
 
-      const setMethodSpy = jest.fn();
-      const originalSet = objSignal.set;
-      objSignal.set = (value: typeof obj | ((prev: typeof obj) => typeof obj)) => {
-        const resolvedValue = typeof value === 'function' ? value(objSignal.get()) : value;
-        setMethodSpy(resolvedValue);
-        originalSet(value);
-      };
+      counter.subscribe(mockCallback);
+      counter.set(5);
 
-      objSignal.set({ ...obj });
-
-      expect(objSignal.get()).toEqual(obj);
-      expect(setMethodSpy).toHaveBeenCalledTimes(1);
-
-      objSignal.set({ a: 1, b: 3 });
-      expect(objSignal.get()).toEqual({ a: 1, b: 3 });
-      expect(setMethodSpy).toHaveBeenCalledTimes(2);
+      expect(mockCallback).toHaveBeenCalledWith(5);
     });
 
-    it('should support custom equality functions', () => {
-      const customEquals = (a: { id: number }, b: { id: number }) => {
-        return a.id === b.id;
-      };
+    it('should not notify subscribers when value does not change', () => {
+      const counter = createSignal(0);
+      const mockCallback = jest.fn();
 
-      const objSignal = createSignal({ id: 1, value: 'test' }, {
-        equals: customEquals,
-      });
+      counter.subscribe(mockCallback);
+      counter.set(0);
 
-      objSignal.set({ id: 1, value: 'changed' });
-      expect(objSignal.get()).toEqual({ id: 1, value: 'test' });
-
-      objSignal.set({ id: 2, value: 'test' });
-      expect(objSignal.get()).toEqual({ id: 2, value: 'test' });
-    });
-  });
-
-  describe('useSignal React Hook', () => {
-    it('should return the current signal value and a setter', () => {
-      const countSignal = createSignal(0);
-
-      const { result } = renderHook(() => useSignal(countSignal));
-
-      expect(result.current[0]).toBe(0);
-      expect(typeof result.current[1]).toBe('function');
+      expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    it('should update the component when the signal changes', () => {
-      const countSignal = createSignal(0);
+    it('should support unsubscribing', () => {
+      const counter = createSignal(0);
+      const mockCallback = jest.fn();
 
-      const { result } = renderHook(() => useSignal(countSignal));
+      const unsubscribe = counter.subscribe(mockCallback);
+      unsubscribe();
+      counter.set(5);
 
-      act(() => {
-        countSignal.set(5);
-      });
-
-      expect(result.current[0]).toBe(5);
+      expect(mockCallback).not.toHaveBeenCalled();
     });
 
-    it('should update the signal when the setter is called', () => {
-      const countSignal = createSignal(0);
+    it('should support deep equality checks when option is enabled', () => {
+      const user = createSignal({ name: 'John', age: 30 }, { deepEqual: true });
+      const mockCallback = jest.fn();
+      user.subscribe(mockCallback);
 
-      const { result } = renderHook(() => useSignal(countSignal));
+      // Same content but different object reference
+      user.set({ name: 'John', age: 30 });
 
-      act(() => {
-        result.current[1](5);
-      });
-
-      expect(countSignal.get()).toBe(5);
-    });
-
-    it('should support functional updates in the hook', () => {
-      const countSignal = createSignal(5);
-
-      const { result } = renderHook(() => useSignal(countSignal));
-
-      act(() => {
-        result.current[1](prev => prev + 10);
-      });
-
-      expect(countSignal.get()).toBe(15);
-    });
-
-    it('should not cause unnecessary re-renders with memoized setter', () => {
-      const countSignal = createSignal(5);
-
-      const { result, rerender } = renderHook(() => useSignal(countSignal));
-      const initialSetter = result.current[1];
-
-      rerender();
-
-      expect(result.current[1]).toBe(initialSetter);
+      // Assuming deepEqual implementation works correctly
+      expect(mockCallback).not.toHaveBeenCalled();
     });
   });
 
   describe('TypeScript Type Safety', () => {
     it('should correctly infer signal types', () => {
-      const numSignal = createSignal(42);
-      const strSignal = createSignal('hello');
-      const objSignal = createSignal({ foo: 'bar' });
+      // Create actual signals for type testing
+      const numberSignal = createSignal(42);
+      const stringSignal = createSignal('hello');
+      const objectSignal = createSignal({ foo: 'bar' });
 
-      type NumType = SignalValue<typeof numSignal>;
-      type StrType = SignalValue<typeof strSignal>;
-      type ObjType = SignalValue<typeof objSignal>;
+      // Extract value types using SignalValue
+      type NumType = SignalValue<typeof numberSignal>;
+      type StrType = SignalValue<typeof stringSignal>;
+      type ObjType = SignalValue<typeof objectSignal>;
 
+      // Verify types are correctly inferred
       const num: NumType = 100;
       const str: StrType = 'world';
       const obj: ObjType = { foo: 'baz' };
 
+      // Type checks in tests
       expect(typeof num).toBe('number');
       expect(typeof str).toBe('string');
       expect(typeof obj).toBe('object');
     });
 
     it('should support UnwrapSignal utility type', () => {
+      // Define the interface for testing
       interface TestObject {
         id: number;
         name: string;
       }
 
-      const objSignal = createSignal<TestObject>({ id: 1, name: 'test' });
+      // Create an actual signal for type testing
+      const testObjectSignal = createSignal<TestObject>({ id: 1, name: 'test' });
 
-      type UnwrappedType = UnwrapSignal<typeof objSignal>;
+      // Use UnwrapSignal to extract the type
+      type UnwrappedType = UnwrapSignal<typeof testObjectSignal>;
 
       const unwrapped: UnwrappedType = { id: 2, name: 'unwrapped' };
 

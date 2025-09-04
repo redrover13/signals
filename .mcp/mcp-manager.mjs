@@ -24,29 +24,28 @@ class MCPConfigManager {
   getConfigPaths() {
     const home = os.homedir();
     const platform = os.platform();
-    
+
     const paths = [
       // Project level (highest priority)
       path.join(process.cwd(), '.mcp', 'config', 'mcp.json'),
       path.join(process.cwd(), 'mcp.json'),
-      
+
       // User level
-      ...(platform === 'win32' ? [
-        path.join(home, 'AppData', 'Roaming', 'Code', 'User', 'mcp.json'),
-        path.join(home, 'AppData', 'Local', 'mcp', 'config.json')
-      ] : [
-        path.join(home, '.config', 'mcp', 'config.json'),
-        path.join(home, '.vscode', 'mcp.json'),
-        path.join(home, '.mcp.json')
-      ]),
-      
+      ...(platform === 'win32'
+        ? [
+            path.join(home, 'AppData', 'Roaming', 'Code', 'User', 'mcp.json'),
+            path.join(home, 'AppData', 'Local', 'mcp', 'config.json'),
+          ]
+        : [
+            path.join(home, '.config', 'mcp', 'config.json'),
+            path.join(home, '.vscode', 'mcp.json'),
+            path.join(home, '.mcp.json'),
+          ]),
+
       // System level (lowest priority)
-      ...(platform === 'win32' ? [
-        'C:\\ProgramData\\mcp\\config.json'
-      ] : [
-        '/etc/mcp/config.json',
-        '/usr/local/etc/mcp/config.json'
-      ])
+      ...(platform === 'win32'
+        ? ['C:\\ProgramData\\mcp\\config.json']
+        : ['/etc/mcp/config.json', '/usr/local/etc/mcp/config.json']),
     ];
 
     return paths;
@@ -72,15 +71,18 @@ class MCPConfigManager {
    */
   async discoverConfig() {
     await this.loadSchema();
-    
+
     for (const configPath of this.configPaths) {
       try {
-        const exists = await fs.access(configPath).then(() => true).catch(() => false);
+        const exists = await fs
+          .access(configPath)
+          .then(() => true)
+          .catch(() => false);
         if (!exists) continue;
 
         const content = await fs.readFile(configPath, 'utf8');
         const config = JSON.parse(content);
-        
+
         // Validate configuration
         const validation = await this.validateConfig(config);
         if (validation.valid) {
@@ -113,7 +115,9 @@ class MCPConfigManager {
     if (config.servers) {
       for (const [name, server] of Object.entries(config.servers)) {
         if (!name.match(/^[a-zA-Z][a-zA-Z0-9_-]*$/)) {
-          errors.push(`Invalid server name "${name}": must start with letter and contain only alphanumeric, underscore, or dash`);
+          errors.push(
+            `Invalid server name "${name}": must start with letter and contain only alphanumeric, underscore, or dash`,
+          );
         }
 
         if (server.type === 'http') {
@@ -132,7 +136,7 @@ class MCPConfigManager {
 
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -141,52 +145,52 @@ class MCPConfigManager {
    */
   async createEnterpriseConfig() {
     const config = {
-      "$schema": "./mcp-schema.json",
-      "version": "1.0.0",
-      "metadata": {
-        "name": "Enterprise MCP Configuration",
-        "description": "Centralized MCP server configuration for enterprise deployment",
-        "environment": process.env.NODE_ENV || "development"
+      $schema: './mcp-schema.json',
+      version: '1.0.0',
+      metadata: {
+        name: 'Enterprise MCP Configuration',
+        description: 'Centralized MCP server configuration for enterprise deployment',
+        environment: process.env.NODE_ENV || 'development',
       },
-      "servers": {
-        "github": {
-          "url": "https://api.githubcopilot.com/mcp/",
-          "type": "http",
-          "timeout": 30000
+      servers: {
+        github: {
+          url: 'https://api.githubcopilot.com/mcp/',
+          type: 'http',
+          timeout: 30000,
         },
-        "codacy": {
-          "command": "npx",
-          "args": ["-y", "@codacy/codacy-mcp@latest"],
-          "type": "stdio",
-          "env": {
-            "CODACY_ACCOUNT_TOKEN": process.env.CODACY_ACCOUNT_TOKEN || "REPLACE_WITH_TOKEN"
-          }
+        codacy: {
+          command: 'npx',
+          args: ['-y', '@codacy/codacy-mcp@latest'],
+          type: 'stdio',
+          env: {
+            CODACY_ACCOUNT_TOKEN: process.env.CODACY_ACCOUNT_TOKEN || 'REPLACE_WITH_TOKEN',
+          },
         },
-        "playwright": {
-          "command": "npx",
-          "args": ["@playwright/mcp@latest"],
-          "type": "stdio"
+        playwright: {
+          command: 'npx',
+          args: ['@playwright/mcp@latest'],
+          type: 'stdio',
         },
-        "terraform": {
-          "command": "docker",
-          "args": ["run", "-i", "--rm", "hashicorp/terraform-mcp-server"],
-          "type": "stdio"
+        terraform: {
+          command: 'docker',
+          args: ['run', '-i', '--rm', 'hashicorp/terraform-mcp-server'],
+          type: 'stdio',
         },
-        "sequentialthinking": {
-          "command": "npx",
-          "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
-          "type": "stdio"
-        }
+        sequentialthinking: {
+          command: 'npx',
+          args: ['-y', '@modelcontextprotocol/server-sequential-thinking'],
+          type: 'stdio',
+        },
       },
-      "inputs": []
+      inputs: [],
     };
 
     const configDir = path.join(process.cwd(), '.mcp', 'config');
     await fs.mkdir(configDir, { recursive: true });
-    
+
     const configPath = path.join(configDir, 'mcp.json');
     await fs.writeFile(configPath, JSON.stringify(config, null, 2));
-    
+
     console.log(`✅ Enterprise MCP config created: ${configPath}`);
     return configPath;
   }
@@ -200,7 +204,7 @@ class MCPConfigManager {
     }
 
     const results = {};
-    
+
     for (const [name, server] of Object.entries(this.activeConfig.servers)) {
       try {
         if (server.type === 'stdio') {
@@ -268,13 +272,13 @@ class MCPConfigManager {
       node_version: process.version,
       config_paths: this.configPaths,
       active_config: this.activeConfig?._source || 'none',
-      health_check: await this.healthCheck().catch(e => ({ error: e.message }))
+      health_check: await this.healthCheck().catch((e) => ({ error: e.message })),
     };
 
     const reportPath = path.join(process.cwd(), '.mcp', 'diagnostics.json');
     await fs.mkdir(path.dirname(reportPath), { recursive: true });
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
-    
+
     console.log(`📊 Diagnostics report generated: ${reportPath}`);
     return report;
   }
@@ -291,26 +295,26 @@ async function main() {
         const config = await manager.discoverConfig();
         console.log('Active configuration:', JSON.stringify(config, null, 2));
         break;
-        
+
       case 'validate':
         const configToValidate = await manager.discoverConfig();
         const validation = await manager.validateConfig(configToValidate);
         console.log('Validation result:', validation);
         break;
-        
+
       case 'create':
         await manager.createEnterpriseConfig();
         break;
-        
+
       case 'health':
         const health = await manager.healthCheck();
         console.log('Health check results:', JSON.stringify(health, null, 2));
         break;
-        
+
       case 'diagnose':
         await manager.generateDiagnostics();
         break;
-        
+
       default:
         console.log(`
 Enterprise MCP Configuration Manager

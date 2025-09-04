@@ -3,13 +3,7 @@
   "masterConfig": {
     "path": "/home/g_nelson/signals-1/.mcp/config/mcp.json",
     "serverCount": 5,
-    "servers": [
-      "github",
-      "codacy",
-      "playwright",
-      "terraform",
-      "sequentialthinking"
-    ]
+    "servers": ["github", "codacy", "playwright", "terraform", "sequentialthinking"]
   },
   "platforms": {
     "github-copilot": {

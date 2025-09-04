@@ -21,7 +21,7 @@ export class OrdersController {
   // GET /api/v1/orders - List orders
   async listOrders(req: Request, res: Response): Promise<void> {
     const { page = 1, limit = 20, status, customerId } = req.query;
-    
+
     const filters: OrderFilters = {
       ...(status && { status: status as OrderStatus }),
       ...(customerId && { customerId: customerId as string }),
@@ -50,7 +50,7 @@ export class OrdersController {
   // GET /api/v1/orders/:orderId - Get specific order
   async getOrder(req: Request, res: Response): Promise<void> {
     const { orderId } = req.params;
-    
+
     const order = await this.orderService.getOrderById(orderId);
     if (!order) {
       res.status(404).json({
@@ -91,7 +91,7 @@ export class OrdersController {
   // PUT /api/v1/orders/:orderId - Update entire order
   async updateOrder(req: Request, res: Response): Promise<void> {
     const { orderId } = req.params;
-    
+
     try {
       const updateData = await this.validateUpdateOrderRequest(req.body);
       const order = await this.orderService.updateOrder(orderId, updateData);
@@ -115,7 +115,7 @@ export class OrdersController {
 
     try {
       const order = await this.orderService.updateOrderStatus(orderId, status, reason);
-      
+
       res.json({
         data: order,
         meta: {
@@ -135,7 +135,7 @@ export class OrdersController {
 
     try {
       await this.orderService.cancelOrder(orderId, reason);
-      
+
       res.status(204).send(); // No content for successful deletion
     } catch (error) {
       this.handleError(error, res);
@@ -145,9 +145,9 @@ export class OrdersController {
   // GET /api/v1/orders/:orderId/items - Nested resource
   async getOrderItems(req: Request, res: Response): Promise<void> {
     const { orderId } = req.params;
-    
+
     const items = await this.orderService.getOrderItems(orderId);
-    
+
     res.json({
       data: items,
       meta: {
@@ -198,10 +198,10 @@ Use appropriate HTTP status codes for different response scenarios.
 export class MenuController {
   async getMenuItem(req: Request, res: Response): Promise<void> {
     const { itemId } = req.params;
-    
+
     try {
       const item = await this.menuService.getMenuItem(itemId);
-      
+
       if (!item) {
         // 404 - Resource not found
         res.status(404).json({
@@ -264,7 +264,7 @@ export class MenuController {
 
   async updateMenuItem(req: Request, res: Response): Promise<void> {
     const { itemId } = req.params;
-    
+
     try {
       const updateData = await this.validateMenuItemUpdate(req.body);
       const item = await this.menuService.updateMenuItem(itemId, updateData);
@@ -301,10 +301,10 @@ export class MenuController {
 
   async deleteMenuItem(req: Request, res: Response): Promise<void> {
     const { itemId } = req.params;
-    
+
     try {
       await this.menuService.deleteMenuItem(itemId);
-      
+
       // 204 - No content (successful deletion)
       res.status(204).send();
     } catch (error) {
@@ -372,10 +372,7 @@ export interface ResponseLinks {
 }
 
 export class ResponseBuilder {
-  static success<T>(
-    data: T,
-    meta: Partial<ResponseMeta> = {}
-  ): ApiResponse<T> {
+  static success<T>(data: T, meta: Partial<ResponseMeta> = {}): ApiResponse<T> {
     return {
       data,
       meta: {
@@ -391,7 +388,7 @@ export class ResponseBuilder {
     data: T[],
     pagination: PaginationMeta,
     baseUrl: string,
-    meta: Partial<ResponseMeta> = {}
+    meta: Partial<ResponseMeta> = {},
   ): ApiResponse<T[]> {
     const links: ResponseLinks = {
       self: `${baseUrl}?page=${pagination.page}&limit=${pagination.limit}`,
@@ -420,10 +417,7 @@ export class ResponseBuilder {
     };
   }
 
-  static error(
-    error: AppError,
-    meta: Partial<ResponseMeta> = {}
-  ): ErrorResponse {
+  static error(error: AppError, meta: Partial<ResponseMeta> = {}): ErrorResponse {
     return {
       error: {
         code: error.code,
@@ -444,13 +438,16 @@ export class ResponseBuilder {
 export class RestaurantController {
   async getRestaurants(req: Request, res: Response): Promise<void> {
     const { page = 1, limit = 20, city } = req.query;
-    
-    const result = await this.restaurantService.getRestaurants({
-      city: city as string,
-    }, {
-      page: Number(page),
-      limit: Math.min(Number(limit), 100),
-    });
+
+    const result = await this.restaurantService.getRestaurants(
+      {
+        city: city as string,
+      },
+      {
+        page: Number(page),
+        limit: Math.min(Number(limit), 100),
+      },
+    );
 
     const response = ResponseBuilder.paginated(
       result.restaurants,
@@ -463,7 +460,7 @@ export class RestaurantController {
         hasPrev: result.page > 1,
       },
       `${req.protocol}://${req.get('host')}${req.path}`,
-      { requestId: req.headers['x-request-id'] as string }
+      { requestId: req.headers['x-request-id'] as string },
     );
 
     res.json(response);
@@ -485,9 +482,12 @@ All API inputs must be validated and sanitized, with special attention to Vietna
 import { z } from 'zod';
 
 // Vietnamese-specific validation schemas
-const vietnamesePhoneSchema = z.string()
-  .regex(/^(\+84|84|0)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-6|8|9]|9[0-4|6-9])[0-9]{7}$/, 
-    'Invalid Vietnamese phone number format');
+const vietnamesePhoneSchema = z
+  .string()
+  .regex(
+    /^(\+84|84|0)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-6|8|9]|9[0-4|6-9])[0-9]{7}$/,
+    'Invalid Vietnamese phone number format',
+  );
 
 const vietnameseAddressSchema = z.object({
   street: z.string().min(1).max(200),
@@ -499,19 +499,25 @@ const vietnameseAddressSchema = z.object({
 
 const createOrderSchema = z.object({
   customerId: z.string().uuid('Invalid customer ID format'),
-  customerName: z.string()
+  customerName: z
+    .string()
     .min(1, 'Customer name is required')
     .max(100, 'Customer name too long')
     .regex(/^[\p{L}\s\-'\.]+$/u, 'Invalid characters in customer name'),
   customerPhone: vietnamesePhoneSchema,
-  items: z.array(z.object({
-    menuItemId: z.string().min(1, 'Menu item ID is required'),
-    quantity: z.number()
-      .int('Quantity must be an integer')
-      .min(1, 'Quantity must be at least 1')
-      .max(50, 'Quantity cannot exceed 50'),
-    specialInstructions: z.string().max(500).optional(),
-  })).min(1, 'At least one item is required'),
+  items: z
+    .array(
+      z.object({
+        menuItemId: z.string().min(1, 'Menu item ID is required'),
+        quantity: z
+          .number()
+          .int('Quantity must be an integer')
+          .min(1, 'Quantity must be at least 1')
+          .max(50, 'Quantity cannot exceed 50'),
+        specialInstructions: z.string().max(500).optional(),
+      }),
+    )
+    .min(1, 'At least one item is required'),
   deliveryAddress: vietnameseAddressSchema.optional(),
   paymentMethod: z.enum([
     'Tiền Mặt',
@@ -519,7 +525,7 @@ const createOrderSchema = z.object({
     'Momo',
     'ZaloPay',
     'VNPay',
-    'Thẻ Tín Dụng'
+    'Thẻ Tín Dụng',
   ]),
   orderType: z.enum(['Tại Chỗ', 'Mang Đi', 'Giao Hàng']),
   specialRequests: z.string().max(1000).optional(),
@@ -530,36 +536,42 @@ export class OrderValidationMiddleware {
   static validateCreateOrder = async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<void> => {
     try {
       // Sanitize input
       const sanitizedBody = this.sanitizeInput(req.body);
-      
+
       // Validate against schema
       const validatedData = createOrderSchema.parse(sanitizedBody);
-      
+
       // Additional business logic validation
       await this.validateBusinessRules(validatedData);
-      
+
       // Attach validated data to request
       req.validatedData = validatedData;
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json(ResponseBuilder.error(
-          new ValidationError(
-            'request_body',
-            req.body,
-            error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
-          )
-        ));
+        res
+          .status(400)
+          .json(
+            ResponseBuilder.error(
+              new ValidationError(
+                'request_body',
+                req.body,
+                error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', '),
+              ),
+            ),
+          );
       } else if (error instanceof ValidationError) {
         res.status(400).json(ResponseBuilder.error(error));
       } else {
-        res.status(500).json(ResponseBuilder.error(
-          new InternalServerError('Validation failed', { cause: error })
-        ));
+        res
+          .status(500)
+          .json(
+            ResponseBuilder.error(new InternalServerError('Validation failed', { cause: error })),
+          );
       }
     }
   };
@@ -573,11 +585,11 @@ export class OrderValidationMiddleware {
         .replace(/javascript:/gi, '')
         .replace(/on\w+\s*=/gi, '');
     }
-    
+
     if (Array.isArray(input)) {
-      return input.map(item => this.sanitizeInput(item));
+      return input.map((item) => this.sanitizeInput(item));
     }
-    
+
     if (input && typeof input === 'object') {
       const sanitized: any = {};
       for (const [key, value] of Object.entries(input)) {
@@ -585,7 +597,7 @@ export class OrderValidationMiddleware {
       }
       return sanitized;
     }
-    
+
     return input;
   }
 
@@ -595,7 +607,7 @@ export class OrderValidationMiddleware {
       throw new ValidationError(
         'deliveryAddress',
         data.deliveryAddress,
-        'Delivery address is required for delivery orders'
+        'Delivery address is required for delivery orders',
       );
     }
 
@@ -603,26 +615,28 @@ export class OrderValidationMiddleware {
     if (data.scheduledDeliveryTime) {
       const scheduledTime = new Date(data.scheduledDeliveryTime);
       const now = new Date();
-      
+
       if (scheduledTime <= now) {
         throw new ValidationError(
           'scheduledDeliveryTime',
           data.scheduledDeliveryTime,
-          'Scheduled delivery time must be in the future'
+          'Scheduled delivery time must be in the future',
         );
       }
 
       // Check if scheduled time is within business hours (Vietnam time)
-      const vietnamTime = new Date(scheduledTime.toLocaleString('en-US', {
-        timeZone: 'Asia/Ho_Chi_Minh'
-      }));
+      const vietnamTime = new Date(
+        scheduledTime.toLocaleString('en-US', {
+          timeZone: 'Asia/Ho_Chi_Minh',
+        }),
+      );
       const hour = vietnamTime.getHours();
-      
+
       if (hour < 6 || hour > 22) {
         throw new ValidationError(
           'scheduledDeliveryTime',
           data.scheduledDeliveryTime,
-          'Delivery is only available between 6:00 AM and 10:00 PM Vietnam time'
+          'Delivery is only available between 6:00 AM and 10:00 PM Vietnam time',
         );
       }
     }
@@ -677,7 +691,7 @@ export class AuthService {
       role: user.role,
       permissions: user.permissions,
       iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
+      exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours
       iss: this.jwtIssuer,
       aud: this.jwtAudience,
       preferredLanguage: user.preferences.language,
@@ -722,17 +736,21 @@ export class AuthMiddleware {
   authenticate = (req: Request, res: Response, next: NextFunction): void => {
     try {
       const authHeader = req.headers.authorization;
-      
+
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        res.status(401).json(ResponseBuilder.error(
-          new AuthenticationError('Missing or invalid authorization header')
-        ));
+        res
+          .status(401)
+          .json(
+            ResponseBuilder.error(
+              new AuthenticationError('Missing or invalid authorization header'),
+            ),
+          );
         return;
       }
 
       const token = authHeader.substring(7); // Remove 'Bearer ' prefix
       const payload = this.authService.verifyToken(token);
-      
+
       // Attach user info to request
       req.user = {
         id: payload.userId,
@@ -748,9 +766,13 @@ export class AuthMiddleware {
       if (error instanceof AuthenticationError) {
         res.status(401).json(ResponseBuilder.error(error));
       } else {
-        res.status(500).json(ResponseBuilder.error(
-          new InternalServerError('Authentication failed', { cause: error })
-        ));
+        res
+          .status(500)
+          .json(
+            ResponseBuilder.error(
+              new InternalServerError('Authentication failed', { cause: error }),
+            ),
+          );
       }
     }
   };
@@ -758,23 +780,25 @@ export class AuthMiddleware {
   authorize = (requiredPermissions: string[]) => {
     return (req: Request, res: Response, next: NextFunction): void => {
       if (!req.user) {
-        res.status(401).json(ResponseBuilder.error(
-          new AuthenticationError('Authentication required')
-        ));
+        res
+          .status(401)
+          .json(ResponseBuilder.error(new AuthenticationError('Authentication required')));
         return;
       }
 
-      const hasPermission = requiredPermissions.every(permission =>
-        req.user.permissions.includes(permission)
+      const hasPermission = requiredPermissions.every((permission) =>
+        req.user.permissions.includes(permission),
       );
 
       if (!hasPermission) {
-        res.status(403).json(ResponseBuilder.error(
-          new AuthorizationError('Insufficient permissions', {
-            required: requiredPermissions,
-            actual: req.user.permissions,
-          })
-        ));
+        res.status(403).json(
+          ResponseBuilder.error(
+            new AuthorizationError('Insufficient permissions', {
+              required: requiredPermissions,
+              actual: req.user.permissions,
+            }),
+          ),
+        );
         return;
       }
 

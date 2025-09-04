@@ -1,9 +1,9 @@
-import { 
+import {
   createSignal,
-  createDerivedSignal as derivedSignal, 
+  createDerivedSignal as derivedSignal,
   batch,
   persistentSignal,
-  fromPromise
+  fromPromise,
 } from '../index';
 import { renderHook, act } from '@testing-library/react';
 import { useSignal } from '../index';
@@ -12,33 +12,33 @@ describe('Signal Library', () => {
   describe('createSignal', () => {
     it('should create a signal with the initial value', () => {
       const signal = createSignal(10);
-      expect(signal?.get()).toBe(10);
+      expect(signal && signal.get()).toBe(10);
     });
 
     it('should update the value with set', () => {
       const signal = createSignal('hello');
-      signal?.set('world');
-      expect(signal?.get()).toBe('world');
+      signal && signal.set('world');
+      expect(signal && signal.get()).toBe('world');
     });
 
     it('should notify subscribers when value changes', () => {
       const signal = createSignal(0);
       const mockCallback = jest.fn();
-      
-      signal?.subscribe(mockCallback);
-      signal?.set(5);
-      
+
+      signal && signal.subscribe(mockCallback);
+      signal && signal.set(5);
+
       expect(mockCallback).toHaveBeenCalledWith(5);
     });
 
     it('should allow unsubscribing', () => {
       const signal = createSignal(0);
       const mockCallback = jest.fn();
-      
-      const unsubscribe = signal?.subscribe(mockCallback);
-      unsubscribe?.();
-      signal?.set(5);
-      
+
+      const unsubscribe = signal && signal.subscribe(mockCallback);
+      unsubscribe();
+      signal && signal.set(5);
+
       expect(mockCallback).not.toHaveBeenCalled();
     });
   });
@@ -47,40 +47,36 @@ describe('Signal Library', () => {
     it('should compute derived value from dependencies', () => {
       const firstName = createSignal('John');
       const lastName = createSignal('Doe');
-      
-      const fullName = derivedSignal(
-        () => `${firstName.get()} ${lastName.get()}`
-      );
-      
-      expect(fullName?.get()).toBe('John Doe');
+
+      const fullName = derivedSignal(() => `${firstName.get()} ${lastName.get()}`);
+
+      expect(fullName && fullName.get()).toBe('John Doe');
     });
 
     it('should update when dependencies change', () => {
       const width = createSignal(5);
       const height = createSignal(10);
-      
-      const area = derivedSignal(
-        () => width.get() * height.get()
-      );
-      
-      expect(area?.get()).toBe(50);
-      
-      width?.set(7);
-      expect(area?.get()).toBe(70);
-      
-      height?.set(8);
-      expect(area?.get()).toBe(56);
+
+      const area = derivedSignal(() => width.get() * height.get());
+
+      expect(area && area.get()).toBe(50);
+
+      width && width.set(7);
+      expect(area && area.get()).toBe(70);
+
+      height && height.set(8);
+      expect(area && area.get()).toBe(56);
     });
 
     it('should notify subscribers when derived value changes', () => {
       const count = createSignal(1);
       const doubled = derivedSignal(() => count.get() * 2);
-      
+
       const mockCallback = jest.fn();
-      doubled?.subscribe(mockCallback);
-      
-      count?.set(2);
-      
+      doubled && doubled.subscribe(mockCallback);
+
+      count && count.set(2);
+
       expect(mockCallback).toHaveBeenCalledWith(4);
     });
   });
@@ -88,35 +84,35 @@ describe('Signal Library', () => {
   describe('useSignal', () => {
     it('should return the current value and setter', () => {
       const count = createSignal(0);
-      
+
       const { result } = renderHook(() => useSignal(count));
-      
+
       expect(result.current[0]).toBe(0);
       expect(typeof result.current[1]).toBe('function');
     });
 
     it('should update component when signal changes', () => {
       const count = createSignal(0);
-      
+
       const { result } = renderHook(() => useSignal(count));
-      
+
       act(() => {
-        count?.set(5);
+        count && count.set(5);
       });
-      
+
       expect(result.current[0]).toBe(5);
     });
 
     it('should update signal when setter is called', () => {
       const count = createSignal(0);
-      
+
       const { result } = renderHook(() => useSignal(count));
-      
+
       act(() => {
         result.current[1](10);
       });
-      
-      expect(count?.get()).toBe(10);
+
+      expect(count && count.get()).toBe(10);
     });
   });
 
@@ -124,19 +120,19 @@ describe('Signal Library', () => {
     it('should batch multiple updates', () => {
       const count = createSignal(0);
       const mockCallback = jest.fn();
-      
-      count?.subscribe(mockCallback);
-      
+
+      count && count.subscribe(mockCallback);
+
       batch(() => {
-        count?.set(1);
-        count?.set(2);
-        count?.set(3);
+        count && count.set(1);
+        count && count.set(2);
+        count && count.set(3);
       });
-      
+
       // In a more sophisticated implementation, this would be 1
       // But our simple implementation doesn't queue updates
-      expect(mockCallback.mock.calls?.length).toBe(3);
-      expect(count?.get()).toBe(3);
+      expect(mockCallback.mock.calls && calls.length).toBe(3);
+      expect(count && count.get()).toBe(3);
     });
   });
 
@@ -149,66 +145,66 @@ describe('Signal Library', () => {
           getItem: jest.fn((key: string) => store[key] || null),
           setItem: jest.fn((key: string, value: string) => {
             if (key) {
-              store[key] = value?.toString();
+              store[key] = value && value.toString();
             }
           }),
           clear: jest.fn(() => {
             store = {};
-          })
+          }),
         };
       })();
-      
+
       Object.defineProperty(window, 'localStorage', {
         value: localStorageMock,
-        writable: true
+        writable: true,
       });
     });
 
     it('should use initial value when nothing in storage', () => {
       const signal = persistentSignal('test-key', 'initial');
-      expect(signal?.get()).toBe('initial');
+      expect(signal && signal.get()).toBe('initial');
     });
 
     it('should persist value to localStorage when set', () => {
       const signal = persistentSignal('test-key', 'initial');
-      signal?.set('updated');
-      
-      expect(window.localStorage?.setItem).toHaveBeenCalledWith(
-        'test-key', 
-        JSON.stringify('updated')
+      signal && signal.set('updated');
+
+      expect(window.localStorage && localStorage.setItem).toHaveBeenCalledWith(
+        'test-key',
+        JSON.stringify('updated'),
       );
     });
   });
 
   describe('fromPromise', () => {
     it('should start with loading state', () => {
-      const promise = new Promise<string>(resolve => {
+      const promise = new Promise<string>((resolve) => {
         setTimeout(() => resolve('data'), 100);
       });
-      
+
       const signal = fromPromise(promise, undefined);
-      
-      expect(signal?.get()).toEqual({
+
+      expect(signal && signal.get()).toEqual({
         loading: true,
         data: undefined,
-        error: undefined
+        error: undefined,
       });
     });
 
     it('should update with data when promise resolves', async () => {
       const promise = Promise.resolve('success');
       const signal = fromPromise(promise, undefined);
-      
+
       // Wait for the promise to resolve
       await promise;
-      
+
       // Need a small delay for the signal to update
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
-      expect(signal?.get()).toEqual({
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(signal && signal.get()).toEqual({
         loading: false,
         data: 'success',
-        error: undefined
+        error: undefined,
       });
     });
 
@@ -216,33 +212,33 @@ describe('Signal Library', () => {
       const error = new Error('Failed');
       const promise = Promise.reject(error);
       const signal = fromPromise(promise, undefined);
-      
+
       // Suppress unhandled rejection warning
       await promise.catch((err: Error): void => {
-        console.error("Suppressing error:", err.message);
+        console.error('Suppressing error:', err.message);
       });
-      
+
       // Need a small delay for the signal to update
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
-      expect(signal?.get()).toEqual({
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(signal && signal.get()).toEqual({
         loading: false,
         data: undefined,
-        error: error
+        error: error,
       });
     });
 
     it('should use initialValue while loading', () => {
-      const promise = new Promise<string>(resolve => {
+      const promise = new Promise<string>((resolve) => {
         setTimeout(() => resolve('data'), 100);
       });
-      
+
       const signal = fromPromise(promise, 'initial');
-      
-      expect(signal?.get()).toEqual({
+
+      expect(signal && signal.get()).toEqual({
         loading: true,
         data: 'initial',
-        error: undefined
+        error: undefined,
       });
     });
   });

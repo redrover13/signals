@@ -52,17 +52,17 @@ export function formatMcpMetrics(metrics: McpMetrics): string {
   if (!metrics) {
     return 'No metrics available';
   }
-  
+
   return `
 MCP Metrics:
 -----------
-Servers: ${metrics?.serverCount || 0} (${metrics?.healthyServers || 0} healthy)
-Requests: ${metrics?.requestCount || 0} (${metrics?.successCount || 0} success, ${metrics?.failureCount || 0} failures)
+Servers: ${metrics && metrics.serverCount || 0} (${metrics && metrics.healthyServers || 0} healthy)
+Requests: ${metrics && metrics.requestCount || 0} (${metrics && metrics.successCount || 0} success, ${metrics && metrics.failureCount || 0} failures)
 Response Times: 
-  - Avg: ${metrics?.avgResponseTimeMs || 0}ms
-  - P95: ${metrics?.p95ResponseTimeMs || 0}ms
-  - P99: ${metrics?.p99ResponseTimeMs || 0}ms
-Time Window: ${metrics?.timeWindow?.start || 'N/A'} to ${metrics?.timeWindow?.end || 'N/A'}
+  - Avg: ${metrics && metrics.avgResponseTimeMs || 0}ms
+  - P95: ${metrics && metrics.p95ResponseTimeMs || 0}ms
+  - P99: ${metrics && metrics.p99ResponseTimeMs || 0}ms
+Time Window: ${metrics && metrics.timeWindow && timeWindow.start || 'N/A'} to ${metrics && metrics.timeWindow && timeWindow.end || 'N/A'}
 `;
 }
 
@@ -76,7 +76,7 @@ export function safeJsonParse<T>(jsonStr: string | null | undefined, defaultValu
   if (!jsonStr) {
     return defaultValue;
   }
-  
+
   try {
     return JSON.parse(jsonStr) as T;
   } catch (err) {
@@ -94,19 +94,19 @@ export async function checkMcpServerHealth(config: McpServerConfig): Promise<boo
   if (!config || !config.enabled || !config.endpoint) {
     return false;
   }
-  
+
   try {
     const response = await fetch(`${config.endpoint}/health`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        ...(config.auth?.type === 'apikey' && config.auth.key 
-          ? { 'Authorization': `Bearer ${config.auth.key}` } 
-          : {})
+        ...(config.auth && auth.type === 'apikey' && config.auth.key
+          ? { Authorization: `Bearer ${config.auth.key}` }
+          : {}),
       },
-      timeout: config.timeoutMs || 5000
+      timeout: config.timeoutMs || 5000,
     });
-    
+
     return response.ok;
   } catch (err) {
     console.error(`Health check failed for MCP server ${config.name}:`, err);
@@ -131,26 +131,27 @@ export function calculateMcpMetrics(config: { servers?: McpServerConfig[] }): Mc
     p99ResponseTimeMs: 0,
     timeWindow: {
       start: new Date(Date.now() - 3600000).toISOString(), // Last hour
-      end: new Date().toISOString()
-    }
+      end: new Date().toISOString(),
+    },
   };
-  
-  if (config?.servers) {
+
+  if (config && config.servers) {
     config.servers.forEach((server, index) => {
       if (server.enabled) {
         metrics.serverCount++;
         // We'd need to actually check health in a real implementation
         // For now, we'll simulate some healthy servers
-        if (index % 3 !== 0) { // Arbitrary condition for demo
+        if (index % 3 !== 0) {
+          // Arbitrary condition for demo
           metrics.healthyServers++;
         }
       }
     });
   }
-  
-  const enabledServers = config?.servers ? config.servers.filter(s => s && s.enabled) : [];
+
+  const enabledServers = config && config.servers ? config.servers.filter((s) => s && s.enabled) : [];
   metrics.serverCount = enabledServers.length;
-  
+
   // Sample data for demonstration
   metrics.requestCount = 1250;
   metrics.successCount = 1180;
@@ -158,6 +159,6 @@ export function calculateMcpMetrics(config: { servers?: McpServerConfig[] }): Mc
   metrics.avgResponseTimeMs = 234;
   metrics.p95ResponseTimeMs = 456;
   metrics.p99ResponseTimeMs = 789;
-  
+
   return metrics;
 }

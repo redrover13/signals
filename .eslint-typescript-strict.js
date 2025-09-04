@@ -22,7 +22,7 @@ module.exports = {
     'no-var': 'error',
     'prefer-const': 'error',
     'no-duplicate-imports': 'error',
-    
+
     // TypeScript specific rules
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/no-explicit-any': 'error',
@@ -31,10 +31,13 @@ module.exports = {
     '@typescript-eslint/no-unsafe-call': 'error',
     '@typescript-eslint/no-unsafe-return': 'error',
     '@typescript-eslint/no-floating-promises': 'error',
-    '@typescript-eslint/explicit-function-return-type': ['error', {
-      'allowExpressions': true,
-      'allowTypedFunctionExpressions': true,
-    }],
+    '@typescript-eslint/explicit-function-return-type': [
+      'error',
+      {
+        allowExpressions: true,
+        allowTypedFunctionExpressions: true,
+      },
+    ],
     '@typescript-eslint/explicit-module-boundary-types': 'error',
     '@typescript-eslint/restrict-template-expressions': 'error',
     '@typescript-eslint/unbound-method': 'error',
@@ -49,39 +52,39 @@ module.exports = {
     '@typescript-eslint/naming-convention': [
       'error',
       {
-        'selector': 'default',
-        'format': ['camelCase'],
+        selector: 'default',
+        format: ['camelCase'],
       },
       {
-        'selector': 'variable',
-        'format': ['camelCase', 'UPPER_CASE'],
+        selector: 'variable',
+        format: ['camelCase', 'UPPER_CASE'],
       },
       {
-        'selector': 'parameter',
-        'format': ['camelCase'],
-        'leadingUnderscore': 'allow',
+        selector: 'parameter',
+        format: ['camelCase'],
+        leadingUnderscore: 'allow',
       },
       {
-        'selector': 'memberLike',
-        'modifiers': ['private'],
-        'format': ['camelCase'],
-        'leadingUnderscore': 'require',
+        selector: 'memberLike',
+        modifiers: ['private'],
+        format: ['camelCase'],
+        leadingUnderscore: 'require',
       },
       {
-        'selector': 'typeLike',
-        'format': ['PascalCase'],
+        selector: 'typeLike',
+        format: ['PascalCase'],
       },
       {
-        'selector': 'interface',
-        'format': ['PascalCase'],
-        'prefix': ['I'],
+        selector: 'interface',
+        format: ['PascalCase'],
+        prefix: ['I'],
       },
       {
-        'selector': 'enum',
-        'format': ['PascalCase'],
-      }
+        selector: 'enum',
+        format: ['PascalCase'],
+      },
     ],
-    
+
     // Import related rules
     'import/no-unresolved': 'error',
     'import/named': 'error',
@@ -90,22 +93,15 @@ module.exports = {
     'import/order': [
       'error',
       {
-        'groups': [
-          'builtin',
-          'external',
-          'internal',
-          'parent',
-          'sibling',
-          'index',
-        ],
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
         'newlines-between': 'always',
-        'alphabetize': { order: 'asc', caseInsensitive: true },
+        alphabetize: { order: 'asc', caseInsensitive: true },
       },
     ],
   },
   settings: {
     'import/resolver': {
-      'typescript': {},
+      typescript: {},
     },
   },
   overrides: [

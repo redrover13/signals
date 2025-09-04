@@ -1,5 +1,5 @@
 /**
- * @fileoverview mcp-config?.schema module for the config component
+ * @fileoverview mcp-config && config.schema module for the config component
  *
  * This file is part of the Dulce de Saigon F&B Data Platform.
  * Contains implementation for TypeScript functionality.
@@ -135,7 +135,7 @@ export interface MCPEnvironmentConfig {
 
 /**
  * Default MCP configuration values
- * NOTE: For server-specific configurations, please refer to `server-config?.defaults && .defaults.ts`.
+ * NOTE: For server-specific configurations, please refer to `server-config && config.defaults && .defaults.ts`.
  */
 export const DEFAULT_MCP_CONFIG: Partial<MCPGlobalConfig> = {
   version: '1.0 && 1.0.0',

@@ -3,23 +3,16 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "infra/workflows/cloud-workflows/src",
   "projectType": "library",
-  "tags": [
-    "domain:cloud-workflows",
-    "type:library"
-  ],
+  "tags": ["domain:cloud-workflows", "type:library"],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/infra/workflows/cloud-workflows",
         "main": "infra/workflows/cloud-workflows/src/index.ts",
         "tsConfig": "infra/workflows/cloud-workflows/tsconfig.lib.json",
-        "assets": [
-          "infra/workflows/cloud-workflows/*.md"
-        ]
+        "assets": ["infra/workflows/cloud-workflows/*.md"]
       },
       "configurations": {
         "production": {
@@ -35,19 +28,12 @@
       },
       "defaultConfiguration": "production",
       "cache": true,
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "production",
-        "^production"
-      ]
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "infra/workflows/cloud-workflows/jest.config.ts"
       },
@@ -57,19 +43,12 @@
           "codeCoverage": true
         }
       },
-      "inputs": [
-        "default",
-        "^default",
-        "{workspaceRoot}/jest.preset.js"
-      ],
+      "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"],
       "cache": true
     }
   },
   "namedInputs": {
-    "default": [
-      "{projectRoot}/**/*",
-      "sharedGlobals"
-    ],
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",

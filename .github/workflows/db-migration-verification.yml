@@ -2,7 +2,7 @@ name: Database Migration Verification
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
       - '**/migrations/**'
       - '**/schemas/**'
@@ -13,7 +13,7 @@ jobs:
     name: Verify Database Migrations
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: ""
+      STORE_PATH: ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,13 +32,13 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: pnpm
-          
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -47,7 +47,7 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-          
+
       - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@v2.1.0
 

@@ -30,7 +30,7 @@ export const sanitizeInput = (input: string): string => {
 export const validateInput = (
   input: string | undefined,
   pattern: RegExp,
-  errorMessage = 'Input validation failed'
+  errorMessage = 'Input validation failed',
 ): { isValid: boolean | undefined; error?: string } => {
   if (typeof input !== 'string' || !pattern.test(input)) {
     return { isValid: false, error: errorMessage };
@@ -43,12 +43,12 @@ export const validateInput = (
  * @returns CSRF token
  */
 export const generateCSRFToken = (): string => {
-  const token = Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15);
-  
+  const token =
+    Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
   // Store the token in localStorage or cookies
   localStorage.setItem('csrf_token', token);
-  
+
   return token;
 };
 
@@ -70,14 +70,15 @@ export const setSecurityHeaders = (): void => {
   // This only works on the server side, but we include the definitions
   // to document what headers should be set in the server configuration
   const headers = {
-    'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:;",
+    'Content-Security-Policy':
+      "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:;",
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
     'X-XSS-Protection': '1; mode=block',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'geolocation=(), microphone=()',
   };
-  
+
   // Log the headers in development mode
   if (process.env.NODE_ENV === 'development') {
     console.log('Security headers that should be set on the server:', headers);

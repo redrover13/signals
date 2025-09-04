@@ -4,6 +4,4 @@ import { readFileSync } from 'fs';
 const baseConfigStr = readFileSync('../../.eslintrc.json', 'utf8');
 const baseConfig = JSON.parse(baseConfigStr);
 
-export default [
-    ...baseConfig
-];
+export default [...baseConfig];

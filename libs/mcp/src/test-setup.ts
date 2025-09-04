@@ -32,23 +32,24 @@ process.env['MCP_PORT'] = '9000';
 process.env['MCP_HOST'] = 'localhost';
 
 // Extend Jest with custom matchers if needed
-expect && expect.extend({
-  toBeValidUrl(received: string) {
-    try {
-      // eslint-disable-next-line no-new
-      new URL(received);
-      return {
-        message: () => `expected ${received} not to be a valid URL`,
-        pass: true,
-      };
-    } catch (error) {
-      return {
-        message: () => `expected ${received} to be a valid URL`,
-        pass: false,
-      };
-    }
-  },
-});
+expect &&
+  expect.extend({
+    toBeValidUrl(received: string) {
+      try {
+        // eslint-disable-next-line no-new
+        new URL(received);
+        return {
+          message: () => `expected ${received} not to be a valid URL`,
+          pass: true,
+        };
+      } catch (error) {
+        return {
+          message: () => `expected ${received} to be a valid URL`,
+          pass: false,
+        };
+      }
+    },
+  });
 
 // Global test cleanup
 afterAll(() => {

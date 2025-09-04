@@ -15,25 +15,25 @@ jest.mock('gcp-auth', () => ({
   getPubSubClient: jest.fn(() => ({
     subscription: jest.fn(() => ({
       on: jest.fn(),
-    }))
+    })),
   })),
-  insertRows: mockInsertRows
+  insertRows: mockInsertRows,
 }));
 
 // Mock MCP service
 jest.mock('@dulce/mcp', () => ({
   mcpService: {
     initialize: jest.fn(),
-    getEnabledServers: jest.fn(() => ['test-server'])
-  }
+    getEnabledServers: jest.fn(() => ['test-server']),
+  },
 }));
 
 // Mock Vertex AI client
 jest.mock('@dulce/adk', () => ({
   VertexAIClient: jest.fn().mockImplementation(() => ({
-    predict: jest.fn().mockResolvedValue('mock prediction')
+    predict: jest.fn().mockResolvedValue('mock prediction'),
   })),
-  VertexAIClientConfig: {}
+  VertexAIClientConfig: {},
 }));
 
 // Since the main.ts file has side effects (starts the server), we need to test the functions indirectly
@@ -45,7 +45,7 @@ describe('Agent Runner Service', () => {
   describe('Agent Task Processing', () => {
     // Test individual agent processors by importing and testing them
     // This is a simplified approach since the actual functions are not exported
-    
+
     it('should handle task message structure correctly', () => {
       const taskMessage = {
         id: 'task-123',
@@ -53,7 +53,7 @@ describe('Agent Runner Service', () => {
         agentType: 'test-agent',
         priority: 'normal',
         timestamp: new Date().toISOString(),
-        source: 'api'
+        source: 'api',
       };
 
       // Verify the task message has all required fields
@@ -71,7 +71,7 @@ describe('Agent Runner Service', () => {
         agent_type: 'test-agent',
         task: { type: 'test' },
         status: 'started' as const,
-        started_at: new Date().toISOString()
+        started_at: new Date().toISOString(),
       };
 
       // Verify the agent run has all required fields
@@ -87,12 +87,12 @@ describe('Agent Runner Service', () => {
         'gemini-orchestrator',
         'bq-agent',
         'content-agent',
-        'crm-agent', 
+        'crm-agent',
         'reviews-agent',
-        'default'
+        'default',
       ];
 
-      expectedAgentTypes.forEach(agentType => {
+      expectedAgentTypes.forEach((agentType) => {
         expect(typeof agentType).toBe('string');
         expect(agentType.length).toBeGreaterThan(0);
       });
@@ -110,8 +110,8 @@ describe('Agent Runner Service', () => {
           status: 'completed',
           result: { success: true },
           started_at: new Date().toISOString(),
-          completed_at: new Date().toISOString()
-        }
+          completed_at: new Date().toISOString(),
+        },
       ]);
 
       expect(mockInsertRows).toHaveBeenCalledWith('dulce.agent_runs', expect.any(Array));

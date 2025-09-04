@@ -2,16 +2,11 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../dist/out-tsc",
-        "module": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "nodenext",
     "moduleResolution": "node10",
     "jsx": "react-jsx",
-    "types": [
-      "jest",
-      "node",
-      "@nx/react/typings/cssmodule.d.ts",
-      "@nx/react/typings/image.d.ts"
-    ]
+    "types": ["jest", "node", "@nx/react/typings/cssmodule.d.ts", "@nx/react/typings/image.d.ts"]
   },
   "include": [
     "jest.config.ts",
@@ -27,9 +22,5 @@
     "**/*.spec.ts",
     "**/*.test.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "tmp",
-    "dist"
-  ]
+  "exclude": ["node_modules", "tmp", "dist"]
 }

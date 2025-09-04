@@ -17,7 +17,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // Mock lazy-loaded components
 vi.mock('./federation-demo', () => ({
   __esModule: true,
-  default: () => <div data-testid="federation-demo">Federation Demo Component</div>
+  default: () => <div data-testid="federation-demo">Federation Demo Component</div>,
 }));
 
 // Mock the env config
@@ -31,10 +31,10 @@ vi.mock('../utils/env-config', () => ({
       projectId: 'test-project',
       storageBucket: 'test.appspot.com',
       messagingSenderId: '123456789',
-      appId: '1:123456789:web:abcdef'
-    }
+      appId: '1:123456789:web:abcdef',
+    },
   }),
-  isDevelopment: () => true
+  isDevelopment: () => true,
 }));
 
 describe('App Component', () => {
@@ -55,14 +55,14 @@ describe('App Component', () => {
 
   it('should switch to Federation Demo when button is clicked', async () => {
     render(<App />);
-    
+
     // Check initial state - AgentInterface should be visible
     expect(screen.getByText('AI Agent Interface')).toBeInTheDocument();
-    
+
     // Click the toggle button
     const toggleButton = screen.getByText('Show Federation Demo');
     await userEvent.click(toggleButton);
-    
+
     // Federation Demo should now be visible and button text should change
     expect(screen.getByTestId('federation-demo')).toBeInTheDocument();
     expect(screen.getByText('Show Local Agent Interface')).toBeInTheDocument();

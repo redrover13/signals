@@ -2,7 +2,7 @@
 
 /**
  * Fix for TS2532: Object is possibly 'null' or 'undefined'
- * 
+ *
  * This script attempts to fix null/undefined errors by:
  * 1. Adding optional chaining (?.)
  * 2. Adding nullish coalescing operators (??)
@@ -24,27 +24,27 @@ function findFilesWithErrors() {
   try {
     const output = require('child_process').execSync(
       'npx tsc --noEmit 2>&1 | grep -E "error TS253[23]: Object is possibly"',
-      { encoding: 'utf8', stdio: 'pipe' }
+      { encoding: 'utf8', stdio: 'pipe' },
     );
-    
+
     // Parse file paths and null/undefined errors
     const errors = [];
     const pattern = /^(.+?)((d+),(d+)): error TS(253[23]): Object is possibly '(null|undefined)'/;
-    
+
     for (const line of output.split('\n')) {
       const match = line.match(pattern);
       if (match) {
         const [_, filePath, line, column, errorCode, nullType] = match;
-        errors.push({ 
-          filePath, 
-          line: parseInt(line), 
-          column: parseInt(column), 
+        errors.push({
+          filePath,
+          line: parseInt(line),
+          column: parseInt(column),
           errorCode,
-          nullType
+          nullType,
         });
       }
     }
-    
+
     return errors;
   } catch (error) {
     // If grep doesn't find anything, it returns non-zero exit code
@@ -60,14 +60,14 @@ for (const { filePath, line, column, errorCode, nullType } of errors) {
   try {
     const content = fs.readFileSync(filePath, 'utf8');
     const lines = content.split('\n');
-    
+
     // Get the problematic line
     const problematicLine = lines[line - 1];
-    
+
     // 1. Add optional chaining for property access
     if (problematicLine.match(/\w+\.\w+/)) {
       const fixedLine = problematicLine.replace(/(\.)(\w+)/g, '?.$2');
-      
+
       if (fixedLine !== problematicLine) {
         lines[line - 1] = fixedLine;
         fs.writeFileSync(filePath, lines.join('\n'));
@@ -76,17 +76,17 @@ for (const { filePath, line, column, errorCode, nullType } of errors) {
         continue;
       }
     }
-    
+
     // 2. Add nullish coalescing for variable assignment
     const assignmentMatch = problematicLine.match(/(\w+)\s*=\s*([^;]+)/);
     if (assignmentMatch) {
       const [_, variable, value] = assignmentMatch;
-      
+
       const fixedLine = problematicLine.replace(
         assignmentMatch[0],
-        `${variable} = ${value} ?? ${value.includes('"') ? '""' : value.includes("'") ? "''" : '{}'}`
+        `${variable} = ${value} ?? ${value.includes('"') ? '""' : value.includes("'") ? "''" : '{}'}`,
       );
-      
+
       lines[line - 1] = fixedLine;
       fs.writeFileSync(filePath, lines.join('\n'));
       fixedFiles++;

@@ -15,23 +15,19 @@ const info = (msg) => console.log(chalk.blue(`ℹ️ ${msg}`));
 const warning = (msg) => console.log(chalk.yellow(`⚠️ ${msg}`));
 
 // Configuration
-const IGNORE_PATTERNS = [
-  'node_modules',
-  'dist',
-  '.git',
-  'coverage',
-  'tmp',
-];
+const IGNORE_PATTERNS = ['node_modules', 'dist', '.git', 'coverage', 'tmp'];
 
 // Find TypeScript configuration files
 function findTsConfigs() {
   try {
-    const tsConfigFiles = execSync('find . -name "tsconfig*.json" -not -path "*/node_modules/*" -not -path "*/dist/*"')
+    const tsConfigFiles = execSync(
+      'find . -name "tsconfig*.json" -not -path "*/node_modules/*" -not -path "*/dist/*"',
+    )
       .toString()
       .trim()
       .split('\n')
       .filter(Boolean);
-    
+
     return tsConfigFiles;
   } catch (err) {
     error('Failed to find TypeScript configuration files');
@@ -45,18 +41,19 @@ function checkTsConfigsForStrictMode(tsConfigFiles) {
   let allStrict = true;
   const nonStrictConfigs = [];
 
-  tsConfigFiles.forEach(configPath => {
+  tsConfigFiles.forEach((configPath) => {
     try {
       const configContent = fs.readFileSync(configPath, 'utf8');
       const config = JSON.parse(
         // Remove comments from JSON
-        configContent.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '')
+        configContent.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, ''),
       );
-      
+
       // Check for strict mode
       const hasStrict = config.compilerOptions && config.compilerOptions.strict === true;
-      const hasStrictNullChecks = config.compilerOptions && config.compilerOptions.strictNullChecks === true;
-      
+      const hasStrictNullChecks =
+        config.compilerOptions && config.compilerOptions.strictNullChecks === true;
+
       if (!hasStrict && !hasStrictNullChecks) {
         allStrict = false;
         nonStrictConfigs.push(configPath);
@@ -85,21 +82,21 @@ function runTypeCheck() {
 // Run the validation
 function validateTypeScriptStrict() {
   info('Validating TypeScript strict mode configuration...');
-  
+
   const tsConfigFiles = findTsConfigs();
   info(`Found ${tsConfigFiles.length} TypeScript configuration files`);
-  
+
   const { allStrict, nonStrictConfigs } = checkTsConfigsForStrictMode(tsConfigFiles);
-  
+
   if (!allStrict) {
     warning('Some TypeScript configuration files are not using strict mode:');
-    nonStrictConfigs.forEach(config => console.log(`  - ${config}`));
+    nonStrictConfigs.forEach((config) => console.log(`  - ${config}`));
   } else {
     success('All TypeScript configuration files are using strict mode');
   }
-  
+
   const typeCheckPassed = runTypeCheck();
-  
+
   if (typeCheckPassed) {
     success('TypeScript strict validation complete - all checks passed');
     return 0;

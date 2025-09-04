@@ -3,7 +3,12 @@
  * Tests for caching, connection pooling, and query optimization
  */
 
-import { MCPService, CacheService, PerformanceMetricsService, ConnectionPoolService } from '@dulce/mcp';
+import {
+  MCPService,
+  CacheService,
+  PerformanceMetricsService,
+  ConnectionPoolService,
+} from '@dulce/mcp';
 
 describe('Performance Optimizations', () => {
   let mcpService: MCPService | undefined;
@@ -21,7 +26,7 @@ describe('Performance Optimizations', () => {
   afterEach(async () => {
     cacheService && cacheService.destroy();
     performanceService && performanceService.destroy();
-    await connectionPool && connectionPool.shutdown();
+    (await connectionPool) && connectionPool.shutdown();
   });
 
   describe('Cache Service', () => {
@@ -48,7 +53,7 @@ describe('Performance Optimizations', () => {
       expect(cacheService && cacheService.get(key)).toEqual(data);
 
       // Wait for expiration
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(cacheService && cacheService.get(key)).toBeNull();
     });
@@ -102,7 +107,7 @@ describe('Performance Optimizations', () => {
       const serverId = 'databases';
 
       performanceService && performanceService.startRequest(requestId, method, serverId);
-      
+
       // Simulate processing time
       setTimeout(() => {
         performanceService && performanceService.completeRequest(requestId, { cacheHit: false });
@@ -118,8 +123,9 @@ describe('Performance Optimizations', () => {
       // Simulate multiple requests
       for (let i = 0; i < 10; i++) {
         const requestId = `request-${i}`;
-        performanceService && performanceService.startRequest(requestId, 'test && test.method', 'test-server');
-        
+        performanceService &&
+          performanceService.startRequest(requestId, 'test && test.method', 'test-server');
+
         // Simulate different response times
         setTimeout(() => {
           if (i < 8) {
@@ -161,16 +167,17 @@ describe('Performance Optimizations', () => {
         connection: {
           type: 'stdio' as const,
           endpoint: 'test-command',
-          timeout: 30000
+          timeout: 30000,
         },
         healthCheck: {
           interval: 60000,
           timeout: 5000,
-          failureThreshold: 3
-        }
+          failureThreshold: 3,
+        },
       };
 
-      const connection = await connectionPool && connectionPool.acquireConnection(serverId, serverConfig);
+      const connection =
+        (await connectionPool) && connectionPool.acquireConnection(serverId, serverConfig);
       expect(connection).toBeDefined();
       expect(connection && connection.serverId).toBe(serverId);
       expect(connection && connection.status).toBe('active');
@@ -194,20 +201,22 @@ describe('Performance Optimizations', () => {
         connection: {
           type: 'stdio' as const,
           endpoint: 'test-command',
-          timeout: 30000
+          timeout: 30000,
         },
         healthCheck: {
           interval: 60000,
           timeout: 5000,
-          failureThreshold: 3
-        }
+          failureThreshold: 3,
+        },
       };
 
-      const connection1 = await connectionPool && connectionPool.acquireConnection(serverId, serverConfig);
+      const connection1 =
+        (await connectionPool) && connectionPool.acquireConnection(serverId, serverConfig);
       connectionPool && connectionPool.releaseConnection(connection1);
 
-      const connection2 = await connectionPool && connectionPool.acquireConnection(serverId, serverConfig);
-      
+      const connection2 =
+        (await connectionPool) && connectionPool.acquireConnection(serverId, serverConfig);
+
       // Should reuse the same connection
       expect(connection2 && connection2.id).toBe(connection1 && connection1.id);
       expect(connection2 && connection2.useCount).toBeGreaterThan(1);
@@ -218,10 +227,11 @@ describe('Performance Optimizations', () => {
     it('should optimize BigQuery queries for Vietnamese market', async () => {
       // This would test the BigQuery optimization logic
       const query = 'SELECT * FROM events_20241223';
-      
+
       // Mock the BigQuery optimization
-      const optimizedQuery = 'SELECT * FROM events_20241223 WHERE _TABLE_SUFFIX BETWEEN FORMAT_DATE(\'%Y%m%d\', DATE_SUB(CURRENT_DATE(\'Asia/Ho_Chi_Minh\'), INTERVAL 7 DAY)) AND FORMAT_DATE(\'%Y%m%d\', CURRENT_DATE(\'Asia/Ho_Chi_Minh\'))';
-      
+      const optimizedQuery =
+        "SELECT * FROM events_20241223 WHERE _TABLE_SUFFIX BETWEEN FORMAT_DATE('%Y%m%d', DATE_SUB(CURRENT_DATE('Asia/Ho_Chi_Minh'), INTERVAL 7 DAY)) AND FORMAT_DATE('%Y%m%d', CURRENT_DATE('Asia/Ho_Chi_Minh'))";
+
       expect(optimizedQuery).toContain('Asia/Ho_Chi_Minh');
       expect(optimizedQuery).toContain('_TABLE_SUFFIX');
     });
@@ -241,19 +251,25 @@ describe('Performance Optimizations', () => {
     it('should demonstrate end-to-end performance optimization', async () => {
       // This is a conceptual test showing how all optimizations work together
       const startTime = Date.now();
-      
+
       // Simulate a cached BigQuery request
-      const cacheKey = CacheService && CacheService.createKey('bigquery && bigquery.query', { query: 'SELECT COUNT(*) FROM restaurants' }, 'databases');
-      
+      const cacheKey =
+        CacheService &&
+        CacheService.createKey(
+          'bigquery && bigquery.query',
+          { query: 'SELECT COUNT(*) FROM restaurants' },
+          'databases',
+        );
+
       // First request - cache miss
       cacheService && cacheService.set(cacheKey, { result: [{ count: 1250 }] });
-      
+
       // Second request - cache hit
       const cachedResult = cacheService && cacheService.get(cacheKey);
-      
+
       const endTime = Date.now();
       const duration = endTime - startTime;
-      
+
       expect(cachedResult).toBeDefined();
       expect(duration).toBeLessThan(100); // Should be very fast due to caching
     });
@@ -268,12 +284,13 @@ describe('Resource Cleanup Tests', () => {
 
     // Use services
     cacheService && cacheService.set('test', 'data');
-    performanceService && performanceService.startRequest('test-req', 'test && test.method', 'test-server');
+    performanceService &&
+      performanceService.startRequest('test-req', 'test && test.method', 'test-server');
 
     // Cleanup
     cacheService && cacheService.destroy();
     performanceService && performanceService.destroy();
-    await connectionPool && connectionPool.shutdown();
+    (await connectionPool) && connectionPool.shutdown();
 
     // Verify cleanup
     const stats = cacheService && cacheService.getStats();

@@ -46,7 +46,7 @@ const logger = {
       fs.appendFileSync(LOG_FILE, logMessage);
       console.log(logMessage);
     }
-  }
+  },
 };
 
 // Map of tools by name
@@ -58,36 +58,36 @@ const toolMap = TOOLS.reduce((map, tool) => {
 // Execute a command and return the output
 function executeCommand(command, cwd) {
   logger.info(`Executing command: ${command} in directory: ${cwd}`);
-  
+
   return new Promise((resolve, reject) => {
     const [cmd, ...args] = command.split(' ');
-    const process = spawn(cmd, args, { 
+    const process = spawn(cmd, args, {
       cwd,
-      shell: true
+      shell: true,
     });
-    
+
     let stdout = '';
     let stderr = '';
-    
+
     process.stdout.on('data', (data) => {
       stdout += data.toString();
     });
-    
+
     process.stderr.on('data', (data) => {
       stderr += data.toString();
     });
-    
+
     process.on('close', (code) => {
       logger.debug(`Command completed with exit code: ${code}`);
       logger.debug(`stdout: ${stdout}`);
-      
+
       if (code !== 0) {
         logger.error(`Command failed with exit code: ${code}`);
         logger.error(`stderr: ${stderr}`);
         reject(new Error(`Command failed with exit code: ${code}\n${stderr}`));
         return;
       }
-      
+
       resolve(stdout);
     });
   });
@@ -99,18 +99,18 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
+
   // Handle OPTIONS requests for CORS
   if (req.method === 'OPTIONS') {
     res.statusCode = 204;
     res.end();
     return;
   }
-  
+
   // Parse the URL
   const url = new URL(req.url, `http://${req.headers.host}`);
   const pathParts = url.pathname.split('/').filter(Boolean);
-  
+
   // Handle health check with GET or POST
   if (pathParts[0] === 'health') {
     res.statusCode = 200;
@@ -118,7 +118,7 @@ const server = http.createServer(async (req, res) => {
     res.end(JSON.stringify({ status: 'ok' }));
     return;
   }
-  
+
   // Only process POST requests for tools
   if (req.method !== 'POST') {
     res.statusCode = 405;
@@ -130,7 +130,7 @@ const server = http.createServer(async (req, res) => {
   if (pathParts[0] === 'tools' && pathParts.length > 1) {
     const toolName = pathParts[1];
     const tool = toolMap[toolName];
-    
+
     if (!tool) {
       logger.error(`Tool not found: ${toolName}`);
       res.statusCode = 404;
@@ -138,36 +138,38 @@ const server = http.createServer(async (req, res) => {
       res.end(JSON.stringify({ error: `Tool not found: ${toolName}` }));
       return;
     }
-    
+
     // Read the request body
     let body = '';
-    req.on('data', chunk => {
+    req.on('data', (chunk) => {
       body += chunk.toString();
     });
-    
+
     req.on('end', async () => {
       try {
         // Parse the request parameters
         const params = JSON.parse(body);
-        logger.debug(`Received request for tool: ${toolName} with params: ${JSON.stringify(params)}`);
-        
+        logger.debug(
+          `Received request for tool: ${toolName} with params: ${JSON.stringify(params)}`,
+        );
+
         // Process the command template with parameters
         let command = tool.command;
-        
+
         // Replace parameters in the command
         for (const [key, value] of Object.entries(params)) {
           if (typeof value === 'string') {
             command = command.replace(new RegExp(`{{\\s*${key}\\s*}}`, 'g'), value);
           }
         }
-        
+
         // Remove any remaining template placeholders
         command = command.replace(/{{[^}]+}}/g, '');
-        
+
         // Execute the command
         try {
           const output = await executeCommand(command, tool.cwd);
-          
+
           // Try to parse the output as JSON
           let jsonOutput;
           try {
@@ -175,7 +177,7 @@ const server = http.createServer(async (req, res) => {
           } catch (e) {
             jsonOutput = { output };
           }
-          
+
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify(jsonOutput));
@@ -202,7 +204,7 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   logger.info(`Codacy MCP Server running at http://localhost:${PORT}`);
   logger.info(`Configuration: ${configPath}`);
-  logger.info(`Tools: ${TOOLS.map(t => t.name).join(', ')}`);
+  logger.info(`Tools: ${TOOLS.map((t) => t.name).join(', ')}`);
 });
 
 // Handle graceful shutdown

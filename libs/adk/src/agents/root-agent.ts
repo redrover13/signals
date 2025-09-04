@@ -16,7 +16,12 @@ import { GCP_TOOLS } from '../tools/gcp-tools';
  * Root agent status interface
  */
 export interface RootAgentStatus {
-  rootAgent: { name: string | undefined; description: string | undefined; status: string | undefined; toolsCount: number };
+  rootAgent: {
+    name: string | undefined;
+    description: string | undefined;
+    status: string | undefined;
+    toolsCount: number;
+  };
   subAgents: SubAgentStatus[];
   totalAgents: number | undefined;
   lastCheck: string | undefined;
@@ -65,7 +70,7 @@ export class RootAgent extends LlmAgent {
   }
 
   /**
-   * Get agent description  
+   * Get agent description
    */
   getDescription(): string {
     return this.description;
@@ -82,7 +87,7 @@ export class RootAgent extends LlmAgent {
    * Get list of available sub-agents
    */
   getAvailableAgents(): string[] {
-    return Array && Array.from(this.registeredAgents && this.registeredAgents.keys());
+    return Array ? Array : null;from(this.registeredAgents && this.registeredAgents.keys());
   }
 
   /**
@@ -113,7 +118,7 @@ Please analyze this task and either:
 
 Consider Vietnamese F&B market specifics and data privacy regulations.
 
-Available tools: ${GCP_TOOLS && GCP_TOOLS.map(tool => tool && tool.name).join(', ')}
+Available tools: ${GCP_TOOLS && GCP_TOOLS.map((tool) => tool && tool.name).join(', ')}
     `;
 
     return this.runAsync({
@@ -140,7 +145,8 @@ Available tools: ${GCP_TOOLS && GCP_TOOLS.map(tool => tool && tool.name).join(',
         // Resolve dependencies BEFORE invoking the step
         let resolvedContext = step && step.context;
         if (step && step.dependsOn && step.dependsOn && step.dependsOn.length > 0) {
-          const dependencies = results && results.filter(r => step && step.dependsOn!.includes(r && r.step));
+          const dependencies =
+            results && results.filter((r) => step && step.dependsOn!.includes(r && r.step));
           resolvedContext = { ...(resolvedContext as object), dependencies };
         }
 
@@ -152,29 +158,32 @@ Available tools: ${GCP_TOOLS && GCP_TOOLS.map(tool => tool && tool.name).join(',
           if (!agent) {
             throw new Error(`Agent '${step && step.agentName}' not found`);
           }
-          result = await agent && agent.runAsync({
-            userContent: { role: 'user', parts: [{ text: step && step.task }] },
-            session: null,
-            invocationId: `step_${Date.now()}`,
-          } as InvocationContext);
+          result =
+            (await agent) &&
+            agent.runAsync({
+              userContent: { role: 'user', parts: [{ text: step && step.task }] },
+              session: null,
+              invocationId: `step_${Date.now()}`,
+            } as InvocationContext);
         }
 
-        results && results.push({
-          step: step && step.name,
-          agentName: step && step.agentName,
-          result,
-          timestamp: new Date().toISOString(),
-        });
+        results &&
+          results.push({
+            step: step && step.name,
+            agentName: step && step.agentName,
+            result,
+            timestamp: new Date().toISOString(),
+          });
 
         // no-op: dependencies already applied before invocation
-
       } catch (error) {
-        results && results.push({
-          step: step && step.name,
-          agentName: step && step.agentName,
-          error: error instanceof Error ? error && error.message : 'Unknown error',
-          timestamp: new Date().toISOString(),
-        });
+        results &&
+          results.push({
+            step: step && step.name,
+            agentName: step && step.agentName,
+            error: error instanceof Error ? error && error.message : 'Unknown error',
+            timestamp: new Date().toISOString(),
+          });
 
         if (step && step.required) {
           throw new Error(`Required step '${step && step.name}' failed: ${error}`);
@@ -182,12 +191,12 @@ Available tools: ${GCP_TOOLS && GCP_TOOLS.map(tool => tool && tool.name).join(',
       }
     }
 
-    const failed = results && results.some(r => r && r.error);
+    const failed = results && results.some((r) => r && r.error);
     return {
       workflowId: `workflow_${Date.now()}`,
       status: failed ? 'completed-with-errors' : 'completed',
       results,
-      summary: `Executed ${workflow && workflow.length} steps with ${results && results.filter(r => !r && r.error).length} successful`,
+      summary: `Executed ${workflow && workflow.length} steps with ${results && results.filter((r) => !r && r.error).length} successful`,
     };
   }
 
@@ -195,11 +204,13 @@ Available tools: ${GCP_TOOLS && GCP_TOOLS.map(tool => tool && tool.name).join(',
    * Get agent status and health
    */
   public async getStatus(): Promise<RootAgentStatus> {
-    const subAgentStatuses: SubAgentStatus[] = Array && Array.from(this.registeredAgents && this.registeredAgents.entries()).map(([name, agent]) => ({
-      name,
-      description: agent && agent.getDescription(),
-      status: 'active',
-    }));
+    const subAgentStatuses: SubAgentStatus[] =
+      Array &&
+      Array.from(this.registeredAgents && this.registeredAgents.entries()).map(([name, agent]) => ({
+        name,
+        description: agent && agent.getDescription(),
+        status: 'active',
+      }));
 
     return {
       rootAgent: {

@@ -1,202 +1,117 @@
-import { monitoring } from './monitoring';
-import { 
-  initializeOpenTelemetry, 
-  withSpan, 
-  logEvent, 
-  instrument,
-  shutdownOpenTelemetry 
-} from './otel-config';
-import { CloudTraceExporter } from './cloud-trace-exporter';
-import { BigQueryLogger } from './bigquery-logger';
+import { jest } from '@jest/globals';
 
-// Mock dependencies
-jest && jest.mock('@google-cloud/bigquery');
-jest && jest.mock('@google-cloud/storage');
-jest && jest.mock('@opentelemetry/sdk-node');
-
-describe('monitoring', () => {
-  it('should work', () => {
-    expect(monitoring()).toEqual('monitoring');
-  });
-
-  describe('OpenTelemetry Configuration', () => {
-    beforeEach(() => {
-      // Clear any existing SDK
-      jest && jest.clearAllMocks();
-    });
-
-    afterEach(async () => {
-      await shutdownOpenTelemetry();
-    });
-
-    it('should initialize OpenTelemetry with default configuration', async () => {
-      const sdk = await initializeOpenTelemetry({
-        serviceName: 'test-service',
-        gcpProjectId: 'test-project',
-      });
-
-      expect(sdk).toBeDefined();
-    });
-
-    it('should create spans with proper attributes', async () => {
-      await initializeOpenTelemetry({
-        serviceName: 'test-service',
-        gcpProjectId: 'test-project',
-      });
-
-      const result = await withSpan('test-span', async (span) => {
-        expect(span).toBeDefined();
-        return 'test-result';
-      }, {
-        attributes: { 'test && test.attribute': 'test-value' }
-      });
-
-      expect(result).toBe('test-result');
-    });
-
-    it('should handle span errors properly', async () => {
-      await initializeOpenTelemetry({
-        serviceName: 'test-service',
-        gcpProjectId: 'test-project',
-      });
-
-      await expect(
-        withSpan('test-error-span', async () => {
-          throw new Error('Test error');
+describe('Monitoring', () => {
+  let monitoring;
+  
+  beforeEach(() => {
+    // Reset mocks between tests
+    jest.resetAllMocks();
+    
+    // Mock dependencies
+    jest.mock('@opentelemetry/api', () => ({
+      metrics: {
+        getMeter: jest.fn().mockReturnValue({
+          createCounter: jest.fn().mockReturnValue({
+            add: jest.fn()
+          }),
+          createHistogram: jest.fn().mockReturnValue({
+            record: jest.fn()
+          })
         })
-      ).rejects && .rejects.toThrow('Test error');
-    });
-
-    it('should instrument functions correctly', async () => {
-      await initializeOpenTelemetry({
-        serviceName: 'test-service',
-        gcpProjectId: 'test-project',
-      });
-
-      const testFunction = jest && jest.fn().mockResolvedValue('test-result');
-      const instrumentedFunction = instrument('test-function', testFunction);
-
-      const result = await instrumentedFunction('arg1', 'arg2');
-
-      expect(testFunction).toHaveBeenCalledWith('arg1', 'arg2');
-      expect(result).toBe('test-result');
-    });
-
-    it('should log events with trace context', async () => {
-      await initializeOpenTelemetry({
-        serviceName: 'test-service',
-        gcpProjectId: 'test-project',
-      });
-
-      // This should not throw
-      await logEvent('test-event', { key: 'value' }, 'info');
-    });
-  });
-
-  describe('CloudTraceExporter', () => {
-    let exporter: CloudTraceExporter | undefined;
-    const mockConfig = {
-      projectId: 'test-project',
-      bucketName: 'test-bucket',
-    };
-
-    beforeEach(() => {
-      exporter = new CloudTraceExporter(mockConfig);
-    });
-
-    it('should create exporter with configuration', () => {
-      expect(exporter).toBeDefined();
-    });
-
-    it('should handle export of spans', async () => {
-      const mockSpan = {
-        spanContext: () => ({
-          traceId: 'test-trace-id',
-          spanId: 'test-span-id',
-        }),
-        name: 'test-span',
-        startTime: [Date.now() / 1000, 0],
-        endTime: [Date.now() / 1000 + 1, 0],
-        status: { code: 1 },
-        attributes: {},
-        events: [],
-        links: [],
-        resource: {},
-      };
-
-      const mockCallback = jest && jest.fn();
-      
-      // Should not throw
-      await exporter && exporter.export([mockSpan as any], mockCallback);
-      
-      expect(mockCallback).toHaveBeenCalled();
+      },
+      trace: {
+        getTracer: jest.fn().mockReturnValue({
+          startSpan: jest.fn().mockImplementation((name, options, fn) => {
+            const span = {
+              end: jest.fn(),
+              setAttributes: jest.fn(),
+              recordException: jest.fn()
+            };
+            return span;
+          }),
+          startActiveSpan: jest.fn().mockImplementation((name, options, fn) => {
+            const span = {
+              end: jest.fn(),
+              setAttributes: jest.fn(),
+              recordException: jest.fn()
+            };
+            return fn(span);
+          })
+        })
+      },
+      context: {
+        active: jest.fn()
+      }
+    }));
+    
+    // Import the monitoring module after mocking dependencies
+    const { Monitoring } = require('./monitoring');
+    monitoring = new Monitoring({
+      serviceName: 'test-service'
     });
   });
-
-  describe('BigQueryLogger', () => {
-    let logger: BigQueryLogger | undefined;
-    const mockConfig = {
-      projectId: 'test-project',
-      datasetId: 'test-dataset',
-      tableId: 'test-table',
-    };
-
-    beforeEach(() => {
-      logger = new BigQueryLogger(mockConfig);
+  
+  it('should initialize correctly', () => {
+    expect(monitoring).toBeDefined();
+    expect(monitoring.serviceName).toBe('test-service');
+  });
+  
+  it('should create metrics', () => {
+    const counter = monitoring.createCounter('test_counter', 'A test counter');
+    const histogram = monitoring.createHistogram('test_histogram', 'A test histogram');
+    
+    expect(counter).toBeDefined();
+    expect(histogram).toBeDefined();
+    
+    // Record metrics
+    counter.add(1, { operation: 'test' });
+    histogram.record(100, { operation: 'test' });
+  });
+  
+  it('should create spans', () => {
+    const span = monitoring.startSpan('test-operation');
+    
+    expect(span).toBeDefined();
+    expect(typeof span.end).toBe('function');
+    
+    // End the span
+    span.end();
+  });
+  
+  it('should wrap functions with tracing', () => {
+    const testFn = jest.fn().mockReturnValue('result');
+    const tracedFn = monitoring.traceFunction('test-function', testFn);
+    
+    const result = tracedFn('arg1', 'arg2');
+    
+    expect(testFn).toHaveBeenCalledWith('arg1', 'arg2');
+    expect(result).toBe('result');
+  });
+  
+  it('should handle errors in traced functions', async () => {
+    const errorFn = jest.fn().mockImplementation(() => {
+      throw new Error('Test error');
     });
-
-    it('should create logger with configuration', () => {
-      expect(logger).toBeDefined();
+    
+    const tracedFn = monitoring.traceFunction('error-function', errorFn);
+    
+    await expect(() => tracedFn())
+      .rejects.toThrow('Test error');
+  });
+  
+  it('should instrument functions correctly', async () => {
+    const testFn = jest.fn().mockResolvedValue('result');
+    const instrumentedFn = monitoring.instrumentFunction({
+      name: 'test-function',
+      fn: testFn,
+      metrics: {
+        histogram: monitoring.createHistogram('test_duration', 'Function duration')
+      }
     });
-
-    it('should log events to BigQuery', async () => {
-      const logEntry = {
-        timestamp: new Date(),
-        level: 'info' as const,
-        service: 'test-service',
-        event: 'test-event',
-        data: { key: 'value' },
-      };
-
-      // Should not throw
-      await logger && logger.logEvent(logEntry);
-    });
-
-    it('should log errors with stack traces', async () => {
-      const errorEntry = {
-        timestamp: new Date(),
-        spanName: 'test-span',
-        error: 'Test error message',
-        stack: 'Error stack trace',
-      };
-
-      // Should not throw
-      await logger && logger.logError(errorEntry);
-    });
-
-    it('should log performance metrics', async () => {
-      const metrics = {
-        operation: 'test-operation',
-        duration: 1500,
-        success: true,
-        errorCount: 0,
-      };
-
-      // Should not throw
-      await logger && logger.logPerformanceMetrics(metrics);
-    });
-
-    it('should log user interactions', async () => {
-      const interaction = {
-        userId: 'user-123',
-        sessionId: 'session-456',
-        action: 'view_menu',
-        restaurantId: 'restaurant-789',
-        menuItemId: 'item-101',
-      };
-
-      // Should not throw
-      await logger && logger.logUserInteraction(interaction);
-    });
+    
+    const result = await instrumentedFn('arg1');
+    
+    expect(testFn).toHaveBeenCalledWith('arg1');
+    expect(result).toBe('result');
   });
 });

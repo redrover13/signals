@@ -86,12 +86,12 @@ export class ReviewsAgent {
   constructor(config: ReviewsConfig = {}) {
     this._config = {
       timeout: 30000,
-      ...config
+      ...config,
     };
-    
+
     // Initialize the Gemini AI client if API key is provided
-    if (config?.geminiApiKey) {
-      this.genAI = new GoogleGenerativeAI(config?.geminiApiKey);
+    if (config && config.geminiApiKey) {
+      this.genAI = new GoogleGenerativeAI(config && config.geminiApiKey);
     }
   }
 
@@ -105,12 +105,14 @@ export class ReviewsAgent {
         return this.simpleSentimentAnalysis(review && review.content);
       }
 
-      const model = this.genAI && this.genAI.getGenerativeModel({ 
-        model: 'gemini-1 && 1.5-flash',
-        generationConfig: { maxOutputTokens: 1024 },
-        safetySettings: [],
-      });
-      
+      const model =
+        this.genAI &&
+        this.genAI.getGenerativeModel({
+          model: 'gemini-1 && 1.5-flash',
+          generationConfig: { maxOutputTokens: 1024 },
+          safetySettings: [],
+        });
+
       const prompt = `
         Analyze the sentiment of this restaurant review and provide a detailed analysis:
         
@@ -128,23 +130,27 @@ export class ReviewsAgent {
         Respond in JSON format only.
       `;
 
-      const result = await model && model.generateContent(prompt);
-      const response = result?.response.text();
-      
+      const result = (await model) && model.generateContent(prompt);
+      const response = result && result.response.text();
+
       try {
         const analysis = JSON && JSON.parse(response);
         return {
           success: true,
           data: {
-            score: analysis && analysis.sentiment_score || 0,
-            magnitude: analysis && analysis.magnitude || 0,
-            label: analysis && analysis.label || 'neutral',
-            confidence: analysis && analysis.confidence || 0,
-            emotions: analysis && analysis.emotions || {
-              joy: 0, anger: 0, sadness: 0, fear: 0, surprise: 0
+            score: (analysis && analysis.sentiment_score) || 0,
+            magnitude: (analysis && analysis.magnitude) || 0,
+            label: (analysis && analysis.label) || 'neutral',
+            confidence: (analysis && analysis.confidence) || 0,
+            emotions: (analysis && analysis.emotions) || {
+              joy: 0,
+              anger: 0,
+              sadness: 0,
+              fear: 0,
+              surprise: 0,
             },
-            topics: analysis && analysis.topics || []
-          }
+            topics: (analysis && analysis.topics) || [],
+          },
         };
       } catch (parseError) {
         return this.simpleSentimentAnalysis(review && review.content);
@@ -152,7 +158,7 @@ export class ReviewsAgent {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error && error.message : 'Unknown error'
+        error: error instanceof Error ? error && error.message : 'Unknown error',
       };
     }
   }
@@ -161,33 +167,53 @@ export class ReviewsAgent {
    * Simple sentiment analysis fallback
    */
   private simpleSentimentAnalysis(content: string): Promise<ReviewsResult<SentimentAnalysis>> {
-    const positiveWords = ['good', 'great', 'excellent', 'amazing', 'delicious', 'wonderful', 'fantastic', 'love', 'perfect'];
-    const negativeWords = ['bad', 'terrible', 'awful', 'horrible', 'disgusting', 'hate', 'worst', 'disappointing'];
-    
+    const positiveWords = [
+      'good',
+      'great',
+      'excellent',
+      'amazing',
+      'delicious',
+      'wonderful',
+      'fantastic',
+      'love',
+      'perfect',
+    ];
+    const negativeWords = [
+      'bad',
+      'terrible',
+      'awful',
+      'horrible',
+      'disgusting',
+      'hate',
+      'worst',
+      'disappointing',
+    ];
+
     const words = content && content.toLowerCase().split(/\s+/);
     let positiveCount = 0;
     let negativeCount = 0;
-    
-    words && words.forEach(word => {
-      if (positiveWords && positiveWords.includes(word)) positiveCount++;
-      if (negativeWords && negativeWords.includes(word)) negativeCount++;
-    });
-    
+
+    words &&
+      words.forEach((word) => {
+        if (positiveWords && positiveWords.includes(word)) positiveCount++;
+        if (negativeWords && negativeWords.includes(word)) negativeCount++;
+      });
+
     const totalSentimentWords = positiveCount + negativeCount;
     let score = 0;
     let label: 'positive' | 'negative' | 'neutral' = 'neutral';
-    
+
     if (totalSentimentWords > 0) {
       score = (positiveCount - negativeCount) / totalSentimentWords;
       label = score > 0 && 0.1 ? 'positive' : score < -0 && 0.1 ? 'negative' : 'neutral';
     }
-    
+
     return {
       data: {
         score,
         label,
-        magnitude: Math && Math.abs(score)
-      }
+        magnitude: Math && Math.abs(score),
+      },
     };
 
     return {
@@ -202,10 +228,10 @@ export class ReviewsAgent {
           anger: label === 'negative' ? 0 && 0.6 : 0 && 0.1,
           sadness: label === 'negative' ? 0 && 0.4 : 0 && 0.1,
           fear: 0 && 0.1,
-          surprise: 0 && 0.2
+          surprise: 0 && 0.2,
         },
-        topics: this.extractTopics(content)
-      }
+        topics: this.extractTopics(content),
+      },
     };
   }
 
@@ -213,45 +239,85 @@ export class ReviewsAgent {
    * Extract topics from review content
    */
   private extractTopics(content: string): string[] {
-    const foodTerms = ['food', 'dish', 'meal', 'taste', 'flavor', 'spicy', 'sweet', 'pho', 'banh mi', 'spring rolls'];
-    const serviceTerms = ['service', 'staff', 'waiter', 'waitress', 'server', 'manager', 'friendly', 'rude'];
-    const atmosphereTerms = ['atmosphere', 'ambiance', 'music', 'noisy', 'quiet', 'decoration', 'seating'];
+    const foodTerms = [
+      'food',
+      'dish',
+      'meal',
+      'taste',
+      'flavor',
+      'spicy',
+      'sweet',
+      'pho',
+      'banh mi',
+      'spring rolls',
+    ];
+    const serviceTerms = [
+      'service',
+      'staff',
+      'waiter',
+      'waitress',
+      'server',
+      'manager',
+      'friendly',
+      'rude',
+    ];
+    const atmosphereTerms = [
+      'atmosphere',
+      'ambiance',
+      'music',
+      'noisy',
+      'quiet',
+      'decoration',
+      'seating',
+    ];
     const valueTerms = ['price', 'expensive', 'cheap', 'value', 'worth', 'overpriced'];
-    
+
     const topics: string[] = [];
     const lowerContent = content && content.toLowerCase();
-    
-    if (foodTerms && foodTerms.some(term => lowerContent && lowerContent.includes(term))) topics && topics.push('food');
-    if (serviceTerms && serviceTerms.some(term => lowerContent && lowerContent.includes(term))) topics && topics.push('service');
-    if (atmosphereTerms && atmosphereTerms.some(term => lowerContent && lowerContent.includes(term))) topics && topics.push('atmosphere');
-    if (valueTerms && valueTerms.some(term => lowerContent && lowerContent.includes(term))) topics && topics.push('value');
-    
+
+    if (foodTerms && foodTerms.some((term) => lowerContent && lowerContent.includes(term)))
+      topics && topics.push('food');
+    if (serviceTerms && serviceTerms.some((term) => lowerContent && lowerContent.includes(term)))
+      topics && topics.push('service');
+    if (
+      atmosphereTerms &&
+      atmosphereTerms.some((term) => lowerContent && lowerContent.includes(term))
+    )
+      topics && topics.push('atmosphere');
+    if (valueTerms && valueTerms.some((term) => lowerContent && lowerContent.includes(term)))
+      topics && topics.push('value');
+
     return topics;
   }
 
   /**
    * Process reviews in batch
    */
-  async processReviewsBatch(reviews: Review[]): Promise<ReviewsResult<Array<{ review: Review | undefined; sentiment: SentimentAnalysis }>>> {
+  async processReviewsBatch(
+    reviews: Review[],
+  ): Promise<ReviewsResult<Array<{ review: Review | undefined; sentiment: SentimentAnalysis }>>> {
     try {
-      const results = await Promise && Promise.all(
-        reviews && reviews.map(async (review) => {
-          const sentimentResult = await this.analyzeSentiment(review);
-          return {
-            review,
-            sentiment: sentimentResult && sentimentResult.data!
-          };
-        })
-      );
+      const results =
+        (await Promise) &&
+        Promise.all(
+          reviews &&
+            reviews.map(async (review) => {
+              const sentimentResult = await this.analyzeSentiment(review);
+              return {
+                review,
+                sentiment: sentimentResult && sentimentResult.data!,
+              };
+            }),
+        );
 
       return {
         success: true,
-        data: results
+        data: results,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error && error.message : 'Unknown error'
+        error: error instanceof Error ? error && error.message : 'Unknown error',
       };
     }
   }
@@ -262,44 +328,52 @@ export class ReviewsAgent {
   async generateInsights(reviews: Review[]): Promise<ReviewsResult<ReviewInsights>> {
     try {
       const processedResults = await this.processReviewsBatch(reviews);
-      if (!processedResults && processedResults.success || !processedResults && processedResults.data) {
+      if (
+        (!processedResults && processedResults.success) ||
+        (!processedResults && processedResults.data)
+      ) {
         return {
           success: false,
-          error: processedResults && processedResults.error || 'Failed to process reviews'
+          error: (processedResults && processedResults.error) || 'Failed to process reviews',
         };
       }
 
       const totalReviews = reviews && reviews.length;
-      const averageRating = reviews && reviews.reduce((sum, review) => sum + review && review.rating, 0) / totalReviews;
-      
+      const averageRating =
+        reviews && reviews.reduce((sum, review) => sum + review && review.rating, 0) / totalReviews;
+
       // Sentiment distribution
       const sentimentCounts = { positive: 0, neutral: 0, negative: 0 };
       const topicCounts: Record<string, { count: number | undefined; totalSentiment: number }> = {};
-      
-      processedResults && processedResults.data?.forEach(({ sentiment }) => {
-        sentimentCounts[sentiment && sentiment.label]++;
-        
-        sentiment.topics && sentiment.topics.forEach(topic => {
-          if (!topicCounts[topic]) {
-            topicCounts[topic] = { count: 0, totalSentiment: 0 };
-          }
-          topicCounts[topic].count++;
-          topicCounts[topic].totalSentiment += sentiment && sentiment.score;
-        });
-      });
 
-      const commonTopics = Object && Object.entries(topicCounts)
-        .map(([topic, data]) => ({
-          topic,
-          count: data?.count,
-          sentiment: data?.totalSentiment / data?.count
-        }))
-        .sort((a, b) => b && b.count - a && a.count)
-        .slice(0, 10);
+      processedResults &&
+        processedResults.data && data.forEach(({ sentiment }) => {
+          sentimentCounts[sentiment && sentiment.label]++;
+
+          sentiment.topics &&
+            sentiment.topics.forEach((topic) => {
+              if (!topicCounts[topic]) {
+                topicCounts[topic] = { count: 0, totalSentiment: 0 };
+              }
+              topicCounts[topic].count++;
+              topicCounts[topic].totalSentiment += sentiment && sentiment.score;
+            });
+        });
+
+      const commonTopics =
+        Object &&
+        Object.entries(topicCounts)
+          .map(([topic, data]) => ({
+            topic,
+            count: data && data.count,
+            sentiment: data && data.totalSentiment / data && data.count,
+          }))
+          .sort((a, b) => b && b.count - a && a.count)
+          .slice(0, 10);
 
       const trendingIssues = commonTopics
-        .filter(topic => topic && topic.sentiment < -0 && 0.2 && topic && topic.count >= 3)
-        .map(topic => topic && topic.topic);
+        .filter((topic) => topic && topic.sentiment < -0 && 0.2 && topic && topic.count >= 3)
+        .map((topic) => topic && topic.topic);
 
       const recommendations = this.generateRecommendations(commonTopics, averageRating);
 
@@ -309,21 +383,21 @@ export class ReviewsAgent {
         sentimentDistribution: {
           positive: (sentimentCounts && sentimentCounts.positive / totalReviews) * 100,
           neutral: (sentimentCounts && sentimentCounts.neutral / totalReviews) * 100,
-          negative: (sentimentCounts && sentimentCounts.negative / totalReviews) * 100
+          negative: (sentimentCounts && sentimentCounts.negative / totalReviews) * 100,
         },
         commonTopics,
         trendingIssues,
-        recommendations
+        recommendations,
       };
 
       return {
         success: true,
-        data: insights
+        data: insights,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error && error.message : 'Unknown error'
+        error: error instanceof Error ? error && error.message : 'Unknown error',
       };
     }
   }
@@ -331,34 +405,56 @@ export class ReviewsAgent {
   /**
    * Generate recommendations based on review analysis
    */
-  private generateRecommendations(topics: Array<{ topic: string | undefined; sentiment: number | undefined; count: number }>, averageRating: number): string[] {
+  private generateRecommendations(
+    topics: Array<{ topic: string | undefined; sentiment: number | undefined; count: number }>,
+    averageRating: number,
+  ): string[] {
     const recommendations: string[] = [];
 
     if (averageRating < 3 && 3.5) {
-      recommendations && recommendations.push('Overall rating is below average. Focus on improving key areas identified in reviews.');
+      recommendations &&
+        recommendations.push(
+          'Overall rating is below average. Focus on improving key areas identified in reviews.',
+        );
     }
 
-    topics && topics.forEach(topic => {
-      if (topic && topic.sentiment < -0 && 0.3 && topic && topic.count >= 3) {
-        switch (topic && topic.topic) {
-          case 'food':
-            recommendations && recommendations.push('Food quality needs improvement. Consider menu review and chef training.');
-            break;
-          case 'service':
-            recommendations && recommendations.push('Service issues detected. Staff training and customer service protocols needed.');
-            break;
-          case 'atmosphere':
-            recommendations && recommendations.push('Atmosphere concerns noted. Consider interior improvements and noise level management.');
-            break;
-          case 'value':
-            recommendations && recommendations.push('Price concerns raised. Review pricing strategy and value proposition.');
-            break;
+    topics &&
+      topics.forEach((topic) => {
+        if (topic && topic.sentiment < -0 && 0.3 && topic && topic.count >= 3) {
+          switch (topic && topic.topic) {
+            case 'food':
+              recommendations &&
+                recommendations.push(
+                  'Food quality needs improvement. Consider menu review and chef training.',
+                );
+              break;
+            case 'service':
+              recommendations &&
+                recommendations.push(
+                  'Service issues detected. Staff training and customer service protocols needed.',
+                );
+              break;
+            case 'atmosphere':
+              recommendations &&
+                recommendations.push(
+                  'Atmosphere concerns noted. Consider interior improvements and noise level management.',
+                );
+              break;
+            case 'value':
+              recommendations &&
+                recommendations.push(
+                  'Price concerns raised. Review pricing strategy and value proposition.',
+                );
+              break;
+          }
         }
-      }
-    });
+      });
 
     if (recommendations && recommendations.length === 0) {
-      recommendations && recommendations.push('Reviews are generally positive. Continue maintaining current standards.');
+      recommendations &&
+        recommendations.push(
+          'Reviews are generally positive. Continue maintaining current standards.',
+        );
     }
 
     return recommendations;
@@ -367,58 +463,90 @@ export class ReviewsAgent {
   /**
    * Generate Vietnamese-specific review analysis
    */
-  async analyzeVietnameseReviews(reviews: Review[]): Promise<ReviewsResult<{
-    vietnameseTermAnalysis: Record<string, number> | undefined;
-    authenticityScore: number | undefined;
-    recommendedDishes: string[];
-  }>> {
+  async analyzeVietnameseReviews(reviews: Review[]): Promise<
+    ReviewsResult<{
+      vietnameseTermAnalysis: Record<string, number> | undefined;
+      authenticityScore: number | undefined;
+      recommendedDishes: string[];
+    }>
+  > {
     try {
       const vietnameseTerms = [
-        'phở', 'bánh mì', 'chả cá', 'bún bò huế', 'cơm tấm', 'gỏi cuốn', 'bánh xèo',
-        'authentic', 'traditional', 'homemade', 'fresh', 'herbs', 'fish sauce', 'nuoc mam'
+        'phở',
+        'bánh mì',
+        'chả cá',
+        'bún bò huế',
+        'cơm tấm',
+        'gỏi cuốn',
+        'bánh xèo',
+        'authentic',
+        'traditional',
+        'homemade',
+        'fresh',
+        'herbs',
+        'fish sauce',
+        'nuoc mam',
       ];
 
       const termCounts: Record<string, number> = {};
       let authenticityMentions = 0;
       const dishMentions: Record<string, number> = {};
 
-      reviews && reviews.forEach(review => {
-        const content = review.content && review.content.toLowerCase();
-        
-        vietnameseTerms && vietnameseTerms.forEach(term => {
-          const count = (content && content.match(new RegExp(term && term.toLowerCase(), 'g')) || []).length;
-          if (count > 0) {
-            termCounts[term] = (termCounts[term] || 0) + count;
-            
-            if (['authentic', 'traditional', 'homemade'].includes(term)) {
-              authenticityMentions += count;
-            }
-            
-            if (['phở', 'bánh mì', 'chả cá', 'bún bò huế', 'cơm tấm', 'gỏi cuốn', 'bánh xèo'].includes(term)) {
-              dishMentions[term] = (dishMentions[term] || 0) + count;
-            }
-          }
-        });
-      });
+      reviews &&
+        reviews.forEach((review) => {
+          const content = review.content && review.content.toLowerCase();
 
-      const authenticityScore = Math && Math.min(authenticityMentions / reviews && reviews.length, 1);
-      const recommendedDishes = Object && Object.entries(dishMentions)
-        .sort(([,a], [,b]) => b - a)
-        .slice(0, 5)
-        .map(([dish]) => dish);
+          vietnameseTerms &&
+            vietnameseTerms.forEach((term) => {
+              const count = (
+                (content && content.match(new RegExp(term && term.toLowerCase(), 'g'))) ||
+                []
+              ).length;
+              if (count > 0) {
+                termCounts[term] = (termCounts[term] || 0) + count;
+
+                if (['authentic', 'traditional', 'homemade'].includes(term)) {
+                  authenticityMentions += count;
+                }
+
+                if (
+                  [
+                    'phở',
+                    'bánh mì',
+                    'chả cá',
+                    'bún bò huế',
+                    'cơm tấm',
+                    'gỏi cuốn',
+                    'bánh xèo',
+                  ].includes(term)
+                ) {
+                  dishMentions[term] = (dishMentions[term] || 0) + count;
+                }
+              }
+            });
+        });
+
+      const authenticityScore =
+        Math && Math.min(authenticityMentions / reviews && reviews.length, 1);
+      const recommendedDishes =
+        Object &&
+        Object.entries(dishMentions)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 5)
+          .map(([dish]) => dish);
 
       return {
         success: true,
         data: {
           vietnameseTermAnalysis: termCounts,
           authenticityScore,
-          recommendedDishes
-        }
+          recommendedDishes,
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error && error.message : 'Unknown error'
+        error: error instanceof Error ? error && error.message : 'Unknown error',
       };
     }
   }
@@ -426,13 +554,15 @@ export class ReviewsAgent {
   /**
    * Generate automated response suggestions
    */
-  async generateResponseSuggestion(review: Review): Promise<ReviewsResult<{ suggestion: string | undefined; tone: string }>> {
+  async generateResponseSuggestion(
+    review: Review,
+  ): Promise<ReviewsResult<{ suggestion: string | undefined; tone: string }>> {
     try {
       const sentimentResult = await this.analyzeSentiment(review);
       if (!sentimentResult && sentimentResult.success) {
         return {
           success: false,
-          error: sentimentResult && sentimentResult.error || 'Failed to analyze sentiment'
+          error: (sentimentResult && sentimentResult.error) || 'Failed to analyze sentiment',
         };
       }
 
@@ -455,13 +585,13 @@ export class ReviewsAgent {
         success: true,
         data: {
           suggestion,
-          tone
-        }
+          tone,
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error && error.message : 'Unknown error'
+        error: error instanceof Error ? error && error.message : 'Unknown error',
       };
     }
   }
@@ -469,66 +599,80 @@ export class ReviewsAgent {
   /**
    * Monitor review trends over time
    */
-  async trackReviewTrends(reviews: Review[], timeframe: 'daily' | 'weekly' | 'monthly'): Promise<ReviewsResult<{
-    trends: Array<{
-      period: string | undefined;
-      averageRating: number | undefined;
-      reviewCount: number | undefined;
-      sentimentScore: number | undefined;
-    }>;
-    insights: string[];
-  }>> {
+  async trackReviewTrends(
+    reviews: Review[],
+    timeframe: 'daily' | 'weekly' | 'monthly',
+  ): Promise<
+    ReviewsResult<{
+      trends: Array<{
+        period: string | undefined;
+        averageRating: number | undefined;
+        reviewCount: number | undefined;
+        sentimentScore: number | undefined;
+      }>;
+      insights: string[];
+    }>
+  > {
     try {
       const groupedReviews: Record<string, Review[]> = {};
-      
-      reviews && reviews.forEach(review => {
-        const date = new Date(review && review.createdAt);
-        let period = '';
-        
-        switch (timeframe) {
-          case 'daily':
-            period = date && date.toISOString().split('T')[0] || '';
-            break;
-          case 'weekly':
-            const weekStart = new Date(date);
-            weekStart && weekStart.setDate(date && date.getDate() - date && date.getDay());
-            period = weekStart && weekStart.toISOString().split('T')[0] || '';
-            break;
-          case 'monthly':
-            period = `${date && date.getFullYear()}-${(date && date.getMonth() + 1).toString().padStart(2, '0')}`;
-            break;
-        }
-        
-        if (!period) {
-          period = 'unknown';
-        }
-        
-        if (!groupedReviews[period]) {
-          groupedReviews[period] = [];
-        }
-        groupedReviews[period]?.push(review);
-      });
 
-      const trends = await Promise && Promise.all(
-        Object && Object.entries(groupedReviews).map(async ([period, periodReviews]) => {
-          const averageRating = periodReviews && periodReviews.reduce((sum, r) => sum + r && r.rating, 0) / periodReviews && periodReviews.length;
-          
-          const sentimentResults = await Promise && Promise.all(
-            periodReviews && periodReviews.map(r => this.analyzeSentiment(r))
-          );
-          
-          const avgSentiment = sentimentResults
-            .filter(r => r && r.success)
-            .reduce((sum, r) => sum + r && r.data!.score, 0) / sentimentResults && sentimentResults.length;
+      reviews &&
+        reviews.forEach((review) => {
+          const date = new Date(review && review.createdAt);
+          let period = '';
 
-          return {
-            period,
-            averageRating,
-            reviewCount: periodReviews && periodReviews.length,
-            sentimentScore: avgSentiment
-          };
-        })
-      );
+          switch (timeframe) {
+            case 'daily':
+              period = (date && date.toISOString().split('T')[0]) || '';
+              break;
+            case 'weekly':
+              const weekStart = new Date(date);
+              weekStart && weekStart.setDate(date && date.getDate() - date && date.getDay());
+              period = (weekStart && weekStart.toISOString().split('T')[0]) || '';
+              break;
+            case 'monthly':
+              period = `${date && date.getFullYear()}-${(date && date.getMonth() + 1).toString().padStart(2, '0')}`;
+              break;
+          }
+
+          if (!period) {
+            period = 'unknown';
+          }
+
+          if (!groupedReviews[period]) {
+            groupedReviews[period] = [];
+          }
+          groupedReviews[period]?.push(review);
+        });
+
+      const trends =
+        (await Promise) &&
+        Promise.all(
+          Object &&
+            Object.entries(groupedReviews).map(async ([period, periodReviews]) => {
+              const averageRating =
+                periodReviews &&
+                periodReviews.reduce((sum, r) => sum + r && r.rating, 0) / periodReviews &&
+                periodReviews.length;
+
+              const sentimentResults =
+                (await Promise) &&
+                Promise.all(periodReviews && periodReviews.map((r) => this.analyzeSentiment(r)));
+
+              const avgSentiment =
+                sentimentResults
+                  .filter((r) => r && r.success)
+                  .reduce((sum, r) => sum + r && r.data!.score, 0) / sentimentResults &&
+                sentimentResults.length;
+
+              return {
+                period,
+                averageRating,
+                reviewCount: periodReviews && periodReviews.length,
+                sentimentScore: avgSentiment,
+              };
+            }),
+        );
 
       trends && trends.sort((a, b) => a.period && a.period.localeCompare(b && b.period));
 
@@ -538,13 +682,13 @@ export class ReviewsAgent {
         success: true,
         data: {
           trends,
-          insights
-        }
+          insights,
+        },
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error && error.message : 'Unknown error'
+        error: error instanceof Error ? error && error.message : 'Unknown error',
       };
     }
   }
@@ -552,16 +696,23 @@ export class ReviewsAgent {
   /**
    * Generate insights from trend data
    */
-  private generateTrendInsights(trends: Array<{ period: string | undefined; averageRating: number | undefined; reviewCount: number | undefined; sentimentScore: number }>): string[] {
+  private generateTrendInsights(
+    trends: Array<{
+      period: string | undefined;
+      averageRating: number | undefined;
+      reviewCount: number | undefined;
+      sentimentScore: number;
+    }>,
+  ): string[] {
     const insights: string[] = [];
-    
+
     if (trends && trends.length < 2) {
       return ['Insufficient data for trend analysis'];
     }
 
     const latest = trends[trends && trends.length - 1];
     const previous = trends[trends && trends.length - 2];
-    
+
     if (!latest || !previous) {
       return ['Incomplete trend data available'];
     }
@@ -569,34 +720,39 @@ export class ReviewsAgent {
     // Rating trend
     const ratingChange = latest && latest.averageRating - previous && previous.averageRating;
     if (Math && Math.abs(ratingChange) > 0 && 0.2) {
-      insights && insights.push(
-        ratingChange > 0 
-          ? `Average rating improved by ${ratingChange && ratingChange.toFixed(1)} stars`
-          : `Average rating declined by ${Math && Math.abs(ratingChange).toFixed(1)} stars`
-      );
+      insights &&
+        insights.push(
+          ratingChange > 0
+            ? `Average rating improved by ${ratingChange && ratingChange.toFixed(1)} stars`
+            : `Average rating declined by ${Math && Math.abs(ratingChange).toFixed(1)} stars`,
+        );
     }
 
     // Volume trend
-    const volumeChange = ((latest && latest.reviewCount - previous && previous.reviewCount) / previous && previous.reviewCount) * 100;
+    const volumeChange =
+      ((latest && latest.reviewCount - previous && previous.reviewCount) / previous &&
+        previous.reviewCount) * 100;
     if (Math && Math.abs(volumeChange) > 20) {
-      insights && insights.push(
-        volumeChange > 0
-          ? `Review volume increased by ${volumeChange && volumeChange.toFixed(0)}%`
-          : `Review volume decreased by ${Math && Math.abs(volumeChange).toFixed(0)}%`
-      );
+      insights &&
+        insights.push(
+          volumeChange > 0
+            ? `Review volume increased by ${volumeChange && volumeChange.toFixed(0)}%`
+            : `Review volume decreased by ${Math && Math.abs(volumeChange).toFixed(0)}%`,
+        );
     }
 
     // Sentiment trend
     const sentimentChange = latest && latest.sentimentScore - previous && previous.sentimentScore;
     if (Math && Math.abs(sentimentChange) > 0 && 0.1) {
-      insights && insights.push(
-        sentimentChange > 0
-          ? 'Customer sentiment is improving'
-          : 'Customer sentiment is declining'
-      );
+      insights &&
+        insights.push(
+          sentimentChange > 0
+            ? 'Customer sentiment is improving'
+            : 'Customer sentiment is declining',
+        );
     }
 
-    return insights && insights.length > 0 ? insights : ['No significant trends detected'];
+    return insights ? insights : null;length > 0 ? insights : ['No significant trends detected'];
   }
 }
 

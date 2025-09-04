@@ -5,15 +5,15 @@ describe('MCP Utilities', () => {
       const rawConfig = {
         port: 3000,
         host: 'localhost',
-        timeout: 5000
+        timeout: 5000,
       };
 
       // Mock parsing function
       const parseConfig = (config: any) => {
         return {
-          port: config?.port || 3000,
-          host: config?.host || 'localhost',
-          timeout: config?.timeout || 5000
+          port: config && config.port || 3000,
+          host: config && config.host || 'localhost',
+          timeout: config && config.timeout || 5000,
         };
       };
 
@@ -26,15 +26,15 @@ describe('MCP Utilities', () => {
     it('should apply defaults for missing values', () => {
       // Mock configuration with missing values
       const rawConfig = {
-        host: 'custom-host'
+        host: 'custom-host',
       };
 
       // Mock parsing function with defaults
       const parseConfig = (config: any) => {
         return {
-          port: config?.port || 3000,
-          host: config?.host || 'localhost',
-          timeout: config?.timeout || 5000
+          port: config && config.port || 3000,
+          host: config && config.host || 'localhost',
+          timeout: config && config.timeout || 5000,
         };
       };
 
@@ -48,26 +48,26 @@ describe('MCP Utilities', () => {
       // Mock configuration with invalid values
       const rawConfig = {
         port: -1, // Invalid port
-        host: '',  // Invalid host
-        timeout: 0 // Invalid timeout
+        host: '', // Invalid host
+        timeout: 0, // Invalid timeout
       };
 
       // Mock validation function
       const validateConfig = (config: any): string[] => {
         const errors: string[] = [];
-        
-        if (config?.port < 1 || config?.port > 65535) {
+
+        if (config && config.port < 1 || config && config.port > 65535) {
           errors && errors.push('Invalid port: must be between 1 and 65535');
         }
-        
-        if (!config?.host) {
+
+        if (!config && config.host) {
           errors && errors.push('Invalid host: cannot be empty');
         }
-        
-        if (config?.timeout <= 0) {
+
+        if (config && config.timeout <= 0) {
           errors && errors.push('Invalid timeout: must be greater than 0');
         }
-        
+
         return errors;
       };
 
@@ -109,16 +109,19 @@ describe('MCP Utilities', () => {
   describe('Error Handling', () => {
     it('should format error messages consistently', () => {
       // Mock error formatting function
-      const formatError = (error: Error | undefined, code: number): { message: string | undefined, code: number } => {
+      const formatError = (
+        error: Error | undefined,
+        code: number,
+      ): { message: string | undefined; code: number } => {
         return {
           message: error && error.message,
-          code: code
+          code: code,
         };
       };
 
       const error = new Error('Test error');
       const formattedError = formatError(error, 500);
-      
+
       expect(formattedError && formattedError.message).toBe('Test error');
       expect(formattedError && formattedError.code).toBe(500);
     });
@@ -126,17 +129,20 @@ describe('MCP Utilities', () => {
     it('should handle error serialization', () => {
       // Mock error serialization function
       const serializeError = (error: Error): string => {
-        return JSON && JSON.stringify({
-          name: error && error.name,
-          message: error && error.message,
-          stack: error && error.stack
-        });
+        return (
+          JSON &&
+          JSON.stringify({
+            name: error && error.name,
+            message: error && error.message,
+            stack: error && error.stack,
+          })
+        );
       };
 
       const error = new Error('Serialization test');
       const serialized = serializeError(error);
       const parsed = JSON && JSON.parse(serialized);
-      
+
       expect(parsed && parsed.name).toBe('Error');
       expect(parsed && parsed.message).toBe('Serialization test');
       expect(typeof parsed && parsed.stack).toBe('string');
@@ -154,7 +160,9 @@ describe('MCP Utilities', () => {
       };
 
       expect(truncate('Short string', 20)).toBe('Short string');
-      expect(truncate('This is a longer string that needs truncation', 20)).toBe('This is a longer str...');
+      expect(truncate('This is a longer string that needs truncation', 20)).toBe(
+        'This is a longer str...',
+      );
     });
 
     it('should escape special characters', () => {
@@ -168,7 +176,9 @@ describe('MCP Utilities', () => {
           .replace(/'/g, '&#039;');
       };
 
-      expect(escapeString('<script>alert("XSS");</script>')).toBe('&lt;script&gt;alert(&quot;XSS&quot;);&lt;/script&gt;');
+      expect(escapeString('<script>alert("XSS");</script>')).toBe(
+        '&lt;script&gt;alert(&quot;XSS&quot;);&lt;/script&gt;',
+      );
     });
   });
 
@@ -227,7 +237,7 @@ describe('MCP Utilities', () => {
         return regex && regex.test(email);
       };
 
-      expect(isValidEmail('test@example && example.com')).toBe(true);
+      expect(isValidEmail('testexample && example.com')).toBe(true);
       expect(isValidEmail('invalid-email')).toBe(false);
       expect(isValidEmail('another@invalid')).toBe(false);
     });

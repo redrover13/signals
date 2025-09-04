@@ -10,13 +10,13 @@ engines:
     enabled: true
 
 exclude_paths:
-  - "node_modules/**"
-  - "dist/**"
-  - "build/**"
-  - "coverage/**"
-  - "vendor/**"
-  - "**/*.min.js"
-  - "**/*.d.ts"
-  - "apps/*/generated/**"
-  - "libs/*/generated/**"
-  - "infra/terraform/**"
+  - 'node_modules/**'
+  - 'dist/**'
+  - 'build/**'
+  - 'coverage/**'
+  - 'vendor/**'
+  - '**/*.min.js'
+  - '**/*.d.ts'
+  - 'apps/*/generated/**'
+  - 'libs/*/generated/**'
+  - 'infra/terraform/**'

@@ -46,7 +46,7 @@ export function createSignal<T>(initialValue: T): EnhancedSignal<T> {
     const nextValue = typeof value === 'function' ? (value as (prev: T) => T)(currentValue) : value;
     if (nextValue !== currentValue) {
       currentValue = nextValue;
-      subscribers.forEach(callback => callback(currentValue));
+      subscribers.forEach((callback) => callback(currentValue));
     }
   };
 

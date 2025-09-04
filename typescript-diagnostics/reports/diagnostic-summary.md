@@ -6,42 +6,42 @@ Generated: 2025-09-01T03:40:23.777Z
 
 ### Import/Export Analysis
 
-| Metric | Value |
-|--------|-------|
-| Total Files | 501 |
-| ESM Imports | 294 |
-| CommonJS Imports | 2 |
-| Mixed Imports | 2 |
+| Metric           | Value |
+| ---------------- | ----- |
+| Total Files      | 501   |
+| ESM Imports      | 294   |
+| CommonJS Imports | 2     |
+| Mixed Imports    | 2     |
 
 ### Lodash Migration Analysis
 
-| Metric | Value |
-|--------|-------|
-| Total Files | 230 |
-| CommonJS Lodash Imports | 0 |
-| ESM Lodash Imports | 1 |
-| Mixed Lodash Imports | 0 |
+| Metric                  | Value |
+| ----------------------- | ----- |
+| Total Files             | 230   |
+| CommonJS Lodash Imports | 0     |
+| ESM Lodash Imports      | 1     |
+| Mixed Lodash Imports    | 0     |
 
 ### Module System Analysis
 
-| Metric | Value |
-|--------|-------|
-| Total Packages | 31 |
-| Module System Inconsistencies | 10 |
+| Metric                        | Value |
+| ----------------------------- | ----- |
+| Total Packages                | 31    |
+| Module System Inconsistencies | 10    |
 
 ### TypeScript Configuration Analysis
 
-| Metric | Value |
-|--------|-------|
-| Total Configurations | 103 |
-| Inconsistent Settings | 4 |
+| Metric                | Value |
+| --------------------- | ----- |
+| Total Configurations  | 103   |
+| Inconsistent Settings | 4     |
 
 ### TypeScript Errors
 
-| Metric | Value |
-|--------|-------|
-| Total Errors | 601 |
-| Files with Errors | 67 |
+| Metric            | Value |
+| ----------------- | ----- |
+| Total Errors      | 601   |
+| Files with Errors | 67    |
 
 Top Error Types:
 
@@ -51,11 +51,11 @@ Top Error Types:
 
 ### TypeScript Fixes
 
-| Metric | Value |
-|--------|-------|
-| Total Errors | 601 |
-| Fixes Created | 5 |
-| Fixes Applied | 0 |
+| Metric        | Value |
+| ------------- | ----- |
+| Total Errors  | 601   |
+| Fixes Created | 5     |
+| Fixes Applied | 0     |
 
 ## Recommendations
 

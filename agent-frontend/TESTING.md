@@ -72,6 +72,7 @@ We use a universal test setup approach that detects the current testing environm
 To ensure tests work in both Jest and Vitest:
 
 1. **Mocking**:
+
    ```typescript
    // Universal mocking approach
    const mock = typeof vi !== 'undefined' ? vi : jest;
@@ -83,12 +84,13 @@ To ensure tests work in both Jest and Vitest:
    - Avoid framework-specific matchers
 
 3. **Setup and Teardown**:
+
    ```typescript
    // These work in both Jest and Vitest
    beforeEach(() => {
      // Setup code
    });
-   
+
    afterEach(() => {
      // Teardown code
    });

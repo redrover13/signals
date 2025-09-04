@@ -23,20 +23,20 @@ jest.mock('gcp-auth', () => ({
         mockPubSubMessages.push(msg);
         return {
           messageId: 'test-message-id-' + Date.now(),
-          name: 'dulce.agents'
+          name: 'dulce.agents',
         };
-      })
-    }))
+      }),
+    })),
   })),
   getPubSubClient: jest.fn(() => ({
     subscription: jest.fn(() => ({
       on: jest.fn(),
-    }))
+    })),
   })),
   insertRows: jest.fn(async (table, rows) => {
     mockBigQueryRows.push(...rows);
     return Promise.resolve();
-  })
+  }),
 }));
 
 describe('Agent Task Flow Integration', () => {
@@ -59,17 +59,17 @@ describe('Agent Task Flow Integration', () => {
       const taskPayload = {
         task: 'analyze customer reviews',
         agentType: 'reviews-agent',
-        priority: 'high'
+        priority: 'high',
       };
 
       const response = await app.inject({
         method: 'POST',
         url: '/start',
-        payload: taskPayload
+        payload: taskPayload,
       });
 
       expect(response.statusCode).toBe(200);
-      
+
       const body = JSON.parse(response.payload);
       expect(body.ok).toBe(true);
       expect(body.status).toBe('published');
@@ -77,12 +77,12 @@ describe('Agent Task Flow Integration', () => {
       // Verify the message was published to Pub/Sub
       expect(mockPubSubMessages).toHaveLength(1);
       const publishedMessage = mockPubSubMessages[0];
-      
+
       expect(publishedMessage).toMatchObject({
         task: 'analyze customer reviews',
         agentType: 'reviews-agent',
         priority: 'high',
-        source: 'api'
+        source: 'api',
       });
       expect(publishedMessage.id).toMatch(/^task-\d+-[a-z0-9]+$/);
       expect(publishedMessage.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
@@ -91,10 +91,10 @@ describe('Agent Task Flow Integration', () => {
     it('should handle different agent types correctly', async () => {
       const agentTypes = [
         'gemini-orchestrator',
-        'bq-agent', 
+        'bq-agent',
         'content-agent',
         'crm-agent',
-        'reviews-agent'
+        'reviews-agent',
       ];
 
       for (const agentType of agentTypes) {
@@ -104,8 +104,8 @@ describe('Agent Task Flow Integration', () => {
           payload: {
             task: `test task for ${agentType}`,
             agentType,
-            priority: 'normal'
-          }
+            priority: 'normal',
+          },
         });
 
         expect(response.statusCode).toBe(200);
@@ -124,20 +124,20 @@ describe('Agent Task Flow Integration', () => {
       const response = await app.inject({
         method: 'POST',
         url: '/start',
-        payload: { task: 'minimal task' }
+        payload: { task: 'minimal task' },
       });
 
       expect(response.statusCode).toBe(200);
-      
+
       // Verify default values were applied
       expect(mockPubSubMessages).toHaveLength(1);
       const publishedMessage = mockPubSubMessages[0];
-      
+
       expect(publishedMessage).toMatchObject({
         task: 'minimal task',
         agentType: 'default',
         priority: 'normal',
-        source: 'api'
+        source: 'api',
       });
     });
 
@@ -145,20 +145,20 @@ describe('Agent Task Flow Integration', () => {
       const response = await app.inject({
         method: 'POST',
         url: '/start',
-        payload: {}
+        payload: {},
       });
 
       expect(response.statusCode).toBe(200);
-      
+
       // Verify default values were applied
       expect(mockPubSubMessages).toHaveLength(1);
       const publishedMessage = mockPubSubMessages[0];
-      
+
       expect(publishedMessage).toMatchObject({
         task: 'default task',
-        agentType: 'default', 
+        agentType: 'default',
         priority: 'normal',
-        source: 'api'
+        source: 'api',
       });
     });
   });
@@ -169,24 +169,24 @@ describe('Agent Task Flow Integration', () => {
       jest.mock('gcp-auth', () => ({
         getPubSub: jest.fn(() => ({
           topic: () => ({
-            publishMessage: jest.fn().mockRejectedValue(new Error('Connection timeout'))
-          })
-        }))
+            publishMessage: jest.fn().mockRejectedValue(new Error('Connection timeout')),
+          }),
+        })),
       }));
 
       const response = await app.inject({
         method: 'POST',
         url: '/start',
-        payload: { task: 'test task' }
+        payload: { task: 'test task' },
       });
 
       expect(response.statusCode).toBe(500);
-      
+
       const body = JSON.parse(response.payload);
       expect(body).toMatchObject({
         ok: false,
         error: 'Failed to publish task',
-        message: 'Connection timeout'
+        message: 'Connection timeout',
       });
     });
   });

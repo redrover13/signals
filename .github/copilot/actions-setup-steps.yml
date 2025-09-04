@@ -5,6 +5,6 @@
 - uses: connect-to-hosts
   with:
     hosts:
-      - "cloud.nx.app"
-      - "nx.app"
-      - "*.nx.app"
+      - 'cloud.nx.app'
+      - 'nx.app'
+      - '*.nx.app'

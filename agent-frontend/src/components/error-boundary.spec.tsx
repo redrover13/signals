@@ -33,9 +33,9 @@ describe('ErrorBoundary Component', () => {
     const { getByText } = render(
       <ErrorBoundary>
         <div>Test Child</div>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
-    
+
     expect(getByText('Test Child')).toBeInTheDocument();
   });
 
@@ -43,9 +43,9 @@ describe('ErrorBoundary Component', () => {
     const { getByText } = render(
       <ErrorBoundary>
         <ErrorComponent />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
-    
+
     expect(getByText('Something went wrong.')).toBeInTheDocument();
     expect(getByText('Error details')).toBeInTheDocument();
     expect(getByText('Try again')).toBeInTheDocument();
@@ -55,9 +55,9 @@ describe('ErrorBoundary Component', () => {
     const { getByText } = render(
       <ErrorBoundary fallback={<div>Custom Error UI</div>}>
         <ErrorComponent />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
-    
+
     expect(getByText('Custom Error UI')).toBeInTheDocument();
   });
 
@@ -72,22 +72,22 @@ describe('ErrorBoundary Component', () => {
     const { getByText, rerender } = render(
       <ErrorBoundary>
         <ToggleErrorComponent shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
-    
+
     // Initially shows the error UI
     expect(getByText('Something went wrong.')).toBeInTheDocument();
-    
+
     // Click the retry button
     fireEvent.click(getByText('Try again'));
-    
+
     // Now rerender with shouldThrow=false
     rerender(
       <ErrorBoundary>
         <ToggleErrorComponent shouldThrow={false} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
-    
+
     // Should show the normal component content
     expect(getByText('No error')).toBeInTheDocument();
   });

@@ -34,10 +34,10 @@ This directory contains scripts to fix common TypeScript errors.
 - **Description:** Fixes null/undefined check errors by adding optional chaining and nullish coalescing
 - **Usage:** `node typescript-diagnostics/scripts/fixes/fix-null-checks.js`
 
-
 ## How to Use
 
 1. Run the main analysis script:
+
    ```
    node typescript-diagnostics/scripts/fix-common-errors.js
    ```
@@ -45,6 +45,7 @@ This directory contains scripts to fix common TypeScript errors.
 2. Review the generated fix scripts in this directory
 
 3. Run individual fix scripts as needed:
+
    ```
    node typescript-diagnostics/scripts/fixes/fix-name-not-found.js
    ```

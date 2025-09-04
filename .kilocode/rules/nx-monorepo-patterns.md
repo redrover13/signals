@@ -472,7 +472,7 @@ Google Cloud Platform integration library for the Signals monorepo.
 import { BigQueryService } from '@nx-monorepo/gcp';
 
 const bq = new BigQueryService(config);
-const results = await bq.query('SELECT * FROM table');
+const results = await bq.query('SELECT \* FROM table');
 \`\`\`
 
 ## Configuration

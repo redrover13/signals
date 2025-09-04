@@ -16,15 +16,15 @@ const nextConfig = {
   webpack(config, options) {
     // Set the publicPath to support federation
     config.output.publicPath = 'auto';
-    
+
     // Add the Module Federation plugin
     config.plugins.push(
       new NextFederationPlugin({
         ...moduleFederationConfig,
         // Additional NextFederationPlugin options if needed
-      })
+      }),
     );
-    
+
     return config;
   },
 };

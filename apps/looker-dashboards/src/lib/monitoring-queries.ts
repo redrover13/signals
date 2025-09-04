@@ -343,8 +343,12 @@ export const COMPLIANCE_QUERIES = {
  * Generate a monitoring query with parameters
  */
 export function generateMonitoringQuery(
-  queryType: keyof typeof PERFORMANCE_QUERIES | keyof typeof FNB_ANALYTICS_QUERIES | keyof typeof TRACE_ANALYSIS_QUERIES | keyof typeof COMPLIANCE_QUERIES,
-  params: QueryParams
+  queryType:
+    | keyof typeof PERFORMANCE_QUERIES
+    | keyof typeof FNB_ANALYTICS_QUERIES
+    | keyof typeof TRACE_ANALYSIS_QUERIES
+    | keyof typeof COMPLIANCE_QUERIES,
+  params: QueryParams,
 ): string {
   const allQueries = {
     ...PERFORMANCE_QUERIES,
@@ -366,7 +370,12 @@ export function generateMonitoringQuery(
  */
 export const MONITORING_QUERY_SETS = {
   agentHealth: ['healthScore', 'requestThroughput', 'errorAnalysis', 'responseTimePercentiles'],
-  fmbAnalytics: ['restaurantInteractions', 'menuItemPopularity', 'userBehaviorPatterns', 'peakHoursAnalysis'],
+  fmbAnalytics: [
+    'restaurantInteractions',
+    'menuItemPopularity',
+    'userBehaviorPatterns',
+    'peakHoursAnalysis',
+  ],
   traceAnalysis: ['traceCompletionRates', 'longestRunningTraces', 'spanOperationPerformance'],
   compliance: ['dataProcessingCompliance', 'dataRetentionCompliance', 'gdprComplianceAudit'],
 };

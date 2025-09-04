@@ -2,7 +2,13 @@
   "version": "2.0.0",
   "metadata": {
     "description": "Enhanced Universal MCP server configuration with all discovered resources",
-    "compatibility": ["github-copilot", "kilocode", "qodo-gen", "vscode-extensions", "ai-assistants"],
+    "compatibility": [
+      "github-copilot",
+      "kilocode",
+      "qodo-gen",
+      "vscode-extensions",
+      "ai-assistants"
+    ],
     "environment": "development",
     "lastUpdated": "2025-08-29T13:49:06.621Z"
   },
@@ -193,7 +199,7 @@
     },
     "codacy-token": {
       "description": "Codacy API Token",
-      "env": "CODACY_API_TOKEN", 
+      "env": "CODACY_API_TOKEN",
       "secretManager": "projects/${GCP_PROJECT_ID}/secrets/codacy-token/versions/latest"
     },
     "nx-cloud-token": {
@@ -212,7 +218,7 @@
       "secretManager": "projects/${GCP_PROJECT_ID}/secrets/tavily-api-key/versions/latest"
     },
     "qdrant-api-key": {
-      "description": "Qdrant Vector Database API Key", 
+      "description": "Qdrant Vector Database API Key",
       "env": "QDRANT_API_KEY",
       "secretManager": "projects/${GCP_PROJECT_ID}/secrets/qdrant-api-key/versions/latest"
     },

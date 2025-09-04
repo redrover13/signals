@@ -62,7 +62,7 @@ export class ServerHealthService {
    * Initialize health stats for all servers in config
    */
   private initializeHealthStats(): void {
-    if (!this.config?.servers || this.config.servers.length === 0) {
+    if (!this.config && config.servers || this.config.servers.length === 0) {
       return;
     }
 
@@ -129,7 +129,7 @@ export class ServerHealthService {
    * Perform health checks on all servers
    */
   private async performHealthChecks(): Promise<void> {
-    if (this.healthCheckActive || !this.config?.servers) {
+    if (this.healthCheckActive || !this.config && config.servers) {
       return;
     }
 
@@ -137,7 +137,7 @@ export class ServerHealthService {
 
     try {
       for (const server of this.config.servers) {
-        if (!server.id || !server.healthCheck?.enabled) {
+        if (!server.id || !server.healthCheck && healthCheck.enabled) {
           continue;
         }
 
@@ -162,7 +162,7 @@ export class ServerHealthService {
    * @param serverConfig Server configuration
    */
   private async checkServerHealth(serverConfig: MCPServerConfig): Promise<HealthCheckResult> {
-    if (!serverConfig.id || !serverConfig.healthCheck?.endpoint) {
+    if (!serverConfig.id || !serverConfig.healthCheck && healthCheck.endpoint) {
       return {
         serverId: serverConfig.id || 'unknown',
         serverName: serverConfig.name || 'Unknown Server',
@@ -176,27 +176,27 @@ export class ServerHealthService {
     const startTime = Date.now();
     const endpoint = serverConfig.healthCheck.endpoint;
     const timeout = serverConfig.healthCheck.timeoutMs || 5000;
-    
+
     try {
       // Construct the health check URL
-      const baseUrl = serverConfig.url?.replace(/\/$/, '');
+      const baseUrl = serverConfig.url && url.replace(/\/$/, '');
       const url = `${baseUrl}${endpoint}`;
 
       // Perform the health check with timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeout);
-      
-      const response = await fetch(url, { 
+
+      const response = await fetch(url, {
         signal: controller.signal,
         headers: {
-          'Accept': 'application/json',
-        }
+          Accept: 'application/json',
+        },
       });
-      
+
       clearTimeout(timeoutId);
-      
+
       const responseTime = Date.now() - startTime;
-      
+
       if (!response.ok) {
         return {
           serverId: serverConfig.id,
@@ -207,7 +207,7 @@ export class ServerHealthService {
           message: `Health check failed with status ${response.status}`,
         };
       }
-      
+
       return {
         serverId: serverConfig.id,
         serverName: serverConfig.name || 'Unknown Server',
@@ -217,7 +217,7 @@ export class ServerHealthService {
       };
     } catch (error) {
       const responseTime = Date.now() - startTime;
-      
+
       return {
         serverId: serverConfig.id,
         serverName: serverConfig.name || 'Unknown Server',
@@ -237,34 +237,35 @@ export class ServerHealthService {
    */
   private updateHealthStats(serverId: string, result: HealthCheckResult): void {
     const stats = this.healthStats.get(serverId);
-    
+
     if (!stats) {
       return;
     }
-    
+
     stats.totalChecks++;
-    
+
     if (result.status === 'success') {
       stats.successfulChecks++;
       stats.status = 'online';
       stats.consecutiveFailures = 0;
       stats.lastHealthy = result.timestamp;
-      
+
       // Update average response time
-      const totalResponseTime = stats.averageResponseTime * (stats.successfulChecks - 1) + result.responseTime;
+      const totalResponseTime =
+        stats.averageResponseTime * (stats.successfulChecks - 1) + result.responseTime;
       stats.averageResponseTime = totalResponseTime / stats.successfulChecks;
     } else {
       stats.failedChecks++;
       stats.consecutiveFailures++;
       stats.lastUnhealthy = result.timestamp;
-      
+
       if (stats.consecutiveFailures >= this.getFailureThreshold(serverId)) {
         stats.status = 'offline';
       } else {
         stats.status = 'degraded';
       }
     }
-    
+
     // Calculate uptime percentage
     stats.uptime = (stats.successfulChecks / stats.totalChecks) * 100;
   }
@@ -275,21 +276,23 @@ export class ServerHealthService {
    */
   private async handleHealthCheckFailure(serverConfig: MCPServerConfig): Promise<void> {
     const stats = this.healthStats.get(serverConfig.id || '');
-    
+
     if (!stats) {
       return;
     }
-    
-    const failureThreshold = serverConfig.healthCheck?.failureThreshold || 3;
-    
+
+    const failureThreshold = serverConfig.healthCheck && healthCheck.failureThreshold || 3;
+
     if (stats.consecutiveFailures >= failureThreshold) {
       // Server is down, attempt reconnection if enabled
       if (this.shouldAttemptReconnection(serverConfig)) {
         await this.attemptReconnection(serverConfig);
       }
-      
+
       // Could trigger alerts or notifications here
-      console.warn(`Server ${serverConfig.id} is down after ${stats.consecutiveFailures} consecutive failures`);
+      console.warn(
+        `Server ${serverConfig.id} is down after ${stats.consecutiveFailures} consecutive failures`,
+      );
     }
   }
 
@@ -298,7 +301,7 @@ export class ServerHealthService {
    * @param serverConfig Server configuration
    */
   private shouldAttemptReconnection(serverConfig: MCPServerConfig): boolean {
-    return serverConfig.healthCheck?.autoReconnect === true;
+    return serverConfig.healthCheck && healthCheck.autoReconnect === true;
   }
 
   /**
@@ -307,14 +310,14 @@ export class ServerHealthService {
    */
   private async attemptReconnection(serverConfig: MCPServerConfig): Promise<void> {
     console.log(`Attempting to reconnect to server: ${serverConfig.id}`);
-    
+
     try {
       // Perform a health check to see if server is back
       const result = await this.checkServerHealth(serverConfig);
-      
+
       if (result.status === 'success') {
         console.log(`Successfully reconnected to server: ${serverConfig.id}`);
-        
+
         // Reset consecutive failures
         const stats = this.healthStats.get(serverConfig.id || '');
         if (stats) {
@@ -355,20 +358,20 @@ export class ServerHealthService {
   } {
     const stats = Array.from(this.healthStats.values());
     const totalServers = stats.length;
-    const onlineServers = stats.filter(s => s.status === 'online').length;
-    const offlineServers = stats.filter(s => s.status === 'offline').length;
-    const degradedServers = stats.filter(s => s.status === 'degraded').length;
-    
+    const onlineServers = stats.filter((s) => s.status === 'online').length;
+    const offlineServers = stats.filter((s) => s.status === 'offline').length;
+    const degradedServers = stats.filter((s) => s.status === 'degraded').length;
+
     let overallStatus: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
-    
+
     if (offlineServers > 0) {
       overallStatus = 'unhealthy';
     } else if (degradedServers > 0) {
       overallStatus = 'degraded';
     }
-    
+
     const averageUptime = stats.reduce((sum, s) => sum + s.uptime, 0) / Math.max(1, totalServers);
-    
+
     return {
       overallStatus,
       totalServers,
@@ -384,7 +387,7 @@ export class ServerHealthService {
    * @param id Server ID
    */
   private getFailureThreshold(id: string): number {
-    return this.config?.servers.find((s) => s.id === id)?.healthCheck?.failureThreshold ?? 3;
+    return this.config && config.servers.find((s) => s.id === id)?.healthCheck && healthCheck.failureThreshold ?? 3;
   }
 
   /**
@@ -392,15 +395,15 @@ export class ServerHealthService {
    * @param serverId Server ID
    */
   async forceHealthCheck(serverId: string): Promise<HealthCheckResult | null> {
-    const serverConfig = this.config?.servers.find((s) => s.id === serverId);
-    
+    const serverConfig = this.config && config.servers.find((s) => s.id === serverId);
+
     if (!serverConfig || !serverConfig.healthCheck) {
       return null;
     }
-    
+
     const result = await this.checkServerHealth(serverConfig);
     this.updateHealthStats(serverId, result);
-    
+
     return result;
   }
 
@@ -409,16 +412,16 @@ export class ServerHealthService {
    */
   async forceHealthCheckAll(): Promise<HealthCheckResult[]> {
     const results: HealthCheckResult[] = [];
-    
-    if (!this.config?.servers) {
+
+    if (!this.config && config.servers) {
       return results;
     }
-    
+
     for (const server of this.config.servers) {
-      if (!server.id || !server.healthCheck?.enabled) {
+      if (!server.id || !server.healthCheck && healthCheck.enabled) {
         continue;
       }
-      
+
       try {
         const result = await this.checkServerHealth(server);
         this.updateHealthStats(server.id, result);
@@ -427,7 +430,7 @@ export class ServerHealthService {
         console.error(`Error checking health for server ${server.id}:`, error);
       }
     }
-    
+
     return results;
   }
 }

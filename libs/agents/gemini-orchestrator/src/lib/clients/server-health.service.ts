@@ -16,9 +16,19 @@ export interface ServerHealthStats {}
 
 export class ServerHealthService {
   constructor(_clientService: MCPClientService) {}
-  getServerHealthStats(_serverId: string): ServerHealthStats { return {}; }
-  getAllHealthStats(): Map<string, ServerHealthStats> { return new Map(); }
-  getSystemHealth(): any { return {}; }
-  async forceHealthCheck(_serverId: string): Promise<HealthCheckResult> { return {}; }
-  async forceHealthCheckAll(): Promise<HealthCheckResult[]> { return []; }
+  getServerHealthStats(_serverId: string): ServerHealthStats {
+    return {};
+  }
+  getAllHealthStats(): Map<string, ServerHealthStats> {
+    return new Map();
+  }
+  getSystemHealth(): any {
+    return {};
+  }
+  async forceHealthCheck(_serverId: string): Promise<HealthCheckResult> {
+    return {};
+  }
+  async forceHealthCheckAll(): Promise<HealthCheckResult[]> {
+    return [];
+  }
 }

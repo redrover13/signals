@@ -4,16 +4,8 @@
     "outDir": "../../../dist/out-tsc",
     "module": "ESNext",
     "moduleResolution": "nodenext",
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "tmp",
-    "dist"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "tmp", "dist"]
 }

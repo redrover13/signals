@@ -10,23 +10,25 @@
  */
 import { CloudEvent } from '@google-cloud/functions-framework';
 interface StorageObjectData {
-    bucket: string | undefined;
-    name: string | undefined;
-    contentType: string | undefined;
-    size: string | undefined;
-    timeCreated: string | undefined;
-    updated: string | undefined;
+  bucket: string | undefined;
+  name: string | undefined;
+  contentType: string | undefined;
+  size: string | undefined;
+  timeCreated: string | undefined;
+  updated: string | undefined;
 }
 /**
  * Cloud Function that processes documents for RAG
  * Triggered by Cloud Storage object creation events
  */
-export declare function processDocument(cloudEvent: CloudEvent<StorageObjectData>): Promise<void> | undefined;
+export declare function processDocument(
+  cloudEvent: CloudEvent<StorageObjectData>,
+): Promise<void> | undefined;
 /**
  * Health check endpoint for the function
  */
 export declare function healthCheck(): Promise<{
-    status: string | undefined;
-    timestamp: string | undefined;
+  status: string | undefined;
+  timestamp: string | undefined;
 }>;
 export {};

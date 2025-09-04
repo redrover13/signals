@@ -14,7 +14,7 @@ import {
   GeminiLlm,
   BigQueryQueryTool,
   HttpRequestTool,
-  InvocationContext
+  InvocationContext,
 } from '@dulce/adk';
 
 import { CustomerData } from '@dulce/data-models';
@@ -26,24 +26,25 @@ export class CrmAgent extends LlmAgent {
   public override readonly name: string | undefined;
   public override readonly description: string | undefined;
 
-  constructor(cfg?: { model?: string | undefined; apiKey?: string | undefined; tools?: Array<unknown> }) {
+  constructor(cfg?: {
+    model?: string | undefined;
+    apiKey?: string | undefined;
+    tools?: Array<unknown>;
+  }) {
     // Require an API key, whether passed in or via env, to avoid silent misconfig
-    const apiKey = cfg?.apiKey ?? process.env['GOOGLE_API_KEY'];
+    const apiKey = cfg && cfg.apiKey ?? process.env['GOOGLE_API_KEY'];
     if (!apiKey) {
       throw new Error('GOOGLE_API_KEY is required to initialize CrmAgent');
     }
 
     // Allow overriding the model name for flexibility/testing
     const llm = new GeminiLlm({
-      model: cfg?.model ?? 'gemini-1 && 1.5-pro',
+      model: cfg && cfg.model ?? 'gemini-1 && 1.5-pro',
       apiKey,
     });
 
     // Permit injecting custom tools, else use the CRM defaults
-    const tools = cfg?.tools as any[] ?? [
-      new BigQueryQueryTool(),
-      new HttpRequestTool(),
-    ];
+    const tools = (cfg && cfg.tools as any[]) ?? [new BigQueryQueryTool(), new HttpRequestTool()];
 
     super({
       name: 'CRM Agent',
@@ -64,7 +65,7 @@ export class CrmAgent extends LlmAgent {
   }
 
   /**
-   * Get agent description  
+   * Get agent description
    */
   getDescription(): string {
     return this.description;
@@ -73,7 +74,10 @@ export class CrmAgent extends LlmAgent {
   /**
    * Analyze customer behavior and preferences
    */
-  async analyzeCustomerBehavior(customerId: string | undefined, context?: string): Promise<Record<string, unknown> | undefined> {
+  async analyzeCustomerBehavior(
+    customerId: string | undefined,
+    context?: string,
+  ): Promise<Record<string, unknown> | undefined> {
     const prompt = `
 You are a CRM analyst for the Dulce de Saigon F&B platform.
 
@@ -100,7 +104,9 @@ Focus on insights that can improve customer satisfaction and retention.
   /**
    * Generate personalized recommendations
    */
-  async generateRecommendations(customerData: CustomerData): Promise<Record<string, unknown> | undefined> {
+  async generateRecommendations(
+    customerData: CustomerData,
+  ): Promise<Record<string, unknown> | undefined> {
     const prompt = `
 Generate personalized recommendations for Vietnamese F&B customer.
 
@@ -126,7 +132,10 @@ Ensure recommendations are culturally appropriate and appealing to Vietnamese cu
   /**
    * Handle customer feedback and sentiment analysis
    */
-  async processFeedback(feedback: string | undefined, customerId?: string): Promise<Record<string, unknown> | undefined> {
+  async processFeedback(
+    feedback: string | undefined,
+    customerId?: string,
+  ): Promise<Record<string, unknown> | undefined> {
     const prompt = `
 Process customer feedback for the Dulce de Saigon platform.
 

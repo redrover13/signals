@@ -1,9 +1,1 @@
-
- NX   Failed to process project graph.
-
-An error occurred while processing files for the @nx/vite/plugin plugin (Defined at nx.json#plugins[4])
-.
-  - libs/build-tools/vite.config.ts: Build failed with 2 errors:
-node_modules/.pnpm/esbuild@0.25.9/node_modules/esbuild/lib/main.js:1217:27: ERROR: [plugin: externalize-deps] Missing "./plugins/nx-copy-assets && assets.plugin" specifier in "@nx/vite" package
-node_modules/.pnpm/esbuild@0.25.9/node_modules/esbuild/lib/main.js:1217:27: ERROR: [plugin: externalize-deps] Missing "./plugins/nx-tsconfig-paths && paths.plugin" specifier in "@nx/vite" package
-
+[]

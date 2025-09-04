@@ -19,33 +19,43 @@ class UniversalMCPRegistry {
         configPaths: [
           path.join(os.homedir(), 'AppData', 'Roaming', 'Code', 'User', 'mcp.json'),
           path.join(os.homedir(), '.config', 'Code', 'User', 'mcp.json'),
-          path.join(os.homedir(), '.vscode', 'mcp.json')
+          path.join(os.homedir(), '.vscode', 'mcp.json'),
         ],
-        format: 'copilot-standard'
+        format: 'copilot-standard',
       },
-      'kilocode': {
+      kilocode: {
         configPaths: [
-          path.join(os.homedir(), '.vscode-server', 'data', 'User', 'globalStorage', 'kilocode.kilo-code', 'settings', 'mcp_settings.json'),
+          path.join(
+            os.homedir(),
+            '.vscode-server',
+            'data',
+            'User',
+            'globalStorage',
+            'kilocode.kilo-code',
+            'settings',
+            'mcp_settings.json',
+          ),
           path.join(os.homedir(), '.kilocode', 'mcp.json'),
-          '/home/g_nelson/signals-1/.kilocode/mcp.json'
+          '/home/g_nelson/signals-1/.kilocode/mcp.json',
         ],
-        format: 'kilocode-native'
+        format: 'kilocode-native',
       },
       'qodo-gen': {
         configPaths: [
           path.join(os.homedir(), '.qodo', 'mcp.json'),
           path.join(os.homedir(), '.codegpt', 'mcp_config.json'),
-          '/home/g_nelson/signals-1/.qodo/mcp.json'
+          '/home/g_nelson/signals-1/.qodo/mcp.json',
         ],
-        format: 'qodo-standard'
+        format: 'qodo-standard',
       },
       'vscode-extensions': {
         configPaths: [
           path.join(os.homedir(), '.vscode', 'extensions', 'mcp.json'),
-          '/home/g_nelson/signals-1/.vscode', 'mcp.json'
+          '/home/g_nelson/signals-1/.vscode',
+          'mcp.json',
         ],
-        format: 'vscode-standard'
-      }
+        format: 'vscode-standard',
+      },
     };
   }
 
@@ -54,33 +64,41 @@ class UniversalMCPRegistry {
    */
   async deployToAllPlatforms() {
     console.log('🚀 Deploying MCP configuration to all AI platforms...');
-    
+
     // Load master configuration
     const masterConfig = await this.loadMasterConfig();
-    
+
     const deploymentResults = {};
-    
+
     for (const [platform, settings] of Object.entries(this.platforms)) {
       try {
-        const platformConfig = await this.adaptConfigForPlatform(masterConfig, platform, settings.format);
-        const deployedPaths = await this.deployToPlatform(platform, platformConfig, settings.configPaths);
-        
+        const platformConfig = await this.adaptConfigForPlatform(
+          masterConfig,
+          platform,
+          settings.format,
+        );
+        const deployedPaths = await this.deployToPlatform(
+          platform,
+          platformConfig,
+          settings.configPaths,
+        );
+
         deploymentResults[platform] = {
           status: 'success',
           deployedPaths,
-          serverCount: Object.keys(platformConfig.servers || {}).length
+          serverCount: Object.keys(platformConfig.servers || {}).length,
         };
-        
+
         console.log(`✅ ${platform}: Deployed to ${deployedPaths.length} locations`);
       } catch (error) {
         deploymentResults[platform] = {
           status: 'error',
-          error: error.message
+          error: error.message,
         };
         console.error(`❌ ${platform}: ${error.message}`);
       }
     }
-    
+
     return deploymentResults;
   }
 
@@ -101,38 +119,38 @@ class UniversalMCPRegistry {
    */
   async adaptConfigForPlatform(masterConfig, platform, format) {
     const adapted = JSON.parse(JSON.stringify(masterConfig)); // Deep clone
-    
+
     switch (format) {
       case 'copilot-standard':
         // GitHub Copilot format (standard MCP)
         adapted.metadata.platform = 'github-copilot';
         break;
-        
+
       case 'kilocode-native':
         // Kilocode specific format
         adapted.metadata.platform = 'kilocode';
         adapted.kilocode = {
           integration: true,
-          features: ['code-analysis', 'suggestions', 'mcp-tools']
+          features: ['code-analysis', 'suggestions', 'mcp-tools'],
         };
         break;
-        
+
       case 'qodo-standard':
         // Qodo Gen specific format
         adapted.metadata.platform = 'qodo-gen';
         adapted.qodo = {
           enableGenerative: true,
           mcpIntegration: true,
-          testGeneration: true
+          testGeneration: true,
         };
         break;
-        
+
       case 'vscode-standard':
         // VS Code extensions format
         adapted.metadata.platform = 'vscode-extensions';
         break;
     }
-    
+
     return adapted;
   }
 
@@ -141,26 +159,26 @@ class UniversalMCPRegistry {
    */
   async deployToPlatform(platform, config, configPaths) {
     const deployedPaths = [];
-    
+
     for (const configPath of configPaths) {
       try {
         // Ensure directory exists
         await fs.mkdir(path.dirname(configPath), { recursive: true });
-        
+
         // Write configuration
         await fs.writeFile(configPath, JSON.stringify(config, null, 2));
         deployedPaths.push(configPath);
-        
+
         console.log(`📋 ${platform}: Config deployed to ${configPath}`);
       } catch (error) {
         console.warn(`⚠️  ${platform}: Failed to deploy to ${configPath}: ${error.message}`);
       }
     }
-    
+
     if (deployedPaths.length === 0) {
       throw new Error(`No successful deployments for ${platform}`);
     }
-    
+
     return deployedPaths;
   }
 
@@ -170,7 +188,7 @@ class UniversalMCPRegistry {
   async createIntegrationScripts() {
     const scriptsDir = '/home/g_nelson/signals-1/.mcp/integrations';
     await fs.mkdir(scriptsDir, { recursive: true });
-    
+
     // Kilocode integration script
     const kilocodeScript = `#!/bin/bash
 # Kilocode MCP Integration Script
@@ -210,12 +228,12 @@ echo "✅ Qodo Gen MCP integration configured"
 
     await fs.writeFile(path.join(scriptsDir, 'setup-kilocode.sh'), kilocodeScript);
     await fs.writeFile(path.join(scriptsDir, 'setup-qodo.sh'), qodoScript);
-    
+
     // Make scripts executable
     await new Promise((resolve) => {
       exec(`chmod +x ${scriptsDir}/*.sh`, resolve);
     });
-    
+
     console.log(`📜 Integration scripts created in ${scriptsDir}`);
     return scriptsDir;
   }
@@ -225,40 +243,41 @@ echo "✅ Qodo Gen MCP integration configured"
    */
   async verifyPlatformAccess() {
     console.log('🔍 Verifying platform access to MCP servers...');
-    
+
     const verification = {};
-    
+
     for (const [platform, settings] of Object.entries(this.platforms)) {
       verification[platform] = {
         configFiles: [],
-        accessibility: 'unknown'
+        accessibility: 'unknown',
       };
-      
+
       for (const configPath of settings.configPaths) {
         try {
           await fs.access(configPath);
           const content = await fs.readFile(configPath, 'utf8');
           const config = JSON.parse(content);
-          
+
           verification[platform].configFiles.push({
             path: configPath,
             valid: true,
-            serverCount: Object.keys(config.servers || {}).length
+            serverCount: Object.keys(config.servers || {}).length,
           });
         } catch (error) {
           verification[platform].configFiles.push({
             path: configPath,
             valid: false,
-            error: error.message
+            error: error.message,
           });
         }
       }
-      
+
       // Determine accessibility
-      const validConfigs = verification[platform].configFiles.filter(f => f.valid);
-      verification[platform].accessibility = validConfigs.length > 0 ? 'accessible' : 'not-accessible';
+      const validConfigs = verification[platform].configFiles.filter((f) => f.valid);
+      verification[platform].accessibility =
+        validConfigs.length > 0 ? 'accessible' : 'not-accessible';
     }
-    
+
     return verification;
   }
 
@@ -268,25 +287,27 @@ echo "✅ Qodo Gen MCP integration configured"
   async generateCompatibilityReport() {
     const verification = await this.verifyPlatformAccess();
     const masterConfig = await this.loadMasterConfig();
-    
+
     const report = {
       timestamp: new Date().toISOString(),
       masterConfig: {
         path: this.baseConfigPath,
         serverCount: Object.keys(masterConfig.servers || {}).length,
-        servers: Object.keys(master_config.servers || {})
+        servers: Object.keys(master_config.servers || {}),
       },
       platforms: verification,
       summary: {
         totalPlatforms: Object.keys(this.platforms).length,
-        accessiblePlatforms: Object.values(verification).filter(p => p.accessibility === 'accessible').length,
-        universalAccess: Object.values(verification).every(p => p.accessibility === 'accessible')
-      }
+        accessiblePlatforms: Object.values(verification).filter(
+          (p) => p.accessibility === 'accessible',
+        ).length,
+        universalAccess: Object.values(verification).every((p) => p.accessibility === 'accessible'),
+      },
     };
-    
+
     const reportPath = '/home/g_nelson/signals-1/.mcp/compatibility-report.json';
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
-    
+
     console.log(`📊 Compatibility report generated: ${reportPath}`);
     return report;
   }
@@ -304,21 +325,21 @@ async function main() {
         console.log('\n📋 Deployment Summary:');
         console.log(JSON.stringify(deploymentResults, null, 2));
         break;
-        
+
       case 'verify':
         const verification = await registry.verifyPlatformAccess();
         console.log('\n🔍 Platform Access Verification:');
         console.log(JSON.stringify(verification, null, 2));
         break;
-        
+
       case 'integrate':
         await registry.createIntegrationScripts();
         break;
-        
+
       case 'report':
         await registry.generateCompatibilityReport();
         break;
-        
+
       default:
         console.log(`
 Universal MCP Registry for AI Tools

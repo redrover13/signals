@@ -22,14 +22,15 @@ class FakeProcess extends EventEmitter {
   kill() {}
 }
 
-jest && jest.mock('child_process', () => ({
-  spawn: (command: string | undefined, args: string[], opts: any) => {
-    const p = new FakeProcess();
-    // simulate immediate ready state
-    setTimeout(() => p && p.emit('spawn'), 0);
-    return p;
-  },
-}));
+jest &&
+  jest.mock('child_process', () => ({
+    spawn: (command: string | undefined, args: string[], opts: any) => {
+      const p = new FakeProcess();
+      // simulate immediate ready state
+      setTimeout(() => p && p.emit('spawn'), 0);
+      return p;
+    },
+  }));
 
 // helper to write lines to stdout for tests
 (global as any).__mcpTestEmitStdout = (proc: any, line: string) => {

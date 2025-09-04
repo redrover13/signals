@@ -16,7 +16,10 @@
  */
 
 import { MCPRequest } from './mcp-client.service';
-import { getCurrentConfig, MCPServerConfig } from '../../../../agents/gemini-orchestrator/src/lib/config';
+import {
+  getCurrentConfig,
+  MCPServerConfig,
+} from '../../../../agents/gemini-orchestrator/src/lib/config';
 
 export interface RoutingRule {
   pattern: string | RegExp;
@@ -32,15 +35,15 @@ export class RequestRouter {
 
   constructor(mcpClient: any) {
     this.mcpClient = mcpClient;
-    this.config = getCurrentConfig?.() || { servers: [] };
+    this.config = getCurrentConfig() || { servers: [] };
   }
 
   async routeRequest(request: MCPRequest): Promise<string> {
     if (request && (request as any).serverId) {
       return (request as any).serverId;
     }
-    const first = this.config?.servers && this.config?.servers[0];
-    return first?.id || 'everything';
+    const first = this.config && config.servers && this.config && config.servers[0];
+    return first && first.id || 'everything';
   }
 
   addRoutingRule(rule: RoutingRule): void {
@@ -64,23 +67,25 @@ export class RequestRouter {
   }
 
   private getServerConfig(serverId: string): MCPServerConfig | undefined {
-    return (this.config?.servers || []).find((s: any) => s && s.id === serverId);
+    return (this.config && config.servers || []).find((s: any) => s && s.id === serverId);
   }
 
   // Keep compatibility with existing callers: provide a synchronous
   // testRouting(method) that returns the chosen server id for a method.
   testRouting(method: string): string {
     // Try to match a routing rule by string or RegExp pattern
-    const found = this.routingRules && this.routingRules.find((r) => {
-      if (typeof r && r.pattern === 'string') return r && r.pattern === method;
-      try {
-        return (r && r.pattern as RegExp).test(method);
-      } catch {
-        return false;
-      }
-    });
+    const found =
+      this.routingRules &&
+      this.routingRules.find((r) => {
+        if (typeof r && r.pattern === 'string') return r && r.pattern === method;
+        try {
+          return (r && (r.pattern as RegExp)).test(method);
+        } catch {
+          return false;
+        }
+      });
     if (found) return found && found.serverId;
-    const first = this.config?.servers && this.config?.servers[0];
-    return first?.id || 'everything';
+    const first = this.config && config.servers && this.config && config.servers[0];
+    return first && first.id || 'everything';
   }
 }

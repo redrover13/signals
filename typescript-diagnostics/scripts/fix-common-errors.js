@@ -2,16 +2,16 @@
 
 /**
  * TypeScript Error Fixer
- * 
+ *
  * This script applies automated fixes for common TypeScript errors.
  * It analyzes the error patterns and suggests or applies fixes.
- * 
+ *
  * Usage:
  *   node typescript-diagnostics/scripts/fix-common-errors.js [--apply]
- * 
+ *
  * Options:
  *   --apply    Apply the fixes automatically (default: false)
- * 
+ *
  * Output:
  *   - Generates JSON report in typescript-diagnostics/reports/
  *   - Creates fix scripts in typescript-diagnostics/scripts/fixes/
@@ -47,12 +47,12 @@ const fixerData = {
   timestamp: new Date().toISOString(),
   errors: {
     total: 0,
-    byCode: {}
+    byCode: {},
   },
   fixes: {
     created: [],
-    applied: []
-  }
+    applied: [],
+  },
 };
 
 /**
@@ -60,17 +60,16 @@ const fixerData = {
  */
 function runTypeScriptCheck() {
   console.log('\n📊 Running TypeScript compiler check...');
-  
+
   try {
     // Run TypeScript with --noEmit to check for errors
-    const tscOutput = execSync('npx tsc --noEmit 2>&1 || true', { 
+    const tscOutput = execSync('npx tsc --noEmit 2>&1 || true', {
       encoding: 'utf8',
-      maxBuffer: 10 * 1024 * 1024 // 10MB buffer for large output
+      maxBuffer: 10 * 1024 * 1024, // 10MB buffer for large output
     });
-    
+
     // Parse the output
     parseTypeScriptErrors(tscOutput);
-    
   } catch (error) {
     console.error('Error running TypeScript check:', error.message);
   }
@@ -82,45 +81,46 @@ function runTypeScriptCheck() {
 function parseTypeScriptErrors(tscOutput) {
   const lines = tscOutput.split('\n');
   const errorPattern = /^(.+)\((\d+),(\d+)\): error TS(\d+): (.+)$/;
-  
+
   // Process each line
   for (const line of lines) {
     const match = line.match(errorPattern);
     if (match) {
       const [_, filePath, lineNum, column, errorCode, errorMessage] = match;
-      
+
       // Count total errors
       fixerData.errors.total++;
-      
+
       // Group by error code
       if (!fixerData.errors.byCode[errorCode]) {
         fixerData.errors.byCode[errorCode] = {
           count: 0,
           message: errorMessage.replace(/'.+?'/g, "'...'"), // Generalize message
-          examples: []
+          examples: [],
         };
       }
-      
+
       fixerData.errors.byCode[errorCode].count++;
-      
+
       // Store up to 5 examples per error code
       if (fixerData.errors.byCode[errorCode].examples.length < 5) {
         fixerData.errors.byCode[errorCode].examples.push({
           file: filePath,
           line: parseInt(lineNum),
           column: parseInt(column),
-          message: errorMessage
+          message: errorMessage,
         });
       }
     }
   }
-  
+
   console.log(`Found ${fixerData.errors.total} TypeScript errors`);
-  
+
   // Sort error codes by frequency
-  const sortedErrorCodes = Object.entries(fixerData.errors.byCode)
-    .sort((a, b) => b[1].count - a[1].count);
-  
+  const sortedErrorCodes = Object.entries(fixerData.errors.byCode).sort(
+    (a, b) => b[1].count - a[1].count,
+  );
+
   console.log('\nTop 5 error types:');
   sortedErrorCodes.slice(0, 5).forEach(([code, data]) => {
     console.log(`TS${code}: ${data.count} occurrences - ${data.message}`);
@@ -132,29 +132,29 @@ function parseTypeScriptErrors(tscOutput) {
  */
 function generateFixScripts() {
   console.log('\n📝 Generating fix scripts...');
-  
+
   // Map of error codes to fix generators
   const fixGenerators = {
     // TS2307: Cannot find module '...' or its corresponding type declarations.
-    '2307': generateModuleNotFoundFix,
-    
+    2307: generateModuleNotFoundFix,
+
     // TS2304: Cannot find name '...'.
-    '2304': generateNameNotFoundFix,
-    
+    2304: generateNameNotFoundFix,
+
     // TS2339: Property '...' does not exist on type '...'.
-    '2339': generatePropertyNotFoundFix,
-    
+    2339: generatePropertyNotFoundFix,
+
     // TS2322: Type '...' is not assignable to type '...'.
-    '2322': generateTypeAssignabilityFix,
-    
+    2322: generateTypeAssignabilityFix,
+
     // TS2532, TS2533: Object is possibly 'undefined' or 'null'.
-    '2532': generateNullCheckFix,
-    '2533': generateNullCheckFix,
-    
+    2532: generateNullCheckFix,
+    2533: generateNullCheckFix,
+
     // TS1378: Top-level 'await' expressions are only allowed when the 'module' option is set to 'es2022', 'esnext', 'system', or 'nodenext'
-    '1378': generateTopLevelAwaitFix
+    1378: generateTopLevelAwaitFix,
   };
-  
+
   // Generate fixes for each supported error type
   for (const [code, generator] of Object.entries(fixGenerators)) {
     if (fixerData.errors.byCode[code]) {
@@ -164,7 +164,7 @@ function generateFixScripts() {
       }
     }
   }
-  
+
   console.log(`Generated ${fixerData.fixes.created.length} fix scripts`);
 }
 
@@ -174,7 +174,7 @@ function generateFixScripts() {
 function generateModuleNotFoundFix(code, errorData) {
   const fixName = 'fix-module-not-found';
   const fixPath = path.join(FIXES_DIR, `${fixName}.js`);
-  
+
   const scriptContent = `#!/usr/bin/env node
 
 /**
@@ -304,12 +304,13 @@ console.log('\\n✅ Module not found fixes completed!');
   // Save the script
   fs.writeFileSync(fixPath, scriptContent);
   fs.chmodSync(fixPath, '755'); // Make executable
-  
+
   return {
     errorCode: code,
     fixName,
     fixPath: `typescript-diagnostics/scripts/fixes/${fixName}.js`,
-    description: 'Fixes module not found errors by installing missing dependencies and updating import paths'
+    description:
+      'Fixes module not found errors by installing missing dependencies and updating import paths',
   };
 }
 
@@ -319,7 +320,7 @@ console.log('\\n✅ Module not found fixes completed!');
 function generateNameNotFoundFix(code, errorData) {
   const fixName = 'fix-name-not-found';
   const fixPath = path.join(FIXES_DIR, `${fixName}.js`);
-  
+
   const scriptContent = `#!/usr/bin/env node
 
 /**
@@ -419,12 +420,12 @@ console.log('\\n✅ Name not found fixes completed!');
   // Save the script
   fs.writeFileSync(fixPath, scriptContent);
   fs.chmodSync(fixPath, '755'); // Make executable
-  
+
   return {
     errorCode: code,
     fixName,
     fixPath: `typescript-diagnostics/scripts/fixes/${fixName}.js`,
-    description: 'Fixes name not found errors by adding missing imports and declarations'
+    description: 'Fixes name not found errors by adding missing imports and declarations',
   };
 }
 
@@ -434,7 +435,7 @@ console.log('\\n✅ Name not found fixes completed!');
 function generatePropertyNotFoundFix(code, errorData) {
   const fixName = 'fix-property-not-found';
   const fixPath = path.join(FIXES_DIR, `${fixName}.js`);
-  
+
   const scriptContent = `#!/usr/bin/env node
 
 /**
@@ -526,12 +527,12 @@ console.log('\\n✅ Property not found fixes completed!');
   // Save the script
   fs.writeFileSync(fixPath, scriptContent);
   fs.chmodSync(fixPath, '755'); // Make executable
-  
+
   return {
     errorCode: code,
     fixName,
     fixPath: `typescript-diagnostics/scripts/fixes/${fixName}.js`,
-    description: 'Fixes property not found errors by adding optional chaining and type assertions'
+    description: 'Fixes property not found errors by adding optional chaining and type assertions',
   };
 }
 
@@ -541,7 +542,7 @@ console.log('\\n✅ Property not found fixes completed!');
 function generateTypeAssignabilityFix(code, errorData) {
   const fixName = 'fix-type-assignability';
   const fixPath = path.join(FIXES_DIR, `${fixName}.js`);
-  
+
   const scriptContent = `#!/usr/bin/env node
 
 /**
@@ -661,12 +662,12 @@ console.log('\\n✅ Type assignability fixes completed!');
   // Save the script
   fs.writeFileSync(fixPath, scriptContent);
   fs.chmodSync(fixPath, '755'); // Make executable
-  
+
   return {
     errorCode: code,
     fixName,
     fixPath: `typescript-diagnostics/scripts/fixes/${fixName}.js`,
-    description: 'Fixes type assignability errors by adding type assertions and guards'
+    description: 'Fixes type assignability errors by adding type assertions and guards',
   };
 }
 
@@ -676,7 +677,7 @@ console.log('\\n✅ Type assignability fixes completed!');
 function generateNullCheckFix(code, errorData) {
   const fixName = 'fix-null-checks';
   const fixPath = path.join(FIXES_DIR, `${fixName}.js`);
-  
+
   const scriptContent = `#!/usr/bin/env node
 
 /**
@@ -783,12 +784,13 @@ console.log('\\n✅ Null/undefined check fixes completed!');
   // Save the script
   fs.writeFileSync(fixPath, scriptContent);
   fs.chmodSync(fixPath, '755'); // Make executable
-  
+
   return {
     errorCode: code,
     fixName,
     fixPath: `typescript-diagnostics/scripts/fixes/${fixName}.js`,
-    description: 'Fixes null/undefined check errors by adding optional chaining and nullish coalescing'
+    description:
+      'Fixes null/undefined check errors by adding optional chaining and nullish coalescing',
   };
 }
 
@@ -798,7 +800,7 @@ console.log('\\n✅ Null/undefined check fixes completed!');
 function generateTopLevelAwaitFix(code, errorData) {
   const fixName = 'fix-top-level-await';
   const fixPath = path.join(FIXES_DIR, `${fixName}.js`);
-  
+
   const scriptContent = `#!/usr/bin/env node
 
 /**
@@ -961,12 +963,12 @@ console.log('\\n✅ Top-level await fixes completed!');
   // Save the script
   fs.writeFileSync(fixPath, scriptContent);
   fs.chmodSync(fixPath, '755'); // Make executable
-  
+
   return {
     errorCode: code,
     fixName,
     fixPath: `typescript-diagnostics/scripts/fixes/${fixName}.js`,
-    description: 'Fixes top-level await errors by updating tsconfig or converting to async IIFE'
+    description: 'Fixes top-level await errors by updating tsconfig or converting to async IIFE',
   };
 }
 
@@ -978,25 +980,25 @@ function applyFixes() {
     console.log('\n⏩ Skipping applying fixes (use --apply to apply fixes)');
     return;
   }
-  
+
   console.log('\n🔧 Applying fixes...');
-  
+
   // Run each fix script
   for (const fix of fixerData.fixes.created) {
     console.log(`\nApplying fix for TS${fix.errorCode}: ${fix.description}`);
-    
+
     try {
-      execFileSync('node', [path.join(ROOT_DIR, fix.fixPath)], { 
+      execFileSync('node', [path.join(ROOT_DIR, fix.fixPath)], {
         stdio: 'inherit',
-        cwd: ROOT_DIR
+        cwd: ROOT_DIR,
       });
-      
+
       fixerData.fixes.applied.push(fix.fixName);
     } catch (error) {
       console.error(`Error applying fix ${fix.fixName}:`, error.message);
     }
   }
-  
+
   console.log(`\nApplied ${fixerData.fixes.applied.length} fixes`);
 }
 
@@ -1005,21 +1007,24 @@ function applyFixes() {
  */
 function generateFixesReadme() {
   const readmePath = path.join(FIXES_DIR, 'README.md');
-  
+
   const readmeContent = `# TypeScript Error Fixes
 
 This directory contains scripts to fix common TypeScript errors.
 
 ## Available Fixes
 
-${fixerData.fixes.created.map(fix => (
-    `### ${fix.fixName}
+${fixerData.fixes.created
+  .map(
+    (fix) =>
+      `### ${fix.fixName}
 
 - **Error Code:** TS${fix.errorCode}
 - **Description:** ${fix.description}
 - **Usage:** \`node ${fix.fixPath}\`
-`
-  )).join('\n')}
+`,
+  )
+  .join('\n')}
 
 ## How to Use
 
@@ -1052,9 +1057,9 @@ function saveReport() {
   // Save JSON report
   fs.writeFileSync(
     path.join(REPORTS_DIR, 'typescript-fixes.json'),
-    JSON.stringify(fixerData, null, 2)
+    JSON.stringify(fixerData, null, 2),
   );
-  
+
   // Generate human-readable report
   const readableReport = [
     '# TypeScript Error Fixes',
@@ -1066,9 +1071,9 @@ function saveReport() {
     `Total Errors: ${fixerData.errors.total}`,
     '',
     '### Top Error Types',
-    ''
+    '',
   ];
-  
+
   // Add top error types
   Object.entries(fixerData.errors.byCode)
     .sort((a, b) => b[1].count - a[1].count)
@@ -1078,11 +1083,11 @@ function saveReport() {
       readableReport.push('  - Example: ' + data.examples[0].message);
       readableReport.push('');
     });
-  
+
   // Add generated fixes
   readableReport.push('## Generated Fix Scripts');
   readableReport.push('');
-  
+
   for (const fix of fixerData.fixes.created) {
     readableReport.push(`### ${fix.fixName}`);
     readableReport.push('');
@@ -1091,23 +1096,20 @@ function saveReport() {
     readableReport.push(`- **Path:** \`${fix.fixPath}\``);
     readableReport.push('');
   }
-  
+
   // Add applied fixes
   if (APPLY_FIXES && fixerData.fixes.applied.length > 0) {
     readableReport.push('## Applied Fixes');
     readableReport.push('');
-    
+
     for (const fixName of fixerData.fixes.applied) {
       readableReport.push(`- Applied \`${fixName}\``);
     }
   }
-  
+
   // Save human-readable report
-  fs.writeFileSync(
-    path.join(REPORTS_DIR, 'typescript-fixes.md'),
-    readableReport.join('\n')
-  );
-  
+  fs.writeFileSync(path.join(REPORTS_DIR, 'typescript-fixes.md'), readableReport.join('\n'));
+
   console.log(`Reports saved to typescript-diagnostics/reports/`);
 }
 

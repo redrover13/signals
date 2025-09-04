@@ -13,8 +13,8 @@ const moduleFederationConfig = {
   remotes: {
     'frontend-agents': {
       external: 'Promise.resolve({})',
-      externalType: 'promise'
-    }
+      externalType: 'promise',
+    },
   },
   shared: (name, config) => {
     // List shared dependencies here to avoid duplicating them
@@ -29,7 +29,7 @@ const moduleFederationConfig = {
         eager: true,
         requiredVersion: false,
       },
-      'react': {
+      react: {
         singleton: true,
         eager: true,
         requiredVersion: false,
@@ -43,7 +43,7 @@ const moduleFederationConfig = {
         singleton: true,
         eager: false,
         requiredVersion: false,
-      }
+      },
     };
 
     return sharedLibs[name] || config.default;

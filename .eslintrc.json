@@ -1,24 +1,10 @@
 {
   "root": true,
-  "ignorePatterns": [
-    "node_modules/",
-    "dist/",
-    ".nx/",
-    ".next/",
-    "coverage/",
-    "*.generated.*"
-  ],
-  "plugins": [
-    "@nx"
-  ],
+  "ignorePatterns": ["node_modules/", "dist/", ".nx/", ".next/", "coverage/", "*.generated.*"],
+  "plugins": ["@nx"],
   "overrides": [
     {
-      "files": [
-        "*.ts",
-        "*.tsx",
-        "*.js",
-        "*.jsx"
-      ],
+      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
         "@nx/enforce-module-boundaries": [
           "error",
@@ -28,16 +14,11 @@
             "depConstraints": [
               {
                 "sourceTag": "*",
-                "onlyDependOnLibsWithTags": [
-                  "*"
-                ]
+                "onlyDependOnLibsWithTags": ["*"]
               },
               {
                 "sourceTag": "domain:gcp",
-                "onlyDependOnLibsWithTags": [
-                  "domain:gcp-core",
-                  "domain:utils"
-                ]
+                "onlyDependOnLibsWithTags": ["domain:gcp-core", "domain:utils"]
               }
             ]
           }
@@ -51,13 +32,8 @@
       }
     },
     {
-      "files": [
-        "*.ts",
-        "*.tsx"
-      ],
-      "extends": [
-        "plugin:@nx/typescript"
-      ],
+      "files": ["*.ts", "*.tsx"],
+      "extends": ["plugin:@nx/typescript"],
       "parserOptions": {
         "project": "./tsconfig.eslint.json"
       },
@@ -66,7 +42,10 @@
         "@typescript-eslint/explicit-function-return-type": "warn",
         "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
         "@typescript-eslint/no-non-null-assertion": "warn",
-        "@typescript-eslint/explicit-member-accessibility": ["warn", { "overrides": { "constructors": "no-public" } }],
+        "@typescript-eslint/explicit-member-accessibility": [
+          "warn",
+          { "overrides": { "constructors": "no-public" } }
+        ],
         "@typescript-eslint/member-ordering": "warn",
         "@typescript-eslint/consistent-type-assertions": "warn",
         "@typescript-eslint/prefer-optional-chain": "warn",
@@ -83,13 +62,8 @@
       }
     },
     {
-      "files": [
-        "*.js",
-        "*.jsx"
-      ],
-      "extends": [
-        "plugin:@nx/javascript"
-      ],
+      "files": ["*.js", "*.jsx"],
+      "extends": ["plugin:@nx/javascript"],
       "rules": {
         "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
         "no-console": ["warn", { "allow": ["warn", "error", "info"] }],
@@ -99,21 +73,14 @@
       }
     },
     {
-      "files": [
-        "*.spec.ts",
-        "*.spec.tsx",
-        "*.spec.js",
-        "*.spec.jsx"
-      ],
+      "files": ["*.spec.ts", "*.spec.tsx", "*.spec.js", "*.spec.jsx"],
       "env": {
         "jest": true
       },
       "rules": {}
     },
     {
-      "files": [
-        "apps/event-parser/**/*.js"
-      ],
+      "files": ["apps/event-parser/**/*.js"],
       "env": {
         "node": true,
         "commonjs": true
@@ -130,10 +97,7 @@
       }
     },
     {
-      "files": [
-        "scripts/**/*.js",
-        "**/*.cjs"
-      ],
+      "files": ["scripts/**/*.js", "**/*.cjs"],
       "env": {
         "node": true,
         "commonjs": true

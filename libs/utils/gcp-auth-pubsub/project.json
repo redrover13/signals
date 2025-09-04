@@ -3,23 +3,16 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/utils/gcp-auth-pubsub/src",
   "projectType": "library",
-  "tags": [
-    "domain:gcp-auth",
-    "type:library"
-  ],
+  "tags": ["domain:gcp-auth", "type:library"],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/utils/gcp-auth-pubsub",
         "main": "libs/utils/gcp-auth-pubsub/src/index.ts",
         "tsConfig": "libs/utils/gcp-auth-pubsub/tsconfig.lib.json",
-        "assets": [
-          "libs/utils/gcp-auth-pubsub/*.md"
-        ]
+        "assets": ["libs/utils/gcp-auth-pubsub/*.md"]
       },
       "configurations": {
         "production": {
@@ -37,9 +30,7 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "libs/utils/gcp-auth-pubsub/jest.config.ts"
       }

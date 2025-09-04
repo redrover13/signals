@@ -23,19 +23,19 @@ function findTsConfigFiles() {
     'libs/*/tsconfig.json',
     'apps/*/tsconfig.json',
     'libs/*/*/tsconfig.json',
-    'apps/*/*/tsconfig.json'
+    'apps/*/*/tsconfig.json',
   ];
-  
+
   let allPaths = [];
-  
-  patterns.forEach(pattern => {
+
+  patterns.forEach((pattern) => {
     const files = glob.sync(pattern, {
       cwd: ROOT_DIR,
-      ignore: ['**/node_modules/**', '**/dist/**', '**/tmp/**']
+      ignore: ['**/node_modules/**', '**/dist/**', '**/tmp/**'],
     });
     allPaths = allPaths.concat(files);
   });
-  
+
   return allPaths;
 }
 
@@ -43,26 +43,22 @@ function findTsConfigFiles() {
 function generateReferencesConfig() {
   const tsConfigPaths = findTsConfigFiles();
   console.log(`Found ${tsConfigPaths.length} tsconfig.json files`);
-  
+
   // Create the references array with relative paths
-  const references = tsConfigPaths.map(configPath => {
+  const references = tsConfigPaths.map((configPath) => {
     return { path: `./${configPath.replace('/tsconfig.json', '')}` };
   });
-  
+
   // Create the tsconfig.references.json content
   const referencesConfig = {
-    extends: "./tsconfig.base.json",
+    extends: './tsconfig.base.json',
     files: [],
-    references: references
+    references: references,
   };
-  
+
   // Write the file
-  fs.writeFileSync(
-    TSCONFIG_REFERENCES_PATH,
-    JSON.stringify(referencesConfig, null, 2),
-    'utf8'
-  );
-  
+  fs.writeFileSync(TSCONFIG_REFERENCES_PATH, JSON.stringify(referencesConfig, null, 2), 'utf8');
+
   console.log(`Generated tsconfig.references.json with ${references.length} references`);
 }
 

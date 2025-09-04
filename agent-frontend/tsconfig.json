@@ -6,9 +6,7 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "allowImportingTsExtensions": true,
-    "types": [
-      "vite/client"
-    ]
+    "types": ["vite/client"]
   },
   "files": [],
   "include": [],
@@ -24,9 +22,5 @@
     }
   ],
   "extends": "../tsconfig.base.json",
-  "exclude": [
-    "node_modules",
-    "tmp",
-    "dist"
-  ]
+  "exclude": ["node_modules", "tmp", "dist"]
 }

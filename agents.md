@@ -160,6 +160,7 @@ The AI assistant should support the following workflows:
 ### GitHub Copilot Configuration
 
 GitHub Copilot is configured with:
+
 - Firewall exceptions for Nx Cloud services via `.github/copilot/actions-setup-steps.yml`
 - General agent settings via `.github/copilot-agent.yml`
 - Domain-specific instructions in `.github/instructions/` (transitioning to this centralized document)
@@ -184,6 +185,7 @@ The following Model Context Protocol (MCP) servers are configured:
 ## Transition Notes
 
 This document centralizes and enhances instructions previously scattered across:
+
 - `.github/copilot-instructions.md`
 - `.github/instructions/codacy.instructions.md`
 - `.github/instructions/nx.instructions.md`

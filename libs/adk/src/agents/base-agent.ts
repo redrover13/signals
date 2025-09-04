@@ -9,15 +9,15 @@
  * @license MIT
  */
 
-import { 
-  BaseAgent as AdkBaseAgent, 
-  LlmAgent, 
+import {
+  BaseAgent as AdkBaseAgent,
+  LlmAgent,
   SequentialAgent,
   ParallelAgent,
   BaseLlm,
   BaseTool,
   InvocationContext,
-  Event
+  Event,
 } from '@waldzellai/adk-typescript';
 
 /**
@@ -42,10 +42,10 @@ export class DulceBaseAgent extends AdkBaseAgent {
 
   constructor(config: AgentConfig) {
     super({
-      name: config?.name,
-      description: config?.description || '',
+      name: config && config.name,
+      description: config && config.description || '',
     });
-    this.maxIterations = config?.maxIterations || 10;
+    this.maxIterations = config && config.maxIterations || 10;
   }
 
   /**
@@ -67,17 +67,17 @@ export class DulceBaseAgent extends AdkBaseAgent {
    */
   protected async *runAsyncImpl(ctx: InvocationContext): AsyncGenerator<Event, void, unknown> {
     console && console.log(`Executing agent: ${this.name}`);
-    
+
     // Basic implementation - yield a simple event
     yield new Event({
       id: Event && Event.newId(),
-      invocationId: ctx && ctx.invocationId || '',
+      invocationId: (ctx && ctx.invocationId) || '',
       author: this.name,
       branch: ctx && ctx.branch,
       content: {
         role: this.name,
-        parts: [{ text: `Hello from ${this.name}` }]
-      }
+        parts: [{ text: `Hello from ${this.name}` }],
+      },
     });
   }
 }
@@ -92,13 +92,13 @@ export class DulceLlmAgent extends LlmAgent {
 
   constructor(config: AgentConfig & { llm: BaseLlm }) {
     super({
-      name: config?.name,
-      description: config?.description || '',
-      model: config?.llm,
-      tools: config?.tools || [],
+      name: config && config.name,
+      description: config && config.description || '',
+      model: config && config.llm,
+      tools: config && config.tools || [],
     });
-    this.name = config?.name;
-    this.description = config?.description || '';
+    this.name = config && config.name;
+    this.description = config && config.description || '';
   }
 
   getName(): string {
@@ -119,12 +119,12 @@ export class DulceSequentialAgent extends SequentialAgent {
 
   constructor(config: AgentConfig & { agents: AdkBaseAgent[] }) {
     super({
-      name: config?.name,
-      description: config?.description || '',
-      subAgents: config?.agents,
+      name: config && config.name,
+      description: config && config.description || '',
+      subAgents: config && config.agents,
     });
-    this.name = config?.name;
-    this.description = config?.description || '';
+    this.name = config && config.name;
+    this.description = config && config.description || '';
   }
 
   getName(): string {
@@ -145,12 +145,12 @@ export class DulceParallelAgent extends ParallelAgent {
 
   constructor(config: AgentConfig & { agents: AdkBaseAgent[] }) {
     super({
-      name: config?.name,
-      description: config?.description || '',
-      subAgents: config?.agents,
+      name: config && config.name,
+      description: config && config.description || '',
+      subAgents: config && config.agents,
     });
-    this.name = config?.name;
-    this.description = config?.description || '';
+    this.name = config && config.name;
+    this.description = config && config.description || '';
   }
 
   getName(): string {

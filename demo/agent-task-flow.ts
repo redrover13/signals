@@ -23,7 +23,7 @@ async function demonstrateAgentTaskFlow() {
       agentType: 'reviews-agent',
       priority: 'high',
       timestamp: new Date().toISOString(),
-      source: 'demo'
+      source: 'demo',
     };
 
     console.log('📝 Task Message Structure:');
@@ -32,10 +32,10 @@ async function demonstrateAgentTaskFlow() {
 
     // Get Pub/Sub client (this will use the mock implementation in test env)
     const pubsub = getPubSub();
-    
+
     console.log('📡 Publishing task to dulce.agents topic...');
     const result = await pubsub.topic('dulce.agents').publishMessage(taskMessage);
-    
+
     console.log('✅ Task published successfully!');
     console.log(`   Message ID: ${result?.messageId}`);
     console.log(`   Topic: ${result?.name}`);
@@ -60,15 +60,15 @@ async function demonstrateAgentTaskFlow() {
         sentiment_summary: {
           positive: 75,
           neutral: 15,
-          negative: 10
+          negative: 10,
         },
         key_themes: ['service quality', 'food taste', 'delivery speed'],
-        processed_reviews: 1234
+        processed_reviews: 1234,
       },
       started_at: new Date().toISOString(),
-      completed_at: new Date().toISOString()
+      completed_at: new Date().toISOString(),
     };
-    
+
     console.log(JSON.stringify(expectedAgentRun, null, 2));
     console.log('');
 
@@ -77,9 +77,10 @@ async function demonstrateAgentTaskFlow() {
     console.log('🔧 Next Steps for Production:');
     console.log('   • Deploy infrastructure: terraform apply infra/terraform/dulce-core/');
     console.log('   • Build and deploy API: docker build apps/api && deploy to Cloud Run');
-    console.log('   • Build and deploy agent runner: docker build apps/agents && deploy to Cloud Run');
+    console.log(
+      '   • Build and deploy agent runner: docker build apps/agents && deploy to Cloud Run',
+    );
     console.log('   • Configure monitoring and alerts');
-
   } catch (error) {
     console.error('❌ Demo failed:', error);
     process.exit(1);

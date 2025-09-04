@@ -26,11 +26,12 @@ export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
     const requests = rateLimitMap.get(clientIP) || [];
     const recentRequests = requests.filter((time: number) => now - time < 60000); // 1 minute window
 
-    if (recentRequests.length >= 10) { // 10 requests per minute
+    if (recentRequests.length >= 10) {
+      // 10 requests per minute
       reply.code(429).send({
         error: 'Too Many Requests',
         message: 'Rate limit exceeded. Please try again later.',
-        retryAfter: 60
+        retryAfter: 60,
       });
       return;
     }
@@ -63,13 +64,13 @@ export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
         system: {
           nodeVersion,
           platform,
-          timezone: 'Asia/Ho_Chi_Minh'
+          timezone: 'Asia/Ho_Chi_Minh',
         },
         request: {
           userAgent,
           accept,
-          ip: request.ip
-        }
+          ip: request.ip,
+        },
       });
 
       // Comprehensive health response
@@ -87,14 +88,14 @@ export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
             rss: memoryUsage.rss,
             heapUsed: memoryUsage.heapUsed,
             heapTotal: memoryUsage.heapTotal,
-            external: memoryUsage.external
-          }
+            external: memoryUsage.external,
+          },
         },
         services: {
           mcp: 'unknown', // MCP service status would be checked here
           database: 'unknown', // Add database health check
-          cache: 'unknown'     // Add cache health check
-        }
+          cache: 'unknown', // Add cache health check
+        },
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -102,30 +103,34 @@ export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
       return reply.code(500).send({
         status: 'error',
         message: 'Health check failed',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
   });
 
   // Add a detailed health endpoint
-  fastify.get('/detailed', { schema: { response: { 200: detailedHealthCheckResponseSchema } } }, async function (request: FastifyRequest, reply: FastifyReply) {
-    const healthDetails = {
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      checks: {
-        filesystem: await checkFilesystem(),
-        memory: checkMemory(),
-        cpu: checkCPU(),
-        network: checkNetwork()
-      }
-    };
+  fastify.get(
+    '/detailed',
+    { schema: { response: { 200: detailedHealthCheckResponseSchema } } },
+    async function (request: FastifyRequest, reply: FastifyReply) {
+      const healthDetails = {
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        checks: {
+          filesystem: await checkFilesystem(),
+          memory: checkMemory(),
+          cpu: checkCPU(),
+          network: checkNetwork(),
+        },
+      };
 
-    return reply.send(healthDetails);
-  });
+      return reply.send(healthDetails);
+    },
+  );
 }
 
 // Helper functions for detailed health checks
-async function checkFilesystem(): Promise<{status: string | undefined, message: string}> {
+async function checkFilesystem(): Promise<{ status: string | undefined; message: string }> {
   try {
     // Check if we can write to temp directory
     const fs = await import('fs/promises');
@@ -139,19 +144,25 @@ async function checkFilesystem(): Promise<{status: string | undefined, message: 
   }
 }
 
-function checkMemory(): {status: string | undefined, usage: any} {
+function checkMemory(): { status: string | undefined; usage: any } {
   const usage = process.memoryUsage();
   const heapUsedMB = usage.heapUsed / 1024 / 1024;
   const heapTotalMB = usage.heapTotal / 1024 / 1024;
 
   if (heapUsedMB > heapTotalMB * 0.9) {
-    return { status: 'warning', usage: { heapUsedMB, heapTotalMB, percentage: (heapUsedMB / heapTotalMB * 100).toFixed(1) } };
+    return {
+      status: 'warning',
+      usage: { heapUsedMB, heapTotalMB, percentage: ((heapUsedMB / heapTotalMB) * 100).toFixed(1) },
+    };
   }
 
-  return { status: 'ok', usage: { heapUsedMB, heapTotalMB, percentage: (heapUsedMB / heapTotalMB * 100).toFixed(1) } };
+  return {
+    status: 'ok',
+    usage: { heapUsedMB, heapTotalMB, percentage: ((heapUsedMB / heapTotalMB) * 100).toFixed(1) },
+  };
 }
 
-function checkCPU(): {status: string | undefined, load: any} {
+function checkCPU(): { status: string | undefined; load: any } {
   const loadAvg = process.cpuUsage();
   const loadPercentage = (loadAvg.user + loadAvg.system) / 1000000; // Convert to seconds
 
@@ -160,12 +171,12 @@ function checkCPU(): {status: string | undefined, load: any} {
     load: {
       user: loadAvg.user,
       system: loadAvg.system,
-      percentage: loadPercentage.toFixed(1)
-    }
+      percentage: loadPercentage.toFixed(1),
+    },
   };
 }
 
-function checkNetwork(): {status: string | undefined, message: string} {
+function checkNetwork(): { status: string | undefined; message: string } {
   // Basic network connectivity check
   return { status: 'ok', message: 'Network interfaces available' };
 }

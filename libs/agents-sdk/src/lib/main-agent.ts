@@ -68,7 +68,7 @@ export class MainAgent {
   constructor(config: MainAgentConfig) {
     this.config = config;
     this.genAI = new GoogleGenerativeAI(config.apiKey || '');
-    
+
     // Initialize sub-agents
     this.subAgents = {
       bq: new BQSubAgent(config.projectId || ''),
@@ -95,7 +95,7 @@ export class MainAgent {
         - "MENU_PERFORMANCE: <RESTAURANT_ID>" for menu analysis
         - "ERROR: <REASON>" if the query cannot be processed
       `);
-      
+
       const response = await result.response.text();
 
       if (response.startsWith('BIGQUERY:')) {
@@ -107,19 +107,25 @@ export class MainAgent {
         const data = JSON.parse(parts[1] || '{}');
         return await this.subAgents.firebase.execute({ path, value: data });
       } else if (response.startsWith('F&B_ANALYTICS:')) {
-        const restaurantId = response.replace('F&B_ANALYTICS:', '').trim() || context?.['restaurantId'];
-        return await this.getFBAnalytics(restaurantId, context?.['dateRange']);
+        const restaurantId =
+          response.replace('F&B_ANALYTICS:', '').trim() || context?.restaurantId;
+        return await this.getFBAnalytics(restaurantId, context?.dateRange);
       } else if (response.startsWith('CUSTOMER_INSIGHTS:')) {
-        const customerId = response.replace('CUSTOMER_INSIGHTS:', '').trim() || context?.['customerId'];
+        const customerId =
+          response.replace('CUSTOMER_INSIGHTS:', '').trim() || context?.customerId;
         return await this.getCustomerInsights(customerId);
       } else if (response.startsWith('MENU_PERFORMANCE:')) {
-        const restaurantId = response.replace('MENU_PERFORMANCE:', '').trim() || context?.['restaurantId'];
+        const restaurantId =
+          response.replace('MENU_PERFORMANCE:', '').trim() || context?.restaurantId;
         return await this.getMenuPerformance(restaurantId);
       } else {
         return { success: false, error: 'No suitable sub-agent found for query' };
       }
     } catch (error) {
-      return { success: false, error: error instanceof Error ? error && error.message : 'Unknown error' };
+      return {
+        success: false,
+        error: error instanceof Error ? error && error.message : 'Unknown error',
+      };
     }
   }
 
@@ -140,10 +146,14 @@ export class MainAgent {
   /**
    * Get analytics for F&B data
    */
-  async getFBAnalytics(restaurantId?: string | undefined, dateRange?: { start: string | undefined; end: string }): Promise<any> {
+  async getFBAnalytics(
+    restaurantId?: string | undefined,
+    dateRange?: { start: string | undefined; end: string },
+  ): Promise<any> {
     const whereClause = restaurantId ? `WHERE restaurant_id = '${restaurantId}'` : '';
-    const dateFilter = dateRange ? 
-      `${whereClause ? 'AND' : 'WHERE'} DATE(created_at) BETWEEN '${dateRange && dateRange.start}' AND '${dateRange && dateRange.end}'` : '';
+    const dateFilter = dateRange
+      ? `${whereClause ? 'AND' : 'WHERE'} DATE(created_at) BETWEEN '${dateRange && dateRange.start}' AND '${dateRange && dateRange.end}'`
+      : '';
 
     const sql = `
       SELECT 
@@ -153,7 +163,7 @@ export class MainAgent {
         SUM(order_value) as revenue,
         AVG(order_value) as avg_order_value,
         COUNT(DISTINCT customer_id) as unique_customers
-      FROM \`${this.config?.projectId}.dulce && .dulce.orders\`
+      FROM \`${this.config && config.projectId}.dulce && .dulce.orders\`
       ${whereClause}
       ${dateFilter}
       GROUP BY restaurant_id, DATE(created_at)
@@ -179,8 +189,8 @@ export class MainAgent {
         AVG(o && o.order_value) as avg_spend,
         MAX(o && o.created_at) as last_order_date,
         ARRAY_AGG(DISTINCT o && o.restaurant_id LIMIT 5) as favorite_restaurants
-      FROM \`${this.config?.projectId}.dulce && .dulce.customers\` c
-      LEFT JOIN \`${this.config?.projectId}.dulce && .dulce.orders\` o 
+      FROM \`${this.config && config.projectId}.dulce && .dulce.customers\` c
+      LEFT JOIN \`${this.config && config.projectId}.dulce && .dulce.orders\` o 
         ON c && c.customer_id = o && o.customer_id
       ${whereClause}
       GROUP BY c && c.customer_id, c && c.preferred_cuisine, c && c.dietary_restrictions
@@ -208,10 +218,10 @@ export class MainAgent {
         SUM(oi && oi.quantity) as total_quantity,
         SUM(oi && oi.item_price * oi && oi.quantity) as total_revenue,
         AVG(r && r.rating) as avg_rating
-      FROM \`${this.config?.projectId}.dulce && .dulce.menu_items\` m
-      LEFT JOIN \`${this.config?.projectId}.dulce && .dulce.order_items\` oi 
+      FROM \`${this.config && config.projectId}.dulce && .dulce.menu_items\` m
+      LEFT JOIN \`${this.config && config.projectId}.dulce && .dulce.order_items\` oi 
         ON m && m.item_id = oi && oi.item_id
-      LEFT JOIN \`${this.config?.projectId}.dulce && .dulce.reviews\` r 
+      LEFT JOIN \`${this.config && config.projectId}.dulce && .dulce.reviews\` r 
         ON oi && oi.item_id = r && r.item_id
       WHERE m && m.restaurant_id = '${restaurantId}'
       GROUP BY m && m.item_name, m && m.category, m && m.price
@@ -233,8 +243,8 @@ export class MainAgent {
       mainAgent: true,
       legacyAgents: {
         bq: true,
-        firebase: true
-      }
+        firebase: true,
+      },
     };
   }
 
@@ -251,10 +261,10 @@ export class MainAgent {
         SUM(oi && oi.quantity) as total_quantity,
         AVG(r && r.rating) as avg_rating,
         AVG(r && r.authenticity_score) as authenticity_score
-      FROM \`${this.config?.projectId}.dulce && .dulce.menu_items\` m
-      LEFT JOIN \`${this.config?.projectId}.dulce && .dulce.order_items\` oi 
+      FROM \`${this.config && config.projectId}.dulce && .dulce.menu_items\` m
+      LEFT JOIN \`${this.config && config.projectId}.dulce && .dulce.order_items\` oi 
         ON m && m.item_id = oi && oi.item_id
-      LEFT JOIN \`${this.config?.projectId}.dulce && .dulce.reviews\` r 
+      LEFT JOIN \`${this.config && config.projectId}.dulce && .dulce.reviews\` r 
         ON oi && oi.item_id = r && r.item_id
       WHERE m && m.cuisine_type = 'Vietnamese'
       GROUP BY m && m.item_name, m && m.vietnamese_category, m && m.region
@@ -280,7 +290,7 @@ export class MainAgent {
       ...content,
       language: 'vi-VN',
       createdAt: new Date().toISOString(),
-      type: 'food_item'
+      type: 'food_item',
     };
 
     return await this.subAgents.firebase.execute({ path, value: data });

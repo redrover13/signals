@@ -67,7 +67,7 @@ export function initializeOpenTelemetry(config?: OtelConfig): NodeSDK | null {
   });
 
   let traceExporter: ConsoleSpanExporter | OTLPTraceExporter | CloudTraceExporter;
-  
+
   if (finalConfig.environment === 'production') {
     // Use GCP Cloud Trace in production
     traceExporter = new CloudTraceExporter({
@@ -104,7 +104,7 @@ export function initializeOpenTelemetry(config?: OtelConfig): NodeSDK | null {
         version: finalConfig.serviceVersion,
       },
     });
-    
+
     if (sdkOptions) {
       sdkOptions.traceExporter = customExporter;
     }
@@ -116,8 +116,10 @@ export function initializeOpenTelemetry(config?: OtelConfig): NodeSDK | null {
   // Set up global tracer
   tracer = trace.getTracer(finalConfig.serviceName);
 
-  console.log(`OpenTelemetry initialized for ${finalConfig.serviceName} in ${finalConfig.environment} environment`);
-  
+  console.log(
+    `OpenTelemetry initialized for ${finalConfig.serviceName} in ${finalConfig.environment} environment`,
+  );
+
   return sdk;
 }
 
@@ -136,12 +138,15 @@ export function getTracer(): Tracer {
  * @param name Name of the span
  * @param options Span options
  */
-export function createSpan(name: string, options?: { attributes?: Record<string, string | number | boolean>, kind?: SpanKind }) {
+export function createSpan(
+  name: string,
+  options?: { attributes?: Record<string, string | number | boolean>; kind?: SpanKind },
+) {
   const tracer = getTracer();
-  
+
   return tracer.startSpan(name || 'unnamed-span', {
-    attributes: options?.attributes || {},
-    kind: options?.kind || SpanKind.INTERNAL,
+    attributes: options && options.attributes || {},
+    kind: options && options.kind || SpanKind.INTERNAL,
   });
 }
 
@@ -150,27 +155,35 @@ export function createSpan(name: string, options?: { attributes?: Record<string,
  * @param name Name of the span
  * @param options Span options
  */
-export function startActiveSpan<T>(name: string, callback: (span: any) => T, options?: { attributes?: Record<string, string | number | boolean>, kind?: SpanKind }): T {
+export function startActiveSpan<T>(
+  name: string,
+  callback: (span: any) => T,
+  options?: { attributes?: Record<string, string | number | boolean>; kind?: SpanKind },
+): T {
   const tracer = getTracer();
-  
-  return tracer.startActiveSpan(name || 'unnamed-span', {
-    attributes: options?.attributes || {},
-    kind: options?.kind || SpanKind.INTERNAL,
-  }, (span) => {
-    try {
-      const result = callback(span);
-      span.setStatus({ code: SpanStatusCode.OK });
-      span.end();
-      return result;
-    } catch (error) {
-      span.setStatus({
-        code: SpanStatusCode.ERROR,
-        message: (error as Error)?.message || 'Unknown error',
-      });
-      span.end();
-      throw error;
-    }
-  });
+
+  return tracer.startActiveSpan(
+    name || 'unnamed-span',
+    {
+      attributes: options && options.attributes || {},
+      kind: options && options.kind || SpanKind.INTERNAL,
+    },
+    (span) => {
+      try {
+        const result = callback(span);
+        span.setStatus({ code: SpanStatusCode.OK });
+        span.end();
+        return result;
+      } catch (error) {
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: (error as Error)?.message || 'Unknown error',
+        });
+        span.end();
+        throw error;
+      }
+    },
+  );
 }
 
 /**
@@ -190,7 +203,10 @@ export function addSpanEvent(span: any, event: string, data?: Record<string, any
  * @param span The span to set attributes on
  * @param attributes Attributes to set
  */
-export function setSpanAttributes(span: any, attributes: Record<string, string | number | boolean>): void {
+export function setSpanAttributes(
+  span: any,
+  attributes: Record<string, string | number | boolean>,
+): void {
   if (span && attributes) {
     Object.entries(attributes).forEach(([key, value]) => {
       span.setAttribute(key, value);
@@ -210,18 +226,18 @@ export function instrument<T extends (...args: any[]) => any>(
   options: {
     attributes?: Record<string, string | number | boolean> | undefined;
     kind?: SpanKind | undefined;
-  } = {}
+  } = {},
 ): T {
   return (async (...args: any[]) => {
     const spanName = name || fn.name || 'anonymous';
-    
+
     return startActiveSpan(
       spanName,
       async (span) => {
         if (options.attributes) {
           setSpanAttributes(span, options.attributes);
         }
-        
+
         try {
           const result = await fn(...args);
           return result;
@@ -233,7 +249,7 @@ export function instrument<T extends (...args: any[]) => any>(
           throw error;
         }
       },
-      { kind: options.kind }
+      { kind: options.kind },
     );
   }) as T;
 }
@@ -245,6 +261,6 @@ export function shutdownOpenTelemetry(): Promise<void> {
   if (!sdk) {
     return Promise.resolve();
   }
-  
+
   return sdk.shutdown();
 }

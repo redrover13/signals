@@ -38,23 +38,23 @@ function writePackageJson(packageJson) {
 // Update package.json with TypeScript Project References scripts
 function updatePackageJson() {
   const packageJson = readPackageJson();
-  
+
   // Add/update TypeScript Project References scripts
   packageJson.scripts = packageJson.scripts || {};
-  
+
   // Define the scripts to add or update
   const scriptsToAdd = {
-    "ts:build": "tsc -b tsconfig.references.json",
-    "ts:build:watch": "tsc -b tsconfig.references.json --watch",
-    "ts:clean": "tsc -b tsconfig.references.json --clean",
-    "ts:refs:enable": "node scripts/enable-ts-project-references.js",
-    "ts:refs:fix": "node scripts/fix-ts-project-references.js",
-    "ts:build:project": "tsc -b",
-    "ts:build:libs": "tsc -b libs/*/tsconfig.json",
-    "ts:build:apps": "tsc -b apps/*/tsconfig.json",
-    "ts:refs:generate": "node scripts/generate-ts-references.js"
+    'ts:build': 'tsc -b tsconfig.references.json',
+    'ts:build:watch': 'tsc -b tsconfig.references.json --watch',
+    'ts:clean': 'tsc -b tsconfig.references.json --clean',
+    'ts:refs:enable': 'node scripts/enable-ts-project-references.js',
+    'ts:refs:fix': 'node scripts/fix-ts-project-references.js',
+    'ts:build:project': 'tsc -b',
+    'ts:build:libs': 'tsc -b libs/*/tsconfig.json',
+    'ts:build:apps': 'tsc -b apps/*/tsconfig.json',
+    'ts:refs:generate': 'node scripts/generate-ts-references.js',
   };
-  
+
   // Add or update the scripts
   let changedCount = 0;
   for (const [name, command] of Object.entries(scriptsToAdd)) {
@@ -63,7 +63,7 @@ function updatePackageJson() {
       changedCount++;
     }
   }
-  
+
   if (changedCount > 0) {
     console.log(`Added/updated ${changedCount} TypeScript build scripts`);
     writePackageJson(packageJson);

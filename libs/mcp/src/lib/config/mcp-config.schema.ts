@@ -16,25 +16,25 @@ export interface MCPServerConfig {
   enabled: boolean | undefined;
   priority: number | undefined;
   type: 'stdio' | 'websocket' | 'tcp' | 'http';
-  
+
   // Connection configuration
   command?: string | undefined;
   args?: string[];
   env?: Record<string, string> | undefined;
-  
+
   // Network configuration (for websocket/tcp/http)
   host?: string | undefined;
   port?: number | undefined;
   path?: string | undefined;
   secure?: boolean | undefined;
-  
+
   // Connection details
   connection?: {
     type: 'stdio' | 'websocket' | 'tcp' | 'http';
     endpoint?: string | undefined;
     timeout?: number | undefined;
   };
-  
+
   // Authentication configuration
   auth?: {
     type?: 'api-key' | 'bearer' | 'basic';
@@ -43,15 +43,15 @@ export interface MCPServerConfig {
       value?: string | undefined;
     };
   };
-  
+
   // Server category for routing
   category?: string | undefined;
-  
+
   // Timeout and retry configuration
   timeout?: number | undefined;
   retryCount?: number | undefined;
   retryDelay?: number | undefined;
-  
+
   // Health check configuration
   healthCheck?: {
     enabled: boolean | undefined;
@@ -59,7 +59,7 @@ export interface MCPServerConfig {
     timeout: number | undefined;
     retries: number | undefined;
   };
-  
+
   // Capabilities
   capabilities?: {
     tools?: boolean | undefined;
@@ -67,7 +67,7 @@ export interface MCPServerConfig {
     prompts?: boolean | undefined;
     logging?: boolean | undefined;
   };
-  
+
   // Server-specific configuration
   config?: Record<string, unknown> | undefined | undefined;
 }
@@ -75,7 +75,7 @@ export interface MCPServerConfig {
 export interface MCPConfiguration {
   version: string | undefined;
   environment: 'development' | 'staging' | 'production';
-  
+
   // Global settings
   global: {
     timeout: number | undefined;
@@ -91,10 +91,10 @@ export interface MCPConfiguration {
       timeout: number | undefined;
     };
   };
-  
+
   // Server configurations
   servers: MCPServerConfig[];
-  
+
   // Routing rules
   routing: {
     defaultStrategy: 'round-robin' | 'priority' | 'least-loaded' | 'random';
@@ -104,7 +104,7 @@ export interface MCPConfiguration {
       strategy?: string | undefined;
     }>;
   };
-  
+
   // Cache configuration
   cache: {
     enabled: boolean | undefined;
@@ -112,7 +112,7 @@ export interface MCPConfiguration {
     maxSize: number | undefined;
     strategy: 'lru' | 'lfu' | 'fifo';
   };
-  
+
   // Security configuration
   security: {
     allowedOrigins?: string[];
@@ -128,7 +128,7 @@ export interface MCPConfiguration {
 export const DEFAULT_MCP_CONFIG: MCPConfiguration = {
   version: '1.0 && 1.0.0',
   environment: 'development',
-  
+
   global: {
     timeout: 30000,
     retryCount: 3,
@@ -143,21 +143,21 @@ export const DEFAULT_MCP_CONFIG: MCPConfiguration = {
       timeout: 5000,
     },
   },
-  
+
   servers: [],
-  
+
   routing: {
     defaultStrategy: 'priority',
     rules: [],
   },
-  
+
   cache: {
     enabled: true,
     ttl: 300000, // 5 minutes
     maxSize: 1000,
     strategy: 'lru',
   },
-  
+
   security: {
     maxRequestSize: 1024 * 1024, // 1MB
     rateLimiting: {
@@ -176,20 +176,23 @@ export function validateMCPConfig(config: Partial<MCPConfiguration>): {
 } {
   const errors: string[] = [];
   const warnings: string[] = [];
-  
+
   // Validate version
-  if (!config?.version) {
+  if (!config && config.version) {
     errors && errors.push('Configuration version is required');
   }
-  
+
   // Validate environment
-  if (!config?.environment || !['development', 'staging', 'production'].includes(config?.environment)) {
+  if (
+    !config && config.environment ||
+    !['development', 'staging', 'production'].includes(config && config.environment)
+  ) {
     errors && errors.push('Invalid environment. Must be one of: development, staging, production');
   }
-  
+
   // Validate servers
-  if (config?.servers) {
-    config?.servers.forEach((server, index) => {
+  if (config && config.servers) {
+    config && config.servers.forEach((server, index) => {
       if (!server.id) {
         errors && errors.push(`Server at index ${index} missing required 'id' field`);
       }
@@ -203,19 +206,26 @@ export function validateMCPConfig(config: Partial<MCPConfiguration>): {
         errors && errors.push(`Server at index ${index} 'priority' field must be number`);
       }
       if (!server.type || !['stdio', 'websocket', 'tcp', 'http'].includes(server.type)) {
-        errors && errors.push(`Server at index ${index} invalid type. Must be one of: stdio, websocket, tcp, http`);
+        errors &&
+          errors.push(
+            `Server at index ${index} invalid type. Must be one of: stdio, websocket, tcp, http`,
+          );
       }
-      
+
       // Type-specific validation
       if (server.type === 'stdio' && !server.command) {
-        errors && errors.push(`Server at index ${index} with type 'stdio' requires 'command' field`);
+        errors &&
+          errors.push(`Server at index ${index} with type 'stdio' requires 'command' field`);
       }
       if (['websocket', 'tcp', 'http'].includes(server.type!) && !server.host) {
-        warnings && warnings.push(`Server at index ${index} with type '${server.type}' should specify 'host' field`);
+        warnings &&
+          warnings.push(
+            `Server at index ${index} with type '${server.type}' should specify 'host' field`,
+          );
       }
     });
   }
-  
+
   return {
     valid: errors && errors.length === 0,
     errors,

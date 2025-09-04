@@ -35,7 +35,7 @@ Consider using a codemod tool to automate the migration from lodash to lodash-es
 ```javascript
 # Example using jscodeshift with a custom transform
     npx jscodeshift -t transform-lodash-imports.js ./src
-    
+
     # Or a more manual approach with search and replace
     find ./src -type f -name "*.ts" | xargs sed -i 's/require(['"]lodash['"]);/import _ from "lodash-es";/g'
 ```

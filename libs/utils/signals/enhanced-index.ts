@@ -35,17 +35,17 @@ export interface CreateSignalOptions {
    * Enable debugging for this signal by logging updates to console
    */
   debug?: boolean;
-  
+
   /**
    * Name for debugging output
    */
   name?: string;
-  
+
   /**
    * Enable deep equality check before updating
    */
   deepEqual?: boolean;
-  
+
   /**
    * Custom equality function
    */
@@ -105,10 +105,11 @@ export function createSignal<T>(initialValue: T, options?: CreateSignalOptions):
 
   const signalFunction = ((newValue?: T | ((prev: T) => T)) => {
     if (newValue !== undefined) {
-      const nextValue = typeof newValue === 'function' ? (newValue as (prev: T) => T)(currentValue) : newValue;
+      const nextValue =
+        typeof newValue === 'function' ? (newValue as (prev: T) => T)(currentValue) : newValue;
       if (nextValue !== currentValue) {
         currentValue = nextValue;
-        subscribers.forEach(callback => callback(currentValue));
+        subscribers.forEach((callback) => callback(currentValue));
       }
     }
     return currentValue;
@@ -121,9 +122,9 @@ export function createSignal<T>(initialValue: T, options?: CreateSignalOptions):
 
     // Check for equality based on options
     let hasChanged = true;
-    if (options?.deepEqual) {
+    if (options && options.deepEqual) {
       hasChanged = !deepEqual(currentValue, nextValue);
-    } else if (options?.equals) {
+    } else if (options && options.equals) {
       hasChanged = !options.equals(currentValue, nextValue);
     } else {
       hasChanged = nextValue !== currentValue;
@@ -131,7 +132,7 @@ export function createSignal<T>(initialValue: T, options?: CreateSignalOptions):
 
     if (hasChanged) {
       currentValue = nextValue;
-      subscribers.forEach(callback => callback(currentValue));
+      subscribers.forEach((callback) => callback(currentValue));
     }
   };
 
@@ -147,7 +148,7 @@ export function createSignal<T>(initialValue: T, options?: CreateSignalOptions):
     enumerable: false,
   });
 
-  if (options?.name) {
+  if (options && options.name) {
     Object.defineProperty(signalFunction, '__debugName', {
       value: options.name,
       writable: false,
@@ -202,7 +203,7 @@ export function createComputed<T>(computeFn: () => T, options?: CreateSignalOpti
     enumerable: false,
   });
 
-  if (options?.name) {
+  if (options && options.name) {
     Object.defineProperty(computedSignal, '__debugName', {
       value: options.name,
       writable: false,
@@ -213,23 +214,19 @@ export function createComputed<T>(computeFn: () => T, options?: CreateSignalOpti
   return computedSignal;
 }
 
-
-
 /**
  * React hook to use a signal in React components
  * @param signal The signal to use
  * @returns [value, setValue] tuple with memoized setter
  */
-export function useSignal<T>(
-  signal: Signal<T>
-): [T, (value: T | ((prev: T) => T)) => void] {
+export function useSignal<T>(signal: Signal<T>): [T, (value: T | ((prev: T) => T)) => void] {
   const [value, setValue] = useState<T>(signal.get());
 
   const signalRef = useRef(signal);
   signalRef.current = signal;
 
   useEffect(() => {
-    const unsubscribe = signalRef.current.subscribe(newValue => {
+    const unsubscribe = signalRef.current.subscribe((newValue) => {
       setValue(newValue);
     });
 
@@ -243,12 +240,9 @@ export function useSignal<T>(
     };
   }, [signal, value]);
 
-  const setSignalValue = useCallback(
-    (newValue: T | ((prev: T) => T)) => {
-      signalRef.current.set(newValue);
-    },
-    []
-  );
+  const setSignalValue = useCallback((newValue: T | ((prev: T) => T)) => {
+    signalRef.current.set(newValue);
+  }, []);
 
   return [value, setSignalValue];
 }

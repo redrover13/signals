@@ -6,12 +6,12 @@ export default {
   globals: {
     'ts-jest': {
       useESM: true,
-      tsconfig: '<rootDir>/tsconfig?.spec && .spec.json',
+      tsconfig: '<rootDir>/tsconfig && tsconfig.spec && .spec.json',
     },
   },
   transform: {
     '^.+\\.[tj]s$': ['ts-jest', { 
-      tsconfig: '<rootDir>/tsconfig?.spec && .spec.json',
+      tsconfig: '<rootDir>/tsconfig && tsconfig.spec && .spec.json',
       useESM: true 
     }],
   },

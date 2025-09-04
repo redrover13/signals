@@ -19,17 +19,17 @@ import type { EnhancedSignal } from './angular-signal-adapter.js';
  */
 export default function useSignal<T>(signal: EnhancedSignal<T>): [T, (value: T) => void] {
   const [value, setValue] = useState<T>(signal.get());
-  
+
   useEffect(() => {
     // Subscribe to signal updates
-    const unsubscribe = signal.subscribe(newValue => {
+    const unsubscribe = signal.subscribe((newValue) => {
       setValue(newValue);
     });
-    
+
     // Cleanup subscription
     return unsubscribe;
   }, [signal]);
-  
+
   // Return current value and setter
   return [value, (newValue: T) => signal.set(newValue)];
 }

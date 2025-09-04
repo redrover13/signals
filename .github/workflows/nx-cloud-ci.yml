@@ -69,7 +69,7 @@ jobs:
           EOL
 
       - name: Initialize Nx Cloud run
-        run: pnpm exec nx-cloud start-ci-run
+        run: pnpm exec nx-cloud start-ci-run --distribute-on=5:linux:16:8
 
       - name: Run lint tasks
         run: pnpm exec nx-cloud record -- pnpm exec nx run-many --target=lint --all --parallel=3

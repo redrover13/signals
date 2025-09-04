@@ -53,7 +53,7 @@ export class BQAgent {
     try {
       const options = {
         query: sql,
-        location: this.config && config.location || 'US',
+        location: this.config?.location || 'US',
         params: params || [],
         useLegacySql: false,
       };

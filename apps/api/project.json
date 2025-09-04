@@ -23,6 +23,7 @@
         "assets": [
           { "glob": "**/*", "input": "apps/api/src/routes", "output": "routes" }
         ]
+      },
       "configurations": {
         "production": {
           "optimization": true,

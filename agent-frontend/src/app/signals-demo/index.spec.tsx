@@ -14,13 +14,7 @@ import userEvent from '@testing-library/user-event';
 import { SignalsDemo } from './index';
 
 // Mock the signals library
-// In agent-frontend/jest.config.ts
-moduleNameMapper: {
-  '\\.module\\.css$': 'identity-obj-proxy',
-  '\\.css$': 'identity-obj-proxy',
-  '^@/(.*)$': '<rootDir>/src/$1',
-  '^@dulce/(.*)$': '<rootDir>/../../libs/$1/src/index.ts',
-},
+jest.mock('@dulce/signals', () => {
   let sharedValue = 0;
   let localValue = 'Local Value';
   

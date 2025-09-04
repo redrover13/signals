@@ -16,7 +16,14 @@ export default [
             "prefer-const": "warn",
             
             // No console logs in production code
-            "no-console": ["warn", { allow: ["warn", "error"] }]
+            "no-console": ["warn", { allow: ["warn", "error"] }],
+            
+            // TypeScript specific rules
+            "@typescript-eslint/explicit-module-boundary-types": "warn",
+            "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+            
+            // General code quality rules
+            "no-debugger": "warn"
         },
         
         // Use latest ECMAScript features
@@ -29,29 +36,6 @@ export default [
                     jsx: true
                 }
             }
-        }
-    }
-];
-        rules: {
-            // TypeScript specific rules
-            "@typescript-eslint/no-explicit-any": "warn",
-            "@typescript-eslint/explicit-module-boundary-types": "warn",
-            "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
-            
-            // General code quality rules
-            "no-console": ["warn", { "allow": ["warn", "error"] }],
-            "no-debugger": "warn",
-            "prefer-const": "warn",
-            
-            // Enforce NX module boundaries
-            "@nx/enforce-module-boundaries": [
-                "error",
-                {
-                    "enforceBuildableLibDependency": true,
-                    "allow": [],
-                    "depConstraints": baseConfig.overrides[0].rules["@nx/enforce-module-boundaries"][1].depConstraints
-                }
-            ]
         }
     }
 ];

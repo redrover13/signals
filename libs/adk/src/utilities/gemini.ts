@@ -70,9 +70,10 @@ export function extractGeminiResponseText(response: any): string {
       return response.text;
     }
 
-    // Mock response for testing
-    return 'This is a mock response from Gemini.';
-  } catch (error) {
+    // No recognizable content; avoid fabricating output
+    return process.env.NODE_ENV === 'test'
+      ? 'This is a mock response from Gemini.'
+      : '';
     console.error('Error extracting Gemini response text:', error);
     return '';
   }

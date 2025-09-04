@@ -18,66 +18,66 @@ export const options = {
       duration: '1m',
       tags: { test_type: 'smoke' },
     },
-    
+
     // Load test - average expected load
     load: {
       executor: 'ramping-vus',
       startVUs: 0,
       stages: [
-        { duration: '2m', target: 10 },  // Ramp up
-        { duration: '5m', target: 10 },  // Stay at load
-        { duration: '2m', target: 0 },   // Ramp down
+        { duration: '2m', target: 10 }, // Ramp up
+        { duration: '5m', target: 10 }, // Stay at load
+        { duration: '2m', target: 0 }, // Ramp down
       ],
       tags: { test_type: 'load' },
     },
-    
+
     // Stress test - above normal conditions
     stress: {
       executor: 'ramping-vus',
       startVUs: 0,
       stages: [
-        { duration: '2m', target: 10 },  // Normal load
-        { duration: '5m', target: 20 },  // Stress load
-        { duration: '3m', target: 30 },  // Peak stress
-        { duration: '2m', target: 0 },   // Ramp down
+        { duration: '2m', target: 10 }, // Normal load
+        { duration: '5m', target: 20 }, // Stress load
+        { duration: '3m', target: 30 }, // Peak stress
+        { duration: '2m', target: 0 }, // Ramp down
       ],
       tags: { test_type: 'stress' },
     },
-    
+
     // Spike test - sudden traffic surge
     spike: {
       executor: 'ramping-vus',
       startVUs: 0,
       stages: [
-        { duration: '1m', target: 10 },  // Normal load
+        { duration: '1m', target: 10 }, // Normal load
         { duration: '30s', target: 50 }, // Spike!
-        { duration: '3m', target: 10 },  // Back to normal
-        { duration: '1m', target: 0 },   // Ramp down
+        { duration: '3m', target: 10 }, // Back to normal
+        { duration: '1m', target: 0 }, // Ramp down
       ],
       tags: { test_type: 'spike' },
     },
   },
-  
+
   thresholds: {
     // Overall HTTP request duration thresholds
     http_req_duration: [
-      'p(50)<200',   // 50% of requests under 200ms
-      'p(95)<500',   // 95% of requests under 500ms
-      'p(99)<1000',  // 99% of requests under 1s
+      'p(50)<200', // 50% of requests under 200ms
+      'p(95)<500', // 95% of requests under 500ms
+      'p(99)<1000', // 99% of requests under 1s
     ],
-    
+
     // HTTP request failure rate
     http_req_failed: ['rate<0.05'], // Less than 5% failures
-    
+
     // Custom error rate
     errors: ['rate<0.05'], // Less than 5% custom errors
-    
+
     // API-specific response time
     api_response_time: [
-      'p(95)<300',   // 95% of API calls under 300ms
-      'avg<150',     // Average under 150ms
+      'p(95)<300', // 95% of API calls under 300ms
+      'avg<150', // Average under 150ms
     ],
-    
+
     // Scenario-specific thresholds
     'http_req_duration{test_type:smoke}': ['p(95)<100'],
     'http_req_duration{test_type:load}': ['p(95)<500'],
@@ -100,38 +100,38 @@ const endpoints = [
 function selectEndpoint() {
   const random = Math.random();
   let cumulativeWeight = 0;
-  
+
   for (const endpoint of endpoints) {
     cumulativeWeight += endpoint.weight;
     if (random <= cumulativeWeight / endpoints.length) {
       return endpoint.path;
     }
   }
-  
+
   return endpoints[0].path; // Fallback
 }
 
 // Main test function
-export default function() {
+export default function () {
   const endpoint = selectEndpoint();
   const url = `${BASE_URL}${endpoint}`;
-  
+
   // Add request headers
   const params = {
     headers: {
       'Content-Type': 'application/json',
       'User-Agent': 'k6-load-test/1.0',
-      'Accept': 'application/json',
+      Accept: 'application/json',
     },
     timeout: '30s',
   };
-  
+
   // Make HTTP request
   const response = http.get(url, params);
-  
+
   // Record custom metric
   apiResponseTime.add(response.timings.duration);
-  
+
   // Basic checks
   const checks = check(response, {
     'status is 200 or 404': (r) => r.status === 200 || r.status === 404,
@@ -139,7 +139,7 @@ export default function() {
     'response has body': (r) => r.body && r.body.length > 0,
     'no server errors': (r) => r.status < 500,
   });
-  
+
   // Advanced checks for specific endpoints
   if (endpoint === '/health') {
     const healthChecks = check(response, {
@@ -163,10 +163,10 @@ export default function() {
     });
     errorRate.add(!apiChecks && response.status !== 404);
   }
-  
+
   // Record overall errors
   errorRate.add(!checks);
-  
+
   // Realistic user behavior - pause between requests
   sleep(Math.random() * 2 + 1); // 1-3 seconds
 }
@@ -175,16 +175,16 @@ export default function() {
 export function setup() {
   console.log(`🚀 Starting load test for: ${BASE_URL}`);
   console.log(`📊 Test scenarios: ${Object.keys(options.scenarios).join(', ')}`);
-  
+
   // Warm-up request
   const warmupResponse = http.get(`${BASE_URL}/health`);
-  
+
   if (warmupResponse.status !== 200 && warmupResponse.status !== 404) {
     console.warn(`⚠️ Warmup request failed with status: ${warmupResponse.status}`);
   } else {
     console.log(`✅ Warmup request successful`);
   }
-  
+
   return { baseUrl: BASE_URL };
 }
 
@@ -202,7 +202,7 @@ export function handleSummary(data) {
     metrics: {},
     checks: {},
   };
-  
+
   // Extract scenario results
   for (const [scenarioName, scenarioData] of Object.entries(data.metrics)) {
     if (scenarioName.startsWith('iteration_duration{scenario:')) {
@@ -213,18 +213,18 @@ export function handleSummary(data) {
       };
     }
   }
-  
+
   // Extract key metrics
   const keyMetrics = [
     'http_req_duration',
-    'http_req_failed', 
+    'http_req_failed',
     'http_reqs',
     'vus',
     'vus_max',
     'errors',
-    'api_response_time'
+    'api_response_time',
   ];
-  
+
   for (const metric of keyMetrics) {
     if (data.metrics[metric]) {
       const metricData = data.metrics[metric];
@@ -236,13 +236,13 @@ export function handleSummary(data) {
         p95: metricData.values['p(95)']?.toFixed(2) || 0,
         p99: metricData.values['p(99)']?.toFixed(2) || 0,
       };
-      
+
       if (metricData.values.rate !== undefined) {
         summary.metrics[metric].rate = `${(metricData.values.rate * 100).toFixed(2)}%`;
       }
     }
   }
-  
+
   // Extract check results
   for (const [checkName, checkData] of Object.entries(data.metrics)) {
     if (checkName.startsWith('checks{')) {
@@ -254,12 +254,12 @@ export function handleSummary(data) {
       };
     }
   }
-  
+
   // Generate multiple output formats
   return {
     'load-test-results.json': JSON.stringify(summary, null, 2),
     'load-test-detailed.json': JSON.stringify(data, null, 2),
-    'stdout': `
+    stdout: `
 📊 Load Test Summary
 ===================
 
@@ -272,15 +272,23 @@ export function handleSummary(data) {
 
 🏃 Virtual Users: ${summary.metrics.vus_max?.max || 0} peak
 
-${Object.keys(summary.scenarios).length > 0 ? '📋 Scenarios:\n' + 
-  Object.entries(summary.scenarios)
-    .map(([name, data]) => `  • ${name}: ${data.iterations} iterations`)
-    .join('\n') : ''}
+${
+  Object.keys(summary.scenarios).length > 0
+    ? '📋 Scenarios:\n' +
+      Object.entries(summary.scenarios)
+        .map(([name, data]) => `  • ${name}: ${data.iterations} iterations`)
+        .join('\n')
+    : ''
+}
 
-${Object.keys(summary.checks).length > 0 ? '✅ Checks:\n' + 
-  Object.entries(summary.checks)
-    .map(([name, data]) => `  • ${name}: ${data.rate}`)
-    .join('\n') : ''}
+${
+  Object.keys(summary.checks).length > 0
+    ? '✅ Checks:\n' +
+      Object.entries(summary.checks)
+        .map(([name, data]) => `  • ${name}: ${data.rate}`)
+        .join('\n')
+    : ''
+}
     `,
   };
 }

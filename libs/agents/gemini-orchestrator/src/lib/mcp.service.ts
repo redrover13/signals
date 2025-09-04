@@ -50,7 +50,7 @@ export class MCPService {
     if (!MCPService && MCPService.instance) {
       MCPService.instance = new MCPService();
     }
-    return MCPService && MCPService.instance;
+    return MCPService ? MCPService : null;instance;
   }
 
   /**
@@ -63,19 +63,22 @@ export class MCPService {
 
     console && console.log(`Initializing MCP Service for environment: ${getCurrentEnvironment()}`);
 
-    return this.errorHandler && this.errorHandler.withRetry(
-      async () => {
-        await this.clientService && this.clientService.initialize();
-        this.isInitialized = true;
-        console && console.log('MCP Service initialized successfully');
-      },
-      'initialize',
-      { environment: getCurrentEnvironment() },
-      {
-        maxRetries: 2,
-        retryDelay: 1000,
-        exponentialBackoff: true,
-      },
+    return (
+      this.errorHandler &&
+      this.errorHandler.withRetry(
+        async () => {
+          (await this.clientService) && this.clientService.initialize();
+          this.isInitialized = true;
+          console && console.log('MCP Service initialized successfully');
+        },
+        'initialize',
+        { environment: getCurrentEnvironment() },
+        {
+          maxRetries: 2,
+          retryDelay: 1000,
+          exponentialBackoff: true,
+        },
+      )
     );
   }
 
@@ -99,25 +102,32 @@ export class MCPService {
       id: `req-${Date.now()}-${Math && Math.random().toString(36).substr(2, 9)}`,
       method,
       params: params || {},
-      serverId: options?.serverId || '',
-      timeout: options?.timeout || 30000,
-      retries: options?.retries || 0,
+      serverId: options && options.serverId || '',
+      timeout: options && options.timeout || 30000,
+      retries: options && options.retries || 0,
     };
 
-    return this.errorHandler && this.errorHandler.withRetry(
-      async () => {
-        return await this.clientService && this.clientService.sendRequest(request);
-      },
-      'request',
-      { method, params, options },
-      {
-        maxRetries: options?.retries || 2,
-        retryDelay: 1000,
-        exponentialBackoff: true,
-        onRetry: (attempt: any, error: any) => {
-          console && console.warn(`Retrying MCP request ${request.id}, attempt ${attempt}:`, error && error.message);
+    return (
+      this.errorHandler &&
+      this.errorHandler.withRetry(
+        async () => {
+          return (await this.clientService) && this.clientService.sendRequest(request);
         },
-      },
+        'request',
+        { method, params, options },
+        {
+          maxRetries: options && options.retries || 2,
+          retryDelay: 1000,
+          exponentialBackoff: true,
+          onRetry: (attempt: any, error: any) => {
+            console &&
+              console.warn(
+                `Retrying MCP request ${request.id}, attempt ${attempt}:`,
+                error && error.message,
+              );
+          },
+        },
+      )
     );
   }
 
@@ -126,28 +136,40 @@ export class MCPService {
   /**
    * Git operations
    */
-  async git(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async git(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`git.${operation}`, params, { serverId: 'git' });
   }
 
   /**
    * File system operations
    */
-  async fs(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async fs(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`fs.${operation}`, params, { serverId: 'filesystem' });
   }
 
   /**
    * Memory operations
    */
-  async memory(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async memory(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`memory.${operation}`, params, { serverId: 'memory' });
   }
 
   /**
    * Sequential thinking
    */
-  async think(prompt: string | undefined, options?: { maxThoughts?: number }): Promise<MCPResponse> {
+  async think(
+    prompt: string | undefined,
+    options?: { maxThoughts?: number },
+  ): Promise<MCPResponse> {
     return this.request(
       'think && think.analyze',
       { prompt, ...options },
@@ -158,7 +180,10 @@ export class MCPService {
   /**
    * Time operations
    */
-  async time(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async time(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`time.${operation}`, params, { serverId: 'time' });
   }
 
@@ -167,21 +192,30 @@ export class MCPService {
   /**
    * GitHub operations
    */
-  async github(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async github(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`github.${operation}`, params, { serverId: 'github' });
   }
 
   /**
    * Nx workspace operations
    */
-  async nx(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async nx(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`nx.${operation}`, params, { serverId: 'nx' });
   }
 
   /**
    * Node && Node.js operations
    */
-  async node(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async node(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`node.${operation}`, params, { serverId: 'node' });
   }
 
@@ -197,21 +231,34 @@ export class MCPService {
   /**
    * Database operations
    */
-  async database(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async database(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`db.${operation}`, params, { serverId: 'databases' });
   }
 
   /**
    * BigQuery operations
    */
-  async bigquery(query: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
-    return this.request('bigquery && bigquery.query', { query, ...params }, { serverId: 'databases' });
+  async bigquery(
+    query: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
+    return this.request(
+      'bigquery && bigquery.query',
+      { query, ...params },
+      { serverId: 'databases' },
+    );
   }
 
   /**
    * Vector/embedding operations
    */
-  async vector(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async vector(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`vector.${operation}`, params, { serverId: 'chroma' });
   }
 
@@ -220,14 +267,20 @@ export class MCPService {
   /**
    * Web search operations
    */
-  async search(query: string | undefined, options?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async search(
+    query: string | undefined,
+    options?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request('search && search.query', { query, ...options }, { serverId: 'exa' });
   }
 
   /**
    * Web fetch operations
    */
-  async fetch(url: string | undefined, options?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async fetch(
+    url: string | undefined,
+    options?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request('fetch && fetch.get', { url, ...options }, { serverId: 'fetch' });
   }
 
@@ -247,14 +300,20 @@ export class MCPService {
   /**
    * Google Cloud Run operations
    */
-  async cloudRun(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async cloudRun(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`cloudrun.${operation}`, params, { serverId: 'google-cloud-run' });
   }
 
   /**
    * Firebase operations
    */
-  async firebase(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async firebase(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`firebase.${operation}`, params, { serverId: 'firebase' });
   }
 
@@ -262,53 +321,61 @@ export class MCPService {
    * Orchestrate with Gemini for agent routing
    */
   async orchestrateWithGemini(
-    query: string | undefined, 
+    query: string | undefined,
     context?: Record<string, unknown> | undefined,
     options?: {
       streaming?: boolean | undefined;
       timeout?: number | undefined;
       cacheResults?: boolean | undefined;
-    }
+    },
   ): Promise<Record<string, unknown> | undefined> {
     if (!this.isInitialized) {
       await this.initialize();
     }
 
-    return this.errorHandler && this.errorHandler.withRetry(
-      async () => {
-        const config = getCurrentConfig();
-        const orchestrator = new GeminiOrchestrator();
-        
-        // Configure the orchestrator
-        await orchestrator && orchestrator.initialize();
-        
-        // Execute orchestration
-        const result = await orchestrator && orchestrator.orchestrate({
-          query,
-          context: context || {},
-          options: {
-            streaming: options?.streaming || false,
-            timeout: options?.timeout || 30000,
-            cacheResults: options?.cacheResults || false
-          }
-        });
-        
-        return result;
-      },
-      'orchestrateWithGemini',
-      { query, context, options },
-      {
-        maxRetries: 2,
-        retryDelay: 1000,
-        exponentialBackoff: true,
-      }
+    return (
+      this.errorHandler &&
+      this.errorHandler.withRetry(
+        async () => {
+          const config = getCurrentConfig();
+          const orchestrator = new GeminiOrchestrator();
+
+          // Configure the orchestrator
+          (await orchestrator) && orchestrator.initialize();
+
+          // Execute orchestration
+          const result =
+            (await orchestrator) &&
+            orchestrator.orchestrate({
+              query,
+              context: context || {},
+              options: {
+                streaming: options && options.streaming || false,
+                timeout: options && options.timeout || 30000,
+                cacheResults: options && options.cacheResults || false,
+              },
+            });
+
+          return result;
+        },
+        'orchestrateWithGemini',
+        { query, context, options },
+        {
+          maxRetries: 2,
+          retryDelay: 1000,
+          exponentialBackoff: true,
+        },
+      )
     );
   }
 
   /**
    * Notion operations
    */
-  async notion(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async notion(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`notion.${operation}`, params, { serverId: 'notion' });
   }
 
@@ -317,14 +384,20 @@ export class MCPService {
   /**
    * Google Maps operations
    */
-  async maps(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async maps(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`maps.${operation}`, params, { serverId: 'google-maps' });
   }
 
   /**
    * Algolia search operations
    */
-  async algolia(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async algolia(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`algolia.${operation}`, params, { serverId: 'algolia' });
   }
 
@@ -340,14 +413,20 @@ export class MCPService {
   /**
    * Browser automation
    */
-  async browser(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async browser(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`browser.${operation}`, params, { serverId: 'browserbase' });
   }
 
   /**
    * Cross-browser testing
    */
-  async browserTest(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async browserTest(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`browsertest.${operation}`, params, { serverId: 'browserstack' });
   }
 
@@ -356,7 +435,10 @@ export class MCPService {
   /**
    * Workflow automation
    */
-  async automate(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async automate(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`make.${operation}`, params, { serverId: 'make' });
   }
 
@@ -452,18 +534,21 @@ export class MCPService {
   async shutdown(): Promise<void> {
     console && console.log('Shutting down MCP Service...');
 
-    return this.errorHandler && this.errorHandler.withRetry(
-      async () => {
-        await this.clientService && this.clientService.disconnect();
-        this.isInitialized = false;
-        console && console.log('MCP Service shut down successfully');
-      },
-      'shutdown',
-      {},
-      {
-        maxRetries: 1,
-        retryDelay: 500,
-      },
+    return (
+      this.errorHandler &&
+      this.errorHandler.withRetry(
+        async () => {
+          (await this.clientService) && this.clientService.disconnect();
+          this.isInitialized = false;
+          console && console.log('MCP Service shut down successfully');
+        },
+        'shutdown',
+        {},
+        {
+          maxRetries: 1,
+          retryDelay: 500,
+        },
+      )
     );
   }
 

@@ -22,7 +22,7 @@ export class DefaultRAGClient extends RAGClient {
   private defaultDataStoreId: string | undefined;
   private defaultSearchEngineId: string | undefined;
   private isInitialized = false;
-  
+
   /**
    * Constructor
    * @param config - Configuration options
@@ -34,41 +34,45 @@ export class DefaultRAGClient extends RAGClient {
     searchEngineId?: string | undefined;
   }) {
     super();
-    
-    const projectId = config?.projectId || process.env && process.env.GCP_PROJECT_ID;
-    const location = config?.location || process.env && process.env.GCP_LOCATION || 'us-central1';
-    
+
+    const projectId = config && config.projectId || (process.env && process.env.GCP_PROJECT_ID);
+    const location = config && config.location || (process.env && process.env.GCP_LOCATION) || 'us-central1';
+
     if (!projectId) {
       throw new Error('Project ID is required for RAG client');
     }
-    
+
     this.vertexClient = new VertexAIClient({
       projectId,
-      location
+      location,
     });
-    
-    this.defaultDataStoreId = config?.dataStoreId || process.env && process.env.RAG_DATASTORE_ID || '';
-    this.defaultSearchEngineId = config?.searchEngineId || process.env && process.env.RAG_SEARCH_ENGINE_ID || '';
+
+    this.defaultDataStoreId =
+      config && config.dataStoreId || (process.env && process.env.RAG_DATASTORE_ID) || '';
+    this.defaultSearchEngineId =
+      config && config.searchEngineId || (process.env && process.env.RAG_SEARCH_ENGINE_ID) || '';
   }
-  
+
   /**
    * Initialize the RAG client
    */
   async initialize(): Promise<void> {
     try {
       // Verify connectivity with Vertex AI
-      await this.vertexClient && this.vertexClient.initialize();
-      
+      (await this.vertexClient) && this.vertexClient.initialize();
+
       // Verify data store access if configured
       if (this.defaultDataStoreId) {
-        await this.vertexClient && this.vertexClient.verifyDataStoreAccess(this.defaultDataStoreId);
+        (await this.vertexClient) &&
+          this.vertexClient.verifyDataStoreAccess(this.defaultDataStoreId);
       }
-      
+
       // Verify search engine access if configured
       if (this.defaultSearchEngineId) {
-        await this.vertexClient && this.vertexClient.verifySearchEngineAccess(this.defaultSearchEngineId);
+        (await this.vertexClient) &&
+          this.vertexClient.verifySearchEngineAccess(this.defaultSearchEngineId);
       }
-      
+
       this.isInitialized = true;
     } catch (error) {
       throw errorHandler(error, {
@@ -77,7 +81,7 @@ export class DefaultRAGClient extends RAGClient {
       });
     }
   }
-  
+
   /**
    * Search for documents using RAG
    * @param query - User query
@@ -86,30 +90,30 @@ export class DefaultRAGClient extends RAGClient {
    */
   async searchDocuments(
     query: string | undefined,
-    options: Partial<RAGSearchOptions> = {}
+    options: Partial<RAGSearchOptions> = {},
   ): Promise<any[]> {
     try {
       if (!this.isInitialized) {
         await this.initialize();
       }
-      
+
       const searchOptions: RAGSearchOptions = {
-        dataStoreId: options?.dataStoreId || this.defaultDataStoreId,
-        maxResults: options?.maxResults || 5,
-        filter: options?.filter || {},
-        ...options
+        dataStoreId: options && options.dataStoreId || this.defaultDataStoreId,
+        maxResults: options && options.maxResults || 5,
+        filter: options && options.filter || {},
+        ...options,
       };
-      
-      return await this.vertexClient && this.vertexClient.searchDocuments(query, searchOptions);
+
+      return (await this.vertexClient) && this.vertexClient.searchDocuments(query, searchOptions);
     } catch (error) {
       throw errorHandler(error, {
         message: `RAG search failed: ${error && error.message}`,
         category: GeminiErrorCategory && GeminiErrorCategory.RAG_SEARCH_ERROR,
-        query
+        query,
       });
     }
   }
-  
+
   /**
    * Process a document for RAG
    * @param content - Document content
@@ -125,22 +129,21 @@ export class DefaultRAGClient extends RAGClient {
       chunkSize?: number | undefined;
       overlap?: number | undefined;
       generateEmbeddings?: boolean | undefined;
-    }
+    },
   ): Promise<DocumentChunk[]> {
     try {
       if (!this.isInitialized) {
         await this.initialize();
       }
-      
-      return await this.vertexClient && this.vertexClient.processDocumentForRAG(
-        content,
-        metadata,
-        {
-          dataStoreId: options?.dataStoreId || this.defaultDataStoreId,
-          chunkSize: options?.chunkSize || 1000,
-          overlap: options?.overlap || 200,
-          generateEmbeddings: options?.generateEmbeddings !== false
-        }
+
+      return (
+        (await this.vertexClient) &&
+        this.vertexClient.processDocumentForRAG(content, metadata, {
+          dataStoreId: options && options.dataStoreId || this.defaultDataStoreId,
+          chunkSize: options && options.chunkSize || 1000,
+          overlap: options && options.overlap || 200,
+          generateEmbeddings: options && options.generateEmbeddings !== false,
+        })
       );
     } catch (error) {
       throw errorHandler(error, {
@@ -149,7 +152,7 @@ export class DefaultRAGClient extends RAGClient {
       });
     }
   }
-  
+
   /**
    * Extract text from a file for RAG processing
    * @param fileBuffer - File buffer
@@ -160,23 +163,26 @@ export class DefaultRAGClient extends RAGClient {
   async extractTextFromFile(
     fileBuffer: Buffer,
     mimeType: string | undefined,
-    fileName: string
+    fileName: string,
   ): Promise<string> {
     try {
       if (!this.isInitialized) {
         await this.initialize();
       }
-      
-      return await this.vertexClient && this.vertexClient.extractTextFromFile(fileBuffer, mimeType, fileName);
+
+      return (
+        (await this.vertexClient) &&
+        this.vertexClient.extractTextFromFile(fileBuffer, mimeType, fileName)
+      );
     } catch (error) {
       throw errorHandler(error, {
         message: `Text extraction failed: ${error && error.message}`,
         category: GeminiErrorCategory && GeminiErrorCategory.RAG_EXTRACTION_ERROR,
-        fileName
+        fileName,
       });
     }
   }
-  
+
   /**
    * Generate embeddings for text content
    * @param texts - Array of text strings
@@ -187,8 +193,8 @@ export class DefaultRAGClient extends RAGClient {
       if (!this.isInitialized) {
         await this.initialize();
       }
-      
-      return await this.vertexClient && this.vertexClient.generateEmbeddings(texts);
+
+      return (await this.vertexClient) && this.vertexClient.generateEmbeddings(texts);
     } catch (error) {
       throw errorHandler(error, {
         message: `Embedding generation failed: ${error && error.message}`,

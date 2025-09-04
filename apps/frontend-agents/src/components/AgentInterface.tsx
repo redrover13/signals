@@ -51,7 +51,7 @@ export default function AgentInterface({ agentId, isFederated = false }: AgentIn
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
@@ -78,7 +78,7 @@ export default function AgentInterface({ agentId, isFederated = false }: AgentIn
         timestamp: new Date(),
       };
 
-      setMessages(prev => [...prev, agentMessage]);
+      setMessages((prev) => [...prev, agentMessage]);
     } catch (error) {
       console.error('Error calling agent:', error);
       const errorMessage: Message = {
@@ -87,7 +87,7 @@ export default function AgentInterface({ agentId, isFederated = false }: AgentIn
         content: `Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
         timestamp: new Date(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -111,22 +111,22 @@ export default function AgentInterface({ agentId, isFederated = false }: AgentIn
             <p className="text-sm mt-2">Type your message below</p>
           </div>
         ) : (
-          messages.map(message => (
+          messages.map((message) => (
             <div
               key={message.id}
               className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
                 className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                  message.type === 'user'
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-900'
+                  message.type === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-900'
                 }`}
               >
                 <p>{message.content}</p>
-                <p className={`text-xs mt-1 ${
-                  message.type === 'user' ? 'text-blue-100' : 'text-gray-500'
-                }`}>
+                <p
+                  className={`text-xs mt-1 ${
+                    message.type === 'user' ? 'text-blue-100' : 'text-gray-500'
+                  }`}
+                >
                   {message.timestamp.toLocaleTimeString()}
                 </p>
               </div>

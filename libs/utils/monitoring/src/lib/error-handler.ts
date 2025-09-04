@@ -21,14 +21,14 @@ export enum ErrorCategory {
   PERMISSIONS = 'permissions',
   RESOURCE_NOT_FOUND = 'resource_not_found',
   TIMEOUT = 'timeout',
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
 }
 
 export enum ErrorSeverity {
   CRITICAL = 'critical',
   ERROR = 'error',
   WARNING = 'warning',
-  INFO = 'info'
+  INFO = 'info',
 }
 
 export interface ErrorOptions {
@@ -56,7 +56,7 @@ function isRetryableError(category: ErrorCategory): boolean {
     ErrorCategory.DATABASE,
     ErrorCategory.NETWORK,
     ErrorCategory.EXTERNAL_SERVICE,
-    ErrorCategory.TIMEOUT
+    ErrorCategory.TIMEOUT,
   ].includes(category);
 }
 
@@ -75,10 +75,7 @@ function getLogLevel(severity: ErrorSeverity): string {
   }
 }
 
-export function createError(
-  message: string,
-  options: ErrorOptions = {}
-): AppError {
+export function createError(message: string, options: ErrorOptions = {}): AppError {
   const {
     category = ErrorCategory.UNKNOWN,
     severity = ErrorSeverity.ERROR,
@@ -86,18 +83,18 @@ export function createError(
     originalError,
     retryable = isRetryableError(category),
     retryDelay,
-    userMessage = 'An error occurred. Please try again later.'
+    userMessage = 'An error occurred. Please try again later.',
   } = options;
 
   const error = new Error(message) as AppError;
   error.name = 'AppError';
-  
+
   if (error) {
     error.category = category;
     error.severity = severity;
     error.context = {
       ...context,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
     error.originalError = originalError;
     error.retryable = isRetryableError(category);
@@ -109,12 +106,12 @@ export function createError(
 
 export function logError(error: AppError, logger?: BigQueryLogger): void {
   const logLevel = getLogLevel(error.severity || 'error');
-  
+
   // Log to console
   console[logLevel](`[${error.category}] ${error.message}`, {
     severity: error.severity,
     context: error.context,
-    stack: error.stack
+    stack: error.stack,
   });
 
   // Log to BigQuery if logger provided
@@ -125,14 +122,14 @@ export function logError(error: AppError, logger?: BigQueryLogger): void {
       category: error.category,
       context: error.context,
       stack: error.stack,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 }
 
 export function handleError(error: AppError, logger?: BigQueryLogger): void {
   logError(error, logger);
-  
+
   // Add additional error handling logic here
   // For example, sending to error monitoring service
 }

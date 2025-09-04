@@ -2,8 +2,7 @@
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/8cae070168cf488db82478ba6505a005)](https://app.codacy.com/gh/codacy/codacy-cli-v2/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade) [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/8cae070168cf488db82478ba6505a005)](https://app.codacy.com/gh/codacy/codacy-cli-v2/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
 
-
-Codacy CLI (version 2) is a command-line tool for running code analysis and integrating with Codacy. If your repository exists in Codacy, you can sync your configuration to ensure consistency with your organization's standards. 
+Codacy CLI (version 2) is a command-line tool for running code analysis and integrating with Codacy. If your repository exists in Codacy, you can sync your configuration to ensure consistency with your organization's standards.
 
 You can also use Codacy CLI for local code analysis without a Codacy account, leveraging the linter configuration files found in your project's root or Codacy's suggested defaults.
 
@@ -66,6 +65,7 @@ Bootstraps the CLI configuration in your project's folder. This command creates 
   ```
 
 **Flags:**
+
 - `--api-token` (string): Codacy API token (optional; enables fetching remote config)
 - `--provider` (string): Provider (`gh`, `gl`, `bb`), required with `--api-token`
 - `--organization` (string): Organization name, required with `--api-token`
@@ -84,6 +84,7 @@ codacy-cli config reset --api-token <token> --provider <gh|gl|bb> --organization
 ```
 
 **Behavior:**
+
 - **Local mode**: Creates default configurations for all available tools
 - **Remote mode**: Fetches and applies repository-specific configurations from Codacy
 - Prevents accidental mode switching (remote to local requires explicit flags)
@@ -105,6 +106,7 @@ codacy-cli config discover /path/to/project
 ```
 
 **Features:**
+
 - Automatically detects file extensions and maps them to programming languages
 - Updates `.codacy/tools-configs/languages-config.yaml` with discovered languages
 - Enables relevant tools in `codacy.yaml` based on detected languages
@@ -114,6 +116,7 @@ codacy-cli config discover /path/to/project
 ### `install` — Install Runtimes and Tools
 
 Installs all runtimes and tools specified in `.codacy/codacy.yaml`:
+
 - Downloads and extracts runtimes (Node, Python, Dart, Java, etc.)
 - Installs tools (ESLint, Trivy, Pylint, PMD, etc.) using the correct package manager or direct download
 - Handles platform-specific details
@@ -123,6 +126,7 @@ Installs all runtimes and tools specified in `.codacy/codacy.yaml`:
 ```bash
 codacy-cli install
 ```
+
 - Optionally specify a custom registry:
   ```bash
   codacy-cli install --registry <url>
@@ -153,6 +157,7 @@ codacy-cli analyze --tool eslint path/to/file.js
 ```
 
 **Flags:**
+
 - `--output, -o`: Output file for the results; if not provided, results will be printed to the console
 - `--tool, -t`: Tool to run analysis with (e.g., eslint)
 - `--format`: Output format (e.g., `sarif`)
@@ -171,6 +176,7 @@ codacy-cli upload -s path/to/your.sarif -c <commit-uuid> -a <api-token> -p <prov
 ```
 
 **Flags:**
+
 - `--sarif-path, -s`: Path to the SARIF report (required)
 - `--commit-uuid, -c`: Commit UUID
 - `--project-token, -t`: Project token for Codacy API
@@ -231,6 +237,7 @@ codacy-cli upload -s eslint.sarif -c <commit-uuid> -t <project-token>
 ## Troubleshooting
 
 ### WSL (Windows Subsystem for Linux)
+
 - **Always use a WSL terminal** (e.g., Ubuntu on Windows) for all commands.
 - Ensure you have the latest version of WSL and a supported Linux distribution installed.
 - If you see errors related to missing Linux tools (e.g., `curl`, `tar`), install them using your WSL package manager (e.g., `sudo apt install curl tar`).

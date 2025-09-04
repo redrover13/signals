@@ -19,7 +19,7 @@ const messageSignal = createComputed(() => `Hello, ${nameSignal()} (${counterSig
 // Counter component using signals
 export function CounterDemo() {
   const [count, setCount] = useSignal(counterSignal);
-  
+
   return (
     <div className="counter-demo">
       <h2>Counter Demo</h2>
@@ -33,14 +33,14 @@ export function CounterDemo() {
 // Name input component using signals
 export function NameDemo() {
   const [name, setName] = useSignal(nameSignal);
-  
+
   return (
     <div className="name-demo">
       <h2>Name Demo</h2>
-      <input 
-        type="text" 
-        value={name} 
-        onChange={(e) => setName(e.target.value)} 
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
         placeholder="Enter your name"
       />
     </div>
@@ -50,7 +50,7 @@ export function NameDemo() {
 // Message component using derived signal
 export function MessageDemo() {
   const [message] = useSignal(messageSignal);
-  
+
   return (
     <div className="message-demo">
       <h2>Message Demo</h2>

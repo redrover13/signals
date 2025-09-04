@@ -24,9 +24,5 @@
       "path": "../../agents/gemini-orchestrator/tsconfig.lib.json"
     }
   ],
-  "exclude": [
-    "node_modules",
-    "tmp",
-    "dist"
-  ]
+  "exclude": ["node_modules", "tmp", "dist"]
 }

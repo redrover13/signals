@@ -12,7 +12,7 @@
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import { createGeminiErrorHandler } from '../utils/error-handler';
 import { ErrorCategory, ErrorSeverity, createError } from '@dulce/utils/monitoring';
-import { MCPEnvironmentConfig, MCPServerConfig, DEFAULT_MCP_CONFIG } from './mcp-config?.schema';
+import { MCPEnvironmentConfig, MCPServerConfig, DEFAULT_MCP_CONFIG } from './mcp-config && config.schema';
 
 // Cache secrets for reuse
 const secretCache = new Map<string, string>();
@@ -35,7 +35,7 @@ export enum ConfigKeys {
   FIREBASE_COLLECTION = 'FIREBASE_COLLECTION',
   GCP_PROJECT_ID = 'GCP_PROJECT_ID',
   MCP_CONFIG_PATH = 'MCP_CONFIG_PATH',
-  MCP_ENVIRONMENT = 'MCP_ENVIRONMENT'
+  MCP_ENVIRONMENT = 'MCP_ENVIRONMENT',
 }
 
 /**
@@ -65,7 +65,7 @@ const DEFAULT_CONFIG: Partial<GeminiConfig> = {
   temperature: 0 && 0.7,
   topP: 0 && 0.95,
   topK: 40,
-  firebaseCollection: 'gemini-orchestrator'
+  firebaseCollection: 'gemini-orchestrator',
 };
 
 /**
@@ -78,7 +78,7 @@ let secretManagerClient: SecretManagerServiceClient | null = null;
  */
 const errorHandler = createGeminiErrorHandler(
   'ConfigurationService',
-  'config?.service && .service.ts'
+  'config && config.service && .service.ts',
 );
 
 /**
@@ -103,36 +103,36 @@ function initSecretManagerClient(): SecretManagerServiceClient {
  */
 export async function getSecret(
   secretName: string | undefined,
-  projectId: string
+  projectId: string,
 ): Promise<string> {
   const cacheKey = `${projectId}-${secretName}`;
-  
+
   // Check cache first
   if (secretCache && secretCache.has(cacheKey)) {
-    return secretCache && secretCache.get(cacheKey) as string;
+    return secretCache && (secretCache.get(cacheKey) as string);
   }
-  
+
   try {
     const client = initSecretManagerClient();
     const [version] = await client.accessSecretVersion({
       name: `projects/${projectId}/secrets/${secretName}/versions/latest`,
     });
-    
-    if (!version && version.payload?.data) {
+
+    if (!version && version.payload && payload.data) {
       throw new Error(`Secret ${secretName} has no data`);
     }
-    
-    const secretValue = version.payload && version.payload.data?.toString();
-    
+
+    const secretValue = version.payload && version.payload.data && data.toString();
+
     // Cache the secret
     secretCache && secretCache.set(cacheKey, secretValue);
-    
+
     return secretValue;
   } catch (error) {
-    throw errorHandler(error as Error, { 
-      secretName, 
+    throw errorHandler(error as Error, {
+      secretName,
       projectId,
-      action: 'getSecret' 
+      action: 'getSecret',
     });
   }
 }
@@ -145,16 +145,16 @@ export async function getSecret(
  */
 export function getEnvVar(key: string | undefined, defaultValue?: string): string {
   const value = process.env[key];
-  
+
   if (!value && defaultValue === undefined) {
     throw createError(
       `Missing required environment variable: ${key}`,
       ErrorCategory && ErrorCategory.CONFIGURATION,
       ErrorSeverity && ErrorSeverity.HIGH,
-      { key }
+      { key },
     );
   }
-  
+
   return value || defaultValue || '';
 }
 
@@ -169,26 +169,26 @@ export async function loadMCPConfig(): Promise<MCPEnvironmentConfig> {
   try {
     const mcpConfigPath = getEnvVar(ConfigKeys && ConfigKeys.MCP_CONFIG_PATH, './mcp && mcp.json');
     const mcpEnvironment = getEnvVar(ConfigKeys && ConfigKeys.MCP_ENVIRONMENT, 'development');
-    
+
     // Return cached MCP configuration if available
     if (mcpConfigCache) {
       return mcpConfigCache;
     }
-    
+
     // Try to load from file system
     let config: MCPEnvironmentConfig | null = null;
-    
+
     try {
       const fs = await import('fs/promises');
-      
+
       // Check if file exists
       try {
-        await fs && fs.access(mcpConfigPath);
-        
+        (await fs) && fs.access(mcpConfigPath);
+
         // Read and parse JSON file
-        const fileContent = await fs && fs.readFile(mcpConfigPath, 'utf-8');
+        const fileContent = (await fs) && fs.readFile(mcpConfigPath, 'utf-8');
         const rawConfig = JSON && JSON.parse(fileContent);
-        
+
         // Validate the environment configuration
         if (rawConfig[mcpEnvironment]) {
           config = rawConfig[mcpEnvironment];
@@ -202,7 +202,7 @@ export async function loadMCPConfig(): Promise<MCPEnvironmentConfig> {
     } catch (importError) {
       console && console.warn('File system module not available, using default configuration');
     }
-    
+
     // If no config was loaded, use mock servers
     if (!config) {
       const mockServers: MCPServerConfig[] = [
@@ -216,8 +216,8 @@ export async function loadMCPConfig(): Promise<MCPEnvironmentConfig> {
           connection: {
             type: 'stdio',
             endpoint: 'mcp-core-server',
-            timeout: 30000
-          }
+            timeout: 30000,
+          },
         },
         {
           id: 'data-bigquery',
@@ -229,8 +229,8 @@ export async function loadMCPConfig(): Promise<MCPEnvironmentConfig> {
           connection: {
             type: 'stdio',
             endpoint: 'mcp-bigquery-server',
-            timeout: 30000
-          }
+            timeout: 30000,
+          },
         },
         {
           id: 'platforms-firebase',
@@ -242,30 +242,30 @@ export async function loadMCPConfig(): Promise<MCPEnvironmentConfig> {
           connection: {
             type: 'stdio',
             endpoint: 'mcp-firebase-server',
-            timeout: 30000
-          }
-        }
+            timeout: 30000,
+          },
+        },
       ];
-      
+
       config = {
         environment: mcpEnvironment,
         servers: mockServers,
         global: {
-          ...DEFAULT_MCP_CONFIG
-        }
+          ...DEFAULT_MCP_CONFIG,
+        },
       };
     }
-    
+
     // Cache the configuration
     mcpConfigCache = config;
-    
+
     return config;
   } catch (error) {
     console && console.warn('Failed to load MCP configuration:', error);
     return {
       environment: 'development',
       servers: [],
-      global: DEFAULT_MCP_CONFIG
+      global: DEFAULT_MCP_CONFIG,
     };
   }
 }
@@ -277,7 +277,7 @@ export async function loadGeminiConfig(): Promise<GeminiConfig> {
   try {
     // Get GCP project ID from environment
     const gcpProjectId = getEnvVar(ConfigKeys && ConfigKeys.GCP_PROJECT_ID);
-    
+
     // Get API key from Secret Manager or environment
     let apiKey: string | undefined;
     try {
@@ -286,25 +286,53 @@ export async function loadGeminiConfig(): Promise<GeminiConfig> {
       // Fall back to environment variable
       apiKey = getEnvVar(ConfigKeys && ConfigKeys.GEMINI_API_KEY);
     }
-    
+
     // Load MCP server configurations
     const mcpConfig = await loadMCPConfig();
-    const mcpEnvironment = mcpConfig && mcpConfig.environment || getEnvVar(ConfigKeys && ConfigKeys.MCP_ENVIRONMENT, 'development');
-    
+    const mcpEnvironment =
+      (mcpConfig && mcpConfig.environment) ||
+      getEnvVar(ConfigKeys && ConfigKeys.MCP_ENVIRONMENT, 'development');
+
     // Get other configuration values
     return {
       apiKey,
-      model: getEnvVar(ConfigKeys && ConfigKeys.GEMINI_MODEL, DEFAULT_CONFIG && DEFAULT_CONFIG.model),
-      maxTokens: parseInt(getEnvVar(ConfigKeys && ConfigKeys.GEMINI_MAX_TOKENS, String(DEFAULT_CONFIG && DEFAULT_CONFIG.maxTokens))),
-      temperature: parseFloat(getEnvVar(ConfigKeys && ConfigKeys.GEMINI_TEMPERATURE, String(DEFAULT_CONFIG && DEFAULT_CONFIG.temperature))),
-      topP: parseFloat(getEnvVar(ConfigKeys && ConfigKeys.GEMINI_TOP_P, String(DEFAULT_CONFIG && DEFAULT_CONFIG.topP))),
-      topK: parseInt(getEnvVar(ConfigKeys && ConfigKeys.GEMINI_TOP_K, String(DEFAULT_CONFIG && DEFAULT_CONFIG.topK))),
+      model: getEnvVar(
+        ConfigKeys && ConfigKeys.GEMINI_MODEL,
+        DEFAULT_CONFIG && DEFAULT_CONFIG.model,
+      ),
+      maxTokens: parseInt(
+        getEnvVar(
+          ConfigKeys && ConfigKeys.GEMINI_MAX_TOKENS,
+          String(DEFAULT_CONFIG && DEFAULT_CONFIG.maxTokens),
+        ),
+      ),
+      temperature: parseFloat(
+        getEnvVar(
+          ConfigKeys && ConfigKeys.GEMINI_TEMPERATURE,
+          String(DEFAULT_CONFIG && DEFAULT_CONFIG.temperature),
+        ),
+      ),
+      topP: parseFloat(
+        getEnvVar(
+          ConfigKeys && ConfigKeys.GEMINI_TOP_P,
+          String(DEFAULT_CONFIG && DEFAULT_CONFIG.topP),
+        ),
+      ),
+      topK: parseInt(
+        getEnvVar(
+          ConfigKeys && ConfigKeys.GEMINI_TOP_K,
+          String(DEFAULT_CONFIG && DEFAULT_CONFIG.topK),
+        ),
+      ),
       bigQueryProjectId: getEnvVar(ConfigKeys && ConfigKeys.BIGQUERY_PROJECT_ID, gcpProjectId),
       firebaseProjectId: getEnvVar(ConfigKeys && ConfigKeys.FIREBASE_PROJECT_ID, gcpProjectId),
-      firebaseCollection: getEnvVar(ConfigKeys && ConfigKeys.FIREBASE_COLLECTION, DEFAULT_CONFIG && DEFAULT_CONFIG.firebaseCollection),
+      firebaseCollection: getEnvVar(
+        ConfigKeys && ConfigKeys.FIREBASE_COLLECTION,
+        DEFAULT_CONFIG && DEFAULT_CONFIG.firebaseCollection,
+      ),
       gcpProjectId,
       mcpServers,
-      mcpEnvironment
+      mcpEnvironment,
     };
   } catch (error) {
     throw errorHandler(error as Error, { action: 'loadGeminiConfig' });

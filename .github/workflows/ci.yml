@@ -18,7 +18,7 @@ jobs:
   build-test-lint:
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: ""
+      STORE_PATH: ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -134,7 +134,7 @@ jobs:
   terraform-plan:
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: ""
+      STORE_PATH: ''
     needs: build-test-lint
     environment: development
     steps:
@@ -184,7 +184,7 @@ jobs:
   terraform-apply:
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: ""
+      STORE_PATH: ''
     needs: terraform-plan
     environment: production
     if: github.ref == 'refs/heads/main' # Only apply to main branch
@@ -224,7 +224,7 @@ jobs:
   deploy-cloud-functions:
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: ""
+      STORE_PATH: ''
     needs: terraform-apply
     environment: production
     if: github.ref == 'refs/heads/main' # Only deploy to main branch
@@ -308,7 +308,7 @@ jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: ""
+      STORE_PATH: ''
     needs: deploy-cloud-functions
     environment: production
     if: github.ref == 'refs/heads/main' # Only deploy to main branch
@@ -380,7 +380,7 @@ jobs:
   deploy-agents:
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: ""
+      STORE_PATH: ''
     needs: deploy-frontend # Assuming agents might depend on frontend or functions
     environment: production
     if: github.ref == 'refs/heads/main' # Only deploy to main branch

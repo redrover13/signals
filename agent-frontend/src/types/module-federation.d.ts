@@ -15,12 +15,12 @@
 
 declare module 'frontend-agents/AgentInterface' {
   import { ComponentType } from 'react';
-  
+
   interface AgentInterfaceProps {
     agentId: string | undefined;
     isFederated?: boolean | undefined;
   }
-  
+
   const AgentInterface: ComponentType<AgentInterfaceProps> | undefined;
   export default AgentInterface;
 }

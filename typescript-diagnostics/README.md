@@ -23,6 +23,7 @@ node typescript-diagnostics/scripts/diagnose.js
 ```
 
 **Features:**
+
 - Runs TypeScript compiler to gather errors
 - Categorizes errors by type and pattern
 - Analyzes TypeScript configurations
@@ -38,6 +39,7 @@ node typescript-diagnostics/scripts/analyze-lodash-migration.js
 ```
 
 **Features:**
+
 - Identifies problematic lodash import patterns
 - Analyzes package.json dependencies for consistency
 - Maps usage of lodash functions
@@ -56,6 +58,7 @@ node typescript-diagnostics/scripts/standardize-tsconfig.js --apply
 ```
 
 **Features:**
+
 - Analyzes all tsconfig files
 - Identifies inconsistencies in compiler options
 - Generates recommended standard configurations
@@ -74,6 +77,7 @@ node typescript-diagnostics/scripts/fix-common-errors.js --apply
 ```
 
 **Features:**
+
 - Identifies fixable TypeScript errors
 - Generates fix scripts for common issues
 - Can automatically apply fixes
@@ -88,6 +92,7 @@ node typescript-diagnostics/scripts/run-all-diagnostics.js
 ```
 
 **Features:**
+
 - Runs all diagnostic tools
 - Aggregates results into a unified summary
 - Provides clear next steps and recommendations
@@ -125,16 +130,19 @@ Automated fix scripts are generated in the `typescript-diagnostics/scripts/fixes
 ## Getting Started
 
 1. Run the unified diagnostics:
+
    ```bash
    node typescript-diagnostics/scripts/run-all-diagnostics.js
    ```
 
 2. Review the generated summary report:
+
    ```bash
    cat typescript-diagnostics/reports/diagnostic-summary.md
    ```
 
 3. Apply recommended fixes:
+
    ```bash
    node typescript-diagnostics/scripts/standardize-tsconfig.js --apply
    node typescript-diagnostics/scripts/fix-common-errors.js --apply

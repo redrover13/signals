@@ -23,24 +23,27 @@ export const AgentInterface: React.FC<AgentInterfaceProps> = memo(({ config }) =
   const [response, setResponse] = useState<AgentResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim()) return;
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!query.trim()) return;
 
-    setLoading(true);
-    try {
-      const agent = new MainAgent(config.apiKey, config.projectId, config.firebaseConfig);
-      const result = await agent.orchestrate(query);
-      setResponse(result);
-    } catch (error) {
-      setResponse({
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [query, config]);
+      setLoading(true);
+      try {
+        const agent = new MainAgent(config.apiKey, config.projectId, config.firebaseConfig);
+        const result = await agent.orchestrate(query);
+        setResponse(result);
+      } catch (error) {
+        setResponse({
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error occurred',
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [query, config],
+  );
 
   const handleQueryChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setQuery(e.target.value);
@@ -51,7 +54,9 @@ export const AgentInterface: React.FC<AgentInterfaceProps> = memo(({ config }) =
       <h2>AI Agent Interface</h2>
       <form onSubmit={handleSubmit} aria-label="Agent query form">
         <div className={styles['inputGroup']}>
-          <label htmlFor="agent-query" className={styles['visuallyHidden']}>Query</label>
+          <label htmlFor="agent-query" className={styles['visuallyHidden']}>
+            Query
+          </label>
           <textarea
             id="agent-query"
             value={query}
@@ -66,8 +71,8 @@ export const AgentInterface: React.FC<AgentInterfaceProps> = memo(({ config }) =
             Enter a natural language query to interact with the AI agent
           </div>
         </div>
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={loading || !query.trim()}
           className={styles['submitButton']}
           aria-busy={loading}
@@ -79,18 +84,26 @@ export const AgentInterface: React.FC<AgentInterfaceProps> = memo(({ config }) =
       {response && (
         <div className={styles['responseSection']} aria-live="polite">
           <h3>Response:</h3>
-          <div className={`${styles['response']} ${response.success ? styles['success'] : styles['error']}`}>
+          <div
+            className={`${styles['response']} ${response.success ? styles['success'] : styles['error']}`}
+          >
             {response.success ? (
               <div>
-                <p><strong>Success!</strong></p>
+                <p>
+                  <strong>Success!</strong>
+                </p>
                 {response.data && (
-                  <pre className={styles['jsonDisplay']}>{JSON.stringify(response.data, null, 2)}</pre>
+                  <pre className={styles['jsonDisplay']}>
+                    {JSON.stringify(response.data, null, 2)}
+                  </pre>
                 )}
                 {response.message && <p>{response.message}</p>}
               </div>
             ) : (
               <div>
-                <p><strong>Error:</strong> {response.error}</p>
+                <p>
+                  <strong>Error:</strong> {response.error}
+                </p>
               </div>
             )}
           </div>

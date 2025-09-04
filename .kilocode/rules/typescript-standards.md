@@ -63,9 +63,7 @@ export async function fetchUserData(id: string): Promise<UserProfile | null> {
 }
 
 // Good: Generic functions with constraints
-export function createService<T extends ServiceConfig>(
-  config: T
-): Service<T> {
+export function createService<T extends ServiceConfig>(config: T): Service<T> {
   return new Service(config);
 }
 ```
@@ -115,12 +113,7 @@ function parseJson(json: string): unknown {
 
 // Good: Type guards for unknown data
 function isUserProfile(data: unknown): data is UserProfile {
-  return (
-    typeof data === 'object' &&
-    data !== null &&
-    'id' in data &&
-    'email' in data
-  );
+  return typeof data === 'object' && data !== null && 'id' in data && 'email' in data;
 }
 ```
 
@@ -195,9 +188,9 @@ interface Data {
 
 // Bad: Mutable properties without justification
 interface UserProfile {
-  id: string;        // Should be readonly
-  email: string;     // Should be readonly
-  name: string;      // Mutable is OK for display name
+  id: string; // Should be readonly
+  email: string; // Should be readonly
+  name: string; // Mutable is OK for display name
 }
 
 // Bad: Overly complex single interface
@@ -231,7 +224,7 @@ export abstract class AppError extends Error {
 
   constructor(
     message: string,
-    public readonly context?: Record<string, unknown>
+    public readonly context?: Record<string, unknown>,
   ) {
     super(message);
     this.name = this.constructor.name;
@@ -242,11 +235,7 @@ export class ValidationError extends AppError {
   readonly code = 'VALIDATION_ERROR';
   readonly statusCode = 400;
 
-  constructor(
-    field: string,
-    value: unknown,
-    constraint: string
-  ) {
+  constructor(field: string, value: unknown, constraint: string) {
     super(`Validation failed for field '${field}': ${constraint}`);
     this.context = { field, value, constraint };
   }
@@ -310,30 +299,30 @@ Async functions must properly handle and propagate errors.
 // Good: Proper async error handling
 async function processOrderBatch(orders: Order[]): Promise<ProcessResult[]> {
   const results: ProcessResult[] = [];
-  
+
   for (const batch of chunk(orders, 10)) {
     try {
-      const batchResults = await Promise.allSettled(
-        batch.map(order => processOrder(order))
+      const batchResults = await Promise.allSettled(batch.map((order) => processOrder(order)));
+
+      results.push(
+        ...batchResults.map((result) => {
+          if (result.status === 'fulfilled') {
+            return { success: true, data: result.value };
+          } else {
+            logger.error('Order processing failed', {
+              error: result.reason,
+              orderId: batch.find((o) => o.id)?.id,
+            });
+            return { success: false, error: result.reason };
+          }
+        }),
       );
-      
-      results.push(...batchResults.map(result => {
-        if (result.status === 'fulfilled') {
-          return { success: true, data: result.value };
-        } else {
-          logger.error('Order processing failed', {
-            error: result.reason,
-            orderId: batch.find(o => o.id)?.id
-          });
-          return { success: false, error: result.reason };
-        }
-      }));
     } catch (error) {
       logger.error('Batch processing failed', { error, batchSize: batch.length });
       throw new ProcessingError('Failed to process order batch', { cause: error });
     }
   }
-  
+
   return results;
 }
 ```
@@ -398,9 +387,7 @@ type UserRole = 'admin' | 'user' | 'guest';
 type AdminRole = Extract<UserRole, 'admin'>;
 
 // Good: Conditional types
-type ApiResponse<T> = T extends string 
-  ? { message: T } 
-  : { data: T };
+type ApiResponse<T> = T extends string ? { message: T } : { data: T };
 ```
 
 #### ❌ Non-Compliant Examples
@@ -436,10 +423,7 @@ interface Identifiable {
   id: string;
 }
 
-function updateEntity<T extends Identifiable>(
-  entity: T,
-  updates: Partial<Omit<T, 'id'>>
-): T {
+function updateEntity<T extends Identifiable>(entity: T, updates: Partial<Omit<T, 'id'>>): T {
   return { ...entity, ...updates };
 }
 
@@ -451,15 +435,13 @@ interface Timestamped {
 
 function sortByDate<T extends Timestamped>(
   items: T[],
-  field: keyof Timestamped = 'createdAt'
+  field: keyof Timestamped = 'createdAt',
 ): T[] {
   return items.sort((a, b) => a[field].getTime() - b[field].getTime());
 }
 
 // Good: Conditional constraints
-type EventHandler<T> = T extends string 
-  ? (message: T) => void 
-  : (data: T) => void;
+type EventHandler<T> = T extends string ? (message: T) => void : (data: T) => void;
 ```
 
 #### ❌ Non-Compliant Examples
@@ -538,10 +520,10 @@ Follow consistent naming conventions for types and interfaces.
 
 ```typescript
 // Good: Consistent naming
-interface UserProfile { }        // Interface: PascalCase
+interface UserProfile {} // Interface: PascalCase
 type UserRole = 'admin' | 'user'; // Type alias: PascalCase
-enum OrderStatus { }             // Enum: PascalCase
-const USER_ROLES = { } as const; // Const assertion: SCREAMING_SNAKE_CASE
+enum OrderStatus {} // Enum: PascalCase
+const USER_ROLES = {} as const; // Const assertion: SCREAMING_SNAKE_CASE
 
 // Good: Descriptive generic names
 interface Repository<TEntity, TKey = string> {
@@ -560,12 +542,13 @@ interface UserCreatedEvent {
 
 ```typescript
 // Bad: Inconsistent naming
-interface userProfile { }        // Should be PascalCase
-type user_role = 'admin';        // Should be PascalCase
-enum orderStatus { }             // Should be PascalCase
+interface userProfile {} // Should be PascalCase
+type user_role = 'admin'; // Should be PascalCase
+enum orderStatus {} // Should be PascalCase
 
 // Bad: Generic single letters without meaning
-interface Repository<T, U> {     // T and U are not descriptive
+interface Repository<T, U> {
+  // T and U are not descriptive
   findById(id: U): Promise<T | null>;
 }
 ```
@@ -602,7 +585,7 @@ type NonNullable<T> = T extends null | undefined ? never : T;
 ```typescript
 // Bad: Overly complex recursive types
 type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends object 
+  [P in keyof T]?: T[P] extends object
     ? T[P] extends Array<infer U>
       ? Array<DeepPartial<U>>
       : DeepPartial<T[P]>

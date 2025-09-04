@@ -2,7 +2,6 @@
   "name": "rag-document-processor",
   "version": "1.0.0",
   "description": "Cloud Function for processing documents in the RAG pipeline",
-  
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

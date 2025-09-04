@@ -4,8 +4,8 @@ export default {
   preset: '../../../jest.preset.mjs',
   testEnvironment: 'jsdom',
   transform: {
-    '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }]
+    '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../../coverage/libs/utils/signals'
+  coverageDirectory: '../../../coverage/libs/utils/signals',
 };

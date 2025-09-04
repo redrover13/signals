@@ -85,15 +85,15 @@ jobs:
         run: |
           gh pr comment "${{ github.event.pull_request.number }}" --body "
           🚨 **Major Version Update Detected**
-          
+
           This PR contains a major version update for: **${{ steps.metadata.outputs.dependency-names }}**
-          
+
           **Please review carefully:**
           - Check for breaking changes in the changelog
           - Verify all tests pass
           - Consider testing in a staging environment
           - Manual approval required for merge
-          
+
           **Update Type:** ${{ steps.metadata.outputs.update-type }}
           **Dependency Type:** ${{ steps.metadata.outputs.dependency-type }}
           "

@@ -32,19 +32,19 @@ import { GeminiOrchestrator } from '@nx-monorepo/agents/gemini-orchestrator';
 async function main() {
   const orchestrator = new GeminiOrchestrator();
   await orchestrator.initialize();
-  
+
   const result = await orchestrator.orchestrate({
-    query: "What were our top-selling menu items last month?",
+    query: 'What were our top-selling menu items last month?',
     context: {
-      restaurantId: "dds-central",
-      timePeriod: "last-month"
+      restaurantId: 'dds-central',
+      timePeriod: 'last-month',
     },
     options: {
       timeout: 30000,
-      cacheResults: false
-    }
+      cacheResults: false,
+    },
   });
-  
+
   console.log(result);
 }
 ```
@@ -57,20 +57,20 @@ import { MCPService } from '@nx-monorepo/agents/gemini-orchestrator';
 async function main() {
   const mcpService = MCPService.getInstance();
   await mcpService.initialize();
-  
+
   const result = await mcpService.orchestrateWithGemini(
-    "What were our top-selling menu items last month?",
+    'What were our top-selling menu items last month?',
     {
-      restaurantId: "dds-central",
-      timePeriod: "last-month"
+      restaurantId: 'dds-central',
+      timePeriod: 'last-month',
     },
     {
       streaming: false,
       timeout: 60000,
-      cacheResults: true
-    }
+      cacheResults: true,
+    },
   );
-  
+
   console.log(result);
 }
 ```
@@ -79,17 +79,17 @@ async function main() {
 
 ```typescript
 const result = await orchestrator.orchestrate({
-  query: "Analyze sales data for the past quarter",
+  query: 'Analyze sales data for the past quarter',
   context: {
-    restaurantId: "dds-central",
-    timePeriod: "Q1-2024",
-    includeComparisons: true
+    restaurantId: 'dds-central',
+    timePeriod: 'Q1-2024',
+    includeComparisons: true,
   },
   options: {
     streaming: false,
     timeout: 60000,
-    cacheResults: true
-  }
+    cacheResults: true,
+  },
 });
 ```
 
@@ -98,38 +98,41 @@ const result = await orchestrator.orchestrate({
 The orchestrator automatically routes queries to appropriate sub-agents:
 
 #### BigQuery Routing
+
 ```typescript
 // These queries will be routed to BigQuery sub-agent
 await orchestrator.orchestrate({
-  query: "SELECT sales_amount FROM orders WHERE date > '2024-01-01'"
+  query: "SELECT sales_amount FROM orders WHERE date > '2024-01-01'",
 });
 
 await orchestrator.orchestrate({
-  query: "What are our analytics for menu performance?"
+  query: 'What are our analytics for menu performance?',
 });
 ```
 
 #### Firebase Routing
+
 ```typescript
 // These queries will be routed to Firebase sub-agent
 await orchestrator.orchestrate({
-  query: "Get documents from the users collection"
+  query: 'Get documents from the users collection',
 });
 
 await orchestrator.orchestrate({
-  query: "Update customer profile in Firestore"
+  query: 'Update customer profile in Firestore',
 });
 ```
 
 #### RAG Routing
+
 ```typescript
 // These queries will be routed to RAG sub-agent
 await orchestrator.orchestrate({
-  query: "Search for information about Vietnamese coffee culture"
+  query: 'Search for information about Vietnamese coffee culture',
 });
 
 await orchestrator.orchestrate({
-  query: "Find recipes for traditional pho"
+  query: 'Find recipes for traditional pho',
 });
 ```
 
@@ -181,34 +184,40 @@ The orchestrator implements comprehensive error handling with:
 The Gemini Orchestrator requires the following environment variables:
 
 ### Required
+
 - `GEMINI_API_KEY` or `GOOGLE_API_KEY`: Google AI API key for Gemini access
 
 ### Optional
+
 - `GCP_PROJECT_ID`: Google Cloud project ID for BigQuery and other GCP services
 - `NODE_ENV`: Environment (development, staging, production)
 
 ## Features
 
 ### Smart Query Routing
+
 The orchestrator analyzes incoming queries and automatically routes them to the appropriate sub-agent:
 
 - **BigQuery**: SQL queries, analytics requests, data operations
-- **Firebase**: Document operations, Firestore queries, collection management  
+- **Firebase**: Document operations, Firestore queries, collection management
 - **RAG**: Search queries, knowledge retrieval, information requests
 - **Tools**: General tool execution and utility operations
 
 ### Supported Tools
+
 - `bq.query`: Execute BigQuery SQL queries
 - `bq.insert`: Insert data into BigQuery tables
 - `storage.uploadString`: Upload content to Cloud Storage
 
 ### Error Handling
+
 - Comprehensive error categorization
 - Vietnamese-friendly error messages
 - Automatic retry logic with exponential backoff
 - Graceful degradation when services are unavailable
 
 ### Performance Features
+
 - Automatic initialization management
 - Health monitoring and status checks
 - Processing time tracking

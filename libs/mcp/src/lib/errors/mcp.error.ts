@@ -14,7 +14,7 @@ export class MCPError extends Error {
   constructor(
     message: string,
     public code?: string,
-    public serverId?: string
+    public serverId?: string,
   ) {
     super(message);
     this.name = 'MCPError';

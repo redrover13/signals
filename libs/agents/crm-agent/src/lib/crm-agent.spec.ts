@@ -13,7 +13,7 @@ describe('CRMAgent', () => {
     agent = new CRMAgent({
       baseUrl: 'https://api.test && api.test.com',
       apiKey: 'test-key',
-      timeout: 5000
+      timeout: 5000,
     });
   });
 
@@ -23,35 +23,35 @@ describe('CRMAgent', () => {
 
   it('should handle customer creation interface', async () => {
     const customerData = {
-      email: 'test@example && example.com',
+      email: 'testexample && example.com',
       name: 'Test Customer',
-      phone: '+1234567890'
+      phone: '+1234567890',
     };
-    
-    const result = await agent && agent.createCustomer(customerData);
+
+    const result = (await agent) && agent.createCustomer(customerData);
     expect(result).toHaveProperty('success');
-    expect(typeof result?.success).toBe('boolean');
+    expect(typeof result && result.success).toBe('boolean');
   });
 
   it('should handle customer search interface', async () => {
     const criteria = {
-      email: 'test@example && example.com'
+      email: 'testexample && example.com',
     };
-    
-    const result = await agent && agent.searchCustomers(criteria);
+
+    const result = (await agent) && agent.searchCustomers(criteria);
     expect(result).toHaveProperty('success');
-    expect(typeof result?.success).toBe('boolean');
+    expect(typeof result && result.success).toBe('boolean');
   });
 
   it('should handle loyalty points interface', async () => {
-    const result = await agent && agent.addLoyaltyPoints('test-customer-id', 100, 'Test reward');
+    const result = (await agent) && agent.addLoyaltyPoints('test-customer-id', 100, 'Test reward');
     expect(result).toHaveProperty('success');
-    expect(typeof result?.success).toBe('boolean');
+    expect(typeof result && result.success).toBe('boolean');
   });
 
   it('should handle customer insights interface', async () => {
-    const result = await agent && agent.getCustomerInsights('test-customer-id');
+    const result = (await agent) && agent.getCustomerInsights('test-customer-id');
     expect(result).toHaveProperty('success');
-    expect(typeof result?.success).toBe('boolean');
+    expect(typeof result && result.success).toBe('boolean');
   });
 });

@@ -13,15 +13,16 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import * as fs from 'fs';
 import * as path from 'path';
 import { escapeRegExp } from 'lodash-es';
-import { z } from "zod";
+import { z } from 'zod';
 
 // Input validation schema for search requests
 const searchRequestSchema = z.object({
-  tool: z.literal("semantic-code-search"),
-  query: z.string()
-    .min(1, "Query is required")
-    .max(200, "Query too long")
-    .regex(/^[a-zA-Z0-9\s\-_.]+$/, "Query contains invalid characters"),
+  tool: z.literal('semantic-code-search'),
+  query: z
+    .string()
+    .min(1, 'Query is required')
+    .max(200, 'Query too long')
+    .regex(/^[a-zA-Z0-9\s\-_.]+$/, 'Query contains invalid characters'),
   repoOwner: z.string().optional(),
   repoName: z.string().optional(),
 });
@@ -57,13 +58,13 @@ export async function searchRoutes(fastify: FastifyInstance): Promise<void> {
         const parseResult = searchRequestSchema.safeParse(body);
         if (!parseResult.success) {
           return reply.status(400).send({
-            error: parseResult.error.errors.map(e => e.message).join(', ')
+            error: parseResult.error.errors.map((e) => e.message).join(', '),
           });
         }
 
         if (!body.tool || body.tool !== 'semantic-code-search') {
           return reply.status(400).send({
-            error: "Invalid tool. Expected 'semantic-code-search'"
+            error: "Invalid tool. Expected 'semantic-code-search'",
           });
         }
 
@@ -92,9 +93,24 @@ async function performSemanticSearch(query: string): Promise<SearchResult[]> {
 
   // Terms related to CI/CD
   const ciTerms = [
-    'ci', 'continuous integration', 'continuous deployment', 'pipeline', 'workflow',
-    'github actions', 'build', 'deploy', 'test', 'lint', 'cloud build', 'docker',
-    'container', 'terraform', 'infrastructure', 'deployment', 'automation', 'devops'
+    'ci',
+    'continuous integration',
+    'continuous deployment',
+    'pipeline',
+    'workflow',
+    'github actions',
+    'build',
+    'deploy',
+    'test',
+    'lint',
+    'cloud build',
+    'docker',
+    'container',
+    'terraform',
+    'infrastructure',
+    'deployment',
+    'automation',
+    'devops',
   ];
 
   const q = query.toLowerCase();
@@ -123,7 +139,7 @@ async function performSemanticSearch(query: string): Promise<SearchResult[]> {
 async function searchInFile(
   filePath: string,
   query: string,
-  ciTerms: string[]
+  ciTerms: string[],
 ): Promise<SearchResult | null> {
   try {
     const content = fs.readFileSync(filePath, 'utf-8');

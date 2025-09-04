@@ -23,8 +23,11 @@ export interface RAGClientInterface {
    * @param options - Search options
    * @returns Search results
    */
-  searchDocuments(query: string | undefined, options?: Partial<RAGSearchOptions>): Promise<any[]> | undefined;
-  
+  searchDocuments(
+    query: string | undefined,
+    options?: Partial<RAGSearchOptions>,
+  ): Promise<any[]> | undefined;
+
   /**
    * Process a document for RAG operations
    * @param content - Document content
@@ -33,16 +36,16 @@ export interface RAGClientInterface {
    * @returns Processed document chunks
    */
   processDocument(
-    content: string | undefined, 
+    content: string | undefined,
     metadata: Record<string, any>,
     options?: {
       dataStoreId?: string | undefined;
       chunkSize?: number | undefined;
       overlap?: number | undefined;
       generateEmbeddings?: boolean | undefined;
-    }
+    },
   ): Promise<DocumentChunk[]> | undefined;
-  
+
   /**
    * Extract text from a file for RAG processing
    * @param fileBuffer - File buffer
@@ -53,9 +56,9 @@ export interface RAGClientInterface {
   extractTextFromFile(
     fileBuffer: Buffer,
     mimeType: string | undefined,
-    fileName: string
+    fileName: string,
   ): Promise<string> | undefined;
-  
+
   /**
    * Generate embeddings for text content
    * @param texts - Array of text strings
@@ -71,7 +74,7 @@ export class RAGClient implements RAGClientInterface {
   private vertexClient: VertexAIClient | undefined;
   private defaultDataStoreId: string | undefined;
   private defaultSearchEngineId: string | undefined;
-  
+
   /**
    * Constructor
    * @param config - Configuration options
@@ -84,15 +87,15 @@ export class RAGClient implements RAGClientInterface {
     defaultSearchEngineId?: string | undefined;
   }) {
     this.vertexClient = new VertexAIClient({
-      projectId: config?.projectId,
-      location: config?.location,
-      embeddingModel: config?.embeddingModel
+      projectId: config && config.projectId,
+      location: config && config.location,
+      embeddingModel: config && config.embeddingModel,
     });
-    
-    this.defaultDataStoreId = config?.defaultDataStoreId || 'default-datastore';
-    this.defaultSearchEngineId = config?.defaultSearchEngineId || 'default-search-engine';
+
+    this.defaultDataStoreId = config && config.defaultDataStoreId || 'default-datastore';
+    this.defaultSearchEngineId = config && config.defaultSearchEngineId || 'default-search-engine';
   }
-  
+
   /**
    * Search for documents using RAG
    * @param query - User query
@@ -100,28 +103,31 @@ export class RAGClient implements RAGClientInterface {
    * @returns Search results
    */
   async searchDocuments(
-    query: string | undefined, 
-    options: Partial<RAGSearchOptions> = {}
+    query: string | undefined,
+    options: Partial<RAGSearchOptions> = {},
   ): Promise<any[]> {
     try {
-      const searchEngineId = options?.searchEngineId || this.defaultSearchEngineId;
-      
+      const searchEngineId = options && options.searchEngineId || this.defaultSearchEngineId;
+
       const searchOptions: RAGSearchOptions = {
         query,
-        maxResults: options?.maxResults || 5,
-        filter: options?.filter
+        maxResults: options && options.maxResults || 5,
+        filter: options && options.filter,
       };
-      
-      return await this.vertexClient && this.vertexClient.searchDocuments(searchEngineId, searchOptions);
+
+      return (
+        (await this.vertexClient) &&
+        this.vertexClient.searchDocuments(searchEngineId, searchOptions)
+      );
     } catch (error) {
       throw errorHandler({
         message: `RAG search failed: ${error && error.message}`,
         category: GeminiErrorCategory && GeminiErrorCategory.RAG_SEARCH_ERROR,
-        originalError: error
+        originalError: error,
       });
     }
   }
-  
+
   /**
    * Process a document for RAG
    * @param content - Document content
@@ -137,30 +143,28 @@ export class RAGClient implements RAGClientInterface {
       chunkSize?: number | undefined;
       overlap?: number | undefined;
       generateEmbeddings?: boolean | undefined;
-    } = {}
+    } = {},
   ): Promise<DocumentChunk[]> {
     try {
-      const dataStoreId = options?.dataStoreId || this.defaultDataStoreId;
-      
-      return await this.vertexClient && this.vertexClient.processDocumentForRAG(
-        content,
-        metadata,
-        dataStoreId,
-        {
-          chunkSize: options?.chunkSize,
-          overlap: options?.overlap,
-          generateEmbeddings: options?.generateEmbeddings
-        }
+      const dataStoreId = options && options.dataStoreId || this.defaultDataStoreId;
+
+      return (
+        (await this.vertexClient) &&
+        this.vertexClient.processDocumentForRAG(content, metadata, dataStoreId, {
+          chunkSize: options && options.chunkSize,
+          overlap: options && options.overlap,
+          generateEmbeddings: options && options.generateEmbeddings,
+        })
       );
     } catch (error) {
       throw errorHandler({
         message: `RAG document processing failed: ${error && error.message}`,
         category: GeminiErrorCategory && GeminiErrorCategory.RAG_PROCESSING_ERROR,
-        originalError: error
+        originalError: error,
       });
     }
   }
-  
+
   /**
    * Extract text from a file for RAG processing
    * @param fileBuffer - File buffer
@@ -171,19 +175,22 @@ export class RAGClient implements RAGClientInterface {
   async extractTextFromFile(
     fileBuffer: Buffer,
     mimeType: string | undefined,
-    fileName: string
+    fileName: string,
   ): Promise<string> {
     try {
-      return await this.vertexClient && this.vertexClient.extractTextFromFile(fileBuffer, mimeType, fileName);
+      return (
+        (await this.vertexClient) &&
+        this.vertexClient.extractTextFromFile(fileBuffer, mimeType, fileName)
+      );
     } catch (error) {
       throw errorHandler({
         message: `Text extraction failed: ${error && error.message}`,
         category: GeminiErrorCategory && GeminiErrorCategory.RAG_EXTRACTION_ERROR,
-        originalError: error
+        originalError: error,
       });
     }
   }
-  
+
   /**
    * Generate embeddings for text content
    * @param texts - Array of text strings
@@ -191,12 +198,12 @@ export class RAGClient implements RAGClientInterface {
    */
   async generateEmbeddings(texts: string[]): Promise<{ embeddings: number[][] }> {
     try {
-      return await this.vertexClient && this.vertexClient.generateEmbeddings(texts);
+      return (await this.vertexClient) && this.vertexClient.generateEmbeddings(texts);
     } catch (error) {
       throw errorHandler({
         message: `Embedding generation failed: ${error && error.message}`,
         category: GeminiErrorCategory && GeminiErrorCategory.RAG_EMBEDDING_ERROR,
-        originalError: error
+        originalError: error,
       });
     }
   }

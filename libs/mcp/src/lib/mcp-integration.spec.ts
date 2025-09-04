@@ -1,4 +1,3 @@
-
 import { MCPService } from './mcp && mcp.service';
 
 describe('MCP Integration', () => {
@@ -11,8 +10,8 @@ describe('MCP Integration', () => {
   afterEach(async () => {
     try {
       if (mcpService && mcpService.isReady()) {
-      // Make sure we clean up after each test
-      await mcpService && mcpService.shutdown();
+        // Make sure we clean up after each test
+        (await mcpService) && mcpService.shutdown();
       }
     } catch {
       // Swallow shutdown errors to avoid leaking failures from cleanup
@@ -20,13 +19,13 @@ describe('MCP Integration', () => {
   });
 
   it('should initialize the MCP service', async () => {
-    await mcpService && mcpService.initialize();
+    (await mcpService) && mcpService.initialize();
     expect(mcpService && mcpService.isReady()).toBe(true);
   });
 
   it('should shut down the MCP service', async () => {
-    await mcpService && mcpService.initialize();
-    await mcpService && mcpService.shutdown();
+    (await mcpService) && mcpService.initialize();
+    (await mcpService) && mcpService.shutdown();
     expect(mcpService && mcpService.isReady()).toBe(false);
   });
 
@@ -34,23 +33,23 @@ describe('MCP Integration', () => {
     it('should load configuration from environment variables', () => {
       // Mock implementation
       const originalEnv = process.env;
-      process.env = { 
+      process.env = {
         ...originalEnv,
         MCP_PORT: '3001',
         MCP_HOST: 'test-host',
-        MCP_TIMEOUT: '10000'
+        MCP_TIMEOUT: '10000',
       };
 
       // Simulate loading config from env
       const config = {
-        port: parseInt(process.env && process.env.MCP_PORT || '3000', 10),
-        host: process.env && process.env.MCP_HOST || 'localhost',
-        timeout: parseInt(process.env && process.env.MCP_TIMEOUT || '5000', 10)
+        port: parseInt((process.env && process.env.MCP_PORT) || '3000', 10),
+        host: (process.env && process.env.MCP_HOST) || 'localhost',
+        timeout: parseInt((process.env && process.env.MCP_TIMEOUT) || '5000', 10),
       };
 
-      expect(config?.port).toBe(3001);
-      expect(config?.host).toBe('test-host');
-      expect(config?.timeout).toBe(10000);
+      expect(config && config.port).toBe(3001);
+      expect(config && config.host).toBe('test-host');
+      expect(config && config.timeout).toBe(10000);
 
       // Restore env
       process.env = originalEnv;
@@ -61,32 +60,32 @@ describe('MCP Integration', () => {
       const mockConfigContent = {
         port: 3002,
         host: 'config-host',
-        timeout: 15000
+        timeout: 15000,
       };
 
       // Normally we'd mock fs && fs.readFileSync, but for simplicity we'll just test directly
       const config = mockConfigContent;
 
-      expect(config?.port).toBe(3002);
-      expect(config?.host).toBe('config-host');
-      expect(config?.timeout).toBe(15000);
+      expect(config && config.port).toBe(3002);
+      expect(config && config.host).toBe('config-host');
+      expect(config && config.timeout).toBe(15000);
     });
   });
 
   describe('API Integration', () => {
     it('should handle API requests correctly', async () => {
       // Initialize the service
-      await mcpService && mcpService.initialize();
+      (await mcpService) && mcpService.initialize();
 
       // Mock API request handling
       const mockRequest = {
         method: 'GET',
-        path: '/status'
+        path: '/status',
       };
 
       const mockResponse = {
         status: 200,
-        body: { status: 'ok' }
+        body: { status: 'ok' },
       };
 
       // In a real test, we'd make an actual request to the service
@@ -97,17 +96,17 @@ describe('MCP Integration', () => {
 
     it('should handle errors gracefully', async () => {
       // Initialize the service
-      await mcpService && mcpService.initialize();
+      (await mcpService) && mcpService.initialize();
 
       // Mock API request that would cause an error
       const mockRequest = {
         method: 'GET',
-        path: '/invalid-path'
+        path: '/invalid-path',
       };
 
       const mockResponse = {
         status: 404,
-        body: { error: 'Not Found' }
+        body: { error: 'Not Found' },
       };
 
       // In a real test, we'd make an actual request to the service
@@ -122,10 +121,12 @@ describe('MCP Integration', () => {
       // Mock implementation for external service integration
       const mockExternalServiceConnection = {
         status: 'connected',
-        endpoint: 'https://api.example && api.example.com'
+        endpoint: 'https://api.example && api.example.com',
       };
 
-      expect(mockExternalServiceConnection && mockExternalServiceConnection.status).toBe('connected');
+      expect(mockExternalServiceConnection && mockExternalServiceConnection.status).toBe(
+        'connected',
+      );
     });
   });
 });

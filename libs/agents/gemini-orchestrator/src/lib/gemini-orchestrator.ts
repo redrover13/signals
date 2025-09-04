@@ -17,16 +17,16 @@ import {
   FunctionDeclaration,
   Tool,
   FunctionCall,
-  Content
+  Content,
 } from '@google/generative-ai';
 import { getToolFunctionDeclarations, executeTool } from './tools';
-import { 
-  SubAgentType, 
-  OrchestratorInput, 
-  OrchestratorOutput, 
+import {
+  SubAgentType,
+  OrchestratorInput,
+  OrchestratorOutput,
   OrchestratorOptions,
   orchestratorInputSchema,
-  orchestratorOutputSchema
+  orchestratorOutputSchema,
 } from './schemas';
 import { createGeminiErrorHandler } from './utils/error-handler';
 
@@ -51,11 +51,11 @@ export class GeminiOrchestrator {
     }
 
     console.log('GeminiOrchestrator: Initializing...');
-    
+
     try {
       // Get API key from environment variables
       const apiKey = process.env['GEMINI_API_KEY'] || process.env['GOOGLE_API_KEY'];
-      
+
       if (!apiKey) {
         console.warn('GeminiOrchestrator: No API key found, running in simulation mode');
         this.isInitialized = true;
@@ -64,21 +64,23 @@ export class GeminiOrchestrator {
 
       // Initialize Google Generative AI
       this.genAI = new GoogleGenerativeAI(apiKey);
-      
-      // Get the Gemini model with tools configuration
-      const tools: Tool[] = [{
-        functionDeclarations: getToolFunctionDeclarations()
-      }];
 
-      this.model = this.genAI.getGenerativeModel({ 
-        model: "gemini-1.5-pro",
+      // Get the Gemini model with tools configuration
+      const tools: Tool[] = [
+        {
+          functionDeclarations: getToolFunctionDeclarations(),
+        },
+      ];
+
+      this.model = this.genAI.getGenerativeModel({
+        model: 'gemini-1.5-pro',
         tools,
         generationConfig: {
           temperature: 0.1,
           topK: 32,
           topP: 1,
           maxOutputTokens: 8192,
-        }
+        },
       });
 
       this.isInitialized = true;
@@ -114,7 +116,7 @@ export class GeminiOrchestrator {
       const input: OrchestratorInput = orchestratorInputSchema.parse({
         query: params.query,
         context: params.context || {},
-        options: params.options || {}
+        options: params.options || {},
       });
 
       console.log('GeminiOrchestrator: Orchestrating request...');
@@ -146,18 +148,21 @@ export class GeminiOrchestrator {
 
       // Return text response
       const textResponse = response.text();
-      return this.createSuccessResponse({
-        type: 'text_response' as const,
-        text: textResponse
-      }, subAgent, startTime);
-
+      return this.createSuccessResponse(
+        {
+          type: 'text_response' as const,
+          text: textResponse,
+        },
+        subAgent,
+        startTime,
+      );
     } catch (error) {
-      const handledError = errorHandler(error as Error, { 
-        query: params.query, 
-        context: params.context, 
-        options: params.options 
+      const handledError = errorHandler(error as Error, {
+        query: params.query,
+        context: params.context,
+        options: params.options,
       });
-      
+
       return {
         success: false,
         error: handledError.message,
@@ -165,8 +170,8 @@ export class GeminiOrchestrator {
           model: 'gemini-1.5-pro',
           processTime: Date.now() - Date.now(),
           subAgent: SubAgentType.TOOL,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       };
     }
   }
@@ -178,47 +183,53 @@ export class GeminiOrchestrator {
     const lowerQuery = query.toLowerCase();
 
     // BigQuery patterns
-    if (lowerQuery.includes('sql') || 
-        lowerQuery.includes('query') ||
-        lowerQuery.includes('data') ||
-        lowerQuery.includes('analytics') ||
-        lowerQuery.includes('select') ||
-        lowerQuery.includes('table') ||
-        lowerQuery.includes('sales') ||
-        lowerQuery.includes('revenue') ||
-        lowerQuery.includes('orders') ||
-        lowerQuery.includes('selling') ||
-        lowerQuery.includes('performance') ||
-        lowerQuery.includes('metrics') ||
-        lowerQuery.includes('report') ||
-        lowerQuery.includes('count') ||
-        lowerQuery.includes('top') ||
-        lowerQuery.includes('best')) {
+    if (
+      lowerQuery.includes('sql') ||
+      lowerQuery.includes('query') ||
+      lowerQuery.includes('data') ||
+      lowerQuery.includes('analytics') ||
+      lowerQuery.includes('select') ||
+      lowerQuery.includes('table') ||
+      lowerQuery.includes('sales') ||
+      lowerQuery.includes('revenue') ||
+      lowerQuery.includes('orders') ||
+      lowerQuery.includes('selling') ||
+      lowerQuery.includes('performance') ||
+      lowerQuery.includes('metrics') ||
+      lowerQuery.includes('report') ||
+      lowerQuery.includes('count') ||
+      lowerQuery.includes('top') ||
+      lowerQuery.includes('best')
+    ) {
       return SubAgentType.BIGQUERY;
     }
 
     // Firebase patterns
-    if (lowerQuery.includes('document') ||
-        lowerQuery.includes('collection') ||
-        lowerQuery.includes('firestore') ||
-        lowerQuery.includes('save') ||
-        lowerQuery.includes('update') ||
-        lowerQuery.includes('delete') ||
-        lowerQuery.includes('get ') ||
-        lowerQuery.includes('fetch')) {
+    if (
+      lowerQuery.includes('document') ||
+      lowerQuery.includes('collection') ||
+      lowerQuery.includes('firestore') ||
+      lowerQuery.includes('save') ||
+      lowerQuery.includes('update') ||
+      lowerQuery.includes('delete') ||
+      lowerQuery.includes('get ') ||
+      lowerQuery.includes('fetch')
+    ) {
       return SubAgentType.FIREBASE;
     }
 
     // RAG patterns
-    if (lowerQuery.includes('search') ||
-        lowerQuery.includes('find') ||
-        lowerQuery.includes('knowledge') ||
-        lowerQuery.includes('information') ||
-        lowerQuery.includes('learn') ||
-        lowerQuery.includes('about') ||
-        lowerQuery.includes('recipe') ||
-        lowerQuery.includes('how to') ||
-        lowerQuery.includes('what is')) {
+    if (
+      lowerQuery.includes('search') ||
+      lowerQuery.includes('find') ||
+      lowerQuery.includes('knowledge') ||
+      lowerQuery.includes('information') ||
+      lowerQuery.includes('learn') ||
+      lowerQuery.includes('about') ||
+      lowerQuery.includes('recipe') ||
+      lowerQuery.includes('how to') ||
+      lowerQuery.includes('what is')
+    ) {
       return SubAgentType.RAG;
     }
 
@@ -247,10 +258,10 @@ Context provided: ${JSON.stringify(input.context)}
 Please analyze the user's query and determine if you need to use any tools, then provide a comprehensive response.`;
 
     return [
-      { 
-        role: 'user', 
-        parts: [{ text: `${systemPrompt}\n\nUser Query: ${input.query}` }] 
-      }
+      {
+        role: 'user',
+        parts: [{ text: `${systemPrompt}\n\nUser Query: ${input.query}` }],
+      },
     ];
   }
 
@@ -258,10 +269,10 @@ Please analyze the user's query and determine if you need to use any tools, then
    * Handles function calls from Gemini responses
    */
   private async handleFunctionCalls(
-    functionCalls: FunctionCall[], 
-    input: OrchestratorInput, 
-    subAgent: SubAgentType, 
-    startTime: number
+    functionCalls: FunctionCall[],
+    input: OrchestratorInput,
+    subAgent: SubAgentType,
+    startTime: number,
   ): Promise<Record<string, unknown>> {
     try {
       const toolResults = [];
@@ -272,27 +283,30 @@ Please analyze the user's query and determine if you need to use any tools, then
           toolResults.push({
             tool: call.name,
             input: call.args,
-            result: result
+            result: result,
           });
         } catch (toolError) {
-          const handledToolError = errorHandler(toolError as Error, { 
-            toolName: call.name, 
-            toolArgs: call.args 
+          const handledToolError = errorHandler(toolError as Error, {
+            toolName: call.name,
+            toolArgs: call.args,
           });
           toolResults.push({
             tool: call.name,
             input: call.args,
-            result: { error: handledToolError.message }
+            result: { error: handledToolError.message },
           });
         }
       }
 
-      return this.createSuccessResponse({
-        type: 'tool_results' as const,
-        results: toolResults,
-        text: `Executed ${functionCalls.length} tool(s) successfully`
-      }, subAgent, startTime);
-
+      return this.createSuccessResponse(
+        {
+          type: 'tool_results' as const,
+          results: toolResults,
+          text: `Executed ${functionCalls.length} tool(s) successfully`,
+        },
+        subAgent,
+        startTime,
+      );
     } catch (error) {
       const handledError = errorHandler(error as Error, { functionCalls });
       throw handledError;
@@ -302,9 +316,12 @@ Please analyze the user's query and determine if you need to use any tools, then
   /**
    * Creates a simulation response when Gemini API is not available
    */
-  private createSimulationResponse(input: OrchestratorInput, startTime: number): Record<string, unknown> {
+  private createSimulationResponse(
+    input: OrchestratorInput,
+    startTime: number,
+  ): Record<string, unknown> {
     const subAgent = this.analyzeQueryForRouting(input.query);
-    
+
     // Create response data based on the sub-agent type
     let responseData;
     switch (subAgent) {
@@ -313,7 +330,7 @@ Please analyze the user's query and determine if you need to use any tools, then
           type: 'bigquery_result' as const,
           sql: 'SIMULATED_SQL_QUERY',
           rows: [{ simulated: true, message: 'This would contain BigQuery results' }],
-          rowCount: 1
+          rowCount: 1,
         };
         break;
       case SubAgentType.FIREBASE:
@@ -321,22 +338,22 @@ Please analyze the user's query and determine if you need to use any tools, then
           type: 'firebase_document' as const,
           collection: 'simulated_collection',
           id: 'simulated_id',
-          document: { simulated: true, message: 'This would contain Firebase document' }
+          document: { simulated: true, message: 'This would contain Firebase document' },
         };
         break;
       case SubAgentType.RAG:
         responseData = {
           type: 'text_response' as const,
-          text: `RAG search simulation for: "${input.query}". This would return relevant knowledge base results.`
+          text: `RAG search simulation for: "${input.query}". This would return relevant knowledge base results.`,
         };
         break;
       default:
         responseData = {
           type: 'text_response' as const,
-          text: `Tool execution simulation for: "${input.query}". This would execute the appropriate tools.`
+          text: `Tool execution simulation for: "${input.query}". This would execute the appropriate tools.`,
         };
     }
-    
+
     return this.createSuccessResponse(responseData, subAgent, startTime);
   }
 
@@ -344,9 +361,9 @@ Please analyze the user's query and determine if you need to use any tools, then
    * Creates a standardized success response
    */
   private createSuccessResponse(
-    data: any, 
-    subAgent: SubAgentType, 
-    startTime: number
+    data: any,
+    subAgent: SubAgentType,
+    startTime: number,
   ): Record<string, unknown> {
     return {
       success: true,
@@ -356,8 +373,8 @@ Please analyze the user's query and determine if you need to use any tools, then
         model: 'gemini-1.5-pro',
         processTime: Date.now() - startTime,
         subAgent,
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      },
     };
   }
 
@@ -368,7 +385,7 @@ Please analyze the user's query and determine if you need to use any tools, then
     return {
       initialized: this.isInitialized,
       hasModel: !!this.model,
-      modelName: this.model ? 'gemini-1.5-pro' : undefined
+      modelName: this.model ? 'gemini-1.5-pro' : undefined,
     };
   }
 
@@ -390,34 +407,36 @@ Please analyze the user's query and determine if you need to use any tools, then
       if (!this.isInitialized) {
         return {
           status: 'unhealthy',
-          details: { error: 'Not initialized' }
+          details: { error: 'Not initialized' },
         };
       }
 
       if (!this.model) {
         return {
           status: 'degraded',
-          details: { warning: 'Running in simulation mode - no Gemini API key' }
+          details: { warning: 'Running in simulation mode - no Gemini API key' },
         };
       }
 
       // Test with a simple query
-      const testResult = await this.model.generateContent('Hello, respond with "OK" if you are working.');
+      const testResult = await this.model.generateContent(
+        'Hello, respond with "OK" if you are working.',
+      );
       const response = await testResult.response;
-      
+
       return {
         status: 'healthy',
-        details: { 
+        details: {
           model: 'gemini-1.5-pro',
           testResponse: response.text(),
-          initialized: this.isInitialized
-        }
+          initialized: this.isInitialized,
+        },
       };
     } catch (error) {
       const handledError = errorHandler(error as Error, { operation: 'healthCheck' });
       return {
         status: 'unhealthy',
-        details: { error: handledError.message }
+        details: { error: handledError.message },
       };
     }
   }

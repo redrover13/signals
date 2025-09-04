@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true,
+    "exactOptionalPropertyTypes": false,
+    "strictPropertyInitialization": false
+  },
+  "include": ["libs/**/*.ts", "tools/**/*.ts", "scripts/**/*.ts", "**/*.d.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "*.generated.*",
+    "apps/**/*",
+    "agent-frontend/**/*",
+    "**/*.tsx",
+    "**/*.jsx"
+  ]
+}

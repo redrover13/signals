@@ -18,14 +18,14 @@ export * from './agents/root-agent';
 
 // GCP Tools
 export * from './tools/gcp-tools';
-export { 
-  BigQueryQueryTool, 
-  BigQueryInsertTool, 
-  GCSUploadTool, 
+export {
+  BigQueryQueryTool,
+  BigQueryInsertTool,
+  GCSUploadTool,
   HttpRequestTool,
   GCP_TOOLS,
   getToolByName,
-  getToolNames
+  getToolNames,
 } from './tools/gcp-tools';
 
 // Configuration utilities

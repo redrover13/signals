@@ -19,7 +19,7 @@ const moduleFederationConfig = {
         eager: true,
         requiredVersion: false,
       },
-      'react': {
+      react: {
         singleton: true,
         eager: true,
         requiredVersion: false,

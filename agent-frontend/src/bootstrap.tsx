@@ -18,12 +18,10 @@ import App from './app/app';
 // Create a shared signal that can be used across micro-frontends
 export const sharedCountSignal = createSignal(0);
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
 root.render(
   <StrictMode>
     <App />
-  </StrictMode>
+  </StrictMode>,
 );

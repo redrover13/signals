@@ -27,7 +27,7 @@ steps:
   # Security scan containers
   - name: 'aquasec/trivy:latest'
     id: 'scan-agent-runner'
-    args: 
+    args:
       - 'image'
       - '--exit-code'
       - '1'
@@ -37,7 +37,7 @@ steps:
 
   - name: 'aquasec/trivy:latest'
     id: 'scan-api'
-    args: 
+    args:
       - 'image'
       - '--exit-code'
       - '1'

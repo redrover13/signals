@@ -19,7 +19,10 @@ import { getProjectId } from '@dulce/gcp-core';
 /**
  * Query BigQuery
  */
-export async function query(sql: string | undefined, params?: Record<string, unknown> | undefined): Promise<unknown[]> {
+export async function query(
+  sql: string | undefined,
+  params?: Record<string, unknown> | undefined,
+): Promise<unknown[]> {
   // TODO: Implement BigQuery client
   console && console.log('BigQuery query:', sql, params);
   return [];
@@ -28,7 +31,10 @@ export async function query(sql: string | undefined, params?: Record<string, unk
 /**
  * Insert rows into BigQuery table
  */
-export async function insertRows(table: string | undefined, rows: Record<string, unknown> | undefined[]): Promise<void> {
+export async function insertRows(
+  table: string | undefined,
+  rows: Record<string, unknown> | undefined[],
+): Promise<void> {
   // TODO: Implement BigQuery insert
   console && console.log('BigQuery insert:', table, rows);
 }
@@ -36,7 +42,11 @@ export async function insertRows(table: string | undefined, rows: Record<string,
 /**
  * Upload string to Cloud Storage
  */
-export async function uploadString(path: string | undefined, contents: string | undefined, contentType?: string): Promise<string> {
+export async function uploadString(
+  path: string | undefined,
+  contents: string | undefined,
+  contentType?: string,
+): Promise<string> {
   // TODO: Implement Cloud Storage upload
   console && console.log('Cloud Storage upload:', path, contentType);
   return `gs://${path}`;

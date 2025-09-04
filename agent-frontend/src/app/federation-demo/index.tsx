@@ -18,9 +18,7 @@ const RemoteAgentInterface = lazy(() => {
   return new Promise<typeof import('../mocks/AgentInterface.tsx')>((resolve, reject) => {
     const timeout = setTimeout(() => {
       console.warn('Timeout loading remote component, using mock implementation');
-      import('../mocks/AgentInterface.tsx')
-        .then(resolve)
-        .catch(reject);
+      import('../mocks/AgentInterface.tsx').then(resolve).catch(reject);
     }, 5000);
 
     // Try to load the remote module first
@@ -33,9 +31,7 @@ const RemoteAgentInterface = lazy(() => {
         console.warn('Failed to load remote component, using mock implementation', error);
         clearTimeout(timeout);
         // Fallback to mock implementation
-        import('../mocks/AgentInterface.tsx')
-          .then(resolve)
-          .catch(reject);
+        import('../mocks/AgentInterface.tsx').then(resolve).catch(reject);
       });
   });
 });
@@ -62,17 +58,19 @@ export default function FederationDemo({ agentId = 'gemini-orchestrator' }: Fede
       <p className={styles['description']}>
         This component demonstrates module federation by loading a component from another app.
       </p>
-      
+
       <div className={styles['remoteComponentContainer']}>
         <h2 className={styles['remoteComponentTitle']}>Remote Agent Interface</h2>
-        
+
         {loadError ? (
           <div>
             <p>Failed to load remote component: {loadError.message}</p>
             <button onClick={handleRetry}>Retry</button>
           </div>
         ) : (
-          <Suspense fallback={<div className={styles['loadingIndicator']}>Loading remote component...</div>}>
+          <Suspense
+            fallback={<div className={styles['loadingIndicator']}>Loading remote component...</div>}
+          >
             <ErrorCatcher onError={setLoadError}>
               <RemoteAgentInterface agentId={agentId} isFederated={true} />
             </ErrorCatcher>

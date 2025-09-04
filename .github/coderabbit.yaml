@@ -11,15 +11,15 @@ review:
     - libs/adk/src/types/**/*.ts
     - apps/agents/src/**/*.ts
     - libs/utils/gcp-auth*/src/**/*.ts
-    
+
   # Files to ignore
   ignore:
-    - "**/*.spec.ts"
-    - "**/*.test.ts"
-    - "**/*.d.ts"
-    - "**/node_modules/**"
-    - "**/.next/**"
-    - "**/dist/**"
+    - '**/*.spec.ts'
+    - '**/*.test.ts'
+    - '**/*.d.ts'
+    - '**/node_modules/**'
+    - '**/.next/**'
+    - '**/dist/**'
 
   # Review settings
   review_comment_settings:
@@ -45,7 +45,7 @@ ai:
   summarize_pull_request: true
   line_comments: true
   semantic_search: true
-  
+
   # Focus areas
   focus:
     - type_safety

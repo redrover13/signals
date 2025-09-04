@@ -32,19 +32,19 @@ class SecretsManager {
     if (this.initialized) {
       return;
     }
-    
+
     try {
       if (!PROJECT_ID) {
         console.warn('GOOGLE_CLOUD_PROJECT environment variable not set');
       }
-      
+
       if (this) {
         this.secretManager = new DulceSecretManager(PROJECT_ID);
       }
-      
+
       // Load required secrets
       await this.loadRequiredSecrets();
-      
+
       this.initialized = true;
       console.log('Secrets Manager initialized successfully');
     } catch (error) {
@@ -60,24 +60,22 @@ class SecretsManager {
     if (!this.secretManager) {
       throw new Error('Secret Manager not initialized');
     }
-    
+
     for (const secretConfig of DULCE_SECRETS) {
       const { name, required } = secretConfig;
-      
+
       try {
         // Check if environment variable exists first
         const envValue = process.env[name];
-        
+
         if (envValue) {
           this.cachedSecrets[name] = envValue;
           continue;
         }
-        
+
         // Try to get from Secret Manager
-        const secretValue = await this.secretManager.getSecret(
-          `${name}_${ENVIRONMENT}`
-        );
-        
+        const secretValue = await this.secretManager.getSecret(`${name}_${ENVIRONMENT}`);
+
         this.cachedSecrets[name] = secretValue;
       } catch (error) {
         if (required) {
@@ -99,13 +97,13 @@ class SecretsManager {
     if (!this.initialized) {
       throw new Error('Secrets Manager not initialized');
     }
-    
+
     const secretValue = this.cachedSecrets[name];
-    
+
     if (!secretValue) {
       throw new Error(`Secret ${name} not found`);
     }
-    
+
     return secretValue;
   }
 

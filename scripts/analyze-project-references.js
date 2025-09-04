@@ -19,12 +19,12 @@ function extractImports(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   const importRegex = /import\s+(?:(?:[{}\s\w*,]+)\s+from\s+)?['"]([^'"]+)['"]/g;
   const imports = [];
-  
+
   let match;
   while ((match = importRegex.exec(content)) !== null) {
     imports.push(match[1]);
   }
-  
+
   return imports;
 }
 
@@ -34,7 +34,7 @@ function mapPackageToProject(packageName) {
   const tsconfigPath = path.join(rootDir, 'tsconfig.base.json');
   const tsconfig = JSON.parse(fs.readFileSync(tsconfigPath, 'utf8'));
   const paths = tsconfig.compilerOptions.paths || {};
-  
+
   for (const [alias, aliasPath] of Object.entries(paths)) {
     if (packageName === alias || packageName.startsWith(alias + '/')) {
       // Extract the project directory from the path mapping
@@ -42,69 +42,72 @@ function mapPackageToProject(packageName) {
       return projectPath;
     }
   }
-  
+
   return null;
 }
 
 // Function to check if a project has a reference to another project
 function hasProjectReference(projectDir, referenceDir) {
   const tsconfigPath = path.join(rootDir, projectDir, 'tsconfig.json');
-  
+
   if (!fs.existsSync(tsconfigPath)) {
     return false;
   }
-  
+
   const tsconfig = JSON.parse(fs.readFileSync(tsconfigPath, 'utf8'));
   const references = tsconfig.references || [];
-  
+
   for (const reference of references) {
     const refPath = reference.path;
     const absoluteRefPath = path.resolve(path.join(rootDir, projectDir), refPath);
-    
+
     // Check if the reference points to the target project
     if (absoluteRefPath.includes(referenceDir)) {
       return true;
     }
   }
-  
+
   return false;
 }
 
 // Main function to analyze imports and project references
 function analyzeProjectReferences() {
   // Find all TypeScript files in the project
-  const files = glob.sync(path.join(rootDir, 'libs/**/*.ts'), { ignore: ['**/node_modules/**', '**/*.d.ts'] });
-  
+  const files = glob.sync(path.join(rootDir, 'libs/**/*.ts'), {
+    ignore: ['**/node_modules/**', '**/*.d.ts'],
+  });
+
   const projectDependencies = {};
-  
+
   // Extract imports from each file and map them to projects
   for (const file of files) {
     const relativeFilePath = path.relative(rootDir, file);
-    const projectDir = relativeFilePath.split(path.sep)[0] + '/' + relativeFilePath.split(path.sep)[1];
-    
+    const projectDir =
+      relativeFilePath.split(path.sep)[0] + '/' + relativeFilePath.split(path.sep)[1];
+
     if (!projectDependencies[projectDir]) {
       projectDependencies[projectDir] = new Set();
     }
-    
+
     const imports = extractImports(file);
-    
+
     for (const importPath of imports) {
       // Skip relative imports and node_modules imports
       if (importPath.startsWith('.') || !importPath.startsWith('@')) {
         continue;
       }
-      
+
       const dependencyProject = mapPackageToProject(importPath);
-      
+
       if (dependencyProject && dependencyProject !== projectDir) {
         projectDependencies[projectDir].add(dependencyProject);
       }
     }
   }
-  
+
   // Check if project references are correctly set up
   const missingReferences = [];
-  
+
   for (const [projectDir, dependencies] of Object.entries(projectDependencies)) {
     for (const dependency of dependencies) {
       if (!hasProjectReference(projectDir, dependency)) {
@@ -112,10 +115,10 @@ function analyzeProjectReferences() {
       }
     }
   }
-  
+
   return {
     projectDependencies,
-    missingReferences
+    missingReferences,
   };
 }
 

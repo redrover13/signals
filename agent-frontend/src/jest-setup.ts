@@ -23,7 +23,7 @@ window.IntersectionObserver = mockIntersectionObserver;
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: jest.fn().mockImplementation(query => ({
+  value: jest.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -43,7 +43,7 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
 }));
 
 // Mock for requestAnimationFrame
-global.requestAnimationFrame = jest.fn(callback => {
+global.requestAnimationFrame = jest.fn((callback) => {
   setTimeout(callback, 0);
   return 0;
 });
@@ -51,7 +51,7 @@ global.requestAnimationFrame = jest.fn(callback => {
 // Mock for Web Crypto API
 Object.defineProperty(global.self, 'crypto', {
   value: {
-    getRandomValues: arr => {
+    getRandomValues: (arr) => {
       return require('crypto').randomBytes(arr.length);
     },
     subtle: {
@@ -66,9 +66,8 @@ Object.defineProperty(global.self, 'crypto', {
 const originalConsoleError = console.error;
 console.error = (...args) => {
   if (
-    typeof args[0] === 'string' && 
-    (args[0].includes('React does not recognize the') || 
-     args[0].includes('Warning:'))
+    typeof args[0] === 'string' &&
+    (args[0].includes('React does not recognize the') || args[0].includes('Warning:'))
   ) {
     return;
   }
@@ -76,20 +75,20 @@ console.error = (...args) => {
 };
 
 // Mock localStorage and sessionStorage
-const localStorageMock = (function() {
+const localStorageMock = (function () {
   let store = {};
   return {
-    getItem: jest.fn(key => store[key] || null),
+    getItem: jest.fn((key) => store[key] || null),
     setItem: jest.fn((key, value) => {
       store[key] = value.toString();
     }),
-    removeItem: jest.fn(key => {
+    removeItem: jest.fn((key) => {
       delete store[key];
     }),
     clear: jest.fn(() => {
       store = {};
     }),
-    key: jest.fn(index => {
+    key: jest.fn((index) => {
       return Object.keys(store)[index] || null;
     }),
     get length() {

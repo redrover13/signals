@@ -23,7 +23,7 @@ describe('OrderService', () => {
       // Arrange
       const orderItems: OrderItem[] = [
         { id: '1', price: 100000, quantity: 2 }, // 200,000 VND
-        { id: '2', price: 50000, quantity: 1 },  // 50,000 VND
+        { id: '2', price: 50000, quantity: 1 }, // 50,000 VND
       ];
       const taxRate = 0.1; // 10% VAT in Vietnam
       const expectedTotal = 275000; // (200,000 + 50,000) * 1.1
@@ -170,7 +170,7 @@ describe('BigQueryService', () => {
       const sql = 'SELECT * FROM users WHERE id = ?';
       const params = ['user123'];
       const expectedResults = [{ id: 'user123', name: 'John Doe' }];
-      
+
       mockBigQueryClient.query.mockResolvedValue([expectedResults]);
 
       // Act
@@ -188,7 +188,7 @@ describe('BigQueryService', () => {
         expect.objectContaining({
           sql: expect.stringContaining('SELECT * FROM users'),
           paramCount: 1,
-        })
+        }),
       );
     });
 
@@ -196,14 +196,12 @@ describe('BigQueryService', () => {
       // Arrange
       const sql = 'INVALID SQL';
       const queryError = new Error('Syntax error in SQL');
-      
+
       mockBigQueryClient.query.mockRejectedValue(queryError);
 
       // Act & Assert
-      await expect(bigQueryService.executeQuery(sql)).rejects.toThrow(
-        ExternalServiceError
-      );
-      
+      await expect(bigQueryService.executeQuery(sql)).rejects.toThrow(ExternalServiceError);
+
       expect(mockLogger.error).toHaveBeenCalledWith(
         'BigQuery query failed',
         expect.objectContaining({
@@ -211,7 +209,7 @@ describe('BigQueryService', () => {
           error: expect.objectContaining({
             message: 'Syntax error in SQL',
           }),
-        })
+        }),
       );
     });
   });
@@ -224,7 +222,7 @@ describe('BigQueryService', () => {
 // Bad: Shared mocks without proper cleanup
 describe('BigQueryService', () => {
   const mockBigQueryClient = jest.fn(); // Shared across tests
-  
+
   it('should execute query', async () => {
     mockBigQueryClient.mockResolvedValue([{ id: '1' }]);
     // Test implementation
@@ -272,18 +270,14 @@ describe('OrderService', () => {
     } as any;
 
     // Don't mock the service under test
-    orderService = new OrderService(
-      mockOrderRepository,
-      mockPaymentService,
-      mockEmailService
-    );
+    orderService = new OrderService(mockOrderRepository, mockPaymentService, mockEmailService);
   });
 
   it('should create order and send confirmation email', async () => {
     // Arrange
     const orderData = createTestOrderData();
     const createdOrder = { ...orderData, id: 'order123' };
-    
+
     mockOrderRepository.create.mockResolvedValue(createdOrder);
     mockPaymentService.processPayment.mockResolvedValue({ id: 'payment123' });
     mockEmailService.sendOrderConfirmation.mockResolvedValue(undefined);
@@ -309,7 +303,7 @@ describe('OrderService', () => {
     const mockOrderService = {
       createOrder: jest.fn().mockResolvedValue({ id: 'order123' }),
     };
-    
+
     // This doesn't test the actual implementation
     const result = await mockOrderService.createOrder({});
     expect(result).toEqual({ id: 'order123' });
@@ -338,7 +332,7 @@ describe('UserRepository Integration', () => {
     // Set up test database
     testDatabase = await createTestDatabase();
     await testDatabase.migrate();
-    
+
     userRepository = new UserRepository(testDatabase);
   });
 
@@ -391,9 +385,9 @@ describe('UserRepository Integration', () => {
       await userRepository.create(userData);
 
       // Act & Assert
-      await expect(
-        userRepository.create({ ...userData, name: 'User 2' })
-      ).rejects.toThrow(ConflictError);
+      await expect(userRepository.create({ ...userData, name: 'User 2' })).rejects.toThrow(
+        ConflictError,
+      );
     });
   });
 
@@ -438,7 +432,7 @@ describe('Orders API Integration', () => {
     // Set up test application
     testDatabase = await createTestDatabase();
     app = await createTestApp(testDatabase);
-    
+
     // Create test user and get auth token
     const testUser = await createTestUser();
     authToken = await generateAuthToken(testUser.id);
@@ -495,7 +489,7 @@ describe('Orders API Integration', () => {
       const createdOrder = await testDatabase
         .collection('orders')
         .findOne({ id: response.body.id });
-      
+
       expect(createdOrder).toBeTruthy();
       expect(createdOrder.customerId).toBe(orderData.customerId);
     });
@@ -535,10 +529,7 @@ describe('Orders API Integration', () => {
       };
 
       // Act & Assert
-      await request(app)
-        .post('/api/orders')
-        .send(orderData)
-        .expect(401);
+      await request(app).post('/api/orders').send(orderData).expect(401);
     });
   });
 });
@@ -622,8 +613,14 @@ export const TestDataFactory = {
   // Builder pattern for complex objects
   userBuilder: () => ({
     withEmail: (email: string) => ({ ...TestDataFactory.createUser(), email }),
-    withVietnamesePhone: (phone: string) => ({ ...TestDataFactory.createUser(), phoneNumber: phone }),
-    withPreferences: (preferences: UserPreferences) => ({ ...TestDataFactory.createUser(), preferences }),
+    withVietnamesePhone: (phone: string) => ({
+      ...TestDataFactory.createUser(),
+      phoneNumber: phone,
+    }),
+    withPreferences: (preferences: UserPreferences) => ({
+      ...TestDataFactory.createUser(),
+      preferences,
+    }),
     build: (overrides: Partial<User> = {}) => TestDataFactory.createUser(overrides),
   }),
 };
@@ -698,9 +695,7 @@ export class TestSeeder {
       }),
     ];
 
-    return Promise.all(
-      users.map(user => this.database.collection('users').insertOne(user))
-    );
+    return Promise.all(users.map((user) => this.database.collection('users').insertOne(user)));
   }
 
   private async seedMenuItems(): Promise<MenuItem[]> {
@@ -723,16 +718,14 @@ export class TestSeeder {
     ];
 
     return Promise.all(
-      menuItems.map(item => this.database.collection('menu_items').insertOne(item))
+      menuItems.map((item) => this.database.collection('menu_items').insertOne(item)),
     );
   }
 
   async cleanAll(): Promise<void> {
     const collections = ['users', 'orders', 'menu_items', 'payments'];
     await Promise.all(
-      collections.map(collection => 
-        this.database.collection(collection).deleteMany({})
-      )
+      collections.map((collection) => this.database.collection(collection).deleteMany({})),
     );
   }
 }

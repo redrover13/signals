@@ -18,10 +18,10 @@ jest.mock('gcp-auth', () => ({
     topic: jest.fn(() => ({
       publishMessage: jest.fn(async (msg) => ({
         messageId: 'test-message-id-' + Date.now(),
-        name: 'dulce.agents'
-      }))
-    }))
-  }))
+        name: 'dulce.agents',
+      })),
+    })),
+  })),
 }));
 
 describe('Agents Routes', () => {
@@ -41,21 +41,21 @@ describe('Agents Routes', () => {
       const taskPayload = {
         task: 'test task',
         agentType: 'test-agent',
-        priority: 'high'
+        priority: 'high',
       };
 
       const response = await app.inject({
         method: 'POST',
         url: '/start',
-        payload: taskPayload
+        payload: taskPayload,
       });
 
       expect(response.statusCode).toBe(200);
-      
+
       const body = JSON.parse(response.payload);
       expect(body).toMatchObject({
         ok: true,
-        status: 'published'
+        status: 'published',
       });
       expect(body.id).toMatch(/^task-\d+-[a-z0-9]+$/);
       expect(body.messageId).toMatch(/^test-message-id-\d+$/);
@@ -66,16 +66,16 @@ describe('Agents Routes', () => {
       const response = await app.inject({
         method: 'POST',
         url: '/start',
-        payload: {}
+        payload: {},
       });
 
       expect(response.statusCode).toBe(200);
-      
+
       const body = JSON.parse(response.payload);
       expect(body).toMatchObject({
         ok: true,
         task: 'default task',
-        status: 'published'
+        status: 'published',
       });
     });
 
@@ -84,24 +84,24 @@ describe('Agents Routes', () => {
       jest.mock('gcp-auth', () => ({
         getPubSub: jest.fn(() => ({
           topic: () => ({
-            publishMessage: jest.fn().mockRejectedValue(new Error('Pub/Sub error'))
-          })
-        }))
+            publishMessage: jest.fn().mockRejectedValue(new Error('Pub/Sub error')),
+          }),
+        })),
       }));
 
       const response = await app.inject({
         method: 'POST',
         url: '/start',
-        payload: { task: 'test task' }
+        payload: { task: 'test task' },
       });
 
       expect(response.statusCode).toBe(500);
-      
+
       const body = JSON.parse(response.payload);
       expect(body).toMatchObject({
         ok: false,
         error: 'Failed to publish task',
-        message: 'Pub/Sub error'
+        message: 'Pub/Sub error',
       });
     });
   });

@@ -16,7 +16,7 @@
  Delete this file and get started with your project!
  * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
- export function NxWelcome({ title }: { title: string }) {
+export function NxWelcome({ title }: { title: string }) {
   return (
     <>
       <style
@@ -700,9 +700,7 @@
                 </svg>
                 <span>
                   Install Nx Console for JetBrains
-                  <span>
-                    Available for WebStorm, Intellij IDEA Ultimate and more!
-                  </span>
+                  <span>Available for WebStorm, Intellij IDEA Ultimate and more!</span>
                 </span>
               </a>
               <div id="nx-cloud" className="rounded shadow">
@@ -729,14 +727,14 @@
                     <span>Enable faster CI & better DX</span>
                   </h2>
                 </div>
-                <p>
-                  Your workspace is connected to Nx Cloud.
-                </p>
+                <p>Your workspace is connected to Nx Cloud.</p>
                 <a
                   href="https://nx.dev/ci/intro/ci-with-nx#learn-about-nx-on-ci"
                   target="_blank"
                   rel="noreferrer"
-                > Learn about Nx on CI
+                >
+                  {' '}
+                  Learn about Nx on CI
                 </a>
               </div>
             </div>
@@ -761,19 +759,18 @@
                   />
                 </svg>
                 Build, test and lint your app
-                </summary>
-                <pre>
-                 <span># Build</span>
-                  nx build {title}
-                  <span># Test</span>
-                  nx test {title}
-                  <span># Lint</span>
-                  nx lint {title}
-                  <span># Run them together!</span>
-                  nx run-many -p {title} -t build test lint
-                
-                </pre>
-                </details>
+              </summary>
+              <pre>
+                <span># Build</span>
+                nx build {title}
+                <span># Test</span>
+                nx test {title}
+                <span># Lint</span>
+                nx lint {title}
+                <span># Run them together!</span>
+                nx run-many -p {title} -t build test lint
+              </pre>
+            </details>
 
             <details>
               <summary>

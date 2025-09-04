@@ -7,6 +7,7 @@ The Signals monorepo is a comprehensive data platform for the Vietnamese F&B mar
 ## 2. Project Structure
 
 ### Core Architecture
+
 - **`apps/`** - Deployable applications (cloud functions, frontend, agents, event parsers)
 - **`libs/`** - Reusable libraries organized by domain (agents, data-models, gcp, mcp, utils)
 - **`infra/`** - Infrastructure as Code (Terraform modules, Cloud Workflows)
@@ -14,6 +15,7 @@ The Signals monorepo is a comprehensive data platform for the Vietnamese F&B mar
 - **`.kilocode/`** - AI coding standards and governance rules
 
 ### Key Directories
+
 - **`apps/cloud-functions/`** - Serverless APIs for data ingestion (social, CRM, CMS, reviews)
 - **`apps/frontend-agents/`** - Next.js user interface
 - **`libs/agents/`** - AI agent implementations (BQ, Looker, CRM, content, reviews)
@@ -22,30 +24,23 @@ The Signals monorepo is a comprehensive data platform for the Vietnamese F&B mar
 - **`infra/terraform/`** - Infrastructure modules (BigQuery, functions, Vertex AI, Looker)
 
 ### NX Project Organization
+
 ```typescript
 // ✅ Good: Proper library structure
-libs/
-  gcp/
-    src/
-      lib/
-        bigquery/
-          bigquery.service.ts
-          bigquery.types.ts
-        storage/
-          storage.service.ts
-      index.ts  // Barrel export
+libs / gcp / src / lib / bigquery / bigquery.service.ts;
+bigquery.types.ts;
+storage / storage.service.ts;
+index.ts; // Barrel export
 
 // ❌ Bad: Mixing concerns
-libs/
-  utils/
-    src/
-      bigquery-helper.ts  // Should be in gcp lib
-      react-components.ts // Should be in UI lib
+libs / utils / src / bigquery - helper.ts; // Should be in gcp lib
+react - components.ts; // Should be in UI lib
 ```
 
 ## 3. Test Strategy
 
 ### Framework & Organization
+
 - **Primary**: Jest with TypeScript support via `ts-jest`
 - **Structure**: Co-located `*.spec.ts` files alongside source code
 - **Configuration**: NX-managed Jest projects with shared configuration
@@ -53,6 +48,7 @@ libs/
 ### Testing Patterns
 
 #### Unit Tests
+
 ```typescript
 // ✅ Good: Proper unit test structure
 describe('MCPService', () => {
@@ -84,6 +80,7 @@ describe('MCPService', () => {
 ```
 
 #### Integration Tests
+
 ```typescript
 // ✅ Good: Integration test with proper setup
 describe('BigQuery Integration', () => {
@@ -93,22 +90,23 @@ describe('BigQuery Integration', () => {
     // Use test project and dataset
     bigQueryService = new BigQueryService({
       projectId: 'test-project',
-      datasetId: 'test_dataset'
+      datasetId: 'test_dataset',
     });
   });
 
   it('should create and query table', async () => {
     const tableName = `test_table_${Date.now()}`;
-    
+
     await bigQueryService.createTable(tableName, schema);
     const result = await bigQueryService.query(`SELECT * FROM ${tableName}`);
-    
+
     expect(result).toBeDefined();
   });
 });
 ```
 
 ### Test Quality Guidelines
+
 - **Arrange-Act-Assert**: Structure tests clearly
 - **Descriptive Names**: Test names should describe the behavior
 - **Mock External Dependencies**: Always mock GCP services, APIs, databases
@@ -120,6 +118,7 @@ describe('BigQuery Integration', () => {
 ### TypeScript Standards
 
 #### Type Safety
+
 ```typescript
 // ✅ Good: Explicit types and proper error handling
 interface UserProfile {
@@ -146,20 +145,19 @@ async function getUserProfile(userId: any): Promise<any> {
 ```
 
 #### Async/Await Patterns
+
 ```typescript
 // ✅ Good: Proper async patterns with error handling
 async function processOrderBatch(orders: Order[]): Promise<ProcessResult[]> {
   const results: ProcessResult[] = [];
-  
+
   // Process in batches to avoid overwhelming services
   for (const batch of chunk(orders, 10)) {
-    const batchResults = await Promise.allSettled(
-      batch.map(order => processOrder(order))
-    );
-    
+    const batchResults = await Promise.allSettled(batch.map((order) => processOrder(order)));
+
     results.push(...batchResults.map(mapSettledResult));
   }
-  
+
   return results;
 }
 
@@ -174,6 +172,7 @@ async function processOrderBatch(orders: Order[]): Promise<any[]> {
 ```
 
 ### Naming Conventions
+
 - **Files**: kebab-case (`user-service.ts`, `data-models.spec.ts`)
 - **Classes**: PascalCase (`MCPService`, `BigQueryClient`)
 - **Functions/Variables**: camelCase (`getUserData`, `isInitialized`)
@@ -182,13 +181,14 @@ async function processOrderBatch(orders: Order[]): Promise<any[]> {
 - **Types**: PascalCase (`OrderStatus`, `PaymentMethod`)
 
 ### Error Handling Patterns
+
 ```typescript
 // ✅ Good: Custom error classes with context
 export class BigQueryError extends Error {
   constructor(
     message: string,
     public readonly query?: string,
-    public readonly cause?: Error
+    public readonly cause?: Error,
   ) {
     super(message);
     this.name = 'BigQueryError';
@@ -203,12 +203,13 @@ try {
   throw new BigQueryError(
     'Failed to execute query',
     sql,
-    error instanceof Error ? error : new Error(String(error))
+    error instanceof Error ? error : new Error(String(error)),
   );
 }
 ```
 
 ### Code Organization
+
 ```typescript
 // ✅ Good: Barrel exports with clear structure
 // libs/gcp/src/index.ts
@@ -226,6 +227,7 @@ export type { BigQueryConfig, QueryResult } from './bigquery.types';
 ## 5. Common Patterns
 
 ### Singleton Services
+
 ```typescript
 // ✅ Good: Thread-safe singleton with proper typing
 export class MCPService {
@@ -249,13 +251,14 @@ export class MCPService {
   }
 
   async shutdown(): Promise<void> {
-    await Promise.all([...this.clients.values()].map(client => client.close()));
+    await Promise.all([...this.clients.values()].map((client) => client.close()));
     this.clients.clear();
   }
 }
 ```
 
 ### GCP Service Integration
+
 ```typescript
 // ✅ Good: Proper GCP service wrapper with retry logic
 export class BigQueryService {
@@ -283,27 +286,28 @@ export class BigQueryService {
 
   private async withRetry<T>(operation: () => Promise<T>): Promise<T> {
     let lastError: Error;
-    
+
     for (let attempt = 1; attempt <= this.retryConfig.maxAttempts; attempt++) {
       try {
         return await operation();
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
-        
+
         if (attempt === this.retryConfig.maxAttempts || !this.isRetryableError(error)) {
           break;
         }
-        
+
         await this.delay(this.retryConfig.baseDelay * Math.pow(2, attempt - 1));
       }
     }
-    
+
     throw new BigQueryError('Operation failed after retries', undefined, lastError);
   }
 }
 ```
 
 ### Configuration Management
+
 ```typescript
 // ✅ Good: Type-safe configuration with validation
 import { z } from 'zod';
@@ -352,6 +356,7 @@ export function loadConfig(): AppConfig {
 ## 6. Do's and Don'ts
 
 ### ✅ Do's
+
 - Use NX generators (`nx g`) for creating new projects and components
 - Respect NX project boundaries and dependency constraints
 - Tag AI-generated code with `// AI-GENERATED` comments
@@ -369,6 +374,7 @@ export function loadConfig(): AppConfig {
 - **Use dependency injection for testability**
 
 ### ❌ Don'ts
+
 - Don't bypass NX module boundaries
 - Don't commit secrets or sensitive data to version control
 - Don't use `any` type without justification
@@ -388,6 +394,7 @@ export function loadConfig(): AppConfig {
 ## 7. Tools & Dependencies
 
 ### Core Technologies
+
 - **Runtime**: Node.js 20+ with ES modules
 - **Package Manager**: pnpm with workspace support
 - **Monorepo**: NX with caching and affected builds
@@ -397,6 +404,7 @@ export function loadConfig(): AppConfig {
 - **Formatting**: Prettier with consistent configuration
 
 ### Cloud & Infrastructure
+
 - **Platform**: Google Cloud Platform
 - **IaC**: Terraform with modular structure
 - **CI/CD**: GitHub Actions with Workload Identity Federation
@@ -404,12 +412,14 @@ export function loadConfig(): AppConfig {
 - **Security**: Google Secret Manager, IAM with least privilege
 
 ### AI & Data
+
 - **AI Platform**: Google Vertex AI and Gemini
 - **Data Warehouse**: BigQuery with dbt transformations
 - **Messaging**: Google Cloud Pub/Sub
 - **Analytics**: Google Analytics 4 integration
 
 ### Development Workflow
+
 ```bash
 # Setup
 pnpm install
@@ -427,6 +437,7 @@ pnpm nx affected --target=build
 ```
 
 ### Linting Configuration
+
 The project uses ESLint with NX integration to enforce code quality and consistency:
 
 - **Base Configuration**: Configured in `.eslintrc.json` with TypeScript and JavaScript rules
@@ -437,6 +448,7 @@ The project uses ESLint with NX integration to enforce code quality and consiste
   - NX commands: `pnpm nx lint <project-name>` or `pnpm nx affected --target=lint`
 
 Key rules enforced include:
+
 - TypeScript type safety (no-explicit-any, explicit-return-types)
 - Unused variables detection
 - Module boundary enforcement via NX
@@ -446,6 +458,7 @@ Key rules enforced include:
 ## 8. Other Notes
 
 ### LLM Code Generation Guidelines
+
 - Always review and understand AI-generated code before committing
 - Use the project's established patterns and conventions
 - Ensure proper error handling and type safety
@@ -459,6 +472,7 @@ Key rules enforced include:
 - **Implement proper input validation**
 
 ### Performance Optimization
+
 ```typescript
 // ✅ Good: Efficient data processing with streaming
 async function processLargeDataset(datasetId: string): Promise<void> {
@@ -488,6 +502,7 @@ async function processLargeDataset(datasetId: string): Promise<void> {
 ```
 
 ### Special Considerations
+
 - **Vietnamese Compliance**: Ensure all user-facing content supports Vietnamese localization
 - **Data Privacy**: Follow Vietnamese data protection regulations (see `.kilocode/rules/vietnamese-compliance.md`)
 - **Performance**: Optimize for BigQuery query performance and cost
@@ -498,6 +513,7 @@ async function processLargeDataset(datasetId: string): Promise<void> {
 - **Dependencies**: Keep dependencies up-to-date and scan for vulnerabilities
 
 ### Edge Cases & Constraints
+
 - Handle BigQuery quota limits gracefully
 - Implement proper backpressure for Pub/Sub consumers
 - Consider time zone handling for Vietnamese market (ICT/UTC+7)

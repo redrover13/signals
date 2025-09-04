@@ -1,15 +1,15 @@
 import { lookerDashboards } from './looker-dashboards';
-import { 
+import {
   AGENT_MONITORING_DASHBOARD,
   REALTIME_DASHBOARD,
   generateDashboardTemplate,
-  exportDashboardTemplate
+  exportDashboardTemplate,
 } from './dashboard-templates';
-import { 
+import {
   generateMonitoringQuery,
   PERFORMANCE_QUERIES,
   FNB_ANALYTICS_QUERIES,
-  MONITORING_QUERY_SETS
+  MONITORING_QUERY_SETS,
 } from './monitoring-queries';
 
 describe('lookerDashboards', () => {
@@ -38,7 +38,7 @@ describe('lookerDashboards', () => {
         projectId: 'test-project',
         datasetId: 'test-dataset',
         tableId: 'test-table',
-        dashboardName: 'Custom Dashboard'
+        dashboardName: 'Custom Dashboard',
       };
 
       const template = generateDashboardTemplate(options);
@@ -52,7 +52,7 @@ describe('lookerDashboards', () => {
     it('should export dashboard template as JSON', () => {
       const exported = exportDashboardTemplate(AGENT_MONITORING_DASHBOARD, 'json');
       const parsed = JSON.parse(exported);
-      
+
       expect(parsed.name).toBe(AGENT_MONITORING_DASHBOARD.name);
       expect(parsed.pages).toHaveLength(4);
     });
@@ -60,7 +60,7 @@ describe('lookerDashboards', () => {
     it('should export dashboard template as Looker format', () => {
       const exported = exportDashboardTemplate(AGENT_MONITORING_DASHBOARD, 'looker');
       const parsed = JSON.parse(exported);
-      
+
       expect(parsed.dashboardName).toBe(AGENT_MONITORING_DASHBOARD.name);
       expect(parsed.dataConnectors).toBeDefined();
       expect(parsed.charts).toBeDefined();
@@ -74,12 +74,12 @@ describe('lookerDashboards', () => {
       datasetId: 'test-dataset',
       tableId: 'test-table',
       timeRange: '24h' as const,
-      service: 'test-service'
+      service: 'test-service',
     };
 
     it('should generate health score query', () => {
       const query = PERFORMANCE_QUERIES.healthScore(testParams);
-      
+
       expect(query).toContain('test-project.test-dataset.test-table');
       expect(query).toContain('24h');
       expect(query).toContain('test-service');
@@ -88,7 +88,7 @@ describe('lookerDashboards', () => {
 
     it('should generate request throughput query', () => {
       const query = PERFORMANCE_QUERIES.requestThroughput(testParams);
-      
+
       expect(query).toContain('requests_per_minute');
       expect(query).toContain('TIMESTAMP_TRUNC');
       expect(query).toContain('24h');
@@ -97,7 +97,7 @@ describe('lookerDashboards', () => {
     it('should generate F&B analytics queries', () => {
       const restaurantQuery = FNB_ANALYTICS_QUERIES.restaurantInteractions(testParams);
       const menuQuery = FNB_ANALYTICS_QUERIES.menuItemPopularity(testParams);
-      
+
       expect(restaurantQuery).toContain('restaurant_id');
       expect(restaurantQuery).toContain('interaction_type');
       expect(menuQuery).toContain('menu_item_id');
@@ -105,7 +105,7 @@ describe('lookerDashboards', () => {
 
     it('should generate query using helper function', () => {
       const query = generateMonitoringQuery('healthScore', testParams);
-      
+
       expect(query).toContain('health_score');
       expect(query).toContain('test-project');
     });
@@ -127,32 +127,34 @@ describe('lookerDashboards', () => {
   describe('Dashboard Integration', () => {
     it('should support Vietnamese data compliance requirements', () => {
       const dashboard = AGENT_MONITORING_DASHBOARD;
-      
+
       expect(dashboard.metadata?.compliance).toBe('GDPR-Vietnam Compatible');
       expect(dashboard.metadata?.region).toBe('Asia-Southeast1');
-      
+
       // Check compliance page exists
-      const compliancePage = dashboard.pages.find(page => page.name === 'Compliance & Security');
+      const compliancePage = dashboard.pages.find((page) => page.name === 'Compliance & Security');
       expect(compliancePage).toBeDefined();
-      expect(compliancePage?.charts.some(chart => chart.title.includes('Vietnam Data Law'))).toBe(true);
+      expect(compliancePage?.charts.some((chart) => chart.title.includes('Vietnam Data Law'))).toBe(
+        true,
+      );
     });
 
     it('should include F&B specific metrics', () => {
       const dashboard = AGENT_MONITORING_DASHBOARD;
-      
+
       // Check F&B operations page exists
-      const fnbPage = dashboard.pages.find(page => page.name === 'F&B Operations');
+      const fnbPage = dashboard.pages.find((page) => page.name === 'F&B Operations');
       expect(fnbPage).toBeDefined();
-      expect(fnbPage?.charts.some(chart => chart.title.includes('Restaurant'))).toBe(true);
-      expect(fnbPage?.charts.some(chart => chart.title.includes('Menu'))).toBe(true);
+      expect(fnbPage?.charts.some((chart) => chart.title.includes('Restaurant'))).toBe(true);
+      expect(fnbPage?.charts.some((chart) => chart.title.includes('Menu'))).toBe(true);
     });
 
     it('should have proper filter configuration', () => {
       const dashboard = AGENT_MONITORING_DASHBOARD;
-      
-      const timeFilter = dashboard.filters.find(filter => filter.id === 'time_range');
-      const serviceFilter = dashboard.filters.find(filter => filter.id === 'service_filter');
-      
+
+      const timeFilter = dashboard.filters.find((filter) => filter.id === 'time_range');
+      const serviceFilter = dashboard.filters.find((filter) => filter.id === 'service_filter');
+
       expect(timeFilter).toBeDefined();
       expect(timeFilter?.defaultValue).toBe('LAST_24_HOURS');
       expect(serviceFilter).toBeDefined();

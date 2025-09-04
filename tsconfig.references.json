@@ -87,9 +87,5 @@
       "path": "./infra/workflows/pubsub-workflows"
     }
   ],
-  "exclude": [
-    "node_modules",
-    "tmp",
-    "dist"
-  ]
+  "exclude": ["node_modules", "tmp", "dist"]
 }

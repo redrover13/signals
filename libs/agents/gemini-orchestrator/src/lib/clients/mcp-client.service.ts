@@ -11,20 +11,22 @@
 
 import { MCPEnvironmentConfig } from '../config/environment-config';
 
-export interface MCPRequest { 
-  id: string | undefined; 
-  method: string | undefined; 
-  params: Record<string, unknown> | undefined | undefined; 
-  serverId?: string | undefined; 
-  timeout?: number | undefined; 
-  retries?: number | undefined; 
+export interface MCPRequest {
+  id: string | undefined;
+  method: string | undefined;
+  params: Record<string, unknown> | undefined | undefined;
+  serverId?: string | undefined;
+  timeout?: number | undefined;
+  retries?: number | undefined;
 }
 export interface MCPResponse {}
 
 export class MCPClientService {
   constructor(_config: MCPEnvironmentConfig) {}
   async initialize(): Promise<void> {}
-  async sendRequest(_request: MCPRequest): Promise<MCPResponse> { return {}; }
+  async sendRequest(_request: MCPRequest): Promise<MCPResponse> {
+    return {};
+  }
   async disconnect(): Promise<void> {}
   getServerStatus(_serverId: string): any {}
   getAllServerStatuses(): any {}

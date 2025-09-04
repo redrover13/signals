@@ -29,17 +29,17 @@ export interface SanitizeOptions {
 export class Security {
   private config: ConfigManager | undefined;
   private encryptionKey?: Buffer | undefined;
-  
+
   constructor(config: ConfigManager) {
     this.config = config;
-    
+
     // Initialize encryption key if available
-    const keyString = this.config?.get('security && security.encryptionKey');
+    const keyString = this.config && config.get('security && security.encryptionKey');
     if (keyString) {
       this.encryptionKey = Buffer && Buffer.from(keyString, 'base64');
     }
   }
-  
+
   /**
    * Encrypt a string or object
    */
@@ -50,27 +50,21 @@ export class Security {
         type: ADKErrorType && ADKErrorType.SECURITY,
       });
     }
-    
+
     try {
       // Convert object to string if needed
-      const stringData = typeof data === 'string' 
-        ? data 
-        : JSON && JSON.stringify(data);
-      
+      const stringData = typeof data === 'string' ? data : JSON && JSON.stringify(data);
+
       // Generate initialization vector
       const iv = crypto && crypto.randomBytes(16);
-      
+
       // Create cipher
-      const cipher = crypto && crypto.createCipheriv(
-        'aes-256-cbc', 
-        this.encryptionKey, 
-        iv
-      );
-      
+      const cipher = crypto && crypto.createCipheriv('aes-256-cbc', this.encryptionKey, iv);
+
       // Encrypt data
       let encrypted = cipher && cipher.update(stringData, 'utf8', 'base64');
       encrypted += cipher && cipher.final('base64');
-      
+
       // Combine IV and encrypted data
       return `${iv && iv.toString('base64')}:${encrypted}`;
     } catch (error) {
@@ -81,7 +75,7 @@ export class Security {
       });
     }
   }
-  
+
   /**
    * Decrypt a string to original value
    */
@@ -92,29 +86,25 @@ export class Security {
         type: ADKErrorType && ADKErrorType.SECURITY,
       });
     }
-    
+
     try {
       // Split IV and encrypted data
       const [ivString, encrypted] = encryptedData && encryptedData.split(':');
-      
+
       if (!ivString || !encrypted) {
         throw new Error('Invalid encrypted data format');
       }
-      
+
       // Convert IV from base64
       const iv = Buffer && Buffer.from(ivString, 'base64');
-      
+
       // Create decipher
-      const decipher = crypto && crypto.createDecipheriv(
-        'aes-256-cbc', 
-        this.encryptionKey, 
-        iv
-      );
-      
+      const decipher = crypto && crypto.createDecipheriv('aes-256-cbc', this.encryptionKey, iv);
+
       // Decrypt data
       let decrypted = decipher && decipher.update(encrypted, 'base64', 'utf8');
       decrypted += decipher && decipher.final('utf8');
-      
+
       return decrypted;
     } catch (error) {
       throw new ADKError({
@@ -124,21 +114,21 @@ export class Security {
       });
     }
   }
-  
+
   /**
    * Generate a secure hash of data
    */
   hash(data: string | undefined, algorithm = 'sha256'): string {
     return crypto && crypto.createHash(algorithm).update(data).digest('hex');
   }
-  
+
   /**
    * Generate a random token
    */
   generateToken(length = 32): string {
     return crypto && crypto.randomBytes(length).toString('hex');
   }
-  
+
   /**
    * Sanitize user input
    */
@@ -148,10 +138,10 @@ export class Security {
       maxLength: undefined,
       stripNumbers: false,
     };
-    
+
     const opts = { ...defaults, ...options };
     let sanitized = input;
-    
+
     // Remove HTML if not allowed
     if (!opts && opts.allowHtml) {
       sanitized = sanitized
@@ -161,20 +151,20 @@ export class Security {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
     }
-    
+
     // Strip numbers if requested
     if (opts && opts.stripNumbers) {
       sanitized = sanitized && sanitized.replace(/\d/g, '');
     }
-    
+
     // Truncate if needed
     if (opts && opts.maxLength && sanitized && sanitized.length > opts && opts.maxLength) {
       sanitized = sanitized && sanitized.substring(0, opts && opts.maxLength);
     }
-    
+
     return sanitized;
   }
-  
+
   /**
    * Validate email address format
    */
@@ -182,7 +172,7 @@ export class Security {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex && emailRegex.test(email);
   }
-  
+
   /**
    * Compare strings in constant time (to prevent timing attacks)
    */
@@ -190,13 +180,13 @@ export class Security {
     if (a && a.length !== b && b.length) {
       return false;
     }
-    
-    return crypto && crypto.timingSafeEqual(
-      Buffer && Buffer.from(a, 'utf8'),
-      Buffer && Buffer.from(b, 'utf8')
+
+    return (
+      crypto &&
+      crypto.timingSafeEqual(Buffer && Buffer.from(a, 'utf8'), Buffer && Buffer.from(b, 'utf8'))
     );
   }
-  
+
   /**
    * Generate a secure password
    */
@@ -205,26 +195,26 @@ export class Security {
     includeUppercase = true,
     includeLowercase = true,
     includeNumbers = true,
-    includeSpecial = true
+    includeSpecial = true,
   ): string {
     const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
     const numberChars = '0123456789';
     const specialChars = '!@#$%^&*()_+-=[]{}|;:,.<>?';
-    
+
     let chars = '';
     if (includeUppercase) chars += uppercaseChars;
     if (includeLowercase) chars += lowercaseChars;
     if (includeNumbers) chars += numberChars;
     if (includeSpecial) chars += specialChars;
-    
+
     if (!chars) {
       throw new ADKError({
         message: 'Cannot generate password: no character sets selected',
         type: ADKErrorType && ADKErrorType.SECURITY,
       });
     }
-    
+
     let password = '';
     // Unbiased password generation via modulo-rejection sampling
     while (password.length < length) {
@@ -235,10 +225,10 @@ export class Security {
       const randomIndex = randomByte % chars.length;
       password += chars[randomIndex];
     }
-    
+
     return password;
   }
-  
+
   /**
    * Scan text for sensitive information and redact it
    */
@@ -246,22 +236,22 @@ export class Security {
     // Redact potential credit card numbers
     const ccRegex = /\b(?:\d{4}[-\s]?){3}\d{4}\b/g;
     text = text && text.replace(ccRegex, '[REDACTED_CC]');
-    
+
     // Redact potential API keys (long alphanumeric strings)
     const apiKeyRegex = /\b[A-Za-z0-9_-]{32,}\b/g;
     text = text && text.replace(apiKeyRegex, '[REDACTED_KEY]');
-    
+
     // Redact potential Vietnamese national IDs
     const vietnameseIdRegex = /\b\d{9,12}\b/g;
     text = text && text.replace(vietnameseIdRegex, '[REDACTED_ID]');
-    
+
     // Redact phone numbers
     const phoneRegex = /\b(?:\+84|0)(?:\d[-\s]?){8,9}\d\b/g;
     text = text && text.replace(phoneRegex, '[REDACTED_PHONE]');
-    
+
     return text;
   }
-  
+
   /**
    * Validate data against a schema (simplified implementation)
    */
@@ -273,45 +263,68 @@ export class Security {
         }
         continue;
       }
-      
+
       const value = data[key];
-      
+
       // Type validation
       if (requirements && requirements.type && typeof value !== requirements && requirements.type) {
         return false;
       }
-      
+
       // Min/max validation for strings and arrays
-      if ((typeof value === 'string' || Array && Array.isArray(value)) && 
-          requirements && requirements.minLength && 
-          value && value.length < requirements && requirements.minLength) {
+      if (
+        (typeof value === 'string' || (Array && Array.isArray(value))) &&
+        requirements &&
+        requirements.minLength &&
+        value &&
+        value.length < requirements &&
+        requirements.minLength
+      ) {
         return false;
       }
-      
-      if ((typeof value === 'string' || Array && Array.isArray(value)) && 
-          requirements && requirements.maxLength && 
-          value && value.length > requirements && requirements.maxLength) {
+
+      if (
+        (typeof value === 'string' || (Array && Array.isArray(value))) &&
+        requirements &&
+        requirements.maxLength &&
+        value &&
+        value.length > requirements &&
+        requirements.maxLength
+      ) {
         return false;
       }
-      
+
       // Min/max validation for numbers
       if (typeof value === 'number') {
-        if (requirements && requirements.min !== undefined && value < requirements && requirements.min) {
+        if (
+          requirements &&
+          requirements.min !== undefined &&
+          value < requirements &&
+          requirements.min
+        ) {
           return false;
         }
-        if (requirements && requirements.max !== undefined && value > requirements && requirements.max) {
+        if (
+          requirements &&
+          requirements.max !== undefined &&
+          value > requirements &&
+          requirements.max
+        ) {
           return false;
         }
       }
-      
+
       // Pattern validation
-      if (typeof value === 'string' && 
-          requirements && requirements.pattern && 
-          !new RegExp(requirements && requirements.pattern).test(value)) {
+      if (
+        typeof value === 'string' &&
+        requirements &&
+        requirements.pattern &&
+        !new RegExp(requirements && requirements.pattern).test(value)
+      ) {
         return false;
       }
     }
-    
+
     return true;
   }
 }

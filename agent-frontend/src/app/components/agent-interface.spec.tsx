@@ -26,11 +26,11 @@ jest.mock('agents-sdk', () => {
           return Promise.resolve({
             success: true,
             data: { result: 'Test result' },
-            message: 'Operation completed successfully'
+            message: 'Operation completed successfully',
           });
-        })
+        }),
       };
-    })
+    }),
   };
 });
 
@@ -44,8 +44,8 @@ describe('AgentInterface Component', () => {
       projectId: 'test-project',
       storageBucket: 'test.appspot.com',
       messagingSenderId: '123456789',
-      appId: '1:123456789:web:abcdef'
-    }
+      appId: '1:123456789:web:abcdef',
+    },
   };
 
   it('renders successfully', () => {
@@ -68,32 +68,32 @@ describe('AgentInterface Component', () => {
     render(<AgentInterface config={mockConfig} />);
     const textarea = screen.getByPlaceholderText(/Enter your query/i);
     await userEvent.type(textarea, 'Test query');
-    
+
     const submitButton = screen.getByText('Send Query');
     expect(submitButton).not.toBeDisabled();
   });
 
   it('shows loading state during query submission', async () => {
     render(<AgentInterface config={mockConfig} />);
-    
+
     const textarea = screen.getByPlaceholderText(/Enter your query/i);
     await userEvent.type(textarea, 'Test query');
-    
+
     const submitButton = screen.getByText('Send Query');
     fireEvent.click(submitButton);
-    
+
     expect(screen.getByText('Processing...')).toBeInTheDocument();
   });
 
   it('displays successful response', async () => {
     render(<AgentInterface config={mockConfig} />);
-    
+
     const textarea = screen.getByPlaceholderText(/Enter your query/i);
     await userEvent.type(textarea, 'Test query');
-    
+
     const submitButton = screen.getByText('Send Query');
     fireEvent.click(submitButton);
-    
+
     await waitFor(() => {
       expect(screen.getByText('Success!')).toBeInTheDocument();
       expect(screen.getByText('Operation completed successfully')).toBeInTheDocument();
@@ -103,13 +103,13 @@ describe('AgentInterface Component', () => {
 
   it('displays error message on failure', async () => {
     render(<AgentInterface config={mockConfig} />);
-    
+
     const textarea = screen.getByPlaceholderText(/Enter your query/i);
     await userEvent.type(textarea, 'cause error');
-    
+
     const submitButton = screen.getByText('Send Query');
     fireEvent.click(submitButton);
-    
+
     await waitFor(() => {
       expect(screen.getByText('Error:')).toBeInTheDocument();
       expect(screen.getByText('Test error message')).toBeInTheDocument();

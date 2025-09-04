@@ -1,0 +1,24 @@
+--- libs/utils/signals/src/enhanced-signals.spec.ts
++++ libs/utils/signals/src/enhanced-signals.spec.ts
+@@ -135,9 +135,9 @@ describe('Enhanced Signals Library', () => {
+ 
+   describe('TypeScript Type Safety', () => {
+     it('should correctly infer signal types', () => {
+-      const numSignal = createSignal(42);
+-      const strSignal = createSignal('hello');
+-      const objSignal = createSignal({ foo: 'bar' });
++      type NumSignalType = ReturnType<typeof createSignal<number>>;
++      type StrSignalType = ReturnType<typeof createSignal<string>>;
++      type ObjSignalType = ReturnType<typeof createSignal<{foo: string}>>;
+ 
+       type NumType = SignalValue<typeof numSignal>;
+       type StrType = SignalValue<typeof strSignal>;
+@@ -157,7 +157,7 @@ describe('Enhanced Signals Library', () => {
+         name: string;
+       }
+ 
+-      const objSignal = createSignal<TestObject>({ id: 1, name: 'test' });
++      type ObjSignalType = ReturnType<typeof createSignal<TestObject>>;
+ 
+       type UnwrappedType = UnwrapSignal<typeof objSignal>;
+ 

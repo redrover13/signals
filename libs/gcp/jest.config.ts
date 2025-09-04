@@ -1,5 +1,5 @@
 export default {
   displayName: 'gcp',
   preset: '../../jest.preset.mjs',
-  coverageDirectory: '../../coverage/libs/gcp'
+  coverageDirectory: '../../coverage/libs/gcp',
 };

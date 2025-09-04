@@ -60,10 +60,11 @@ export function createSignal<T>(initialValue: T, options?: CreateSignalOptions):
       currentTracker.add(signalFunction);
     }
     if (newValue !== undefined) {
-      const nextValue = typeof newValue === 'function' ? (newValue as (prev: T) => T)(currentValue) : newValue;
+      const nextValue =
+        typeof newValue === 'function' ? (newValue as (prev: T) => T)(currentValue) : newValue;
       if (nextValue !== currentValue) {
         currentValue = nextValue;
-        subscribers.forEach(callback => callback(currentValue));
+        subscribers.forEach((callback) => callback(currentValue));
       }
     }
     return currentValue;
@@ -81,7 +82,7 @@ export function createSignal<T>(initialValue: T, options?: CreateSignalOptions):
     const nextValue = typeof value === 'function' ? (value as (prev: T) => T)(currentValue) : value;
     if (nextValue !== currentValue) {
       currentValue = nextValue;
-      subscribers.forEach(callback => callback(currentValue));
+      subscribers.forEach((callback) => callback(currentValue));
     }
   };
 
@@ -91,7 +92,7 @@ export function createSignal<T>(initialValue: T, options?: CreateSignalOptions):
   };
 
   // Add debugging if enabled
-  if (options?.debug === true) {
+  if (options && options.debug === true) {
     const name = options.name ?? 'Signal';
     console.info(`${name} created with initial value:`, initialValue);
 
@@ -127,13 +128,14 @@ export function createPersistentSignal<T>(key: string, initialValue: T): Signal<
     console.error(`Error loading value for key "${key}" from localStorage:`, error);
   }
 
-  const signalInstance = createSignal<T>(
-    savedValue ?? initialValue
-  );
+  const signalInstance = createSignal<T>(savedValue ?? initialValue);
 
   const originalSet = signalInstance.set;
   signalInstance.set = (newValue: T | ((prev: T) => T)): void => {
-    const valueToStore = typeof newValue === 'function' ? (newValue as (prev: T) => T)(signalInstance.get()) : newValue;
+    const valueToStore =
+      typeof newValue === 'function'
+        ? (newValue as (prev: T) => T)(signalInstance.get())
+        : newValue;
     try {
       localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
@@ -157,9 +159,7 @@ export { createPersistentSignal as persistentSignal };
 // Global state for dependency tracking
 let currentTracker: Set<Signal<any>> | null = null;
 
-export function createDerivedSignal<T>(
-  computeFn: () => T
-): Signal<T> {
+export function createDerivedSignal<T>(computeFn: () => T): Signal<T> {
   let currentValue = computeFn();
   const subscribers = new Set<(value: T) => void>();
   const dependencies = new Set<Signal<any>>();
@@ -177,7 +177,7 @@ export function createDerivedSignal<T>(
 
   const updateValue = () => {
     // Clean up old subscriptions
-    unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
+    unsubscribeFunctions.forEach((unsubscribe) => unsubscribe());
     unsubscribeFunctions = [];
 
     // Track dependencies during computation
@@ -188,12 +188,12 @@ export function createDerivedSignal<T>(
       const newValue = computeFn();
       if (newValue !== currentValue) {
         currentValue = newValue;
-        subscribers.forEach(callback => callback(currentValue));
+        subscribers.forEach((callback) => callback(currentValue));
       }
 
       // Subscribe to newly tracked dependencies
       dependencies.clear();
-      currentTracker.forEach(signal => {
+      currentTracker.forEach((signal) => {
         dependencies.add(signal);
         const unsubscribe = signal.subscribe(updateValue);
         unsubscribeFunctions.push(unsubscribe);
@@ -218,7 +218,7 @@ export function createDerivedSignal<T>(
 export function createComputed<T>(
   computeFn: () => T,
   // @ts-expect-error: dependencies parameter kept for API compatibility
-  dependencies: Signal<any>[] = []
+  dependencies: Signal<any>[] = [],
 ): Signal<T> {
   // For now, ignore dependencies and just create a derived signal
   // In a more sophisticated implementation, this would use the dependencies
@@ -233,7 +233,7 @@ export function createComputed<T>(
  */
 export function createEffect(
   effectFn: () => void | (() => void),
-  dependencies: Signal<any>[] = []
+  dependencies: Signal<any>[] = [],
 ): () => void {
   let cleanup: (() => void) | void;
 
@@ -243,16 +243,14 @@ export function createEffect(
   };
 
   // Subscribe to all dependencies
-  const unsubscribeFunctions = dependencies.map(signal =>
-    signal.subscribe(runEffect)
-  );
+  const unsubscribeFunctions = dependencies.map((signal) => signal.subscribe(runEffect));
 
   // Run effect initially
   runEffect();
 
   return () => {
     if (cleanup) cleanup();
-    unsubscribeFunctions.forEach(unsubscribe => unsubscribe());
+    unsubscribeFunctions.forEach((unsubscribe) => unsubscribe());
   };
 }
 
@@ -280,23 +278,27 @@ export type AsyncSignalState<T> =
  */
 export function fromPromise<T>(
   promise: Promise<T>,
-  initialValue?: T
+  initialValue?: T,
 ): Signal<{ loading: boolean; data: T | undefined; error: Error | undefined }> {
-  const stateSignal = createSignal<{ loading: boolean; data: T | undefined; error: Error | undefined }>({
+  const stateSignal = createSignal<{
+    loading: boolean;
+    data: T | undefined;
+    error: Error | undefined;
+  }>({
     loading: true,
     data: initialValue,
     error: undefined,
   });
 
   promise
-    .then(value => {
+    .then((value) => {
       stateSignal.set({
         loading: false,
         data: value,
         error: undefined,
       });
     })
-    .catch(error => {
+    .catch((error) => {
       stateSignal.set({
         loading: false,
         data: undefined,
@@ -316,7 +318,7 @@ export function useSignal<T>(signal: Signal<T>): [T, (value: T | ((prev: T) => T
   const [value, setValue] = useState<T>(signal.get());
 
   useEffect(() => {
-    const unsubscribe = signal.subscribe(newValue => {
+    const unsubscribe = signal.subscribe((newValue) => {
       setValue(newValue);
     });
 
@@ -335,7 +337,7 @@ export function useSignalValue<T>(signal: Signal<T>): T {
   const [value, setValue] = useState<T>(signal.get());
 
   useEffect(() => {
-    const unsubscribe = signal.subscribe(newValue => {
+    const unsubscribe = signal.subscribe((newValue) => {
       setValue(newValue);
     });
 

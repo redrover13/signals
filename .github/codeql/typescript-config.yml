@@ -15,8 +15,8 @@ paths-ignore:
 query-filters:
   - exclude:
       tags:
-        - "experimental"
-        - "deprecated"
+        - 'experimental'
+        - 'deprecated'
 
 # TypeScript specific overrides
 languages:
@@ -30,7 +30,7 @@ extraction:
       mode: node
 
       # Include additional ECMAScript features
-      features: 
+      features:
         - typescript
         - es2021
 
@@ -44,11 +44,11 @@ extraction:
 
       # Default filters
       exclude:
-        - "node_modules/**"
-        - "dist/**"
-        - ".nx/**"
-        - "**/*.d.ts"
-      
+        - 'node_modules/**'
+        - 'dist/**'
+        - '.nx/**'
+        - '**/*.d.ts'
+
       # TypeScript-specific configuration
       typescript:
         # Use tsconfig.base.json to configure the TypeScript analysis

@@ -3,26 +3,17 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/adk/src",
   "projectType": "library",
-  "tags": [
-    "domain:adk",
-    "type:library"
-  ],
-  "implicitDependencies": [
-    "gcp-auth"
-  ],
+  "tags": ["domain:adk", "type:library"],
+  "implicitDependencies": ["gcp-auth"],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/adk",
         "main": "libs/adk/src/index.ts",
         "tsConfig": "libs/adk/tsconfig.lib.json",
-        "assets": [
-          "libs/adk/*.md"
-        ]
+        "assets": ["libs/adk/*.md"]
       },
       "configurations": {
         "production": {
@@ -38,13 +29,8 @@
       },
       "defaultConfiguration": "production",
       "cache": true,
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "production",
-        "^production"
-      ]
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     },
     "test": {
       "executor": "@nx/jest:jest",
@@ -56,22 +42,14 @@
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": [
-          "libs/adk/**/*.{ts,tsx,js,jsx}"
-        ]
+        "lintFilePatterns": ["libs/adk/**/*.{ts,tsx,js,jsx}"]
       },
-      "inputs": [
-        "default",
-        "{workspaceRoot}/.eslintrc.json"
-      ],
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
       "cache": true
     }
   },
   "namedInputs": {
-    "default": [
-      "{projectRoot}/**/*",
-      "sharedGlobals"
-    ],
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",

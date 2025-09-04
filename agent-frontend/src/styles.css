@@ -6,9 +6,9 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f5f5f5;
@@ -173,15 +173,15 @@ button:disabled {
   .app {
     padding: 10px;
   }
-  
+
   header h1 {
     font-size: 2rem;
   }
-  
+
   .agent-interface {
     padding: 20px;
   }
-  
+
   .input-group textarea {
     font-size: 14px;
   }

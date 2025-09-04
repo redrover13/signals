@@ -51,7 +51,10 @@ async function initializeApp(): Promise<void> {
       console.log('✅ MCP service initialized successfully');
       console.log('📊 Enabled servers:', mcpService.getEnabledServers());
     } catch (mcpError) {
-      console.warn('⚠️  MCP service initialization failed, continuing without MCP:', mcpError.message);
+      console.warn(
+        '⚠️  MCP service initialization failed, continuing without MCP:',
+        mcpError.message,
+      );
       console.log('📋 Server will start without MCP functionality');
     }
 

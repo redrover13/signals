@@ -15,16 +15,20 @@ import FederationDemo from './index';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock the remote component
-vi.mock('frontend-agents/AgentInterface', () => ({
-  __esModule: true,
-  default: ({ agentId, isFederated }) => (
-    <div data-testid="remote-agent-interface">
-      Remote Agent Interface Component
-      <div>Agent ID: {agentId}</div>
-      <div>Is Federated: {isFederated ? 'Yes' : 'No'}</div>
-    </div>
-  )
-}), { virtual: true });
+vi.mock(
+  'frontend-agents/AgentInterface',
+  () => ({
+    __esModule: true,
+    default: ({ agentId, isFederated }) => (
+      <div data-testid="remote-agent-interface">
+        Remote Agent Interface Component
+        <div>Agent ID: {agentId}</div>
+        <div>Is Federated: {isFederated ? 'Yes' : 'No'}</div>
+      </div>
+    ),
+  }),
+  { virtual: true },
+);
 
 describe('FederationDemo Component', () => {
   it('renders successfully', () => {
@@ -51,14 +55,14 @@ describe('FederationDemo Component', () => {
         Suspense: ({ fallback }) => fallback,
       };
     });
-    
+
     render(<FederationDemo />);
     expect(screen.getByText('Loading remote component...')).toBeInTheDocument();
   });
 
   it('passes the correct props to the remote component', () => {
     render(<FederationDemo agentId="test-agent" />);
-    
+
     const remoteComponent = screen.getByTestId('remote-agent-interface');
     expect(remoteComponent).toBeInTheDocument();
     expect(screen.getByText('Agent ID: test-agent')).toBeInTheDocument();

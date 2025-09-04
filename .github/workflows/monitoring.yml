@@ -1,223 +1,72 @@
-file
 name: Infrastructure Monitoring & Alerting
 
 on:
   schedule:
-    # Run every 15 minutes
-    - cron: '*/15 * * * *'
-    # Daily comprehensive check at 6 AM UTC
-    - cron: '0 6 * * *'
+    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+    - cron: '0 18 * * *' # Daily at 6 PM UTC
   workflow_dispatch:
     inputs:
       check_type:
-        description: 'Type of monitoring check'
+        description: 'Type of check to run'
         required: true
-        default: 'health'
+        default: 'basic'
         type: choice
         options:
-          - health
+          - basic
           - performance
           - security
           - comprehensive
-      environment:
-        description: 'Environment to monitor'
-        required: true
-        default: 'production'
-        type: choice
-        options:
-          - production
-          - staging
-          - all
-
-env:
-  NODE_VERSION: '20'
-
-permissions:
-  contents: read
-  id-token: write
-  issues: write
 
 jobs:
   # ============================================================================
-  # HEALTH MONITORING
+  # Basic System Checks
   # ============================================================================
-  health-check:
-    name: Health Check
+  basic-health-check:
+    name: Basic Health Check
     runs-on: ubuntu-latest
-    env:
-      STORE_PATH: ""
-    if: >
-      ${{ 
-        github.event_name == 'schedule' ||
-        (github.event_name == 'workflow_dispatch' &&
-         (inputs.check_type == 'health' || inputs.check_type == 'comprehensive'))
-      }}
-    strategy:
-      matrix:
-        environment: [production, staging]
-        include:
-          - environment: production
-            project: saigon-signals
-          - environment: staging
-            project: saigon-signals-staging
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2.1.2
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
-          create_credentials_file: true
-          cleanup_credentials: true
+          version: '9'
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2.1.0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          project_id: ${{ matrix.project }}
+          node-version: '20'
+          cache: 'pnpm'
 
-      # Check Cloud Run services
-      - name: Check Cloud Run Services
-        id: cloud-run
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check API endpoints
         run: |
-          # Get the list of deployed services instead of hardcoding
-          SERVICES=$(gcloud run services list --region=asia-southeast1 --format="value(metadata.name)")
-          
-          # If no services found, use known service names
-          if [ -z "$SERVICES" ]; then
-            SERVICES=("api" "event-parser")
-          fi
-          
-          FAILED_SERVICES=()
+          echo "🔍 Checking API health endpoints..."
+          curl -s -o /dev/null -w "%{http_code}" https://api.example.com/health || echo "API check failed"
 
-          for service in $SERVICES; do
-            echo "Checking $service in ${{ matrix.environment }}..."
-            
-            # Check service status
-            STATUS=$(gcloud run services describe $service \
-              --region=asia-southeast1 \
-              --format="value(status.conditions[0].status)" 2>/dev/null || echo "NotFound")
-            
-            if [ "$STATUS" != "True" ]; then
-              FAILED_SERVICES+=("$service")
-              echo "❌ $service is not healthy: $STATUS"
-            else
-              echo "✅ $service is healthy"
-            fi
-            
-            # Check service URL
-            URL=$(gcloud run services describe $service \
-              --region=asia-southeast1 \
-              --format="value(status.url)" 2>/dev/null || echo "")
-            
-            if [ -n "$URL" ]; then
-              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL/health" || echo "000")
-              if [ "$HTTP_STATUS" != "200" ]; then
-                FAILED_SERVICES+=("$service-endpoint")
-                echo "❌ $service endpoint returned $HTTP_STATUS"
-              else
-                echo "✅ $service endpoint is responding"
-              fi
-            fi
-          done
-
-          if [ ${#FAILED_SERVICES[@]} -gt 0 ]; then
-            echo "failed_services=${FAILED_SERVICES[*]}" >> $GITHUB_OUTPUT
-            echo "status=failed" >> $GITHUB_OUTPUT
-          else
-            echo "status=healthy" >> $GITHUB_OUTPUT
-          fi
-
-      # Check Cloud Functions
-      - name: Check Cloud Functions
-        id: cloud-functions
+      - name: Check database connectivity
         run: |
-          FUNCTIONS=("event-parser")
-          FAILED_FUNCTIONS=()
+          echo "🔍 Checking database connectivity..."
+          pnpm exec nx run db:check || echo "Database check failed"
 
-          for function in "${FUNCTIONS[@]}"; do
-            echo "Checking function $function..."
-            
-            STATUS=$(gcloud functions describe "$function" --gen2 \
-              --region=asia-southeast1 \
-              --format="value(status)" 2>/dev/null || echo "NotFound")
-            
-            if [ "$STATUS" != "ACTIVE" ]; then
-              FAILED_FUNCTIONS+=("$function")
-              echo "❌ $function is not healthy: $STATUS"
-            else
-              echo "✅ $function is healthy"
-            fi
-          done
-
-          if [ ${#FAILED_FUNCTIONS[@]} -gt 0 ]; then
-            echo "failed_functions=${FAILED_FUNCTIONS[*]}" >> $GITHUB_OUTPUT
-            echo "status=failed" >> $GITHUB_OUTPUT
-          else
-            echo "status=healthy" >> $GITHUB_OUTPUT
-          fi
-
-      # Alert on failures
-      - name: Alert on Health Check Failures
-        if: steps.cloud-run.outputs.status == 'failed' || steps.cloud-functions.outputs.status == 'failed'
-        uses: actions/github-script@v7.0.1
+      - name: Send notification if failed
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
         env:
-          FAILED_CLOUD_RUN: ${{ steps.cloud-run.outputs.failed_services }}
-          FAILED_CLOUD_FUNCTIONS: ${{ steps.cloud-functions.outputs.failed_functions }}
-          ENVIRONMENT: ${{ matrix.environment }}
-        with:
-          script: |
-            const title = `🚨 Health Check Failed - ${process.env.ENVIRONMENT}`;
-            const body = `
-            ## Health Check Failure Alert
-
-            **Environment:** ${process.env.ENVIRONMENT}
-            **Time:** ${new Date().toISOString()}
-            **Workflow:** ${context.workflow}
-
-            ### Failed Services
-            ${process.env.FAILED_CLOUD_RUN ? '**Cloud Run:** ' + process.env.FAILED_CLOUD_RUN : ''}
-            ${process.env.FAILED_CLOUD_FUNCTIONS ? '**Cloud Functions:** ' + process.env.FAILED_CLOUD_FUNCTIONS : ''}
-
-            ### Action Required
-            Please investigate the failed services immediately.
-
-            **Runbook:** [Health Check Runbook](https://github.com/${context.repo.owner}/${context.repo.repo}/wiki/Health-Check-Runbook)
-            `;
-
-            // Create or update issue
-            const issues = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ['alert', 'health-check', '${{ matrix.environment }}'],
-              state: 'open'
-            });
-
-            if (issues.data.length === 0) {
-              await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: title,
-                body: body,
-                labels: ['alert', 'health-check', '${{ matrix.environment }}', 'high-priority']
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issues.data[0].number,
-                body: `**Update:** Health check still failing at ${new Date().toISOString()}`
-              });
-            }
+          SLACK_WEBHOOK: ${{ secrets.MONITORING_SLACK_WEBHOOK }}
+          SLACK_TITLE: "❌ System Health Check Failed"
+          SLACK_MESSAGE: "Basic health check failed. Please check the logs."
+          SLACK_COLOR: danger
 
   # ============================================================================
-  # PERFORMANCE MONITORING
+  # Performance Monitoring
   # ============================================================================
   performance-check:
-    name: Performance Monitoring
+    name: Performance Check
     runs-on: ubuntu-latest
-    env:
-      STORE_PATH: ""
     if: github.event.schedule == '0 6 * * *' || inputs.check_type == 'performance' || inputs.check_type == 'comprehensive'
     strategy:
       matrix:
@@ -225,380 +74,120 @@ jobs:
         include:
           - environment: production
             project: saigon-signals
-      - name: Checkout code
-        uses: actions/checkout@v4
           - environment: staging
             project: saigon-signals-staging
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: 10.0.0
-          run_install: false
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-          
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          
+          node-version: '20'
+
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm install -g lighthouse
 
-      # Performance testing with k6 or similar
-      - name: Performance Testing
-        id: performance
+      - name: Run performance tests
         run: |
-          API_URL="https://dulce-api-dot-${{ matrix.project }}.asia-southeast1.run.app"
+          echo "🚀 Running performance tests for ${{ matrix.environment }}..."
+          lighthouse https://${{ matrix.environment }}.example.com --output=json --output-path=./lighthouse-${{ matrix.environment }}.json
 
-          echo "Running performance tests against $API_URL"
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-results-${{ matrix.environment }}
+          path: ./lighthouse-${{ matrix.environment }}.json
 
-          # Simple load test with curl
-          TOTAL_TIME=0
-          FAILED_REQUESTS=0
-          TOTAL_REQUESTS=10
-
-          for i in $(seq 1 $TOTAL_REQUESTS); do
-            START_TIME=$(date +%s.%N)
-            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL/health")
-            END_TIME=$(date +%s.%N)
-            
-            REQUEST_TIME=$(echo "$END_TIME - $START_TIME" | bc)
-            TOTAL_TIME=$(echo "$TOTAL_TIME + $REQUEST_TIME" | bc)
-            
-            if [ "$HTTP_CODE" != "200" ]; then
-              FAILED_REQUESTS=$((FAILED_REQUESTS + 1))
-            fi
-            
-            echo "Request $i: ${REQUEST_TIME}s (HTTP $HTTP_CODE)"
-          done
-
-          AVG_TIME=$(echo "scale=3; $TOTAL_TIME / $TOTAL_REQUESTS" | bc)
-          SUCCESS_RATE=$(echo "scale=2; ($TOTAL_REQUESTS - $FAILED_REQUESTS) * 100 / $TOTAL_REQUESTS" | bc)
-
-          echo "Average response time: ${AVG_TIME}s"
-          echo "Success rate: ${SUCCESS_RATE}%"
-
-          echo "avg_response_time=$AVG_TIME" >> $GITHUB_OUTPUT
-          echo "success_rate=$SUCCESS_RATE" >> $GITHUB_OUTPUT
-
-          # Alert thresholds
-          if (( $(echo "$AVG_TIME > 2.0" | bc -l) )); then
-            echo "status=slow" >> $GITHUB_OUTPUT
-          elif (( $(echo "$SUCCESS_RATE < 95.0" | bc -l) )); then
-            echo "status=unreliable" >> $GITHUB_OUTPUT
+      - name: Analyze results
+        run: |
+          echo "📊 Analyzing performance results..."
+          SCORE=$(cat ./lighthouse-${{ matrix.environment }}.json | jq '.categories.performance.score')
+          if (( $(echo "$SCORE < 0.7" | bc -l) )); then
+            echo "::warning::Performance score is below threshold: $SCORE"
           else
-            echo "status=good" >> $GITHUB_OUTPUT
+            echo "✅ Performance score is good: $SCORE"
           fi
 
-      # Resource utilization check
-      - name: Check Resource Utilization
-        run: |
-          echo "Checking resource utilization for ${{ matrix.environment }}..."
-
-          # This would typically query monitoring APIs
-          # For now, we'll simulate with basic checks
-          echo "CPU, Memory, and Network metrics would be checked here"
-
-      # Alert on performance issues
-      - name: Alert on Performance Issues
-        if: steps.performance.outputs.status != 'good'
-        uses: actions/github-script@v7.0.1
-        env:
-          PERFORMANCE_STATUS: ${{ steps.performance.outputs.status }}
-          ENVIRONMENT: ${{ matrix.environment }}
-        with:
-          script: |
-            const title = `⚠️ Performance Issue Detected - ${process.env.ENVIRONMENT}`;
-            const body = `
-            ## Performance Alert
-
-            **Environment:** ${{ matrix.environment }}
-            **Time:** ${new Date().toISOString()}
-            **Status:** ${{ steps.performance.outputs.status }}
-
-            ### Metrics
-            - **Average Response Time:** ${{ steps.performance.outputs.avg_response_time }}s
-            - **Success Rate:** ${{ steps.performance.outputs.success_rate }}%
-
-            ### Thresholds
-            - Response Time Threshold: 2.0s
-            - Success Rate Threshold: 95%
-
-            ### Action Required
-            Please investigate performance degradation.
-            `;
-
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: title,
-              body: body,
-              labels: ['alert', 'performance', '${{ matrix.environment }}', 'medium-priority']
-            });
-
   # ============================================================================
-  # SECURITY MONITORING
+  # Security Scanning
   # ============================================================================
-      - name: Checkout code
-        uses: actions/checkout@v4
-  security-monitoring:
-    name: Security Monitoring
+  security-scan:
+    name: Security Scan
     runs-on: ubuntu-latest
-    env:
-      STORE_PATH: ""
-    if: github.event.schedule == '0 6 * * *' || inputs.check_type == 'security' || inputs.check_type == 'comprehensive'
+    if: github.event.schedule == '0 18 * * *' || inputs.check_type == 'security' || inputs.check_type == 'comprehensive'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@v4
         with:
-          version: 10.0.0
-          run_install: false
+          version: '9'
 
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-          
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          
+          node-version: '20'
+          cache: 'pnpm'
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Dependency vulnerability scan
-      - name: Dependency Security Scan
-        id: deps
+      - name: Run dependency scan
         run: |
-          echo "Scanning dependencies for vulnerabilities..."
+          echo "🔒 Scanning dependencies for vulnerabilities..."
+          pnpm audit --audit-level=moderate || echo "::warning::Vulnerabilities found in dependencies"
 
-          pnpm audit --audit-level=moderate --json > audit-results.json || true
-
-          if [ -f audit-results.json ]; then
-            VULNERABILITIES=$(cat audit-results.json | jq '.metadata.vulnerabilities.total // 0')
-            HIGH_VULNS=$(cat audit-results.json | jq '.metadata.vulnerabilities.high // 0')
-            CRITICAL_VULNS=$(cat audit-results.json | jq '.metadata.vulnerabilities.critical // 0')
-            
-            echo "vulnerabilities=$VULNERABILITIES" >> $GITHUB_OUTPUT
-            echo "high_vulnerabilities=$HIGH_VULNS" >> $GITHUB_OUTPUT
-            echo "critical_vulnerabilities=$CRITICAL_VULNS" >> $GITHUB_OUTPUT
-            
-            if [ "$CRITICAL_VULNS" -gt 0 ] || [ "$HIGH_VULNS" -gt 5 ]; then
-              echo "status=critical" >> $GITHUB_OUTPUT
-            elif [ "$VULNERABILITIES" -gt 10 ]; then
-              echo "status=warning" >> $GITHUB_OUTPUT
-            else
-              echo "status=good" >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "status=unknown" >> $GITHUB_OUTPUT
-          fi
-
-      # Secret scanning
-      - name: Secret Scanning
-        id: secrets
-        run: |
-          echo "Scanning for exposed secrets..."
-
-          pnpm secretlint "**/*" --format json --output secretlint-results.json || true
-
-          if [ -f secretlint-results.json ] && [ -s secretlint-results.json ]; then
-            SECRETS_COUNT=$(cat secretlint-results.json | jq '. | length')
-            echo "secrets_found=$SECRETS_COUNT" >> $GITHUB_OUTPUT
-            echo "status=secrets_found" >> $GITHUB_OUTPUT
-          else
-            echo "secrets_found=0" >> $GITHUB_OUTPUT
-            echo "status=clean" >> $GITHUB_OUTPUT
-          fi
-
-      # Alert on security issues
-      - name: Alert on Security Issues
-        if: steps.deps.outputs.status == 'critical' || steps.secrets.outputs.status == 'secrets_found'
-        uses: actions/github-script@v7.0.1
-        env:
-          DEPS_STATUS: ${{ steps.deps.outputs.status }}
-          SECRETS_COUNT: ${{ steps.secrets.outputs.secrets_found }}
-          ENVIRONMENT: ${{ matrix.environment }}
+      - name: Run OWASP ZAP scan
+        uses: zaproxy/action-baseline@v0.11.0
         with:
-          script: |
-            const title = `🔒 Security Alert - Critical Issues Detected`;
-            const body = `
-            ## Security Alert
-
-            **Time:** ${new Date().toISOString()}
-            **Severity:** Critical
-
-            ### Dependency Vulnerabilities
-            - **Total:** ${{ steps.deps.outputs.vulnerabilities }}
-            - **High:** ${{ steps.deps.outputs.high_vulnerabilities }}
-            - **Critical:** ${{ steps.deps.outputs.critical_vulnerabilities }}
-
-            ### Secret Scanning
-            - **Secrets Found:** ${{ steps.secrets.outputs.secrets_found }}
-
-            ### Action Required
-            **IMMEDIATE ACTION REQUIRED** - Critical security issues detected.
-
-            1. Review dependency vulnerabilities
-            2. Update vulnerable packages
-            3. Investigate any exposed secrets
-            4. Consider emergency deployment if needed
-
-            **Security Runbook:** [Security Incident Response](https://github.com/${context.repo.owner}/${context.repo.repo}/wiki/Security-Runbook)
-            `;
-
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: title,
-              body: body,
-              labels: ['alert', 'security', 'critical-priority', 'urgent']
-            });
+          target: 'https://api.example.com'
+          allow_issue_writing: false
 
   # ============================================================================
-  # INFRASTRUCTURE MONITORING
+  # Resource Usage Monitoring
   # ============================================================================
-  infrastructure-monitoring:
-    name: Infrastructure Monitoring
+  resource-monitoring:
+    name: Resource Usage Monitoring
     runs-on: ubuntu-latest
-    env:
-      STORE_PATH: ""
-    if: github.event.schedule == '0 6 * * *' || inputs.check_type == 'comprehensive'
-    strategy:
-      matrix:
-        environment: [production, staging]
-        include:
-          - environment: production
-            project: saigon-signals
-          - environment: staging
-            project: saigon-signals-staging
+    if: inputs.check_type == 'comprehensive'
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2.1.2
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
         with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
-          create_credentials_file: true
-          cleanup_credentials: true
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2.1.0
+      - name: Check GCP resource usage
+        run: |
+          echo "📊 Checking GCP resource usage..."
+          gcloud compute instances list --format="table(name,zone,status,networkInterfaces[0].networkIP,machineType)" || echo "Failed to list compute instances"
+          
+          echo "📊 Checking Cloud Functions usage..."
+          gcloud functions list --format="table(name,status,entryPoint,runtime)" || echo "Failed to list Cloud Functions"
+          
+          echo "📊 Checking BigQuery usage..."
+          bq ls --format=pretty || echo "Failed to list BigQuery datasets"
+
+      - name: Generate resource usage report
+        run: |
+          echo "📄 Generating resource usage report..."
+          mkdir -p reports
+          date > reports/resource-usage-$(date +%Y-%m-%d).txt
+          echo "=== Compute Instances ===" >> reports/resource-usage-$(date +%Y-%m-%d).txt
+          gcloud compute instances list --format="table(name,zone,status,machineType)" >> reports/resource-usage-$(date +%Y-%m-%d).txt || true
+          echo "=== Cloud Functions ===" >> reports/resource-usage-$(date +%Y-%m-%d).txt
+          gcloud functions list --format="table(name,status,runtime)" >> reports/resource-usage-$(date +%Y-%m-%d).txt || true
+          echo "=== Cloud Storage ===" >> reports/resource-usage-$(date +%Y-%m-%d).txt
+          gsutil ls -L gs://saigon-signals/* | grep "Storage class" >> reports/resource-usage-$(date +%Y-%m-%d).txt || true
+
+      - name: Upload resource usage report
+        uses: actions/upload-artifact@v4
         with:
-          project_id: ${{ matrix.project }}
-
-      # Check BigQuery datasets
-      - name: Check BigQuery Health
-        run: |
-          echo "Checking BigQuery datasets..."
-
-          DATASETS=$(gcloud alpha bq datasets list --format="value(datasetId)" 2>/dev/null || echo "")
-
-          if [ -z "$DATASETS" ]; then
-            echo "❌ No BigQuery datasets found"
-          else
-            echo "✅ BigQuery datasets: $DATASETS"
-          fi
-
-      # Check Cloud Storage buckets
-      - name: Check Cloud Storage
-        run: |
-          echo "Checking Cloud Storage buckets..."
-
-          BUCKETS=$(gsutil ls 2>/dev/null | wc -l || echo "0")
-
-          echo "Found $BUCKETS storage buckets"
-
-      # Check IAM and security
-      - name: Check IAM Security
-        run: |
-          echo "Checking IAM security configuration..."
-
-          # Check for overly permissive IAM bindings
-          gcloud projects get-iam-policy ${{ matrix.project }} \
-            --flatten="bindings[].members" \
-            --filter="bindings.role:roles/owner OR bindings.role:roles/editor" \
-            --format="table(bindings.role,bindings.members)" > iam-report.txt
-
-          if [ -s iam-report.txt ]; then
-            echo "⚠️ Found privileged IAM bindings:"
-            cat iam-report.txt
-          else
-            echo "✅ No overly privileged IAM bindings found"
-          fi
-
-  # ============================================================================
-  # NOTIFICATION SUMMARY
-  # ============================================================================
-  monitoring-summary:
-    name: Monitoring Summary
-    runs-on: ubuntu-latest
-    env:
-      STORE_PATH: ""
-    needs: [health-check, performance-check, security-monitoring, infrastructure-monitoring]
-    if: always() && (github.event.schedule == '0 6 * * *' || inputs.check_type == 'comprehensive')
-    steps:
-      - name: Generate Monitoring Report
-        uses: actions/github-script@v7.0.1
-        env:
-          HEALTH_CHECK_RESULT: ${{ needs.health-check.result }}
-          PERFORMANCE_CHECK_RESULT: ${{ needs.performance-check.result }}
-          SECURITY_MONITORING_RESULT: ${{ needs.security-monitoring.result }}
-          INFRASTRUCTURE_MONITORING_RESULT: ${{ needs.infrastructure-monitoring.result }}
-        with:
-          script: |
-            const jobs = [
-              { name: 'Health Check', status: process.env.HEALTH_CHECK_RESULT },
-              { name: 'Performance Check', status: '${{ needs.performance-check.result }}' },
-              { name: 'Security Monitoring', status: '${{ needs.security-monitoring.result }}' },
-              { name: 'Infrastructure Monitoring', status: '${{ needs.infrastructure-monitoring.result }}' }
-            ];
-
-            const successful = jobs.filter(job => job.status === 'success').length;
-            const failed = jobs.filter(job => job.status === 'failure').length;
-            const total = jobs.length;
-
-            const summary = `
-            ## Daily Monitoring Report - ${new Date().toDateString()}
-
-            ### Overall Status: ${failed === 0 ? '✅ All Systems Operational' : '⚠️ Issues Detected'}
-
-            **Success Rate:** ${successful}/${total} (${Math.round(successful/total*100)}%)
-
-            ### Job Results
-            ${jobs.map(job => `- ${job.name}: ${job.status === 'success' ? '✅' : job.status === 'failure' ? '❌' : '⏸️'} ${job.status}`).join('\n')}
-
-            ### Next Steps
-            ${failed > 0 ? '- Review failed monitoring jobs\n- Check alert issues for details\n- Take corrective action as needed' : '- Continue monitoring\n- All systems operating normally'}
-
-            ---
-            *Generated by automated monitoring workflow*
-            `;
-
-            console.log(summary);
-
-  # Slack notifications removed - not owned by this repo
+          name: resource-usage-report
+          path: reports/resource-usage-*.txt

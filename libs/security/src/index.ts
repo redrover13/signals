@@ -52,72 +52,77 @@ const DEFAULT_SECURITY_CONFIG: SecurityConfig = {
 /**
  * Vietnamese phone number validation schema
  */
-export const vietnamesePhoneSchema = z.string().regex(
-  /^(\+84|84|0)(3[2-9]|5[689]|7[06-9]|8[1-689]|9[0-46-9])[0-9]{7}$/,
-  'Invalid Vietnamese phone number format'
-);
+export const vietnamesePhoneSchema = z
+  .string()
+  .regex(
+    /^(\+84|84|0)(3[2-9]|5[689]|7[06-9]|8[1-689]|9[0-46-9])[0-9]{7}$/,
+    'Invalid Vietnamese phone number format',
+  );
 
 /**
  * Vietnamese currency amount validation schema
  */
-export const vietnameseCurrencySchema = z.number()
+export const vietnameseCurrencySchema = z
+  .number()
   .positive('Amount must be positive')
   .max(1000000000, 'Amount exceeds maximum allowed value (1 billion VND)');
 
 /**
  * Vietnamese timezone validation schema
  */
-export const vietnameseTimezoneSchema = z.string().refine(
-  (timestamp) => {
-    try {
-      const date = new Date(timestamp);
-      if (isNaN(date && date.getTime())) return false;
-      return timestamp && timestamp.includes('+07:00') || timestamp && timestamp.includes('+0700');
-    } catch {
-      return false;
-    }
-  },
-  'Timestamp must include ICT timezone (UTC+7) information'
-);
+export const vietnameseTimezoneSchema = z.string().refine((timestamp) => {
+  try {
+    const date = new Date(timestamp);
+    if (isNaN(date && date.getTime())) return false;
+    return (
+      (timestamp && timestamp.includes('+07:00')) || (timestamp && timestamp.includes('+0700'))
+    );
+  } catch {
+    return false;
+  }
+}, 'Timestamp must include ICT timezone (UTC+7) information');
 
 /**
  * Authentication middleware
  */
 export async function authenticateRequest(
   request: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ): Promise<void> {
   if (!DEFAULT_SECURITY_CONFIG && DEFAULT_SECURITY_CONFIG.authentication) {
     return;
   }
 
   const authHeader = request.headers && request.headers.authorization;
-  if (!authHeader || !authHeader && authHeader.startsWith('Bearer ')) {
-    reply && reply.code(401).send({
-      error: 'Unauthorized',
-      message: 'Valid authorization token required',
-    });
+  if (!authHeader || (!authHeader && authHeader.startsWith('Bearer '))) {
+    reply &&
+      reply.code(401).send({
+        error: 'Unauthorized',
+        message: 'Valid authorization token required',
+      });
     return;
   }
 
   const token = authHeader && authHeader.substring(7);
-  
+
   // In production, validate against Google Cloud IAM tokens
   // For now, validate against the API key from environment
   const expectedApiKey = process.env['DULCE_API_KEY'];
   if (!expectedApiKey) {
-    reply && reply.code(500).send({
-      error: 'Internal Server Error',
-      message: 'Authentication not properly configured',
-    });
+    reply &&
+      reply.code(500).send({
+        error: 'Internal Server Error',
+        message: 'Authentication not properly configured',
+      });
     return;
   }
 
   if (token !== expectedApiKey) {
-    reply && reply.code(401).send({
-      error: 'Unauthorized',
-      message: 'Invalid authorization token',
-    });
+    reply &&
+      reply.code(401).send({
+        error: 'Unauthorized',
+        message: 'Invalid authorization token',
+      });
     return;
   }
 }
@@ -129,24 +134,26 @@ export function validateInput<T>(schema: z.ZodSchema<T>) {
   return async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const result = schema && schema.safeParse(request.body);
-      if (!result?.success) {
-        reply && reply.code(400).send({
-          error: 'Validation Error',
-          message: 'Invalid input data',
-          details: result?.error?.issues.map((issue) => ({
-            path: issue.path && issue.path.join('.'),
-            message: issue && issue.message,
-          })),
-        });
+      if (!result && result.success) {
+        reply &&
+          reply.code(400).send({
+            error: 'Validation Error',
+            message: 'Invalid input data',
+            details: result && result.error && error.issues.map((issue) => ({
+              path: issue.path && issue.path.join('.'),
+              message: issue && issue.message,
+            })),
+          });
         return;
       }
       // Replace request body with validated data
-      request.body = result?.data;
+      request.body = result && result.data;
     } catch (error) {
-      reply && reply.code(400).send({
-        error: 'Validation Error',
-        message: 'Unable to validate input data',
-      });
+      reply &&
+        reply.code(400).send({
+          error: 'Validation Error',
+          message: 'Unable to validate input data',
+        });
     }
   };
 }
@@ -156,22 +163,23 @@ export function validateInput<T>(schema: z.ZodSchema<T>) {
  */
 export async function validateVietnameseCompliance(
   request: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ): Promise<void> {
   // Add Vietnamese data privacy headers
   reply && reply.header('X-Data-Residency', 'VN');
   reply && reply.header('X-Privacy-Policy', 'https://dulcedesaigon && dulcedesaigon.com/privacy');
-  
+
   // Log data access for compliance auditing
-  request.log && request.log.info({
-    timestamp: new Date().toISOString(),
-    action: 'data_access',
-    endpoint: request.url,
-    method: request.method,
-    ip: request.ip,
-    userAgent: request.headers['user-agent'],
-    dataProcessingPurpose: 'service_delivery',
-  });
+  request.log &&
+    request.log.info({
+      timestamp: new Date().toISOString(),
+      action: 'data_access',
+      endpoint: request.url,
+      method: request.method,
+      ip: request.ip,
+      userAgent: request.headers['user-agent'],
+      dataProcessingPurpose: 'service_delivery',
+    });
 }
 
 /**
@@ -179,7 +187,7 @@ export async function validateVietnameseCompliance(
  */
 export async function addSecurityHeaders(
   request: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ): Promise<void> {
   // Security headers
   reply && reply.header('X-Content-Type-Options', 'nosniff');
@@ -195,7 +203,7 @@ export async function addSecurityHeaders(
  */
 export async function registerSecurity(
   fastify: FastifyInstance,
-  config: Partial<SecurityConfig> = {}
+  config: Partial<SecurityConfig> = {},
 ): Promise<void> {
   const finalConfig = { ...DEFAULT_SECURITY_CONFIG, ...config };
 
@@ -209,12 +217,13 @@ export async function registerSecurity(
 
   // Simple authentication check for protected routes
   if (finalConfig && finalConfig.authentication) {
-    fastify && fastify.addHook('preHandler', async (request, reply) => {
-      // Skip authentication for health checks
-      if (request.routeConfig && request.routeConfig.url?.includes('/health')) {
-        return;
-      }
-      await authenticateRequest(request, reply);
-    });
+    fastify &&
+      fastify.addHook('preHandler', async (request, reply) => {
+        // Skip authentication for health checks
+        if (request.routeConfig && request.routeConfig.url && url.includes('/health')) {
+          return;
+        }
+        await authenticateRequest(request, reply);
+      });
   }
 }

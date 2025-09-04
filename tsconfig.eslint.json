@@ -1,17 +1,7 @@
 {
   "extends": "./tsconfig.base.json",
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js",
-    "**/*.jsx"
-  ],
-  "exclude": [
-    "node_modules",
-    "tmp",
-    "dist",
-    ".nx"
-  ],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+  "exclude": ["node_modules", "tmp", "dist", ".nx"],
   "compilerOptions": {
     "types": ["node", "jest"]
   }

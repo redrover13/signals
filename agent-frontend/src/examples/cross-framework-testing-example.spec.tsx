@@ -26,10 +26,10 @@ describe('ExampleButton', () => {
   it('renders with the correct label', () => {
     const label = 'Click Me';
     render(<ExampleButton onClick={() => {}} label={label} />);
-    
+
     const button = screen.getByTestId('example-button');
     expect(button).toHaveTextContent(label);
-    
+
     // Log which testing framework is being used
     console.log(`Test running in ${getTestingFramework()}`);
   });
@@ -38,14 +38,14 @@ describe('ExampleButton', () => {
     // Create a mock function using our framework-agnostic helper
     const handleClick = createMock();
     render(<ExampleButton onClick={handleClick} label="Click Me" />);
-    
+
     // Create a user event
     const user = userEvent.setup();
-    
+
     // Find and click the button
     const button = screen.getByTestId('example-button');
     await user.click(button);
-    
+
     // Verify the mock was called
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
@@ -53,7 +53,7 @@ describe('ExampleButton', () => {
   it('shows how to use conditional testing logic if needed', () => {
     // This is a rare case, but demonstrates how to handle framework-specific code
     const isVitest = typeof vi !== 'undefined';
-    
+
     if (isVitest) {
       console.log('Running Vitest-specific test code');
       // Vitest-specific code here if absolutely necessary
@@ -61,7 +61,7 @@ describe('ExampleButton', () => {
       console.log('Running Jest-specific test code');
       // Jest-specific code here if absolutely necessary
     }
-    
+
     // Then continue with framework-agnostic assertions
     expect(true).toBe(true);
   });

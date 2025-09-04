@@ -18,39 +18,42 @@ import styles from './signals-demo.module.css';
 const SignalsDemo = memo(() => {
   // Use the shared count signal
   const [count, setCount] = useSignal(sharedCountSignal);
-  
+
   // Create a local signal with an initial value
   const localSignal = createSignal('Local Value');
   const [localValue, setLocalValue] = useSignal(localSignal);
 
   // Use callbacks to prevent unnecessary re-renders
   const handleIncrement = useCallback(() => {
-    setCount(prevCount => prevCount + 1);
+    setCount((prevCount) => prevCount + 1);
   }, [setCount]);
 
   const handleDecrement = useCallback(() => {
-    setCount(prevCount => prevCount - 1);
+    setCount((prevCount) => prevCount - 1);
   }, [setCount]);
 
-  const handleLocalValueChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setLocalValue(e.target.value);
-  }, [setLocalValue]);
+  const handleLocalValueChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setLocalValue(e.target.value);
+    },
+    [setLocalValue],
+  );
 
   return (
     <div className={styles['signalsDemo']}>
       <h2 className={styles['title']}>Signals Demo (Federated Module)</h2>
-      
+
       <div className={styles['section']}>
         <h3 className={styles['sectionTitle']}>Shared Count: {count}</h3>
         <div className={styles['buttonGroup']}>
-          <button 
+          <button
             className={`${styles['button']} ${styles['incrementButton']}`}
             onClick={handleIncrement}
             aria-label="Increment shared count"
           >
             Increment
           </button>
-          <button 
+          <button
             className={`${styles['button']} ${styles['decrementButton']}`}
             onClick={handleDecrement}
             aria-label="Decrement shared count"
@@ -72,7 +75,8 @@ const SignalsDemo = memo(() => {
       </div>
 
       <p className={styles['footer']}>
-        This component is exposed via Module Federation and can be consumed by other micro-frontends.
+        This component is exposed via Module Federation and can be consumed by other
+        micro-frontends.
       </p>
     </div>
   );

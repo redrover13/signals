@@ -20,13 +20,13 @@ BigQuery queries should be optimized for cost and performance, especially consid
 export class AnalyticsService {
   constructor(
     private readonly bigQuery: BigQuery,
-    private readonly logger: Logger
+    private readonly logger: Logger,
   ) {}
 
   async getUserAnalytics(
     startDate: Date,
     endDate: Date,
-    userId?: string
+    userId?: string,
   ): Promise<UserAnalytics[]> {
     // Good: Use partitioned tables and clustering
     const sql = `
@@ -67,7 +67,7 @@ export class AnalyticsService {
     try {
       const [rows] = await this.bigQuery.query(options);
       const duration = Date.now() - startTime;
-      
+
       this.logger.info('BigQuery analytics query completed', {
         duration,
         rowCount: rows.length,
@@ -118,9 +118,7 @@ export class AnalyticsService {
   }
 
   private getDatasetId(): string {
-    return process.env.NODE_ENV === 'production' 
-      ? 'dulce_de_saigon_prod' 
-      : 'dulce_de_saigon_dev';
+    return process.env.NODE_ENV === 'production' ? 'dulce_de_saigon_prod' : 'dulce_de_saigon_dev';
   }
 }
 ```
@@ -180,13 +178,13 @@ export class DataProcessor {
   constructor(
     private readonly bigQuery: BigQuery,
     private readonly storage: Storage,
-    private readonly logger: Logger
+    private readonly logger: Logger,
   ) {}
 
   async processLargeDataset(
     query: string,
     outputBucket: string,
-    outputFile: string
+    outputFile: string,
   ): Promise<void> {
     const queryStream = this.bigQuery.createQueryStream({
       query,
@@ -217,7 +215,7 @@ export class DataProcessor {
 
     try {
       await pipelineAsync(queryStream, transformStream, uploadStream);
-      
+
       this.logger.info('Large dataset processing completed', {
         outputBucket,
         outputFile,
@@ -271,7 +269,7 @@ export class MenuService {
   constructor(
     private readonly redisClient: Redis,
     private readonly database: Database,
-    private readonly logger: Logger
+    private readonly logger: Logger,
   ) {}
 
   async getMenuItem(itemId: string): Promise<MenuItem | null> {
@@ -304,12 +302,12 @@ export class MenuService {
         await this.redisClient.setex(
           `menu:${itemId}`,
           15 * 60, // 15 minutes
-          JSON.stringify(item)
+          JSON.stringify(item),
         );
       } catch (error) {
         this.logger.warn('Failed to cache in Redis', { itemId, error });
       }
-      
+
       this.logger.debug('Menu item served from database', { itemId });
     }
 
@@ -318,7 +316,7 @@ export class MenuService {
 
   async getPopularMenuItems(limit = 20): Promise<MenuItem[]> {
     const cacheKey = `popular_menu:${limit}`;
-    
+
     // Check Redis cache first (popular items change less frequently)
     try {
       const cached = await this.redisClient.get(cacheKey);
@@ -331,10 +329,11 @@ export class MenuService {
     }
 
     // Query database with optimized query
-    const items = await this.database.collection('menu_items')
-      .find({ 
+    const items = await this.database
+      .collection('menu_items')
+      .find({
         is_active: true,
-        country_code: 'VN' // Vietnamese market only
+        country_code: 'VN', // Vietnamese market only
       })
       .sort({ order_count: -1 })
       .limit(limit)
@@ -345,7 +344,7 @@ export class MenuService {
       await this.redisClient.setex(
         cacheKey,
         60 * 60, // 1 hour
-        JSON.stringify(items)
+        JSON.stringify(items),
       );
     } catch (error) {
       this.logger.warn('Failed to cache popular items', { error });
@@ -357,7 +356,7 @@ export class MenuService {
   async invalidateMenuItemCache(itemId: string): Promise<void> {
     // Clear from all cache levels
     this.memoryCache.delete(itemId);
-    
+
     try {
       await this.redisClient.del(`menu:${itemId}`);
       // Also clear popular items cache as it might be affected
@@ -372,11 +371,11 @@ export class MenuService {
     if (cached && cached.expiry > Date.now()) {
       return cached.data;
     }
-    
+
     if (cached) {
       this.memoryCache.delete(key); // Clean up expired entry
     }
-    
+
     return null;
   }
 
@@ -411,7 +410,7 @@ export class CacheWarmingService {
     private readonly menuService: MenuService,
     private readonly analyticsService: AnalyticsService,
     private readonly scheduler: Scheduler,
-    private readonly logger: Logger
+    private readonly logger: Logger,
   ) {}
 
   async startCacheWarming(): Promise<void> {
@@ -426,7 +425,7 @@ export class CacheWarmingService {
 
   private async warmCriticalCaches(): Promise<void> {
     const startTime = Date.now();
-    
+
     try {
       await Promise.all([
         this.warmPopularMenuItems(),
@@ -444,7 +443,7 @@ export class CacheWarmingService {
   private async warmPopularMenuItems(): Promise<void> {
     // Pre-load popular menu items for different categories
     const categories = ['Phở', 'Bún', 'Cơm', 'Đồ Uống', 'Tráng Miệng'];
-    
+
     await Promise.all(
       categories.map(async (category) => {
         try {
@@ -453,14 +452,14 @@ export class CacheWarmingService {
         } catch (error) {
           this.logger.warn('Failed to warm popular items cache', { category, error });
         }
-      })
+      }),
     );
   }
 
   private async warmDailyAnalytics(): Promise<void> {
     const today = new Date();
     const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
-    
+
     try {
       // Pre-compute daily analytics that are frequently accessed
       await this.analyticsService.getDailyRevenue(yesterday);
@@ -507,24 +506,27 @@ export class DatabaseManager {
   private constructor() {
     this.connectionPool = new Pool({
       // Connection pool configuration
-      min: 2,                    // Minimum connections
-      max: 20,                   // Maximum connections
+      min: 2, // Minimum connections
+      max: 20, // Maximum connections
       acquireTimeoutMillis: 30000, // 30 seconds
-      idleTimeoutMillis: 30000,    // 30 seconds
-      reapIntervalMillis: 1000,    // 1 second
+      idleTimeoutMillis: 30000, // 30 seconds
+      reapIntervalMillis: 1000, // 1 second
       createRetryIntervalMillis: 200,
-      
+
       // Vietnamese data residency
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '5432'),
       database: process.env.DB_NAME || 'dulce_de_saigon',
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      
+
       // SSL configuration for production
-      ssl: process.env.NODE_ENV === 'production' ? {
-        rejectUnauthorized: false,
-      } : false,
+      ssl:
+        process.env.NODE_ENV === 'production'
+          ? {
+              rejectUnauthorized: false,
+            }
+          : false,
     });
 
     // Handle pool events
@@ -546,7 +548,7 @@ export class DatabaseManager {
 
   async query<T>(sql: string, params?: any[]): Promise<T[]> {
     const client = await this.connectionPool.connect();
-    
+
     try {
       const result = await client.query(sql, params);
       return result.rows;
@@ -557,7 +559,7 @@ export class DatabaseManager {
 
   async transaction<T>(callback: (client: PoolClient) => Promise<T>): Promise<T> {
     const client = await this.connectionPool.connect();
-    
+
     try {
       await client.query('BEGIN');
       const result = await callback(client);
@@ -601,9 +603,7 @@ export class OrderProcessor {
   private readonly maxQueueSize = 1000;
   private cleanupInterval: NodeJS.Timeout;
 
-  constructor(
-    private readonly logger: Logger
-  ) {
+  constructor(private readonly logger: Logger) {
     // Set up periodic cleanup
     this.cleanupInterval = setInterval(() => {
       this.cleanupCompletedJobs();
@@ -617,11 +617,11 @@ export class OrderProcessor {
 
     for (let i = 0; i < orders.length; i += chunkSize) {
       const chunk = orders.slice(i, i + chunkSize);
-      
+
       // Process chunk and immediately release memory
       const chunkResults = await this.processChunk(chunk);
       results.push(...chunkResults);
-      
+
       // Force garbage collection hint for large batches
       if (orders.length > 1000 && i % 500 === 0) {
         if (global.gc) {
@@ -636,7 +636,7 @@ export class OrderProcessor {
   private async processChunk(orders: Order[]): Promise<ProcessResult[]> {
     const promises = orders.map(async (order) => {
       const jobId = `job_${order.id}_${Date.now()}`;
-      
+
       // Check queue size to prevent memory overflow
       if (this.processingQueue.size >= this.maxQueueSize) {
         throw new Error('Processing queue is full');
@@ -664,12 +664,10 @@ export class OrderProcessor {
       }
     });
 
-    return Promise.allSettled(promises).then(results => 
-      results.map(result => 
-        result.status === 'fulfilled' 
-          ? result.value 
-          : { success: false, error: result.reason }
-      )
+    return Promise.allSettled(promises).then((results) =>
+      results.map((result) =>
+        result.status === 'fulfilled' ? result.value : { success: false, error: result.reason },
+      ),
     );
   }
 
@@ -695,21 +693,22 @@ export class OrderProcessor {
     }
 
     // Wait for ongoing jobs to complete
-    const ongoingJobs = Array.from(this.processingQueue.values())
-      .filter(job => job.status === 'processing');
+    const ongoingJobs = Array.from(this.processingQueue.values()).filter(
+      (job) => job.status === 'processing',
+    );
 
     if (ongoingJobs.length > 0) {
-      this.logger.info('Waiting for ongoing jobs to complete', { 
-        count: ongoingJobs.length 
+      this.logger.info('Waiting for ongoing jobs to complete', {
+        count: ongoingJobs.length,
       });
-      
+
       // Wait up to 30 seconds for jobs to complete
       const timeout = setTimeout(() => {
         this.logger.warn('Shutdown timeout reached, some jobs may be incomplete');
       }, 30000);
 
       while (this.processingQueue.size > 0) {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
 
       clearTimeout(timeout);

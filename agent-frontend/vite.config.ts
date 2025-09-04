@@ -23,7 +23,7 @@ import moduleFederationConfig from './module-federation.config.js';
 export default defineConfig(async ({ mode }) => {
   // Load environment variables
   const env = loadEnv(mode, process.cwd(), '');
-  
+
   // Create federation plugin
   const federationPlugin = await federation({
     ...moduleFederationConfig,
@@ -33,7 +33,7 @@ export default defineConfig(async ({ mode }) => {
   return {
     root: __dirname,
     cacheDir: '../node_modules/.vite/agent-frontend',
-    
+
     // Define environment variables safely - only expose needed variables
     define: {
       'process.env.NODE_ENV': JSON.stringify(mode),
@@ -43,7 +43,7 @@ export default defineConfig(async ({ mode }) => {
       // Add other specific environment variables as needed
       // Never expose the entire process.env object
     },
-    
+
     server: {
       port: 4200,
       host: 'localhost',
@@ -53,15 +53,16 @@ export default defineConfig(async ({ mode }) => {
         'X-Frame-Options': 'DENY',
         'X-XSS-Protection': '1; mode=block',
         'Referrer-Policy': 'strict-origin-when-cross-origin',
-        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
-      }
+        'Content-Security-Policy':
+          "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;",
+      },
     },
-    
+
     preview: {
       port: 4200,
-      host: 'localhost'
+      host: 'localhost',
     },
-    
+
     plugins: [
       federationPlugin,
       react({
@@ -69,21 +70,20 @@ export default defineConfig(async ({ mode }) => {
         fastRefresh: true,
         // Improve build performance
         babel: {
-          plugins: [
-            ["@babel/plugin-transform-react-jsx", { runtime: "automatic" }]
-          ]
-        }
+          plugins: [['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]],
+        },
       }),
       nxViteTsPaths(),
       nxCopyAssetsPlugin(['*.md']),
-      
+
       // Add bundle visualization in analyze mode
-      mode === 'analyze' && visualizer({
-        open: true,
-        filename: 'dist/stats.html',
-        gzipSize: true
-      }),
-      
+      mode === 'analyze' &&
+        visualizer({
+          open: true,
+          filename: 'dist/stats.html',
+          gzipSize: true,
+        }),
+
       // Add PWA support
       // Temporarily disabled due to stream-browserify issue
       // VitePWA({
@@ -108,12 +108,12 @@ export default defineConfig(async ({ mode }) => {
       //   }
       // })
     ],
-    
+
     // Enable worker support
     worker: {
-      plugins: () => [nxViteTsPaths()]
+      plugins: () => [nxViteTsPaths()],
     },
-    
+
     build: {
       outDir: '../dist/agent-frontend',
       emptyOutDir: true,
@@ -146,25 +146,22 @@ export default defineConfig(async ({ mode }) => {
           // Optimize chunk loading
           chunkFileNames: 'assets/[name]-[hash].js',
           entryFileNames: 'assets/[name]-[hash].js',
-          assetFileNames: 'assets/[name]-[hash].[ext]'
-        }
+          assetFileNames: 'assets/[name]-[hash].[ext]',
+        },
       },
       commonjsOptions: {
         transformMixedEsModules: true,
         // Add custom module resolution for problematic packages
-        include: [
-          /node_modules\/fetch-blob/,
-          /node_modules\/node-fetch/
-        ]
+        include: [/node_modules\/fetch-blob/, /node_modules\/node-fetch/],
       },
       // Enable source maps in development
       sourcemap: mode !== 'production',
       // Minimize in production
       minify: mode === 'production' ? 'esbuild' : false,
       // Configure CSS optimization
-      cssMinify: mode === 'production'
+      cssMinify: mode === 'production',
     },
-    
+
     // Configure testing
     test: {
       globals: true,
@@ -183,41 +180,36 @@ export default defineConfig(async ({ mode }) => {
         inline: [
           '@testing-library/react',
           '@testing-library/user-event',
-          '@testing-library/jest-dom'
-        ]
+          '@testing-library/jest-dom',
+        ],
       },
       // Add global object for compatibility with Jest tests
       define: {
         'window.jest': 'vi',
-        'globalThis.jest': 'vi'
-      }
+        'globalThis.jest': 'vi',
+      },
     },
-    
+
     // Optimize dependencies
     optimizeDeps: {
       include: [
-        'react', 
+        'react',
         'react-dom',
         'lodash-es',
         '@testing-library/react',
         '@testing-library/user-event',
         'node-fetch',
-        'stream-browserify'
+        'stream-browserify',
       ],
-      exclude: [
-        '@dulce/utils-signals',
-        'fetch-blob',
-        'stream-http',
-        'https-browserify'
-      ],
+      exclude: ['@dulce/utils-signals', 'fetch-blob', 'stream-http', 'https-browserify'],
       esbuildOptions: {
         target: 'es2020',
-        supported: { 
-          'top-level-await': true 
-        }
-      }
+        supported: {
+          'top-level-await': true,
+        },
+      },
     },
-    
+
     // Add alias for development fallbacks and Node.js polyfills
     resolve: {
       alias: {
@@ -230,9 +222,9 @@ export default defineConfig(async ({ mode }) => {
         'node:path': 'path-browserify',
         'node:crypto': 'crypto-browserify',
         'node:stream': 'stream-browserify',
-        'stream': 'stream-browserify',
-        'stream-browserify/web': 'stream-browserify'
-      }
-    }
+        stream: 'stream-browserify',
+        'stream-browserify/web': 'stream-browserify',
+      },
+    },
   };
 });

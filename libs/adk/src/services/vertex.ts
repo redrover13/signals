@@ -128,7 +128,11 @@ export class VertexClient {
     }
   }
 
-  async createIndex(displayName: string, description: string, metadata: Record<string, any> = {}): Promise<string> {
+  async createIndex(
+    displayName: string,
+    description: string,
+    metadata: Record<string, any> = {},
+  ): Promise<string> {
     try {
       return await this.indexer.createIndex(displayName, description, metadata);
     } catch (error) {
@@ -155,7 +159,12 @@ export class VertexClient {
     }
   }
 
-  async createDataStore(indexId: string, displayName: string, description: string, metadata: Record<string, any> = {}): Promise<string> {
+  async createDataStore(
+    indexId: string,
+    displayName: string,
+    description: string,
+    metadata: Record<string, any> = {},
+  ): Promise<string> {
     try {
       return await this.indexer.createDataStore(indexId, displayName, description, metadata);
     } catch (error) {
@@ -191,7 +200,12 @@ export class VertexClient {
     }
   }
 
-  async createDocumentChunks(text: string, chunkSize = 1000, chunkOverlap = 200, features: FeatureDetails[] = []): Promise<DocumentChunk[]> {
+  async createDocumentChunks(
+    text: string,
+    chunkSize = 1000,
+    chunkOverlap = 200,
+    features: FeatureDetails[] = [],
+  ): Promise<DocumentChunk[]> {
     try {
       // Split text into chunks
       const chunks: DocumentChunk[] = [];

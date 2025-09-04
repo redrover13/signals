@@ -39,7 +39,7 @@ export const createMock = (implementation?: (...args: any[]) => any) => {
 };
 
 // Mock for requestAnimationFrame
-global.requestAnimationFrame = createMock(callback => {
+global.requestAnimationFrame = createMock((callback) => {
   setTimeout(callback, 0);
   return 0;
 });
@@ -47,7 +47,7 @@ global.requestAnimationFrame = createMock(callback => {
 // Mock for Web Crypto API
 Object.defineProperty(global.self, 'crypto', {
   value: {
-    getRandomValues: arr => {
+    getRandomValues: (arr) => {
       return crypto.randomBytes(arr.length);
     },
     subtle: {
@@ -62,9 +62,8 @@ Object.defineProperty(global.self, 'crypto', {
 const originalConsoleError = console.error;
 console.error = (...args) => {
   if (
-    typeof args[0] === 'string' && 
-    (args[0].includes('React does not recognize the') || 
-     args[0].includes('Warning:'))
+    typeof args[0] === 'string' &&
+    (args[0].includes('React does not recognize the') || args[0].includes('Warning:'))
   ) {
     return;
   }
@@ -72,20 +71,20 @@ console.error = (...args) => {
 };
 
 // Mock localStorage and sessionStorage
-const localStorageMock = (function() {
+const localStorageMock = (function () {
   let store = {};
   return {
-    getItem: createMock(key => store[key] || null),
+    getItem: createMock((key) => store[key] || null),
     setItem: createMock((key, value) => {
       store[key] = value.toString();
     }),
-    removeItem: createMock(key => {
+    removeItem: createMock((key) => {
       delete store[key];
     }),
     clear: createMock(() => {
       store = {};
     }),
-    key: createMock(index => {
+    key: createMock((index) => {
       return Object.keys(store)[index] || null;
     }),
     get length() {
@@ -101,7 +100,7 @@ Object.defineProperty(window, 'sessionStorage', { value: localStorageMock });
 if (isVitest) {
   // Import Vitest specific setup if needed
   // This ensures proper TypeScript imports for Vitest
-  import('./vitest-specific-setup.ts').catch(e => {
+  import('./vitest-specific-setup.ts').catch((e) => {
     console.log('No Vitest specific setup found. This is OK.');
   });
 } else {

@@ -26,7 +26,7 @@ registerRoute(
   /^https:\/\/fonts\.googleapis\.com/,
   new StaleWhileRevalidate({
     cacheName: 'google-fonts-stylesheets',
-  })
+  }),
 );
 
 // Cache the underlying font files with a cache-first strategy for 1 year.
@@ -43,7 +43,7 @@ registerRoute(
         maxEntries: 30,
       }),
     ],
-  })
+  }),
 );
 
 // Cache images with a cache-first strategy
@@ -57,7 +57,7 @@ registerRoute(
         maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
       }),
     ],
-  })
+  }),
 );
 
 // Cache JavaScript and CSS with a stale-while-revalidate strategy
@@ -65,7 +65,7 @@ registerRoute(
   /\.(?:js|css)$/,
   new StaleWhileRevalidate({
     cacheName: 'static-resources',
-  })
+  }),
 );
 
 // API requests with network-first strategy
@@ -79,7 +79,7 @@ registerRoute(
         maxAgeSeconds: 5 * 60, // 5 minutes
       }),
     ],
-  })
+  }),
 );
 
 // Handle offline fallback
@@ -90,7 +90,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open('offline-cache').then((cache) => {
       return cache.add(offlineFallbackPage);
-    })
+    }),
   );
 });
 
@@ -104,7 +104,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(event.request).catch(() => {
         return caches.match(offlineFallbackPage);
-      })
+      }),
     );
     return;
   }

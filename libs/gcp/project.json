@@ -4,23 +4,16 @@
   "sourceRoot": "libs/gcp/src",
   "projectType": "library",
   "implicitDependencies": ["gcp-auth"],
-  "tags": [
-    "domain:gcp",
-    "type:library"
-  ],
+  "tags": ["domain:gcp", "type:library"],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/gcp",
         "main": "libs/gcp/src/index.ts",
         "tsConfig": "libs/gcp/tsconfig.lib.json",
-        "assets": [
-          "libs/gcp/*.md"
-        ]
+        "assets": ["libs/gcp/*.md"]
       },
       "configurations": {
         "production": {
@@ -36,33 +29,20 @@
       },
       "defaultConfiguration": "production",
       "cache": true,
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "production",
-        "^production"
-      ]
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     },
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": [
-          "libs/gcp/**/*.{ts,tsx,js,jsx}"
-        ]
+        "lintFilePatterns": ["libs/gcp/**/*.{ts,tsx,js,jsx}"]
       },
-      "inputs": [
-        "default",
-        "{workspaceRoot}/.eslintrc.json"
-      ],
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
       "cache": true
     }
   },
   "namedInputs": {
-    "default": [
-      "{projectRoot}/**/*",
-      "sharedGlobals"
-    ],
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",

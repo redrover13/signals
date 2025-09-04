@@ -31,8 +31,8 @@ const STANDARD_ESLINT_CONFIG = {
   executor: '@nx/eslint:lint',
   outputs: ['{options.outputFile}'],
   options: {
-    lintFilePatterns: ['libs/**/*.ts', 'libs/**/*.html']
-  }
+    lintFilePatterns: ['libs/**/*.ts', 'libs/**/*.html'],
+  },
 };
 
 const STANDARD_TEST_CONFIG = {
@@ -40,14 +40,14 @@ const STANDARD_TEST_CONFIG = {
   outputs: ['{workspaceRoot}/coverage/{projectRoot}'],
   options: {
     jestConfig: 'jest.config.ts',
-    passWithNoTests: true
+    passWithNoTests: true,
   },
   configurations: {
     ci: {
       ci: true,
-      codeCoverage: true
-    }
-  }
+      codeCoverage: true,
+    },
+  },
 };
 
 const STANDARD_BUILD_CONFIG = {
@@ -58,8 +58,8 @@ const STANDARD_BUILD_CONFIG = {
     tsConfig: '{projectRoot}/tsconfig.lib.json',
     packageJson: '{projectRoot}/package.json',
     main: '{projectRoot}/src/index.ts',
-    assets: ['{projectRoot}/*.md']
-  }
+    assets: ['{projectRoot}/*.md'],
+  },
 };
 
 /**
@@ -67,54 +67,54 @@ const STANDARD_BUILD_CONFIG = {
  */
 async function updateProjectConfigs(): Promise<void> {
   const projectPaths = await glob('libs/**/project.json');
-  
+
   for (const projectPath of projectPaths) {
     console.log(`Updating ${projectPath}...`);
-    
+
     try {
       const configContent = fs.readFileSync(projectPath, 'utf8');
       const config: ProjectConfig = JSON.parse(configContent);
-      
+
       // Extract domain from path for tagging
       const pathParts = path.dirname(projectPath).split(path.sep);
       const domain = pathParts[1]; // 'libs/domain/...'
-      
+
       // Add standard configurations
       if (config?.targets) {
-        config.targets["build"] = {
+        config.targets['build'] = {
           ...STANDARD_BUILD_CONFIG,
-          ...config.targets["build"]
+          ...config.targets['build'],
         };
-        
-        config.targets["lint"] = {
+
+        config.targets['lint'] = {
           ...STANDARD_ESLINT_CONFIG,
-          ...config.targets["lint"]
+          ...config.targets['lint'],
         };
-        
-        config.targets["test"] = {
+
+        config.targets['test'] = {
           ...STANDARD_TEST_CONFIG,
-          ...config.targets["test"]
+          ...config.targets['test'],
         };
       }
-      
+
       // Add named inputs for cache busting
       if (config) {
         config.namedInputs = {
           default: ['{projectRoot}/**/*', '!{projectRoot}/**/*.test.ts'],
           production: ['default'],
-          ...config.namedInputs
+          ...config.namedInputs,
         };
       }
-      
+
       // Add domain tags
       if (config) {
         config.tags = config.tags || [];
       }
-      
+
       if (config?.tags && domain && !config.tags.includes(domain)) {
         config.tags.push(domain);
       }
-      
+
       // Write updated config
       fs.writeFileSync(projectPath, JSON.stringify(config, null, 2), 'utf8');
       console.log(`✅ Updated ${projectPath}`);
@@ -134,7 +134,7 @@ async function main(): Promise<void> {
 }
 
 // Run the script
-main().catch(err => {
+main().catch((err) => {
   console.error('Error updating project configurations:', err);
   process.exit(1);
 });

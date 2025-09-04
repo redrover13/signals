@@ -7,6 +7,7 @@ This document details the successful deployment of the RAG (Retrieval-Augmented 
 ## Infrastructure Components
 
 ### Cloud Storage
+
 - **Documents Bucket**: `saigon-signals-rag-documents`
   - Stores uploaded documents for processing
   - Configured with uniform bucket-level access
@@ -16,6 +17,7 @@ This document details the successful deployment of the RAG (Retrieval-Augmented 
   - Optimized for retrieval operations
 
 ### BigQuery Data Warehouse
+
 - **Dataset**: `rag_dataset`
 - **Table**: `document_chunks`
   - Schema optimized for document retrieval
@@ -23,6 +25,7 @@ This document details the successful deployment of the RAG (Retrieval-Augmented 
   - Includes metadata, content, and processing timestamps
 
 ### Cloud Functions
+
 - **Function**: `rag-document-processor`
   - Runtime: Node.js 18 with ES modules
   - Memory: 1GB, Timeout: 60 seconds
@@ -30,12 +33,14 @@ This document details the successful deployment of the RAG (Retrieval-Augmented 
   - Environment variables configured for all GCP resources
 
 ### Pub/Sub Messaging
+
 - **Topic**: `rag-document-processing`
   - Handles document processing events
   - 24-hour message retention
   - Enables event-driven architecture
 
 ### Security & IAM
+
 - **Service Account**: `rag-pipeline-sa@saigon-signals.iam.gserviceaccount.com`
 - **Permissions**:
   - Storage Admin (bucket access)
@@ -46,6 +51,7 @@ This document details the successful deployment of the RAG (Retrieval-Augmented 
 ## Deployment Process
 
 ### 1. Infrastructure Setup
+
 ```bash
 cd infra/terraform/rag-pipeline
 terraform init
@@ -54,6 +60,7 @@ terraform apply
 ```
 
 ### 2. Cloud Function Development
+
 ```bash
 cd apps/cloud-functions/rag-processor
 pnpm install
@@ -62,6 +69,7 @@ zip -r function-source.zip package.json index.js index.d.ts
 ```
 
 ### 3. Configuration
+
 - **Project**: `saigon-signals`
 - **Region**: `asia-southeast1`
 - **Environment**: Production-ready configuration
@@ -77,9 +85,11 @@ zip -r function-source.zip package.json index.js index.d.ts
 ## Usage
 
 ### Document Upload
+
 Upload documents to the `saigon-signals-rag-documents` bucket to trigger automatic processing.
 
 ### Query Processed Data
+
 ```sql
 SELECT content, metadata
 FROM `rag_dataset.document_chunks`
@@ -88,7 +98,9 @@ ORDER BY chunk_id
 ```
 
 ### Function Invocation
+
 The Cloud Function can be invoked via HTTP:
+
 ```
 POST https://asia-southeast1-saigon-signals.cloudfunctions.net/rag-document-processor
 ```
@@ -96,16 +108,19 @@ POST https://asia-southeast1-saigon-signals.cloudfunctions.net/rag-document-proc
 ## Monitoring & Maintenance
 
 ### Logs
+
 - Cloud Function logs available in Cloud Logging
 - BigQuery audit logs for data access
 - Storage access logs
 
 ### Metrics
+
 - Function execution time and success rates
 - Storage usage and transfer costs
 - BigQuery query performance
 
 ### Alerts
+
 - Function failures
 - Storage quota exceeded
 - BigQuery budget alerts
@@ -113,11 +128,13 @@ POST https://asia-southeast1-saigon-signals.cloudfunctions.net/rag-document-proc
 ## Troubleshooting
 
 ### Common Issues
+
 1. **Function Deployment Failures**: Check package.json for ES module configuration
 2. **Permission Errors**: Verify service account has required IAM roles
 3. **BigQuery Issues**: Ensure dataset and table exist with correct schema
 
 ### Rollback Procedure
+
 ```bash
 cd infra/terraform/rag-pipeline
 terraform destroy
@@ -134,12 +151,13 @@ terraform destroy
 ## Contact
 
 For questions about the RAG pipeline infrastructure:
+
 - **Engineering Team**: Signals Development Team
 - **Documentation**: This document and related architecture docs
 - **Support**: GCP Console and Cloud Logging
 
 ---
 
-*Last Updated: August 30, 2025*
-*Deployment Status: ✅ Successfully Deployed*</content>
+_Last Updated: August 30, 2025_
+_Deployment Status: ✅ Successfully Deployed_</content>
 <parameter name="filePath">/home/g_nelson/signals-1/docs/RAG_PIPELINE_DEPLOYMENT.md

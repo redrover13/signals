@@ -3,24 +3,16 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/ui/components/src",
   "projectType": "library",
-  "tags": [
-    "domain:ui",
-    "type:library",
-    "scope:client"
-  ],
+  "tags": ["domain:ui", "type:library", "scope:client"],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/ui/components",
         "main": "libs/ui/components/src/index.ts",
         "tsConfig": "libs/ui/components/tsconfig.lib.json",
-        "assets": [
-          "libs/ui/components/*.md"
-        ]
+        "assets": ["libs/ui/components/*.md"]
       },
       "configurations": {
         "production": {
@@ -36,19 +28,12 @@
       },
       "defaultConfiguration": "production",
       "cache": true,
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "production",
-        "^production"
-      ]
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "libs/ui/components/jest.config.ts"
       },
@@ -58,32 +43,20 @@
           "codeCoverage": true
         }
       },
-      "inputs": [
-        "default",
-        "^default",
-        "{workspaceRoot}/jest.preset.js"
-      ],
+      "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"],
       "cache": true
     },
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": [
-          "libs/ui/components/**/*.{ts,tsx,js,jsx}"
-        ]
+        "lintFilePatterns": ["libs/ui/components/**/*.{ts,tsx,js,jsx}"]
       },
-      "inputs": [
-        "default",
-        "{workspaceRoot}/.eslintrc.json"
-      ],
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
       "cache": true
     }
   },
   "namedInputs": {
-    "default": [
-      "{projectRoot}/**/*",
-      "sharedGlobals"
-    ],
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",

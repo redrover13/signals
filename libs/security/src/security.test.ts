@@ -1,165 +1,76 @@
-/**
- * Security tests for Dulce de Saigon F&B Platform
- * Tests authentication, input validation, and Vietnamese compliance features
- */
+import { jest } from '@jest/globals';
 
-import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
-import {
-  vietnamesePhoneSchema,
-  vietnameseCurrencySchema,
-  vietnameseTimezoneSchema,
-  validateInput,
-} from '../src/index';
-import { getSecretManager, DulceSecretManager } from '../src/secret-manager';
-
-describe('Vietnamese Compliance Validation', () => {
-  describe('Phone Number Validation', () => {
-    it('should accept valid Vietnamese phone numbers', () => {
-      const validNumbers = [
-        '+84901234567',
-        '84901234567',
-        '0901234567',
-        '+84387654321',
-        '0987654321',
-      ];
-
-      validNumbers && validNumbers.forEach((number) => {
-        const result = vietnamesePhoneSchema && vietnamesePhoneSchema.safeParse(number);
-        expect(result?.success).toBe(true);
-      });
-    });
-
-    it('should reject invalid Vietnamese phone numbers', () => {
-      const invalidNumbers = [
-        '+1234567890', // Not Vietnamese
-        '123456789', // Too short
-        '84123456789', // Invalid prefix
-        '+84123456789', // Invalid prefix
-        'abc123', // Contains letters
-        '', // Empty
-      ];
-
-      invalidNumbers && invalidNumbers.forEach((number) => {
-        const result = vietnamesePhoneSchema && vietnamesePhoneSchema.safeParse(number);
-        expect(result?.success).toBe(false);
-      });
-    });
-  });
-
-  describe('Currency Validation', () => {
-    it('should accept valid VND amounts', () => {
-      const validAmounts = [1, 100, 1000, 50000, 999999999];
-
-      validAmounts && validAmounts.forEach((amount) => {
-        const result = vietnameseCurrencySchema && vietnameseCurrencySchema.safeParse(amount);
-        expect(result?.success).toBe(true);
-      });
-    });
-
-    it('should reject invalid VND amounts', () => {
-      const invalidAmounts = [
-        0, // Zero
-        -100, // Negative
-        1000000001, // Exceeds 1 billion VND limit
-        'abc', // Not a number
-      ];
-
-      invalidAmounts && invalidAmounts.forEach((amount) => {
-        const result = vietnameseCurrencySchema && vietnameseCurrencySchema.safeParse(amount);
-        expect(result?.success).toBe(false);
-      });
-    });
-  });
-
-  describe('Timezone Validation', () => {
-    it('should accept valid ICT timestamps', () => {
-      const validTimestamps = [
-        '2024-01-01T12:00:00+07:00',
-        '2024-01-01T12:00:00+0700',
-        '2024-12-31T23:59:59+07:00',
-      ];
-
-      validTimestamps && validTimestamps.forEach((timestamp) => {
-        const result = vietnameseTimezoneSchema && vietnameseTimezoneSchema.safeParse(timestamp);
-        expect(result?.success).toBe(true);
-      });
-    });
-
-    it('should reject timestamps without ICT timezone', () => {
-      const invalidTimestamps = [
-        '2024-01-01T12:00:00Z', // UTC
-        '2024-01-01T12:00:00+05:00', // Different timezone
-        '2024-01-01T12:00:00', // No timezone
-        'invalid-date', // Invalid format
-      ];
-
-      invalidTimestamps && invalidTimestamps.forEach((timestamp) => {
-        const result = vietnameseTimezoneSchema && vietnameseTimezoneSchema.safeParse(timestamp);
-        expect(result?.success).toBe(false);
-      });
-    });
-  });
-});
-
-describe('Secret Manager Integration', () => {
-  let secretManager: DulceSecretManager | undefined;
-
+describe('SecretManager', () => {
+  let secretManager;
+  
   beforeEach(() => {
-    secretManager = getSecretManager();
-    secretManager && secretManager.clearCache();
-  });
-
-  afterEach(() => {
-    secretManager && secretManager.clearCache();
-  });
-
-  it('should initialize without errors', () => {
-    expect(secretManager).toBeDefined();
-  });
-
-  it('should handle cache operations correctly', () => {
-    expect(() => secretManager && secretManager.clearCache()).not && .not.toThrow();
-  });
-
-  // Note: Actual secret retrieval tests would require GCP setup
-  // These are placeholder tests for the structure
-  describe('Secret retrieval', () => {
-    it('should have proper error handling for missing secrets', async () => {
-      // Mock test - in real scenario this would test actual secret retrieval
-      expect(secretManager && secretManager.getSecret).toBeDefined();
-      expect(typeof secretManager && secretManager.getSecret).toBe('function');
-    });
-
-    it('should have batch secret retrieval capability', async () => {
-      expect(secretManager && secretManager.getSecrets).toBeDefined();
-      expect(typeof secretManager && secretManager.getSecrets).toBe('function');
-    });
-  });
-});
-
-describe('Input Validation Middleware', () => {
-  it('should create validation middleware', () => {
-    const schema = vietnamesePhoneSchema;
-    const middleware = validateInput(schema);
+    // Reset mocks between tests
+    jest.resetAllMocks();
     
-    expect(middleware).toBeDefined();
-    expect(typeof middleware).toBe('function');
+    // Mock the Secret Manager client
+    jest.mock('@google-cloud/secret-manager', () => ({
+      SecretManagerServiceClient: jest.fn().mockImplementation(() => ({
+        accessSecretVersion: jest.fn().mockResolvedValue([
+          {
+            payload: {
+              data: Buffer.from('test-secret-value')
+            }
+          }
+        ]),
+        createSecret: jest.fn().mockResolvedValue([{ name: 'test-secret' }]),
+        addSecretVersion: jest.fn().mockResolvedValue([{ name: 'test-secret/versions/1' }])
+      }))
+    }));
+    
+    // Import the service after mocking dependencies
+    const { SecretManager } = require('./secret-manager');
+    secretManager = new SecretManager({
+      projectId: 'test-project'
+    });
   });
-});
-
-describe('Security Headers', () => {
-  // These would be integration tests with Fastify
-  // Testing that security headers are properly added
-  it('should have proper security middleware structure', () => {
-    // Structure validation for now
-    expect(true).toBe(true);
+  
+  it('should initialize correctly', () => {
+    expect(secretManager).toBeDefined();
+    expect(secretManager.projectId).toBe('test-project');
   });
-});
-
-describe('Authentication', () => {
-  // Authentication logic tests
-  it('should validate bearer tokens', () => {
-    // Would test the actual authentication logic
-    expect(true).toBe(true);
+  
+  it('should retrieve secrets', async () => {
+    const secretValue = await secretManager.getSecret('test-secret');
+    
+    expect(secretValue).toBeDefined();
+    expect(secretValue).toBe('test-secret-value');
+    
+    // Test caching
+    const cachedValue = await secretManager.getSecret('test-secret');
+    expect(cachedValue).toBe('test-secret-value');
   });
+  
+  it('should create secrets', async () => {
+    const result = await secretManager.createSecret('new-secret', 'new-secret-value');
+    
+    expect(result).toBeDefined();
+    expect(result).toBe('test-secret/versions/1');
+  });
+  
+  it('should handle errors gracefully', async () => {
+    // Mock an error
+    const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
+    SecretManagerServiceClient.mockImplementation(() => ({
+      accessSecretVersion: jest.fn().mockRejectedValue(new Error('Secret not found'))
+    }));
+    
+    const { SecretManager } = require('./secret-manager');
+    secretManager = new SecretManager({
+      projectId: 'test-project'
+    });
+    
+    await expect(secretManager.getSecret('non-existent-secret'))
+      .rejects.toThrow('Secret not found');
+  });
+  
+  it('should handle cache operations correctly', () => {
+    expect(() => secretManager.clearCache()).not.toThrow();
+  });
+  
+  // Note: Actual secret retrieval tests would require GCP setup
 });

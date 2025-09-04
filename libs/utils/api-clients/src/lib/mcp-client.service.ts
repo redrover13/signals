@@ -142,7 +142,7 @@ export class MCPClientService {
     }
 
     // Start health monitoring if enabled
-    if (this.config?.global.healthMonitoring?.enabled) {
+    if (this.config && config.global.healthMonitoring && healthMonitoring.enabled) {
       this.healthService.startHealthMonitoring(this.config.global.healthMonitoring.intervalMs);
     }
 
@@ -167,14 +167,14 @@ export class MCPClientService {
     const connection: MCPConnection = {
       id: config.id,
       status: 'connecting',
-      type: config.connection?.type || 'http',
+      type: config.connection && connection.type || 'http',
     };
 
     this.connections.set(config.id, connection);
 
     try {
       // Connect based on connection type
-      switch (config.connection?.type) {
+      switch (config.connection && connection.type) {
         case 'stdio':
           await this.connectViaStdio(config, connection);
           break;
@@ -183,7 +183,7 @@ export class MCPClientService {
           break;
         case 'websocket':
           // Not implemented yet
-          throw new Error(`Unsupported connection type: ${config.connection?.type}`);
+          throw new Error(`Unsupported connection type: ${config.connection && connection.type}`);
       }
 
       connection.status = 'connected';
@@ -201,11 +201,8 @@ export class MCPClientService {
    * @param config Server configuration
    * @param connection Connection object
    */
-  private async connectViaStdio(
-    config: MCPServerConfig,
-    connection: MCPConnection
-  ): Promise<void> {
-    if (!config.connection?.endpoint) {
+  private async connectViaStdio(config: MCPServerConfig, connection: MCPConnection): Promise<void> {
+    if (!config.connection && connection.endpoint) {
       throw new Error('Connection endpoint is required for stdio connections');
     }
 
@@ -246,11 +243,8 @@ export class MCPClientService {
    * @param config Server configuration
    * @param connection Connection object
    */
-  private async connectViaHttp(
-    config: MCPServerConfig,
-    connection: MCPConnection
-  ): Promise<void> {
-    const baseURL = config.connection?.endpoint;
+  private async connectViaHttp(config: MCPServerConfig, connection: MCPConnection): Promise<void> {
+    const baseURL = config.connection && connection.endpoint;
     if (!baseURL) {
       throw new Error('Connection endpoint is required for HTTP connections');
     }
@@ -258,7 +252,7 @@ export class MCPClientService {
     // Create HTTP client
     const client = axios.create({
       baseURL,
-      timeout: config.connection?.timeout || 30000,
+      timeout: config.connection && connection.timeout || 30000,
       headers: this.getAuthHeaders(config),
     });
 
@@ -274,7 +268,7 @@ export class MCPClientService {
       'Content-Type': 'application/json',
     };
 
-    if (config.auth?.type === 'api-key' && config.auth?.credentials?.envVar) {
+    if (config.auth && auth.type === 'api-key' && config.auth && auth.credentials && credentials.envVar) {
       const apiKey = process.env[config.auth.credentials.envVar];
       if (apiKey) {
         headers['X-API-Key'] = apiKey;
@@ -324,17 +318,17 @@ export class MCPClientService {
     }
 
     // Set timeout
-    const timeout = request.timeout || config.connection?.timeout || 30000;
+    const timeout = request.timeout || config.connection && connection.timeout || 30000;
 
     // Send the request based on connection type
-    switch (config.connection?.type) {
+    switch (config.connection && connection.type) {
       case 'http':
         return this.sendHttpRequest(connection, request, timeout);
       case 'stdio':
         return this.sendStdioRequest(connection, request, timeout);
       default:
         throw new Error(
-          `Request sending not implemented for connection type: ${config.connection?.type}`,
+          `Request sending not implemented for connection type: ${config.connection && connection.type}`,
         );
     }
   }
@@ -354,7 +348,7 @@ export class MCPClientService {
       params?: Record<string, string>;
       headers?: Record<string, string>;
     },
-    timeout: number
+    timeout: number,
   ): Promise<any> {
     const client = connection.client as AxiosInstance;
     if (!client) {
@@ -375,7 +369,7 @@ export class MCPClientService {
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        throw new Error(`HTTP error ${error.response.status}: ${error.message}`);
+        throw new Error(`HTTP error ${error?.response?.status || 0}: ${error?.message || "Unknown error"}`);
       }
       throw error;
     }
@@ -396,7 +390,7 @@ export class MCPClientService {
       params?: Record<string, string>;
       headers?: Record<string, string>;
     },
-    timeout: number
+    timeout: number,
   ): Promise<any> {
     const process = connection.process as ChildProcess;
     if (!process || !process.stdin || !process.stdout) {
@@ -406,7 +400,7 @@ export class MCPClientService {
     return new Promise((resolve, reject) => {
       const requestId = Math.random().toString(36).substring(2, 15);
       const timeoutId = setTimeout(() => {
-        reject(new Error(`Request timed out after ${timeout}ms`));
+        reject(new Error(`Request timed out after ${timeout || 0}ms`));
       }, timeout);
 
       // Create request message
@@ -425,7 +419,7 @@ export class MCPClientService {
           const response = JSON.parse(data.toString());
           if (response.id === requestId) {
             clearTimeout(timeoutId);
-            process.stdout?.removeListener('data', responseHandler);
+            process.stdout && stdout.removeListener('data', responseHandler);
 
             if (response.error) {
               reject(new Error(response.error));
@@ -507,7 +501,7 @@ export class MCPClientService {
     const env: Record<string, string> = {};
 
     // Add authentication environment variables
-    if (config.auth?.type === 'api-key' && config.auth?.credentials?.envVar) {
+    if (config.auth && auth.type === 'api-key' && config.auth && auth.credentials && credentials.envVar) {
       const value = process.env[config.auth.credentials.envVar];
       if (value) {
         env[config.auth.credentials.envVar] = value;

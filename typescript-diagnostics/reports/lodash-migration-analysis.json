@@ -8,9 +8,7 @@
     },
     "esm": {
       "count": 1,
-      "files": [
-        "libs/gcp-core/src/index.ts"
-      ]
+      "files": ["libs/gcp-core/src/index.ts"]
     },
     "mixed": {
       "count": 0,
@@ -24,9 +22,7 @@
     },
     "individualFunctions": {
       "count": 1,
-      "files": [
-        "libs/gcp-core/src/index.ts"
-      ]
+      "files": ["libs/gcp-core/src/index.ts"]
     },
     "mixedStyles": {
       "count": 0,

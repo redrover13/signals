@@ -23,7 +23,7 @@ const REQUIRED_SECRETS = [
   'qdrant-url',
   'gcp-project-id',
   'jwt-secret',
-  'dulce-api-key'
+  'dulce-api-key',
 ];
 
 const OPTIONAL_SECRETS = [
@@ -34,7 +34,7 @@ const OPTIONAL_SECRETS = [
   'google-api-key',
   'google-cse-id',
   'brave-api-key',
-  'postgres-connection'
+  'postgres-connection',
 ];
 
 function getGcpProjectId() {
@@ -50,7 +50,7 @@ function getGcpProjectId() {
 function checkSecretExists(secretName, projectId) {
   try {
     execSync(`gcloud secrets describe ${secretName} --project=${projectId}`, {
-      stdio: 'pipe'
+      stdio: 'pipe',
     });
     return true;
   } catch (error) {
@@ -67,7 +67,7 @@ function validateSecrets() {
   let missingOptional = [];
 
   console.log('📋 Checking REQUIRED secrets:');
-  console.log('=' .repeat(50));
+  console.log('='.repeat(50));
 
   for (const secret of REQUIRED_SECRETS) {
     if (checkSecretExists(secret, projectId)) {
@@ -80,7 +80,7 @@ function validateSecrets() {
   }
 
   console.log('\n📋 Checking OPTIONAL secrets:');
-  console.log('=' .repeat(50));
+  console.log('='.repeat(50));
 
   for (const secret of OPTIONAL_SECRETS) {
     if (checkSecretExists(secret, projectId)) {
@@ -91,9 +91,9 @@ function validateSecrets() {
     }
   }
 
-  console.log('\n' + '=' .repeat(50));
+  console.log('\n' + '='.repeat(50));
   console.log('📊 VALIDATION SUMMARY');
-  console.log('=' .repeat(50));
+  console.log('='.repeat(50));
 
   if (allValid) {
     console.log('🎉 All required secrets are properly configured!');
@@ -103,25 +103,27 @@ function validateSecrets() {
     console.log('3. Set up secret rotation policies for production');
   } else {
     console.log('❌ Some required secrets are missing:');
-    missingRequired.forEach(secret => console.log(`   - ${secret}`));
+    missingRequired.forEach((secret) => console.log(`   - ${secret}`));
 
     console.log('\n🔧 To fix this:');
     console.log('1. Run the setup script: ./scripts/setup-secrets.sh');
     console.log('2. Or create secrets manually with gcloud:');
-    missingRequired.forEach(secret => {
+    missingRequired.forEach((secret) => {
       console.log(`   gcloud secrets create ${secret} --project=${projectId}`);
     });
   }
 
   if (missingOptional.length > 0) {
     console.log('\n⚠️  Optional secrets not configured:');
-    missingOptional.forEach(secret => console.log(`   - ${secret}`));
+    missingOptional.forEach((secret) => console.log(`   - ${secret}`));
     console.log('\n💡 You can add these later as needed.');
   }
 
   console.log('\n🔗 Useful commands:');
   console.log(`   List all secrets: gcloud secrets list --project=${projectId}`);
-  console.log(`   View secret value: gcloud secrets versions access latest --secret=github-token --project=${projectId}`);
+  console.log(
+    `   View secret value: gcloud secrets versions access latest --secret=github-token --project=${projectId}`,
+  );
 
   return allValid;
 }

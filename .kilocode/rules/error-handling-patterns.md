@@ -25,11 +25,11 @@ export abstract class AppError extends Error {
   constructor(
     message: string,
     public readonly context?: Record<string, unknown>,
-    public readonly cause?: Error
+    public readonly cause?: Error,
   ) {
     super(message);
     this.name = this.constructor.name;
-    
+
     // Maintain proper stack trace
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
@@ -54,17 +54,16 @@ export class ValidationError extends AppError {
   readonly statusCode = 400;
   readonly isOperational = true;
 
-  constructor(
-    field: string,
-    value: unknown,
-    constraint: string,
-    cause?: Error
-  ) {
-    super(`Validation failed for field '${field}': ${constraint}`, {
-      field,
-      value,
-      constraint,
-    }, cause);
+  constructor(field: string, value: unknown, constraint: string, cause?: Error) {
+    super(
+      `Validation failed for field '${field}': ${constraint}`,
+      {
+        field,
+        value,
+        constraint,
+      },
+      cause,
+    );
   }
 }
 
@@ -74,10 +73,14 @@ export class NotFoundError extends AppError {
   readonly isOperational = true;
 
   constructor(resource: string, identifier: string, cause?: Error) {
-    super(`${resource} with identifier '${identifier}' not found`, {
-      resource,
-      identifier,
-    }, cause);
+    super(
+      `${resource} with identifier '${identifier}' not found`,
+      {
+        resource,
+        identifier,
+      },
+      cause,
+    );
   }
 }
 
@@ -86,15 +89,15 @@ export class ExternalServiceError extends AppError {
   readonly statusCode = 502;
   readonly isOperational = true;
 
-  constructor(
-    service: string,
-    operation: string,
-    cause?: Error
-  ) {
-    super(`External service '${service}' failed during '${operation}'`, {
-      service,
-      operation,
-    }, cause);
+  constructor(service: string, operation: string, cause?: Error) {
+    super(
+      `External service '${service}' failed during '${operation}'`,
+      {
+        service,
+        operation,
+      },
+      cause,
+    );
   }
 }
 
@@ -104,10 +107,14 @@ export class ConfigurationError extends AppError {
   readonly isOperational = false; // Programming error
 
   constructor(setting: string, expectedType: string, cause?: Error) {
-    super(`Configuration error: '${setting}' must be ${expectedType}`, {
-      setting,
-      expectedType,
-    }, cause);
+    super(
+      `Configuration error: '${setting}' must be ${expectedType}`,
+      {
+        setting,
+        expectedType,
+      },
+      cause,
+    );
   }
 }
 ```
@@ -155,17 +162,17 @@ export class OrderService {
   constructor(
     private readonly orderRepository: OrderRepository,
     private readonly paymentService: PaymentService,
-    private readonly logger: Logger
+    private readonly logger: Logger,
   ) {}
 
   async processOrder(orderData: CreateOrderRequest): Promise<Order> {
     try {
       // Validate input
       const validatedData = await this.validateOrderData(orderData);
-      
+
       // Create order
       const order = await this.orderRepository.create(validatedData);
-      
+
       // Process payment
       try {
         const payment = await this.paymentService.processPayment({
@@ -173,7 +180,7 @@ export class OrderService {
           amount: order.totalAmount,
           method: orderData.paymentMethod,
         });
-        
+
         // Update order with payment info
         return await this.orderRepository.update(order.id, {
           paymentId: payment.id,
@@ -182,11 +189,11 @@ export class OrderService {
       } catch (paymentError) {
         // Rollback order on payment failure
         await this.orderRepository.update(order.id, { status: 'payment_failed' });
-        
+
         throw new ExternalServiceError(
           'PaymentService',
           'processPayment',
-          paymentError instanceof Error ? paymentError : new Error(String(paymentError))
+          paymentError instanceof Error ? paymentError : new Error(String(paymentError)),
         );
       }
     } catch (error) {
@@ -194,17 +201,17 @@ export class OrderService {
         orderData: { ...orderData, paymentMethod: '[REDACTED]' },
         error: error instanceof Error ? error.message : String(error),
       });
-      
+
       // Re-throw if it's already an AppError
       if (error instanceof AppError) {
         throw error;
       }
-      
+
       // Wrap unknown errors
       throw new AppError(
         'Failed to process order',
         { orderData: orderData.id },
-        error instanceof Error ? error : new Error(String(error))
+        error instanceof Error ? error : new Error(String(error)),
       );
     }
   }
@@ -225,7 +232,11 @@ export class OrderService {
     }
 
     if (errors.length > 0) {
-      throw new ValidationError('orderData', data, `Multiple validation errors: ${errors.map(e => e.message).join(', ')}`);
+      throw new ValidationError(
+        'orderData',
+        data,
+        `Multiple validation errors: ${errors.map((e) => e.message).join(', ')}`,
+      );
     }
 
     return data as ValidatedOrderData;
@@ -275,9 +286,7 @@ For operations where errors are expected, consider using the Result pattern.
 
 ```typescript
 // Good: Result pattern for expected errors
-export type Result<T, E = Error> = 
-  | { success: true; data: T }
-  | { success: false; error: E };
+export type Result<T, E = Error> = { success: true; data: T } | { success: false; error: E };
 
 export class UserService {
   async findUser(id: string): Promise<Result<User, NotFoundError | ValidationError>> {
@@ -285,7 +294,7 @@ export class UserService {
       if (!id || typeof id !== 'string') {
         return {
           success: false,
-          error: new ValidationError('id', id, 'must be a non-empty string')
+          error: new ValidationError('id', id, 'must be a non-empty string'),
         };
       }
 
@@ -293,7 +302,7 @@ export class UserService {
       if (!user) {
         return {
           success: false,
-          error: new NotFoundError('User', id)
+          error: new NotFoundError('User', id),
         };
       }
 
@@ -301,9 +310,10 @@ export class UserService {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof AppError 
-          ? error 
-          : new ExternalServiceError('UserRepository', 'findById', error as Error)
+        error:
+          error instanceof AppError
+            ? error
+            : new ExternalServiceError('UserRepository', 'findById', error as Error),
       };
     }
   }
@@ -312,7 +322,7 @@ export class UserService {
 // Good: Using Result pattern
 async function handleUserRequest(userId: string): Promise<void> {
   const result = await userService.findUser(userId);
-  
+
   if (!result.success) {
     if (result.error instanceof NotFoundError) {
       // Handle not found specifically
@@ -376,7 +386,7 @@ export class BigQueryService {
       return rows;
     } catch (error) {
       const duration = Date.now() - startTime;
-      
+
       this.logger.error('BigQuery query failed', {
         queryId,
         duration,
@@ -392,7 +402,7 @@ export class BigQueryService {
       throw new ExternalServiceError(
         'BigQuery',
         'executeQuery',
-        error instanceof Error ? error : new Error(String(error))
+        error instanceof Error ? error : new Error(String(error)),
       );
     }
   }
@@ -446,20 +456,20 @@ export interface RetryConfig {
 export class RetryableOperation {
   constructor(
     private readonly config: RetryConfig,
-    private readonly logger: Logger
+    private readonly logger: Logger,
   ) {}
 
   async execute<T>(
     operation: () => Promise<T>,
     operationName: string,
-    isRetryable: (error: Error) => boolean = this.defaultRetryableCheck
+    isRetryable: (error: Error) => boolean = this.defaultRetryableCheck,
   ): Promise<T> {
     let lastError: Error;
-    
+
     for (let attempt = 1; attempt <= this.config.maxAttempts; attempt++) {
       try {
         const result = await operation();
-        
+
         if (attempt > 1) {
           this.logger.info('Operation succeeded after retry', {
             operationName,
@@ -467,11 +477,11 @@ export class RetryableOperation {
             totalAttempts: this.config.maxAttempts,
           });
         }
-        
+
         return result;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
-        
+
         this.logger.warn('Operation failed', {
           operationName,
           attempt,
@@ -479,27 +489,23 @@ export class RetryableOperation {
           error: lastError.message,
           willRetry: attempt < this.config.maxAttempts && isRetryable(lastError),
         });
-        
+
         // Don't retry on last attempt or non-retryable errors
         if (attempt === this.config.maxAttempts || !isRetryable(lastError)) {
           break;
         }
-        
+
         // Calculate delay with exponential backoff
         const delay = Math.min(
           this.config.baseDelay * Math.pow(this.config.backoffMultiplier, attempt - 1),
-          this.config.maxDelay
+          this.config.maxDelay,
         );
-        
+
         await this.delay(delay);
       }
     }
-    
-    throw new ExternalServiceError(
-      'RetryableOperation',
-      operationName,
-      lastError
-    );
+
+    throw new ExternalServiceError('RetryableOperation', operationName, lastError);
   }
 
   private defaultRetryableCheck(error: Error): boolean {
@@ -513,7 +519,7 @@ export class RetryableOperation {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
@@ -521,7 +527,7 @@ export class RetryableOperation {
 export class ExternalApiClient {
   constructor(
     private readonly retryableOperation: RetryableOperation,
-    private readonly httpClient: HttpClient
+    private readonly httpClient: HttpClient,
   ) {}
 
   async fetchUserData(userId: string): Promise<UserData> {
@@ -530,9 +536,8 @@ export class ExternalApiClient {
       'fetchUserData',
       (error) => {
         // Custom retry logic for this operation
-        return error.message.includes('timeout') || 
-               (error as any).status >= 500;
-      }
+        return error.message.includes('timeout') || (error as any).status >= 500;
+      },
     );
   }
 }
@@ -569,22 +574,19 @@ export class CircuitBreaker {
 
   constructor(
     private readonly config: CircuitBreakerConfig,
-    private readonly logger: Logger
+    private readonly logger: Logger,
   ) {}
 
-  async execute<T>(
-    operation: () => Promise<T>,
-    operationName: string
-  ): Promise<T> {
+  async execute<T>(operation: () => Promise<T>, operationName: string): Promise<T> {
     if (this.state === CircuitState.OPEN) {
       if (Date.now() < this.nextAttemptTime) {
         throw new ExternalServiceError(
           'CircuitBreaker',
           operationName,
-          new Error('Circuit breaker is OPEN')
+          new Error('Circuit breaker is OPEN'),
         );
       }
-      
+
       // Transition to half-open
       this.state = CircuitState.HALF_OPEN;
       this.logger.info('Circuit breaker transitioning to HALF_OPEN', {
@@ -594,7 +596,7 @@ export class CircuitBreaker {
 
     try {
       const result = await operation();
-      
+
       // Success - reset circuit breaker
       if (this.state === CircuitState.HALF_OPEN) {
         this.state = CircuitState.CLOSED;
@@ -603,7 +605,7 @@ export class CircuitBreaker {
           operationName,
         });
       }
-      
+
       return result;
     } catch (error) {
       this.recordFailure(operationName);
@@ -618,7 +620,7 @@ export class CircuitBreaker {
     if (this.failureCount >= this.config.failureThreshold) {
       this.state = CircuitState.OPEN;
       this.nextAttemptTime = Date.now() + this.config.recoveryTimeout;
-      
+
       this.logger.warn('Circuit breaker opened', {
         operationName,
         failureCount: this.failureCount,

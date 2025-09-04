@@ -18,6 +18,7 @@ Your primary directive is to plan and execute a complete refactoring of the Sign
 Refactor the repository to align with the following directory structure.
 
 ### **`/apps`**
+
 - `frontend-agents`: The primary user-facing application for serving AI agents (e.g., Next.js).
 - `cloud-functions/`: A container for various serverless functions, organized by domain.
   - `social-api`
@@ -27,6 +28,7 @@ Refactor the repository to align with the following directory structure.
 - `looker-dashboards`: Configuration and embedding logic for Looker dashboards.
 
 ### **`/libs`**
+
 - `agents/`: Core logic for individual agents.
   - `bq-agent`
   - `looker-agent`
@@ -43,6 +45,7 @@ Refactor the repository to align with the following directory structure.
   - `monitoring`
 
 ### **`/infra`**
+
 - `terraform/`: Infrastructure as Code (IaC) for all GCP resources.
   - `bigquery`
   - `functions`
@@ -105,20 +108,20 @@ Execute the refactor in the following sequence:
 
 ## 4. Execution Strategy
 
--   **Mode**: Operate in a two-phase mode. First, provide a **detailed plan** for any given task. After presenting the plan, await the trigger word `EXECUTE` before proceeding with file modifications or command execution.
--   **Reasoning**: Always use a chain-of-thought process. Outline your reasoning, assumptions, and choices before taking action.
--   **Clarity**: If a response is long, break it down into numbered sections with clear headings. Prioritize modularity and document your decisions.
+- **Mode**: Operate in a two-phase mode. First, provide a **detailed plan** for any given task. After presenting the plan, await the trigger word `EXECUTE` before proceeding with file modifications or command execution.
+- **Reasoning**: Always use a chain-of-thought process. Outline your reasoning, assumptions, and choices before taking action.
+- **Clarity**: If a response is long, break it down into numbered sections with clear headings. Prioritize modularity and document your decisions.
 
 ---
 
 ## 5. Prompting Best Practices (for Interacting with Gemini)
 
--   **Specificity is Key**: Provide clear and detailed instructions. Brevity combined with precision avoids ambiguity. :contentReference[oaicite:1]{index=1}
--   **Use Step-by-Step Tasks**: Breaking down complex requests into smaller, sequential steps enhances the model's reasoning and reliability. :contentReference[oaicite:2]{index=2}
--   **Define Output Formats**: Explicitly state the desired output format (e.g., "Provide a plan first," "Generate the output in JSON format"). This helps the model structure its response.
--   **Adopt an Iterative Workflow**: The Plan → Review → Execute cycle is a proven method in prompt engineering for achieving accurate results. :contentReference[oaicite:3]{index=3}
--   **Provide Clear Persona & Context**: A well-defined persona and sufficient context lead to more accurate and better-structured generated code and documentation.
--   **Guard Against Prompt Injection**: Keep instructional text clearly separated from data or file content that is being processed. :contentReference[oaicite:4]{index=4}
+- **Specificity is Key**: Provide clear and detailed instructions. Brevity combined with precision avoids ambiguity. :contentReference[oaicite:1]{index=1}
+- **Use Step-by-Step Tasks**: Breaking down complex requests into smaller, sequential steps enhances the model's reasoning and reliability. :contentReference[oaicite:2]{index=2}
+- **Define Output Formats**: Explicitly state the desired output format (e.g., "Provide a plan first," "Generate the output in JSON format"). This helps the model structure its response.
+- **Adopt an Iterative Workflow**: The Plan → Review → Execute cycle is a proven method in prompt engineering for achieving accurate results. :contentReference[oaicite:3]{index=3}
+- **Provide Clear Persona & Context**: A well-defined persona and sufficient context lead to more accurate and better-structured generated code and documentation.
+- **Guard Against Prompt Injection**: Keep instructional text clearly separated from data or file content that is being processed. :contentReference[oaicite:4]{index=4}
 
 ---
 
@@ -140,7 +143,7 @@ This example shows how file content might be provided as context for a task.
   "metadata": {
     "lastUpdated": "2025-08-22T00:00:00Z",
     "configVersion": "2.0.0",
-    "maintainer": "Signals DevOps Team"
+    "maintainer": "Signals DevOps Team",
   },
   "wif": {
     "enabled": true,
@@ -152,8 +155,8 @@ This example shows how file content might be provided as context for a task.
       "enabled": true,
       "projectId": "${GCP_PROJECT_ID}",
       "keyRing": "mcp-secrets",
-      "location": "${GCP_REGION:-us-central1}"
-    }
+      "location": "${GCP_REGION:-us-central1}",
+    },
   },
   "environments": {
     "development": {
@@ -163,32 +166,32 @@ This example shows how file content might be provided as context for a task.
         "defaultRetry": {
           "attempts": 2,
           "delay": 500,
-          "backoff": "linear"
+          "backoff": "linear",
         },
         "healthMonitoring": {
           "enabled": true,
           "interval": 30000,
-          "alertThreshold": 2
+          "alertThreshold": 2,
         },
         "logging": {
           "level": "debug",
           "destination": "console",
           "includeRequestResponse": true,
-          "structured": true
+          "structured": true,
         },
         "security": {
           "enableTLS": false,
           "validateCertificates": false,
           "maxRequestSize": 52428800,
           "rateLimiting": {
-            "enabled": false
-          }
+            "enabled": false,
+          },
         },
         "errorHandling": {
           "gracefulDegradation": true,
           "fallbackServers": ["memory", "time"],
-          "maxConcurrentFailures": 2
-        }
+          "maxConcurrentFailures": 2,
+        },
       },
       "enabledServers": [
         "semgrep",
@@ -213,143 +216,143 @@ This example shows how file content might be provided as context for a task.
         "apimatic",
         "toolbox",
         "cloudrun",
-        "codacy"
+        "codacy",
       ],
       "serverOverrides": {
         "github": {
           "connection": {
-            "timeout": 10000
+            "timeout": 10000,
           },
           "healthCheck": {
             "interval": 60000,
-            "failureThreshold": 2
+            "failureThreshold": 2,
           },
           "auth": {
             "type": "secret-manager",
-            "secretName": "github-token-dev"
-          }
+            "secretName": "github-token-dev",
+          },
         },
         "codacy": {
           "connection": {
-            "timeout": 20000
+            "timeout": 20000,
           },
           "healthCheck": {
             "interval": 60000,
-            "failureThreshold": 2
+            "failureThreshold": 2,
           },
           "auth": {
             "type": "token",
-            "secretName": "codacy-token-dev"
-          }
+            "secretName": "codacy-token-dev",
+          },
         },
         "databases": {
           "options": {
             "bigqueryProjectId": "${GCP_PROJECT_ID}",
-            "datasets": ["analytics_dev", "signals_dev", "events_dev"]
+            "datasets": ["analytics_dev", "signals_dev", "events_dev"],
           },
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          }
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
+          },
         },
         "google": {
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
           },
           "options": {
-            "services": ["bigquery", "storage", "secretmanager"]
-          }
+            "services": ["bigquery", "storage", "secretmanager"],
+          },
         },
         "exa": {
           "auth": {
             "type": "secret-manager",
-            "secretName": "exa-api-key-dev"
-          }
+            "secretName": "exa-api-key-dev",
+          },
         },
         "toolbox": {
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
           },
           "connection": {
-            "timeout": 30000
+            "timeout": 30000,
           },
           "options": {
-            "toolsConfigSecret": "toolbox-tools-config-${NODE_ENV:-development}"
-          }
+            "toolsConfigSecret": "toolbox-tools-config-${NODE_ENV:-development}",
+          },
         },
         "cloudrun": {
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
           },
           "options": {
-            "invokerServiceAccount": "${WIF_SERVICE_ACCOUNT}"
+            "invokerServiceAccount": "${WIF_SERVICE_ACCOUNT}",
           },
           "connection": {
-            "timeout": 30000
-          }
+            "timeout": 30000,
+          },
         },
         "semgrep": {
           "connection": {
             "endpoint": "${SEMGREP_URL:-https://mcp.semgrep.ai/sse}",
-            "timeout": 10000
-          }
+            "timeout": 10000,
+          },
         },
         "nx-mcp": {
           "connection": {
             "endpoint": "${NX_MCP_URL:-https://mcp.nx.app/sse}",
-            "timeout": 10000
-          }
+            "timeout": 10000,
+          },
         },
         "google-filesystem": {
           "connection": {
             "endpoint": "${GOOGLE_FILESYSTEM_URL:-https://mcp.googleapis.com/filesystem/sse}",
-            "timeout": 15000
+            "timeout": 15000,
           },
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          }
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
+          },
         },
         "google-postgres": {
           "connection": {
             "endpoint": "${GOOGLE_POSTGRES_URL:-https://mcp.googleapis.com/postgres/sse}",
-            "timeout": 15000
+            "timeout": 15000,
           },
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          }
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
+          },
         },
         "google-maps": {
           "connection": {
             "endpoint": "${GOOGLE_MAPS_URL:-https://mcp.googleapis.com/maps/sse}",
-            "timeout": 15000
+            "timeout": 15000,
           },
           "auth": {
             "type": "env",
-            "envName": "GOOGLE_MAPS_API_KEY"
-          }
+            "envName": "GOOGLE_MAPS_API_KEY",
+          },
         },
         "google-search": {
           "connection": {
             "endpoint": "${GOOGLE_SEARCH_URL:-https://mcp.googleapis.com/search/sse}",
-            "timeout": 15000
-          }
+            "timeout": 15000,
+          },
         },
         "qdrant": {
           "connection": {
             "endpoint": "${QDRANT_URL:-https://mcp.qdrant.tech/sse}",
-            "timeout": 15000
+            "timeout": 15000,
           },
           "auth": {
             "type": "env",
-            "envName": "QDRANT_API_KEY"
-          }
-        }
-      }
+            "envName": "QDRANT_API_KEY",
+          },
+        },
+      },
     },
     "staging": {
       "global": {
@@ -358,18 +361,18 @@ This example shows how file content might be provided as context for a task.
         "defaultRetry": {
           "attempts": 3,
           "delay": 1000,
-          "backoff": "exponential"
+          "backoff": "exponential",
         },
         "healthMonitoring": {
           "enabled": true,
           "interval": 60000,
-          "alertThreshold": 3
+          "alertThreshold": 3,
         },
         "logging": {
           "level": "info",
           "destination": "gcp-logging",
           "includeRequestResponse": false,
-          "structured": true
+          "structured": true,
         },
         "security": {
           "enableTLS": true,
@@ -378,14 +381,14 @@ This example shows how file content might be provided as context for a task.
           "rateLimiting": {
             "enabled": true,
             "requestsPerMinute": 1000,
-            "burstLimit": 100
-          }
+            "burstLimit": 100,
+          },
         },
         "errorHandling": {
           "gracefulDegradation": true,
           "fallbackServers": ["memory", "time", "filesystem"],
-          "maxConcurrentFailures": 3
-        }
+          "maxConcurrentFailures": 3,
+        },
       },
       "enabledServers": [
         "semgrep",
@@ -410,7 +413,7 @@ This example shows how file content might be provided as context for a task.
         "apimatic",
         "builtwith",
         "toolbox",
-        "cloudrun"
+        "cloudrun",
       ],
       "serverOverrides": {
         "github": {
@@ -419,126 +422,126 @@ This example shows how file content might be provided as context for a task.
             "retry": {
               "attempts": 3,
               "delay": 1000,
-              "backoff": "exponential"
-            }
+              "backoff": "exponential",
+            },
           },
           "healthCheck": {
             "interval": 120000,
-            "failureThreshold": 3
+            "failureThreshold": 3,
           },
           "auth": {
             "type": "secret-manager",
-            "secretName": "github-token-staging"
-          }
+            "secretName": "github-token-staging",
+          },
         },
         "databases": {
           "options": {
             "bigqueryProjectId": "${GCP_PROJECT_ID}",
-            "datasets": ["analytics_staging", "signals_staging", "events_staging"]
+            "datasets": ["analytics_staging", "signals_staging", "events_staging"],
           },
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          }
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
+          },
         },
         "google": {
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
           },
           "options": {
-            "services": ["bigquery", "storage", "secretmanager", "aiplatform"]
-          }
+            "services": ["bigquery", "storage", "secretmanager", "aiplatform"],
+          },
         },
         "exa": {
           "auth": {
             "type": "secret-manager",
-            "secretName": "exa-api-key-staging"
-          }
+            "secretName": "exa-api-key-staging",
+          },
         },
         "toolbox": {
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
           },
           "connection": {
-            "timeout": 45000
+            "timeout": 45000,
           },
           "options": {
-            "toolsConfigSecret": "toolbox-tools-config-staging"
-          }
+            "toolsConfigSecret": "toolbox-tools-config-staging",
+          },
         },
         "cloudrun": {
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
           },
           "options": {
-            "invokerServiceAccount": "${WIF_SERVICE_ACCOUNT}"
+            "invokerServiceAccount": "${WIF_SERVICE_ACCOUNT}",
           },
           "connection": {
-            "timeout": 45000
-          }
+            "timeout": 45000,
+          },
         },
         "semgrep": {
           "connection": {
             "endpoint": "${SEMGREP_URL:-https://mcp.semgrep.ai/sse}",
-            "timeout": 15000
-          }
+            "timeout": 15000,
+          },
         },
         "nx-mcp": {
           "connection": {
             "endpoint": "${NX_MCP_URL:-https://mcp.nx.app/sse}",
-            "timeout": 15000
-          }
+            "timeout": 15000,
+          },
         },
         "google-filesystem": {
           "connection": {
             "endpoint": "${GOOGLE_FILESYSTEM_URL:-https://mcp.googleapis.com/filesystem/sse}",
-            "timeout": 15000
+            "timeout": 15000,
           },
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          }
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
+          },
         },
         "google-postgres": {
           "connection": {
             "endpoint": "${GOOGLE_POSTGRES_URL:-https://mcp.googleapis.com/postgres/sse}",
-            "timeout": 15000
+            "timeout": 15000,
           },
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
-          }
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
+          },
         },
         "google-maps": {
           "connection": {
             "endpoint": "${GOOGLE_MAPS_URL:-https://mcp.googleapis.com/maps/sse}",
-            "timeout": 15000
+            "timeout": 15000,
           },
           "auth": {
             "type": "env",
-            "envName": "GOOGLE_MAPS_API_KEY"
-          }
+            "envName": "GOOGLE_MAPS_API_KEY",
+          },
         },
         "google-search": {
           "connection": {
             "endpoint": "${GOOGLE_SEARCH_URL:-https://mcp.googleapis.com/search/sse}",
-            "timeout": 15000
-          }
+            "timeout": 15000,
+          },
         },
         "qdrant": {
           "connection": {
             "endpoint": "${QDRANT_URL:-https://mcp.qdrant.tech/sse}",
-            "timeout": 15000
+            "timeout": 15000,
           },
           "auth": {
             "type": "env",
-            "envName": "QDRANT_API_KEY"
-          }
-        }
-      }
+            "envName": "QDRANT_API_KEY",
+          },
+        },
+      },
     },
     "production": {
       "global": {
@@ -547,12 +550,12 @@ This example shows how file content might be provided as context for a task.
         "defaultRetry": {
           "attempts": 5,
           "delay": 2000,
-          "backoff": "exponential"
+          "backoff": "exponential",
         },
         "healthMonitoring": {
           "enabled": true,
           "interval": 300000,
-          "alertThreshold": 5
+          "alertThreshold": 5,
         },
         "logging": {
           "level": "warn",
@@ -561,8 +564,8 @@ This example shows how file content might be provided as context for a task.
           "structured": true,
           "sampling": {
             "enabled": true,
-            "rate": 0.1
-          }
+            "rate": 0.1,
+          },
         },
         "security": {
           "enableTLS": true,
@@ -571,12 +574,12 @@ This example shows how file content might be provided as context for a task.
           "rateLimiting": {
             "enabled": true,
             "requestsPerMinute": 500,
-            "burstLimit": 50
+            "burstLimit": 50,
           },
           "ipWhitelist": {
             "enabled": true,
-            "allowedRanges": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
-          }
+            "allowedRanges": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],
+          },
         },
         "errorHandling": {
           "gracefulDegradation": true,
@@ -585,9 +588,9 @@ This example shows how file content might be provided as context for a task.
           "circuitBreaker": {
             "enabled": true,
             "failureThreshold": 10,
-            "recoveryTimeout": 60000
-          }
-        }
+            "recoveryTimeout": 60000,
+          },
+        },
       },
       "enabledServers": [
         "semgrep",
@@ -611,7 +614,7 @@ This example shows how file content might be provided as context for a task.
         "exa",
         "builtwith",
         "toolbox",
-        "cloudrun"
+        "cloudrun",
       ],
       "serverOverrides": {
         "github": {
@@ -620,76 +623,76 @@ This example shows how file content might be provided as context for a task.
             "retry": {
               "attempts": 5,
               "delay": 2000,
-              "backoff": "exponential"
-            }
+              "backoff": "exponential",
+            },
           },
           "healthCheck": {
             "interval": 300000,
-            "failureThreshold": 5
+            "failureThreshold": 5,
           },
           "auth": {
-            "secretName": "github-token-prod"
-          }
+            "secretName": "github-token-prod",
+          },
         },
         "databases": {
           "options": {
             "bigqueryProjectId": "${GCP_PROJECT_ID}",
-            "datasets": ["analytics", "signals", "events"]
+            "datasets": ["analytics", "signals", "events"],
           },
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
           },
           "connection": {
             "timeout": 60000,
-            "poolSize": 10
-          }
+            "poolSize": 10,
+          },
         },
         "google": {
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
           },
           "options": {
-            "services": ["bigquery", "storage", "secretmanager", "aiplatform", "cloudrun"]
+            "services": ["bigquery", "storage", "secretmanager", "aiplatform", "cloudrun"],
           },
           "connection": {
-            "timeout": 60000
-          }
+            "timeout": 60000,
+          },
         },
         "exa": {
           "auth": {
-            "secretName": "exa-api-key-prod"
+            "secretName": "exa-api-key-prod",
           },
           "connection": {
-            "timeout": 30000
-          }
+            "timeout": 30000,
+          },
         },
         "toolbox": {
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
           },
           "connection": {
-            "timeout": 60000
+            "timeout": 60000,
           },
           "options": {
-            "toolsConfigSecret": "toolbox-tools-config-prod"
-          }
+            "toolsConfigSecret": "toolbox-tools-config-prod",
+          },
         },
         "cloudrun": {
           "auth": {
             "type": "wif",
-            "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+            "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
           },
           "options": {
-            "invokerServiceAccount": "${WIF_SERVICE_ACCOUNT}"
+            "invokerServiceAccount": "${WIF_SERVICE_ACCOUNT}",
           },
           "connection": {
-            "timeout": 60000
-          }
-        }
-      }
+            "timeout": 60000,
+          },
+        },
+      },
     },
     "test": {
       "global": {
@@ -698,55 +701,55 @@ This example shows how file content might be provided as context for a task.
         "defaultRetry": {
           "attempts": 1,
           "delay": 100,
-          "backoff": "linear"
+          "backoff": "linear",
         },
         "healthMonitoring": {
           "enabled": false,
           "interval": 0,
-          "alertThreshold": 0
+          "alertThreshold": 0,
         },
         "logging": {
           "level": "error",
           "destination": "console",
           "includeRequestResponse": false,
-          "structured": false
+          "structured": false,
         },
         "security": {
           "enableTLS": false,
           "validateCertificates": false,
           "maxRequestSize": 1048576,
           "rateLimiting": {
-            "enabled": false
-          }
+            "enabled": false,
+          },
         },
         "errorHandling": {
           "gracefulDegradation": false,
           "fallbackServers": [],
-          "maxConcurrentFailures": 1
-        }
+          "maxConcurrentFailures": 1,
+        },
       },
       "enabledServers": ["memory", "time", "filesystem"],
       "serverOverrides": {
         "memory": {
           "connection": {
-            "timeout": 1000
-          }
+            "timeout": 1000,
+          },
         },
         "time": {
           "connection": {
-            "timeout": 1000
-          }
+            "timeout": 1000,
+          },
         },
         "filesystem": {
           "connection": {
-            "timeout": 2000
+            "timeout": 2000,
           },
           "options": {
-            "allowedDirectories": ["/tmp", "./test-fixtures"]
-          }
-        }
-      }
-    }
+            "allowedDirectories": ["/tmp", "./test-fixtures"],
+          },
+        },
+      },
+    },
   },
   "integrations": {
     "gcp": {
@@ -757,22 +760,22 @@ This example shows how file content might be provided as context for a task.
       "auth": {
         "type": "wif",
         "provider": "${WIF_PROVIDER}",
-        "serviceAccount": "${WIF_SERVICE_ACCOUNT}"
+        "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
       },
       "secretManager": {
         "enabled": true,
         "prefix": "mcp-${NODE_ENV:-development}",
         "caching": {
           "enabled": true,
-          "ttl": 3600
-        }
-      }
+          "ttl": 3600,
+        },
+      },
     },
     "nx": {
       "enabled": true,
       "workspaceRoot": ".",
       "configPath": "nx.json",
-      "cacheDirectory": ".nx/cache"
+      "cacheDirectory": ".nx/cache",
     },
     "github": {
       "enabled": true,
@@ -781,9 +784,9 @@ This example shows how file content might be provided as context for a task.
       "defaultBranch": "main",
       "auth": {
         "type": "secret-manager",
-        "secretName": "github-token-${NODE_ENV:-development}"
-      }
-    }
+        "secretName": "github-token-${NODE_ENV:-development}",
+      },
+    },
   },
   "monitoring": {
     "healthChecks": {
@@ -791,13 +794,13 @@ This example shows how file content might be provided as context for a task.
       "interval": "${HEALTH_CHECK_INTERVAL:-60000}",
       "timeout": "${HEALTH_CHECK_TIMEOUT:-10000}",
       "retries": 3,
-      "endpoints": ["/health", "/ready", "/metrics"]
+      "endpoints": ["/health", "/ready", "/metrics"],
     },
     "metrics": {
       "enabled": true,
       "collectInterval": "${METRICS_INTERVAL:-30000}",
       "retentionDays": "${METRICS_RETENTION:-7}",
-      "exporters": ["prometheus", "gcp-monitoring"]
+      "exporters": ["prometheus", "gcp-monitoring"],
     },
     "alerts": {
       "enabled": true,
@@ -807,31 +810,31 @@ This example shows how file content might be provided as context for a task.
         "responseTime": "${ALERT_RESPONSE_TIME:-30000}",
         "consecutiveFailures": "${ALERT_CONSECUTIVE_FAILURES:-3}",
         "memoryUsage": 85,
-        "cpuUsage": 80
+        "cpuUsage": 80,
       },
       "escalation": {
         "enabled": true,
         "levels": [
           {
             "threshold": 3,
-            "channels": ["gcp-logging"]
+            "channels": ["gcp-logging"],
           },
           {
             "threshold": 5,
-            "channels": ["gcp-logging"]
+            "channels": ["gcp-logging"],
           },
           {
             "threshold": 10,
-            "channels": ["gcp-logging", "pagerduty"]
-          }
-        ]
-      }
+            "channels": ["gcp-logging", "pagerduty"],
+          },
+        ],
+      },
     },
     "tracing": {
       "enabled": true,
       "provider": "gcp-trace",
-      "samplingRate": "${TRACE_SAMPLING_RATE:-0.1}"
-    }
+      "samplingRate": "${TRACE_SAMPLING_RATE:-0.1}",
+    },
   },
   "security": {
     "authentication": {
@@ -841,7 +844,7 @@ This example shows how file content might be provided as context for a task.
         "enabled": true,
         "provider": "${WIF_PROVIDER}",
         "serviceAccount": "${WIF_SERVICE_ACCOUNT}",
-        "tokenLifetime": 3600
+        "tokenLifetime": 3600,
       },
       "secretManager": {
         "enabled": true,
@@ -849,16 +852,16 @@ This example shows how file content might be provided as context for a task.
         "projectId": "${GCP_PROJECT_ID}",
         "caching": {
           "enabled": true,
-          "ttl": 1800
-        }
-      }
+          "ttl": 1800,
+        },
+      },
     },
     "authorization": {
       "enabled": true,
       "provider": "gcp-iam",
       "roles": {
         "mcp-user": {
-          "permissions": ["filesystem.read", "git.status", "memory.get", "time.get", "fetch.get"]
+          "permissions": ["filesystem.read", "git.status", "memory.get", "time.get", "fetch.get"],
         },
         "mcp-developer": {
           "permissions": [
@@ -874,26 +877,26 @@ This example shows how file content might be provided as context for a task.
             "nx.run",
             "node.execute",
             "search.files",
-            "filesystem.list"
-          ]
+            "filesystem.list",
+          ],
         },
         "mcp-admin": {
-          "permissions": ["*"]
-        }
+          "permissions": ["*"],
+        },
       },
-      "defaultRole": "mcp-user"
+      "defaultRole": "mcp-user",
     },
     "encryption": {
       "enabled": true,
       "provider": "gcp-kms",
       "keyRing": "mcp-encryption",
-      "location": "${GCP_REGION:-us-central1}"
+      "location": "${GCP_REGION:-us-central1}",
     },
     "audit": {
       "enabled": true,
       "destination": "gcp-audit-logs",
-      "events": ["auth", "config-change", "server-start", "server-stop", "error"]
-    }
+      "events": ["auth", "config-change", "server-start", "server-stop", "error"],
+    },
   },
 
   "serverCatalog": [
@@ -904,7 +907,7 @@ This example shows how file content might be provided as context for a task.
       "category": "reference",
       "description": "Reference/test server with prompts, resources, and tools. Good for functional testing and examples.",
       "recommendedAuth": "none",
-      "notes": "Useful for local development and example tooling."
+      "notes": "Useful for local development and example tooling.",
     },
     {
       "id": "fetch",
@@ -913,7 +916,7 @@ This example shows how file content might be provided as context for a task.
       "category": "reference",
       "description": "Web content fetching and conversion for LLM use.",
       "recommendedAuth": "none",
-      "notes": "Consider URL allowlists and response size limits for security."
+      "notes": "Consider URL allowlists and response size limits for security.",
     },
     {
       "id": "filesystem",
@@ -922,7 +925,7 @@ This example shows how file content might be provided as context for a task.
       "category": "reference",
       "description": "Secure file operations with configurable access controls.",
       "recommendedAuth": "service-account or secret-manager",
-      "notes": "Use strict allowedDirectories and careful ACLs when enabling."
+      "notes": "Use strict allowedDirectories and careful ACLs when enabling.",
     },
     {
       "id": "git",
@@ -931,7 +934,7 @@ This example shows how file content might be provided as context for a task.
       "category": "reference",
       "description": "Tools to read, search, and manipulate Git repositories.",
       "recommendedAuth": "ssh-key or token",
-      "notes": "Limit write operations in production."
+      "notes": "Limit write operations in production.",
     },
     {
       "id": "memory",
@@ -940,7 +943,7 @@ This example shows how file content might be provided as context for a task.
       "category": "reference",
       "description": "Knowledge graph-based persistent memory system.",
       "recommendedAuth": "api-key or secret-manager",
-      "notes": "Ensure encryption at rest for persisted stores."
+      "notes": "Ensure encryption at rest for persisted stores.",
     },
     {
       "id": "sequentialthinking",
@@ -949,7 +952,7 @@ This example shows how file content might be provided as context for a task.
       "category": "reference",
       "description": "Dynamic and reflective problem-solving through thought sequences.",
       "recommendedAuth": "none",
-      "notes": "Used for advanced agent reasoning workflows."
+      "notes": "Used for advanced agent reasoning workflows.",
     },
     {
       "id": "time",
@@ -958,7 +961,7 @@ This example shows how file content might be provided as context for a task.
       "category": "reference",
       "description": "Time and timezone conversion capabilities.",
       "recommendedAuth": "none",
-      "notes": "Low-risk utility server."
+      "notes": "Low-risk utility server.",
     },
     {
       "id": "apify",
@@ -967,7 +970,7 @@ This example shows how file content might be provided as context for a task.
       "category": "third-party",
       "description": "Actors MCP Server for large-scale web scraping and extraction.",
       "recommendedAuth": "api-key",
-      "notes": "Useful for crawling external menus and pricing data. Consider rate limits and robots.txt."
+      "notes": "Useful for crawling external menus and pricing data. Consider rate limits and robots.txt.",
     },
     {
       "id": "vectorstores",
@@ -976,7 +979,7 @@ This example shows how file content might be provided as context for a task.
       "category": "third-party",
       "description": "Vector DB adapters for semantic search (Pinecone, Qdrant, Chroma, etc.).",
       "recommendedAuth": "api-key",
-      "notes": "Add specific server only after picking a provider; ensure index access controls."
+      "notes": "Add specific server only after picking a provider; ensure index access controls.",
     },
     {
       "id": "meilisearch",
@@ -985,7 +988,7 @@ This example shows how file content might be provided as context for a task.
       "category": "third-party",
       "description": "Full-text & semantic search integration.",
       "recommendedAuth": "api-key",
-      "notes": "Good for fast site search and product/menu search."
+      "notes": "Good for fast site search and product/menu search.",
     },
     {
       "id": "redis",
@@ -994,7 +997,7 @@ This example shows how file content might be provided as context for a task.
       "category": "third-party",
       "description": "Redis key-value store integration and Redis Cloud API.",
       "recommendedAuth": "api-key or managed-provider-credentials",
-      "notes": "Useful for caching and ephemeral memory layers. Ensure network ACLs."
+      "notes": "Useful for caching and ephemeral memory layers. Ensure network ACLs.",
     },
     {
       "id": "toolbox",
@@ -1003,7 +1006,7 @@ This example shows how file content might be provided as context for a task.
       "category": "google",
       "description": "Open-source MCP server to safely expose database tools on GCP (BigQuery, AlloyDB, etc.).",
       "recommendedAuth": "wif / service-account",
-      "notes": "Configure tools.yaml and prefer IAM/WIF for DB access."
+      "notes": "Configure tools.yaml and prefer IAM/WIF for DB access.",
     },
     {
       "id": "cloudrun",
@@ -1012,7 +1015,7 @@ This example shows how file content might be provided as context for a task.
       "category": "google",
       "description": "Reference MCP server and deployment pattern for hosting MCP servers on Cloud Run.",
       "recommendedAuth": "gcp-iap or wif",
-      "notes": "Use Cloud Run and IAM to host MCP implementations."
+      "notes": "Use Cloud Run and IAM to host MCP implementations.",
     },
     {
       "id": "google-cloud",
@@ -1020,7 +1023,7 @@ This example shows how file content might be provided as context for a task.
       "repo": "https://github.com/googleapis/google-cloud-node",
       "category": "google",
       "description": "General Google Cloud services.",
-      "recommendedAuth": "wif / service-account"
+      "recommendedAuth": "wif / service-account",
     },
     {
       "id": "bq",
@@ -1028,7 +1031,7 @@ This example shows how file content might be provided as context for a task.
       "repo": "https://github.com/googleapis/google-cloud-node/tree/main/packages/google-cloud-bigquery",
       "category": "google",
       "description": "BigQuery for data warehousing and analytics.",
-      "recommendedAuth": "wif / service-account"
+      "recommendedAuth": "wif / service-account",
     },
     {
       "id": "nx-mcp",
@@ -1036,7 +1039,7 @@ This example shows how file content might be provided as context for a task.
       "repo": "npm:nx-mcp",
       "category": "third-party",
       "description": "Nx monorepo context (project graph, generators, docs)",
-      "recommendedAuth": "none"
+      "recommendedAuth": "none",
     },
     {
       "id": "google-filesystem",
@@ -1044,7 +1047,7 @@ This example shows how file content might be provided as context for a task.
       "repo": "https://github.com/modelcontextprotocol/server-filesystem",
       "category": "google",
       "description": "Gemini CLI MCP for filesystem access",
-      "recommendedAuth": "service-account or secret-manager"
+      "recommendedAuth": "service-account or secret-manager",
     },
     {
       "id": "google-postgres",
@@ -1052,7 +1055,7 @@ This example shows how file content might be provided as context for a task.
       "repo": "https://github.com/modelcontextprotocol/server-postgres",
       "category": "google",
       "description": "Gemini CLI MCP for PostgreSQL access",
-      "recommendedAuth": "service-account or wif"
+      "recommendedAuth": "service-account or wif",
     },
     {
       "id": "google-maps",
@@ -1061,7 +1064,7 @@ This example shows how file content might be provided as context for a task.
       "category": "google",
       "description": "Google Maps services (geocode, directions, places)",
       "recommendedAuth": "api-key",
-      "notes": "Requires GOOGLE_MAPS_API_KEY environment variable."
+      "notes": "Requires GOOGLE_MAPS_API_KEY environment variable.",
     },
     {
       "id": "google-search",
@@ -1069,7 +1072,7 @@ This example shows how file content might be provided as context for a task.
       "repo": "https://github.com/mcp-server/google-search-mcp",
       "category": "google",
       "description": "Structured Google Search via browser automation",
-      "recommendedAuth": "none"
+      "recommendedAuth": "none",
     },
     {
       "id": "qdrant",
@@ -1077,7 +1080,7 @@ This example shows how file content might be provided as context for a task.
       "repo": "https://github.com/modelcontextprotocol/server-qdrant",
       "category": "third-party",
       "description": "Semantic memory store (Qdrant vector DB)",
-      "recommendedAuth": "api-key"
+      "recommendedAuth": "api-key",
     },
     {
       "id": "csharp-sdk",
@@ -1085,7 +1088,7 @@ This example shows how file content might be provided as context for a task.
       "repo": "nuget:MCP.Sdk",
       "category": "sdk",
       "description": "C# SDK for MCP. Stable and well-supported.",
-      "recommendedAuth": "api-key"
+      "recommendedAuth": "api-key",
     },
     {
       "id": "java-sdk",
@@ -1093,7 +1096,7 @@ This example shows how file content might be provided as context for a task.
       "repo": "https://github.com/spring-projects/spring-ai",
       "category": "sdk",
       "description": "Java SDK for MCP, maintained by Spring AI. Supports sync & async, multiple transports.",
-      "recommendedAuth": "api-key"
+      "recommendedAuth": "api-key",
     },
     {
       "id": "python-sdk",
@@ -1101,7 +1104,7 @@ This example shows how file content might be provided as context for a task.
       "repo": "pypi:mcp-sdk",
       "category": "sdk",
       "description": "Python SDK for MCP. Async-first, asyncio-based.",
-      "recommendedAuth": "api-key"
+      "recommendedAuth": "api-key",
     },
     {
       "id": "typescript-sdk",
@@ -1109,7 +1112,7 @@ This example shows how file content might be provided as context for a task.
       "repo": "npm:@mcp/sdk",
       "category": "sdk",
       "description": "TypeScript SDK for MCP. Promise-based, Express-like API for browser & Node.js.",
-      "recommendedAuth": "api-key"
+      "recommendedAuth": "api-key",
     },
     {
       "id": "kotlin-sdk",
@@ -1117,7 +1120,7 @@ This example shows how file content might be provided as context for a task.
       "repo": "maven:com.mcp.sdk:kotlin-sdk",
       "category": "sdk",
       "description": "Kotlin SDK for MCP. Coroutine-based, JDK 8 compatible.",
-      "recommendedAuth": "api-key"
+      "recommendedAuth": "api-key",
     },
     {
       "id": "go-sdk",
@@ -1125,7 +1128,7 @@ This example shows how file content might be provided as context for a task.
       "repo": "go-mcp",
       "category": "sdk",
       "description": "Go Community SDK for MCP",
-      "recommendedAuth": "api-key"
+      "recommendedAuth": "api-key",
     },
     {
       "id": "rust-sdk",
@@ -1133,7 +1136,7 @@ This example shows how file content might be provided as context for a task.
       "repo": "crate:MCPR",
       "category": "sdk",
       "description": "Rust Community SDK for MCP",
-      "recommendedAuth": "api-key"
+      "recommendedAuth": "api-key",
     },
     {
       "id": "semgrep",
@@ -1141,13 +1144,13 @@ This example shows how file content might be provided as context for a task.
       "repo": "https://github.com/returntocorp/semgrep",
       "category": "third-party",
       "description": "Semgrep code analysis and security scanning",
-      "recommendedAuth": "api-key"
-    }
+      "recommendedAuth": "api-key",
+    },
   ],
   "validation": {
     "schema": {
       "enabled": true,
-      "strict": true
+      "strict": true,
     },
     "environmentVariables": {
       "required": ["GCP_PROJECT_ID", "WIF_PROVIDER", "WIF_SERVICE_ACCOUNT"],
@@ -1168,9 +1171,9 @@ This example shows how file content might be provided as context for a task.
         "QDRANT_URL",
         "GOOGLE_MAPS_API_KEY",
         "QDRANT_API_KEY",
-        "TRACE_SAMPLING_RATE"
-      ]
-    }
-  }
+        "TRACE_SAMPLING_RATE",
+      ],
+    },
+  },
 }
 ```

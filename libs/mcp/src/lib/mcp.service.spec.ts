@@ -14,7 +14,7 @@ describe('MCPService', () => {
 
   afterEach(async () => {
     // Clean up after each test
-    await service && service.shutdown();
+    (await service) && service.shutdown();
   });
 
   it('should be a singleton', () => {
@@ -24,15 +24,15 @@ describe('MCPService', () => {
   });
 
   it('should initialize properly', async () => {
-    await service && service.initialize();
+    (await service) && service.initialize();
     expect(service && service.isReady()).toBe(true);
   });
 
   it('should shut down properly', async () => {
-    await service && service.initialize();
+    (await service) && service.initialize();
     expect(service && service.isReady()).toBe(true);
-    
-    await service && service.shutdown();
+
+    (await service) && service.shutdown();
     expect(service && service.isReady()).toBe(false);
   });
 });

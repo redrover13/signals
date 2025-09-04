@@ -5,6 +5,7 @@ This document explains how to set up and use the Retrieval-Augmented Generation 
 ## Overview
 
 The RAG pipeline automates the process of:
+
 1. **Loading** documents from Cloud Storage
 2. **Chunking** documents into manageable pieces
 3. **Embedding** chunks using Vertex AI
@@ -38,6 +39,7 @@ Before setting up the RAG pipeline, ensure you have:
 ### Required Google Cloud APIs
 
 The following APIs will be automatically enabled by Terraform:
+
 - Vertex AI API (`aiplatform.googleapis.com`)
 - Discovery Engine API (`discoveryengine.googleapis.com`)
 - Cloud Storage API (`storage.googleapis.com`)
@@ -149,6 +151,7 @@ gsutil -h "x-goog-meta-department:marketing" cp document.txt gs://PROJECT_ID-rag
 ### Supported File Types
 
 The pipeline currently supports:
+
 - **Text files** (`.txt`, `.md`)
 - **JSON files** (`.json`)
 - **Markdown files** (`.md`, `.markdown`)
@@ -164,12 +167,12 @@ import { VertexAIClient } from '@nx-monorepo/adk';
 
 const client = new VertexAIClient({
   projectId: 'your-project-id',
-  location: 'asia-southeast1'
+  location: 'asia-southeast1',
 });
 
 const results = await client.searchDocuments('your-search-engine-id', {
   query: 'Vietnamese food preferences',
-  maxResults: 10
+  maxResults: 10,
 });
 
 console.log('Search results:', results);
@@ -180,11 +183,13 @@ console.log('Search results:', results);
 ### Monitoring
 
 1. **Cloud Function Logs**:
+
    ```bash
    gcloud functions logs read rag-document-processor-prod --region=asia-southeast1
    ```
 
 2. **Storage Bucket Events**:
+
    ```bash
    gcloud logging read 'resource.type="gcs_bucket"' --limit=50
    ```
@@ -197,10 +202,12 @@ console.log('Search results:', results);
 ### Common Issues
 
 #### Function Timeout
+
 **Problem**: Large documents cause function timeout  
 **Solution**: Increase timeout in Terraform or split large documents
 
 #### Out of Memory
+
 **Problem**: Function runs out of memory processing large files  
 **Solution**: Increase memory allocation in `main.tf`:
 
@@ -212,6 +219,7 @@ service_config {
 ```
 
 #### Missing Permissions
+
 **Problem**: Function can't access resources  
 **Solution**: Check service account permissions in IAM
 
@@ -230,20 +238,25 @@ export LOG_LEVEL=debug
 ### VertexAIClient Methods
 
 #### `generateEmbeddings(texts: string[]): Promise<EmbeddingResponse>`
+
 Generate embeddings for an array of text strings.
 
 #### `chunkDocument(content: string, metadata: object, chunkSize?: number, overlap?: number): DocumentChunk[]`
+
 Split a document into overlapping chunks.
 
 #### `processDocumentForRAG(content: string, metadata: object, dataStoreId: string, options?: object): Promise<DocumentChunk[]>`
+
 Complete pipeline: chunk document, generate embeddings, and index.
 
 #### `searchDocuments(searchEngineId: string, options: RAGSearchOptions): Promise<SearchResult[]>`
+
 Search indexed documents using Vertex AI Search.
 
 ### Data Structures
 
 #### DocumentChunk
+
 ```typescript
 interface DocumentChunk {
   id: string;
@@ -254,6 +267,7 @@ interface DocumentChunk {
 ```
 
 #### SearchResult
+
 ```typescript
 interface SearchResult {
   id: string;
@@ -292,6 +306,7 @@ gcloud billing budgets create --billing-account=BILLING_ACCOUNT_ID \
 ### Service Account Permissions
 
 The pipeline uses least-privilege access:
+
 - **Storage**: Read documents, write chunks
 - **Vertex AI**: Generate embeddings, manage search
 - **Pub/Sub**: Receive processing messages
@@ -299,6 +314,7 @@ The pipeline uses least-privilege access:
 ### Data Privacy
 
 For Vietnamese market compliance:
+
 - Documents are processed in `asia-southeast1` region
 - No data leaves the specified region
 - Audit logs are enabled for all operations
@@ -317,6 +333,7 @@ embedding_model = "textembedding-gecko-multilingual@001"
 ### Batch Processing
 
 For large document sets, consider:
+
 1. Using Cloud Dataflow for batch processing
 2. Implementing document prioritization
 3. Adding retry mechanisms
@@ -324,6 +341,7 @@ For large document sets, consider:
 ### Integration with Existing Systems
 
 The pipeline integrates with:
+
 - **BigQuery**: For analytics on processed documents
 - **Looker**: For RAG usage dashboards
 - **Cloud Monitoring**: For system health alerts
@@ -339,6 +357,7 @@ The pipeline integrates with:
 ## Support
 
 For issues or questions:
+
 1. Check the troubleshooting section
 2. Review Cloud Function logs
 3. Create an issue in the repository

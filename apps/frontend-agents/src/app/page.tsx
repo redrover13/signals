@@ -23,12 +23,8 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Dulce de Saigon Agent Platform
-              </h1>
-              <p className="mt-2 text-gray-600">
-                AI-Powered F&B Data Platform Agents
-              </p>
+              <h1 className="text-3xl font-bold text-gray-900">Dulce de Saigon Agent Platform</h1>
+              <p className="mt-2 text-gray-600">AI-Powered F&B Data Platform Agents</p>
             </div>
           </div>
         </div>
@@ -36,9 +32,7 @@ export default function HomePage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-            Available Agents
-          </h2>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Available Agents</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <AgentCard
               name="BigQuery Agent"

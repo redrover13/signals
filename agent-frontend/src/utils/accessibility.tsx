@@ -24,9 +24,9 @@ export const useFocusTrap = (active = true) => {
 
     const container = containerRef.current;
     const focusableElements = container.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
     );
-    
+
     const firstElement = focusableElements[0] as HTMLElement;
     const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
 
@@ -123,31 +123,27 @@ interface SkipLinkProps {
  * @param props - Component props
  * @returns Skip link component
  */
-export const SkipLink = ({ 
-  target, 
-  label = 'Skip to content', 
-  className = '' 
-}: SkipLinkProps) => {
+export const SkipLink = ({ target, label = 'Skip to content', className = '' }: SkipLinkProps) => {
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     const targetElement = document.querySelector(target);
     if (targetElement) {
       (targetElement as HTMLElement).focus();
       (targetElement as HTMLElement).setAttribute('tabindex', '-1');
-      
+
       // Remove tabindex after blur to maintain DOM cleanliness
-      targetElement.addEventListener('blur', () => {
-        (targetElement as HTMLElement).removeAttribute('tabindex');
-      }, { once: true });
+      targetElement.addEventListener(
+        'blur',
+        () => {
+          (targetElement as HTMLElement).removeAttribute('tabindex');
+        },
+        { once: true },
+      );
     }
   };
 
   return (
-    <a
-      href={target}
-      className={`skip-link ${className}`}
-      onClick={handleClick}
-    >
+    <a href={target} className={`skip-link ${className}`} onClick={handleClick}>
       {label}
     </a>
   );
@@ -163,13 +159,13 @@ export const SkipLink = ({
 export const hasValidContrast = (
   foreground: string,
   background: string,
-  isLargeText = false
+  isLargeText = false,
 ): boolean => {
   const hexToRgb = (hex: string) => {
     const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
     const fullHex = hex.replace(shorthandRegex, (_, r, g, b) => r + r + g + g + b + b);
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(fullHex);
-    
+
     return result
       ? {
           r: parseInt(result[1], 16),
@@ -187,9 +183,7 @@ export const hasValidContrast = (
     };
 
     const transformChannel = (channel: number) =>
-      channel <= 0.03928
-        ? channel / 12.92
-        : Math.pow((channel + 0.055) / 1.055, 2.4);
+      channel <= 0.03928 ? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4);
 
     return (
       0.2126 * transformChannel(sRGB.r) +
@@ -202,8 +196,7 @@ export const hasValidContrast = (
   const bgLuminance = calculateLuminance(hexToRgb(background));
 
   const ratio =
-    (Math.max(fgLuminance, bgLuminance) + 0.05) /
-    (Math.min(fgLuminance, bgLuminance) + 0.05);
+    (Math.max(fgLuminance, bgLuminance) + 0.05) / (Math.min(fgLuminance, bgLuminance) + 0.05);
 
   // WCAG AA requires 4.5:1 for normal text and 3:1 for large text
   return isLargeText ? ratio >= 3 : ratio >= 4.5;

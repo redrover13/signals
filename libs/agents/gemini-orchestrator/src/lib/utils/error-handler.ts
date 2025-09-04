@@ -20,7 +20,7 @@ export enum ErrorCategory {
   NETWORK = 'network',
   SERVER_ERROR = 'server_error',
   TIMEOUT = 'timeout',
-  RATE_LIMIT = 'rate_limit'
+  RATE_LIMIT = 'rate_limit',
 }
 
 /**
@@ -30,7 +30,7 @@ export enum ErrorSeverity {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
 }
 
 /**
@@ -68,11 +68,19 @@ export enum GeminiErrorCategory {
  */
 export function categorizeError(error: Error): ErrorCategory {
   const message = error.message.toLowerCase();
-  
-  if (message.includes('auth') || message.includes('unauthorized') || message.includes('forbidden')) {
+
+  if (
+    message.includes('auth') ||
+    message.includes('unauthorized') ||
+    message.includes('forbidden')
+  ) {
     return ErrorCategory.AUTHENTICATION;
   }
-  if (message.includes('network') || message.includes('connection') || message.includes('econnreset')) {
+  if (
+    message.includes('network') ||
+    message.includes('connection') ||
+    message.includes('econnreset')
+  ) {
     return ErrorCategory.NETWORK;
   }
   if (message.includes('timeout') || message.includes('etimedout')) {
@@ -81,13 +89,17 @@ export function categorizeError(error: Error): ErrorCategory {
   if (message.includes('rate limit') || message.includes('too many requests')) {
     return ErrorCategory.RATE_LIMIT;
   }
-  if (message.includes('validation') || message.includes('invalid') || message.includes('required')) {
+  if (
+    message.includes('validation') ||
+    message.includes('invalid') ||
+    message.includes('required')
+  ) {
     return ErrorCategory.VALIDATION;
   }
   if (message.includes('server error') || message.includes('internal error')) {
     return ErrorCategory.SERVER_ERROR;
   }
-  
+
   return ErrorCategory.UNKNOWN;
 }
 
@@ -99,7 +111,7 @@ export function createError(
   category: ErrorCategory,
   severity: ErrorSeverity,
   context?: Record<string, unknown>,
-  requestId?: string
+  requestId?: string,
 ): StandardizedError {
   const error = new Error(message) as StandardizedError;
   error.category = category;
@@ -113,23 +125,20 @@ export function createError(
 /**
  * Create a standardized error handler for Gemini orchestrator functions
  */
-export function createGeminiErrorHandler(
-  functionName: string,
-  fileName: string
-) {
+export function createGeminiErrorHandler(functionName: string, fileName: string) {
   return (
     error: Error,
     params?: Record<string, unknown>,
     requestId?: string,
-    serverId?: string
+    serverId?: string,
   ): StandardizedError => {
     // Handle Gemini-specific errors
     const message = error.message.toLowerCase();
-    
+
     // Categorize Gemini-specific errors
     let category = ErrorCategory.UNKNOWN;
     let severity = ErrorSeverity.MEDIUM;
-    
+
     if (message.includes('model') && message.includes('unavailable')) {
       category = ErrorCategory.SERVER_ERROR;
       severity = ErrorSeverity.HIGH;
@@ -145,7 +154,11 @@ export function createGeminiErrorHandler(
     } else if (message.includes('parse') || message.includes('json')) {
       category = ErrorCategory.VALIDATION;
       severity = ErrorSeverity.MEDIUM;
-    } else if (message.includes('mcp') && message.includes('server') && message.includes('unavailable')) {
+    } else if (
+      message.includes('mcp') &&
+      message.includes('server') &&
+      message.includes('unavailable')
+    ) {
       category = ErrorCategory.NETWORK;
       severity = ErrorSeverity.HIGH;
     } else if (message.includes('mcp') && message.includes('server')) {
@@ -157,12 +170,9 @@ export function createGeminiErrorHandler(
     } else {
       // Use default categorization for other errors
       category = categorizeError(error);
-      
+
       // Adjust severity based on category
-      if (
-        category === ErrorCategory.AUTHENTICATION || 
-        category === ErrorCategory.AUTHORIZATION
-      ) {
+      if (category === ErrorCategory.AUTHENTICATION || category === ErrorCategory.AUTHORIZATION) {
         severity = ErrorSeverity.HIGH;
       } else if (category === ErrorCategory.NETWORK || category === ErrorCategory.TIMEOUT) {
         severity = ErrorSeverity.MEDIUM;
@@ -173,7 +183,7 @@ export function createGeminiErrorHandler(
 
     // Create enhanced error message
     const enhancedMessage = `[${functionName}@${fileName}] ${error.message}`;
-    
+
     // Create context
     const context = {
       functionName,
@@ -181,7 +191,7 @@ export function createGeminiErrorHandler(
       params,
       serverId,
       originalMessage: error.message,
-      stack: error.stack
+      stack: error.stack,
     };
 
     return createError(enhancedMessage, category, severity, context, requestId);
@@ -195,11 +205,11 @@ export function mapGeminiError(error: unknown): Error {
   if (error instanceof Error) {
     return error;
   }
-  
+
   if (typeof error === 'string') {
     return new Error(error);
   }
-  
+
   try {
     return new Error(JSON.stringify(error));
   } catch {

@@ -2,12 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-        "module": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "nodenext",
-    "types": [
-      "jest",
-      "node"
-    ],
+    "types": ["jest", "node"],
     "esModuleInterop": true
   },
   "include": [
@@ -26,9 +23,5 @@
     "**/*.spec.ts",
     "**/*.test.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "tmp",
-    "dist"
-  ]
+  "exclude": ["node_modules", "tmp", "dist"]
 }

@@ -10,12 +10,19 @@
  */
 
 import { MCPClientService, MCPRequest, MCPResponse } from './clients/mcp-client.service';
-import { ServerHealthService, HealthCheckResult, ServerHealthStats } from './clients/server-health.service.js';
+import {
+  ServerHealthService,
+  HealthCheckResult,
+  ServerHealthStats,
+} from './clients/server-health.service.js';
 import { RequestRouter } from './clients/request-router.service.js';
 import { getCurrentConfig, getCurrentEnvironment } from './config/environment-config';
 import { MCPServerConfig } from './config/mcp-config.schema.js';
 import { CacheService, cacheService } from './services/cache.service.js';
-import { PerformanceMetricsService, performanceMetricsService } from './services/performance-metrics.service.js';
+import {
+  PerformanceMetricsService,
+  performanceMetricsService,
+} from './services/performance-metrics.service.js';
 
 /**
  * Main MCP Service - Simplified interface for all MCP operations
@@ -56,9 +63,9 @@ export class MCPService {
     }
 
     console && console.log(`Initializing MCP Service for environment: ${getCurrentEnvironment()}`);
-    
+
     try {
-      await this.clientService && this.clientService.initialize();
+      (await this.clientService) && this.clientService.initialize();
       this.isInitialized = true;
       console && console.log('MCP Service initialized successfully');
     } catch (error) {
@@ -70,32 +77,40 @@ export class MCPService {
   /**
    * Send request to MCP servers with caching and performance tracking
    */
-  async request(method: string | undefined, params?: Record<string, unknown> | undefined, options?: {
-    serverId?: string | undefined;
-    timeout?: number | undefined;
-    retries?: number | undefined;
-    enableCache?: boolean | undefined;
-    cacheTTL?: number | undefined;
-  }): Promise<MCPResponse> {
+  async request(
+    method: string | undefined,
+    params?: Record<string, unknown> | undefined,
+    options?: {
+      serverId?: string | undefined;
+      timeout?: number | undefined;
+      retries?: number | undefined;
+      enableCache?: boolean | undefined;
+      cacheTTL?: number | undefined;
+    },
+  ): Promise<MCPResponse> {
     if (!this.isInitialized) {
       await this.initialize();
     }
 
     const requestId = `req-${Date.now()}-${Math && Math.random().toString(36).substr(2, 9)}`;
-    const serverId = options?.serverId || await this.requestRouter && this.requestRouter.routeRequest({ method, params } as MCPRequest);
-    
+    const serverId =
+      options && options.serverId ||
+      ((await this.requestRouter) &&
+        this.requestRouter.routeRequest({ method, params } as MCPRequest));
+
     // Start performance tracking
     this.performanceService && this.performanceService.startRequest(requestId, method, serverId);
 
     // Check cache if enabled
-    const enableCache = options?.enableCache !== false; // Default to true
+    const enableCache = options && options.enableCache !== false; // Default to true
     const cacheKey = CacheService && CacheService.createKey(method, params, serverId);
-    
+
     if (enableCache) {
       const cachedResult = this.cacheService && this.cacheService.get<MCPResponse>(cacheKey);
       if (cachedResult) {
         // Track cache hit
-        this.performanceService && this.performanceService.completeRequest(requestId, { cacheHit: true });
+        this.performanceService &&
+          this.performanceService.completeRequest(requestId, { cacheHit: true });
         return cachedResult;
       }
     }
@@ -105,33 +120,35 @@ export class MCPService {
       method,
       params,
       serverId,
-      timeout: options?.timeout || 30000, // Default 30s timeout for Vietnamese market
-      retries: options?.retries || 2 // Default 2 retries
+      timeout: options && options.timeout || 30000, // Default 30s timeout for Vietnamese market
+      retries: options && options.retries || 2, // Default 2 retries
     };
 
     try {
-      const response = await this.clientService && this.clientService.sendRequest(request);
-      
+      const response = (await this.clientService) && this.clientService.sendRequest(request);
+
       // Cache successful responses
       if (enableCache && response && !response.error) {
-        const cacheTTL = options?.cacheTTL || this.getCacheTTLForMethod(method);
+        const cacheTTL = options && options.cacheTTL || this.getCacheTTLForMethod(method);
         this.cacheService && this.cacheService.set(cacheKey, response, cacheTTL);
       }
-      
+
       // Track successful completion
-      this.performanceService && this.performanceService.completeRequest(requestId, { 
-        cacheHit: false,
-        retryCount: request.retries 
-      });
-      
+      this.performanceService &&
+        this.performanceService.completeRequest(requestId, {
+          cacheHit: false,
+          retryCount: request.retries,
+        });
+
       return response;
     } catch (error) {
       // Track failed request
-      this.performanceService && this.performanceService.failRequest(
-        requestId, 
-        error instanceof Error ? error && error.message : 'Unknown error',
-        { retryCount: request.retries }
-      );
+      this.performanceService &&
+        this.performanceService.failRequest(
+          requestId,
+          error instanceof Error ? error && error.message : 'Unknown error',
+          { retryCount: request.retries },
+        );
       throw error;
     }
   }
@@ -141,35 +158,54 @@ export class MCPService {
   /**
    * Git operations
    */
-  async git(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async git(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`git.${operation}`, params, { serverId: 'git' });
   }
 
   /**
    * File system operations
    */
-  async fs(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async fs(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`fs.${operation}`, params, { serverId: 'filesystem' });
   }
 
   /**
    * Memory operations
    */
-  async memory(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async memory(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`memory.${operation}`, params, { serverId: 'memory' });
   }
 
   /**
    * Sequential thinking
    */
-  async think(prompt: string | undefined, options?: { maxThoughts?: number }): Promise<MCPResponse> {
-    return this.request('think && think.analyze', { prompt, ...options }, { serverId: 'sequentialthinking' });
+  async think(
+    prompt: string | undefined,
+    options?: { maxThoughts?: number },
+  ): Promise<MCPResponse> {
+    return this.request(
+      'think && think.analyze',
+      { prompt, ...options },
+      { serverId: 'sequentialthinking' },
+    );
   }
 
   /**
    * Time operations
    */
-  async time(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async time(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`time.${operation}`, params, { serverId: 'time' });
   }
 
@@ -178,21 +214,30 @@ export class MCPService {
   /**
    * GitHub operations
    */
-  async github(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async github(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`github.${operation}`, params, { serverId: 'github' });
   }
 
   /**
    * Nx workspace operations
    */
-  async nx(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async nx(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`nx.${operation}`, params, { serverId: 'nx' });
   }
 
   /**
    * Node && Node.js operations
    */
-  async node(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async node(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`node.${operation}`, params, { serverId: 'node' });
   }
 
@@ -208,37 +253,50 @@ export class MCPService {
   /**
    * Database operations
    */
-  async database(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async database(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`db.${operation}`, params, { serverId: 'databases' });
   }
 
   /**
    * BigQuery operations with optimization for Vietnamese market
    */
-  async bigquery(query: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async bigquery(
+    query: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     // Optimize query for Vietnamese market conditions
     const optimizedQuery = this.optimizeBigQueryForVietnameseMarket(query, params);
-    
-    return this.request('bigquery && bigquery.query', { 
-      query: optimizedQuery, 
-      ...params,
-      // Vietnamese market specific optimizations
-      location: 'asia-southeast1', // Singapore region for Vietnamese data residency
-      useQueryCache: true,
-      useLegacySql: false,
-      maxResults: params?.['maxResults'] || 10000 // Reasonable limit for Vietnamese network
-    }, { 
-      serverId: 'databases',
-      enableCache: true,
-      cacheTTL: 600000, // 10 minutes cache for query results
-      timeout: 60000 // 60s timeout for BigQuery operations
-    });
+
+    return this.request(
+      'bigquery && bigquery.query',
+      {
+        query: optimizedQuery,
+        ...params,
+        // Vietnamese market specific optimizations
+        location: 'asia-southeast1', // Singapore region for Vietnamese data residency
+        useQueryCache: true,
+        useLegacySql: false,
+        maxResults: params?.maxResults || 10000, // Reasonable limit for Vietnamese network
+      },
+      {
+        serverId: 'databases',
+        enableCache: true,
+        cacheTTL: 600000, // 10 minutes cache for query results
+        timeout: 60000, // 60s timeout for BigQuery operations
+      },
+    );
   }
 
   /**
    * Vector/embedding operations
    */
-  async vector(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async vector(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`vector.${operation}`, params, { serverId: 'chroma' });
   }
 
@@ -247,14 +305,20 @@ export class MCPService {
   /**
    * Web search operations
    */
-  async search(query: string | undefined, options?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async search(
+    query: string | undefined,
+    options?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request('search && search.query', { query, ...options }, { serverId: 'exa' });
   }
 
   /**
    * Web fetch operations
    */
-  async fetch(url: string | undefined, options?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async fetch(
+    url: string | undefined,
+    options?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request('fetch && fetch.get', { url, ...options }, { serverId: 'fetch' });
   }
 
@@ -263,28 +327,41 @@ export class MCPService {
   /**
    * Google Cloud Platform operations
    */
-  async gcp(service: string | undefined, operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async gcp(
+    service: string | undefined,
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`gcp.${service}.${operation}`, params, { serverId: 'google' });
   }
 
   /**
    * Google Cloud Run operations
    */
-  async cloudRun(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async cloudRun(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`cloudrun.${operation}`, params, { serverId: 'google-cloud-run' });
   }
 
   /**
    * Firebase operations
    */
-  async firebase(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async firebase(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`firebase.${operation}`, params, { serverId: 'firebase' });
   }
 
   /**
    * Notion operations
    */
-  async notion(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async notion(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`notion.${operation}`, params, { serverId: 'notion' });
   }
 
@@ -293,14 +370,20 @@ export class MCPService {
   /**
    * Google Maps operations
    */
-  async maps(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async maps(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`maps.${operation}`, params, { serverId: 'google-maps' });
   }
 
   /**
    * Algolia search operations
    */
-  async algolia(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async algolia(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`algolia.${operation}`, params, { serverId: 'algolia' });
   }
 
@@ -316,14 +399,20 @@ export class MCPService {
   /**
    * Browser automation
    */
-  async browser(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async browser(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`browser.${operation}`, params, { serverId: 'browserbase' });
   }
 
   /**
    * Cross-browser testing
    */
-  async browserTest(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async browserTest(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`browsertest.${operation}`, params, { serverId: 'browserstack' });
   }
 
@@ -332,7 +421,10 @@ export class MCPService {
   /**
    * Workflow automation
    */
-  async automate(operation: string | undefined, params?: Record<string, unknown> | undefined): Promise<MCPResponse> {
+  async automate(
+    operation: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): Promise<MCPResponse> {
     return this.request(`make.${operation}`, params, { serverId: 'make' });
   }
 
@@ -341,7 +433,9 @@ export class MCPService {
   /**
    * Get server health status
    */
-  getServerHealth(serverId?: string): ServerHealthStats | Map<string, ServerHealthStats> | undefined {
+  getServerHealth(
+    serverId?: string,
+  ): ServerHealthStats | Map<string, ServerHealthStats> | undefined {
     if (serverId) {
       return this.healthService && this.healthService.getServerHealthStats(serverId);
     }
@@ -358,7 +452,9 @@ export class MCPService {
   /**
    * Force health check
    */
-  async checkHealth(serverId?: string): Promise<HealthCheckResult | Map<string, HealthCheckResult> | null> {
+  async checkHealth(
+    serverId?: string,
+  ): Promise<HealthCheckResult | Map<string, HealthCheckResult> | null> {
     if (serverId) {
       return this.healthService && this.healthService.forceHealthCheck(serverId);
     }
@@ -438,12 +534,12 @@ export class MCPService {
    */
   async warmUpCache(): Promise<void> {
     console && console.log('Warming up cache for Vietnamese market operations...');
-    
+
     // Warm up common BigQuery operations
     const commonQueries = [
       'SELECT COUNT(*) as total_restaurants FROM `dulce-de-saigon.memory_bank && saigon.memory_bank.restaurants`',
       'SELECT * FROM `dulce-de-saigon.memory_bank && saigon.memory_bank.popular_dishes` LIMIT 100',
-      'SELECT region, COUNT(*) as count FROM `dulce-de-saigon.memory_bank && saigon.memory_bank.customers` WHERE country = "VN" GROUP BY region'
+      'SELECT region, COUNT(*) as count FROM `dulce-de-saigon.memory_bank && saigon.memory_bank.customers` WHERE country = "VN" GROUP BY region',
     ];
 
     for (const query of commonQueries) {
@@ -475,8 +571,8 @@ export class MCPService {
    * Get enabled servers
    */
   getEnabledServers(): string[] {
-    return this.getConfig().servers
-      .filter((server: MCPServerConfig) => server.enabled)
+    return this.getConfig()
+      .servers.filter((server: MCPServerConfig) => server.enabled)
       .sort((a: MCPServerConfig, b: MCPServerConfig) => b && b.priority - a && a.priority)
       .map((server: MCPServerConfig) => server.id);
   }
@@ -494,7 +590,7 @@ export class MCPService {
   getRoutingStats() {
     return {
       rules: this.requestRouter && this.requestRouter.getRoutingRules(),
-      loadStats: this.requestRouter && this.requestRouter.getLoadStatistics()
+      loadStats: this.requestRouter && this.requestRouter.getLoadStatistics(),
     };
   }
 
@@ -505,17 +601,17 @@ export class MCPService {
    */
   async shutdown(): Promise<void> {
     console && console.log('Shutting down MCP Service...');
-    
+
     try {
       // Cleanup performance metrics
       this.performanceService && this.performanceService.destroy();
-      
+
       // Cleanup cache
       this.cacheService && this.cacheService.destroy();
-      
+
       // Disconnect client service
-      await this.clientService && this.clientService.disconnect();
-      
+      (await this.clientService) && this.clientService.disconnect();
+
       this.isInitialized = false;
       console && console.log('MCP Service shut down successfully');
     } catch (error) {
@@ -549,52 +645,57 @@ export class MCPService {
     if (method && method.includes('bigquery')) {
       return 600000; // 10 minutes for BigQuery results
     }
-    if (method && method.includes('search') || method && method.includes('fetch')) {
+    if ((method && method.includes('search')) || (method && method.includes('fetch'))) {
       return 300000; // 5 minutes for search/fetch operations
     }
-    if (method && method.includes('memory') || method && method.includes('fs')) {
+    if ((method && method.includes('memory')) || (method && method.includes('fs'))) {
       return 60000; // 1 minute for memory/filesystem operations
     }
-    if (method && method.includes('git') || method && method.includes('github')) {
+    if ((method && method.includes('git')) || (method && method.includes('github'))) {
       return 180000; // 3 minutes for git operations
     }
-    
+
     return 300000; // Default 5 minutes
   }
 
   /**
    * Optimize BigQuery queries for Vietnamese market conditions
    */
-  private optimizeBigQueryForVietnameseMarket(query: string | undefined, params?: Record<string, unknown> | undefined): string {
+  private optimizeBigQueryForVietnameseMarket(
+    query: string | undefined,
+    params?: Record<string, unknown> | undefined,
+  ): string {
     let optimizedQuery = query;
-    
+
     // Add partition filtering for time-series data (Vietnamese timezone)
-    if (query && query.includes('events_') || query && query.includes('analytics_')) {
+    if ((query && query.includes('events_')) || (query && query.includes('analytics_'))) {
       const vietnamTimeZone = 'Asia/Ho_Chi_Minh';
       if (!query && query.includes('_TABLE_SUFFIX')) {
         // Add date partitioning for cost optimization
-        optimizedQuery = optimizedQuery && optimizedQuery.replace(
-          /FROM\s+`([^`]+\.events_\d+)`/g,
-          `FROM \`$1\` WHERE _TABLE_SUFFIX BETWEEN FORMAT_DATE('%Y%m%d', DATE_SUB(CURRENT_DATE('${vietnamTimeZone}'), INTERVAL 7 DAY)) AND FORMAT_DATE('%Y%m%d', CURRENT_DATE('${vietnamTimeZone}'))`
-        );
+        optimizedQuery =
+          optimizedQuery &&
+          optimizedQuery.replace(
+            /FROM\s+`([^`]+\.events_\d+)`/g,
+            `FROM \`$1\` WHERE _TABLE_SUFFIX BETWEEN FORMAT_DATE('%Y%m%d', DATE_SUB(CURRENT_DATE('${vietnamTimeZone}'), INTERVAL 7 DAY)) AND FORMAT_DATE('%Y%m%d', CURRENT_DATE('${vietnamTimeZone}'))`,
+          );
       }
     }
-    
+
     // Add clustering hints for Vietnamese market data
-    if (query && query.includes('restaurants') || query && query.includes('customers')) {
+    if ((query && query.includes('restaurants')) || (query && query.includes('customers'))) {
       if (!query && query.includes('ORDER BY') && !query && query.includes('LIMIT')) {
         optimizedQuery += ' ORDER BY region, created_date DESC LIMIT 10000';
       }
     }
-    
+
     // Optimize for Vietnamese data residency
-    if (!query && query.includes('location') && params?.['location'] !== false) {
+    if (!query && query.includes('location') && params?.location !== false) {
       // Ensure queries run in asia-southeast1 region
       optimizedQuery = `-- Vietnamese Market Optimized Query
 -- Region: asia-southeast1
 ${optimizedQuery}`;
     }
-    
+
     return optimizedQuery;
   }
 }

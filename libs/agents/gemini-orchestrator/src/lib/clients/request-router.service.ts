@@ -14,6 +14,10 @@ import { MCPClientService } from './mcp-client.service';
 export class RequestRouter {
   constructor(_clientService: MCPClientService) {}
   testRouting(_method: string): any {}
-  getRoutingRules(): any[] { return []; }
-  getLoadStatistics(): any { return {}; }
+  getRoutingRules(): any[] {
+    return [];
+  }
+  getLoadStatistics(): any {
+    return {};
+  }
 }

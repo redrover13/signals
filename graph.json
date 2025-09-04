@@ -13,17 +13,10 @@
                 "cwd": "libs/agents/looker-agent",
                 "command": "eslint ."
               },
-              "inputs": [
-                "default",
-                "^default"
-              ],
-              "outputs": [
-                "{workspaceRoot}/dist/{projectRoot}"
-              ],
+              "inputs": ["default", "^default"],
+              "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
               "metadata": {
-                "technologies": [
-                  "eslint"
-                ],
+                "technologies": ["eslint"],
                 "description": "Runs ESLint on project",
                 "help": {
                   "command": "pnpm exec eslint --help",
@@ -47,9 +40,7 @@
                 "command": "jest"
               },
               "metadata": {
-                "technologies": [
-                  "jest"
-                ],
+                "technologies": ["jest"],
                 "description": "Run Jest Tests",
                 "help": {
                   "command": "pnpm exec jest --help",
@@ -61,29 +52,20 @@
                 }
               },
               "cache": true,
-              "inputs": [
-                "default",
-                "^default"
-              ],
-              "outputs": [
-                "{workspaceRoot}/dist/{projectRoot}"
-              ],
+              "inputs": ["default", "^default"],
+              "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
               "executor": "nx:run-commands",
               "configurations": {},
               "parallelism": true
             },
             "build": {
               "executor": "@nx/js:tsc",
-              "outputs": [
-                "{options.outputPath}"
-              ],
+              "outputs": ["{options.outputPath}"],
               "options": {
                 "outputPath": "dist/libs/agents/looker-agent",
                 "main": "libs/agents/looker-agent/src/index.ts",
                 "tsConfig": "libs/agents/looker-agent/tsconfig.lib.json",
-                "assets": [
-                  "libs/agents/looker-agent/*.md"
-                ]
+                "assets": ["libs/agents/looker-agent/*.md"]
               },
               "configurations": {
                 "production": {
@@ -99,20 +81,13 @@
               },
               "defaultConfiguration": "production",
               "cache": true,
-              "dependsOn": [
-                "^build"
-              ],
-              "inputs": [
-                "production",
-                "^production"
-              ],
+              "dependsOn": ["^build"],
+              "inputs": ["production", "^production"],
               "parallelism": true
             },
             "test": {
               "executor": "@nx/jest:jest",
-              "outputs": [
-                "{workspaceRoot}/coverage/{projectRoot}"
-              ],
+              "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
               "options": {
                 "jestConfig": "libs/agents/looker-agent/jest.config.ts"
               },
@@ -122,22 +97,14 @@
                   "codeCoverage": true
                 }
               },
-              "inputs": [
-                "default",
-                "^default",
-                "{workspaceRoot}/jest.preset.js"
-              ],
+              "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"],
               "cache": true,
               "parallelism": true
             }
           },
           "name": "looker-agent",
           "projectType": "library",
-          "tags": [
-            "npm:private",
-            "domain:looker-agent",
-            "type:library"
-          ],
+          "tags": ["npm:private", "domain:looker-agent", "type:library"],
           "metadata": {
             "targetGroups": {},
             "js": {
@@ -149,10 +116,7 @@
           "$schema": "../../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "libs/agents/looker-agent/src",
           "namedInputs": {
-            "default": [
-              "{projectRoot}/**/*",
-              "sharedGlobals"
-            ],
+            "default": ["{projectRoot}/**/*", "sharedGlobals"],
             "production": [
               "default",
               "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
@@ -180,17 +144,10 @@
                 },
                 "command": "eslint ."
               },
-              "inputs": [
-                "default",
-                "^default"
-              ],
-              "outputs": [
-                "{workspaceRoot}/dist/{projectRoot}"
-              ],
+              "inputs": ["default", "^default"],
+              "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
               "metadata": {
-                "technologies": [
-                  "eslint"
-                ],
+                "technologies": ["eslint"],
                 "description": "Runs ESLint on project",
                 "help": {
                   "command": "pnpm exec eslint --help",
@@ -244,9 +201,7 @@
             },
             "build": {
               "executor": "@nx/next:build",
-              "outputs": [
-                "{projectRoot}/dist"
-              ],
+              "outputs": ["{projectRoot}/dist"],
               "defaultConfiguration": "production",
               "options": {},
               "configurations": {
@@ -262,13 +217,8 @@
                 }
               },
               "cache": true,
-              "dependsOn": [
-                "^build"
-              ],
-              "inputs": [
-                "production",
-                "^production"
-              ],
+              "dependsOn": ["^build"],
+              "inputs": ["production", "^production"],
               "parallelism": true
             },
             "serve": {
@@ -300,37 +250,21 @@
             "lint": {
               "executor": "@nx/eslint:lint",
               "options": {
-                "lintFilePatterns": [
-                  "apps/frontend-agents/**/*.{ts,tsx,js,jsx}"
-                ]
+                "lintFilePatterns": ["apps/frontend-agents/**/*.{ts,tsx,js,jsx}"]
               },
-              "inputs": [
-                "default",
-                "{workspaceRoot}/.eslintrc.json"
-              ],
+              "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
               "cache": true,
               "configurations": {},
               "parallelism": true,
-              "outputs": [
-                "{options.outputFile}"
-              ]
+              "outputs": ["{options.outputFile}"]
             }
           },
           "name": "frontend-agents",
           "projectType": "application",
-          "tags": [
-            "npm:private",
-            "domain:frontend-agents",
-            "type:application",
-            "scope:client"
-          ],
+          "tags": ["npm:private", "domain:frontend-agents", "type:application", "scope:client"],
           "metadata": {
             "targetGroups": {
-              "NPM Scripts": [
-                "dev",
-                "start",
-                "type-check"
-              ]
+              "NPM Scripts": ["dev", "start", "type-check"]
             },
             "js": {
               "packageName": "frontend-agents",
@@ -340,10 +274,7 @@
           "$schema": "../../node_modules/nx/schemas/project-schema.json",
           "sourceRoot": "apps/frontend-agents/src",
           "namedInputs": {
-            "default": [
-              "{projectRoot}/**/*",
-              "sharedGlobals"
-            ],
+            "default": ["{projectRoot}/**/*", "sharedGlobals"],
             "production": [
               "default",
               "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",

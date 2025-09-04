@@ -12,7 +12,7 @@ paths-ignore:
 query-filters:
   - exclude:
       tags:
-        - "experimental"
+        - 'experimental'
 
 languages:
   - javascript-typescript

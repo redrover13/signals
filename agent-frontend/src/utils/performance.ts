@@ -19,24 +19,26 @@ import { isProduction } from './env-config';
  */
 export const useRenderPerformance = (componentName: string | undefined, threshold = 16): void => {
   const renderStart = useRef<number>(0);
-  
+
   useEffect(() => {
     const renderTime = performance.now() - renderStart.current;
-    
+
     if (renderTime > threshold) {
-      console.warn(`[Performance] ${componentName} took ${renderTime.toFixed(2)}ms to render, which is above the threshold of ${threshold}ms.`);
+      console.warn(
+        `[Performance] ${componentName} took ${renderTime.toFixed(2)}ms to render, which is above the threshold of ${threshold}ms.`,
+      );
     }
-    
+
     // Log all render times in development
     if (!isProduction()) {
       console.log(`[Performance] ${componentName} rendered in ${renderTime.toFixed(2)}ms`);
     }
-    
+
     return () => {
       renderStart.current = performance.now();
     };
   });
-  
+
   // Set the initial render start time
   if (renderStart.current === 0) {
     renderStart.current = performance.now();
@@ -51,23 +53,27 @@ export const useRenderPerformance = (componentName: string | undefined, threshol
  */
 export const trackInteraction = <T extends (...args: any[]) => any>(
   name: string | undefined,
-  callback: T
+  callback: T,
 ): T => {
   return ((...args) => {
     const start = performance.now();
     const result = callback(...args);
-    
+
     // If the result is a promise, measure its completion time
     if (result instanceof Promise) {
       result.finally(() => {
         const end = performance.now();
-        console.log(`[Performance] Interaction "${name}" took ${(end - start).toFixed(2)}ms to complete`);
+        console.log(
+          `[Performance] Interaction "${name}" took ${(end - start).toFixed(2)}ms to complete`,
+        );
       });
     } else {
       const end = performance.now();
-      console.log(`[Performance] Interaction "${name}" took ${(end - start).toFixed(2)}ms to complete`);
+      console.log(
+        `[Performance] Interaction "${name}" took ${(end - start).toFixed(2)}ms to complete`,
+      );
     }
-    
+
     return result;
   }) as T;
 };

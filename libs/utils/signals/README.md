@@ -36,7 +36,7 @@ count.set(5);
 console.log(count.get()); // 5
 
 // Subscribe to changes
-const unsubscribe = count.subscribe(newValue => {
+const unsubscribe = count.subscribe((newValue) => {
   console.log(`Count changed to: ${newValue}`);
 });
 
@@ -53,10 +53,7 @@ const width = createSignal(5);
 const height = createSignal(10);
 
 // Create a signal derived from other signals
-const area = derivedSignal(
-  [width, height],
-  (w, h) => w * h
-);
+const area = derivedSignal([width, height], (w, h) => w * h);
 
 console.log(area.get()); // 50
 
@@ -113,7 +110,7 @@ theme.set('dark');
 import { fromPromise } from '@nx-monorepo/utils/signals';
 
 // Create a signal from a promise
-const userSignal = fromPromise(fetch('/api/user').then(r => r.json()));
+const userSignal = fromPromise(fetch('/api/user').then((r) => r.json()));
 
 // Use the signal with loading/error states
 userSignal.subscribe(({ loading, data, error }) => {

@@ -17,7 +17,7 @@ jobs:
     name: Test Node ${{ matrix.node-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     env:
-      STORE_PATH: ""
+      STORE_PATH: ''
     strategy:
       fail-fast: false
       matrix:
@@ -29,7 +29,7 @@ jobs:
             node-version: '18'
           - os: macos-latest
             node-version: '18'
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -129,7 +129,7 @@ jobs:
     name: Compatibility Check
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: ""
+      STORE_PATH: ''
     needs: test-matrix
     if: always()
     steps:
@@ -160,12 +160,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
           echo "" >> compatibility-report.md
-          
+
           echo "## Node.js Version Support" >> compatibility-report.md
           echo "- **Required:** $(node -p "require('./package.json').engines?.node || 'not specified'")" >> compatibility-report.md
           echo "- **Tested:** 18.x, 20.x, 22.x" >> compatibility-report.md
           echo "" >> compatibility-report.md
-          
+
           echo "## Operating System Support" >> compatibility-report.md
           echo "- **Ubuntu:** ✅ Tested" >> compatibility-report.md
           echo "- **Windows:** ✅ Tested" >> compatibility-report.md
@@ -183,7 +183,7 @@ jobs:
     name: Performance Baseline
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: ""
+      STORE_PATH: ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -215,11 +215,11 @@ jobs:
       - name: Run performance benchmarks
         run: |
           echo "Running performance benchmarks..."
-          
+
           # Build time benchmark
           echo "Build performance:"
           time pnpm nx run-many -t build --all --parallel=3
-          
+
           # Test execution time
           echo "Test performance:"
           time pnpm nx run-many -t test --all --parallel=3
@@ -227,14 +227,14 @@ jobs:
       - name: Memory usage check
         run: |
           echo "Checking memory usage during build..."
-          
+
           # Monitor memory usage during build
           (while true; do
             ps aux | grep -E "(node|pnpm)" | grep -v grep || true
             sleep 5
           done) &
           MONITOR_PID=$!
-          
+
           pnpm nx build mcp
-          
+
           kill $MONITOR_PID 2>/dev/null || true

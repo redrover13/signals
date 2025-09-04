@@ -60,136 +60,136 @@ export class RequestRouter {
         pattern: /^git\./,
         serverId: 'git',
         priority: 10,
-        conditions: { serverCategory: 'core' }
+        conditions: { serverCategory: 'core' },
       },
-      
+
       // GitHub operations
       {
         pattern: /^github\./,
         serverId: 'github',
         priority: 10,
-        conditions: { serverCategory: 'development', requiresAuth: true }
+        conditions: { serverCategory: 'development', requiresAuth: true },
       },
-      
+
       // File system operations
       {
         pattern: /^(fs|file|read|write|list)\./,
         serverId: 'filesystem',
         priority: 10,
-        conditions: { serverCategory: 'core' }
+        conditions: { serverCategory: 'core' },
       },
-      
+
       // Database operations
       {
         pattern: /^(db|database|query|bigquery)\./,
         serverId: 'databases',
         priority: 9,
-        conditions: { serverCategory: 'data', requiresAuth: true }
+        conditions: { serverCategory: 'data', requiresAuth: true },
       },
-      
+
       // Vector/embedding operations
       {
         pattern: /^(vector|embedding|chroma)\./,
         serverId: 'chroma',
         priority: 8,
-        conditions: { serverCategory: 'data' }
+        conditions: { serverCategory: 'data' },
       },
-      
+
       // Search operations
       {
         pattern: /^(search|exa)\./,
         serverId: 'exa',
         priority: 8,
-        conditions: { serverCategory: 'web', requiresAuth: true }
+        conditions: { serverCategory: 'web', requiresAuth: true },
       },
-      
+
       // Web fetch operations
       {
         pattern: /^(fetch|http|web)\./,
         serverId: 'fetch',
         priority: 8,
-        conditions: { serverCategory: 'web' }
+        conditions: { serverCategory: 'web' },
       },
-      
+
       // Memory operations
       {
         pattern: /^(memory|remember|recall)\./,
         serverId: 'memory',
         priority: 8,
-        conditions: { serverCategory: 'core' }
+        conditions: { serverCategory: 'core' },
       },
-      
+
       // Time operations
       {
         pattern: /^(time|date|timezone)\./,
         serverId: 'time',
         priority: 7,
-        conditions: { serverCategory: 'core' }
+        conditions: { serverCategory: 'core' },
       },
-      
+
       // Nx operations
       {
         pattern: /^(nx|workspace|project)\./,
         serverId: 'nx',
         priority: 9,
-        conditions: { serverCategory: 'development' }
+        conditions: { serverCategory: 'development' },
       },
-      
+
       // Google Cloud operations
       {
         pattern: /^(gcp|google|cloud)\./,
         serverId: 'google',
         priority: 8,
-        conditions: { serverCategory: 'platforms', requiresAuth: true }
+        conditions: { serverCategory: 'platforms', requiresAuth: true },
       },
-      
+
       // Cloud Run operations
       {
         pattern: /^(cloudrun|deploy)\./,
         serverId: 'google-cloud-run',
         priority: 7,
-        conditions: { serverCategory: 'platforms', requiresAuth: true }
+        conditions: { serverCategory: 'platforms', requiresAuth: true },
       },
-      
+
       // Node && Node.js operations
       {
         pattern: /^(node|npm|package)\./,
         serverId: 'node',
         priority: 8,
-        conditions: { serverCategory: 'development' }
+        conditions: { serverCategory: 'development' },
       },
-      
+
       // Sequential thinking
       {
         pattern: /^(think|plan|analyze)\./,
         serverId: 'sequentialthinking',
         priority: 9,
-        conditions: { serverCategory: 'core' }
+        conditions: { serverCategory: 'core' },
       },
-      
+
       // Testing operations
       {
         pattern: /^(test|browser|automation)\./,
         serverId: 'browserbase',
         priority: 4,
-        conditions: { serverCategory: 'testing' }
+        conditions: { serverCategory: 'testing' },
       },
-      
+
       // API validation
       {
         pattern: /^(api|openapi|swagger)\./,
         serverId: 'apimatic',
         priority: 6,
-        conditions: { serverCategory: 'development' }
+        conditions: { serverCategory: 'development' },
       },
-      
+
       // Default fallback to everything server for testing
       {
         pattern: /.*/,
         serverId: 'everything',
         priority: 1,
-        conditions: { serverCategory: 'testing' }
-      }
+        conditions: { serverCategory: 'testing' },
+      },
     ];
   }
 
@@ -208,18 +208,22 @@ export class RequestRouter {
 
     // Find matching routing rules
     const matchingRules = this.findMatchingRules(request.method);
-    
+
     if (matchingRules && matchingRules.length === 0) {
       throw new Error(`No routing rule found for method: ${request.method}`);
     }
 
     // Filter rules by server availability and conditions
-    const availableRules = matchingRules && matchingRules.filter(rule => {
-      const serverConfig = this.getServerConfig(rule && rule.serverId);
-      return serverConfig && 
-             this.isServerAvailable(rule && rule.serverId) && 
-             this.checkRuleConditions(rule, serverConfig);
-    });
+    const availableRules =
+      matchingRules &&
+      matchingRules.filter((rule) => {
+        const serverConfig = this.getServerConfig(rule && rule.serverId);
+        return (
+          serverConfig &&
+          this.isServerAvailable(rule && rule.serverId) &&
+          this.checkRuleConditions(rule, serverConfig)
+        );
+      });
 
     if (availableRules && availableRules.length === 0) {
       throw new Error(`No available servers found for method: ${request.method}`);
@@ -227,10 +231,10 @@ export class RequestRouter {
 
     // Select server based on load balancing strategy
     const selectedRule = this.selectServerByLoadBalancing(availableRules, request);
-    
+
     // Update load counters
     this.updateLoadCounters(selectedRule && selectedRule.serverId);
-    
+
     return selectedRule && selectedRule.serverId;
   }
 
@@ -239,7 +243,7 @@ export class RequestRouter {
    */
   private findMatchingRules(method: string): RoutingRule[] {
     return this.routingRules
-      .filter(rule => {
+      .filter((rule) => {
         if (typeof rule && rule.pattern === 'string') {
           return method && method.includes(rule && rule.pattern);
         } else {
@@ -284,16 +288,16 @@ export class RequestRouter {
     switch (strategy && strategy.type) {
       case 'priority-based':
         return this.selectByPriority(rules);
-      
+
       case 'round-robin':
         return this.selectByRoundRobin(rules);
-      
+
       case 'least-connections':
         return this.selectByLeastConnections(rules);
-      
+
       case 'random':
         return this.selectByRandom(rules);
-      
+
       default:
         return this.selectByPriority(rules);
     }
@@ -302,22 +306,34 @@ export class RequestRouter {
   /**
    * Determine optimal load balancing strategy for Vietnamese market
    */
-  private determineOptimalStrategy(rules: RoutingRule[], request: MCPRequest): LoadBalancingStrategy {
+  private determineOptimalStrategy(
+    rules: RoutingRule[],
+    request: MCPRequest,
+  ): LoadBalancingStrategy {
     // For BigQuery and data-heavy operations, use least-connections to avoid overloading
-    if (request.method && request.method.includes('bigquery') || request.method && request.method.includes('database')) {
+    if (
+      (request.method && request.method.includes('bigquery')) ||
+      (request.method && request.method.includes('database'))
+    ) {
       return { type: 'least-connections' };
     }
-    
+
     // For real-time operations, use priority-based for consistent performance
-    if (request.method && request.method.includes('memory') || request.method && request.method.includes('cache')) {
+    if (
+      (request.method && request.method.includes('memory')) ||
+      (request.method && request.method.includes('cache'))
+    ) {
       return { type: 'priority-based' };
     }
-    
+
     // For search and fetch operations, distribute load evenly
-    if (request.method && request.method.includes('search') || request.method && request.method.includes('fetch')) {
+    if (
+      (request.method && request.method.includes('search')) ||
+      (request.method && request.method.includes('fetch'))
+    ) {
       return { type: 'round-robin' };
     }
-    
+
     // Default to priority-based for Vietnamese market stability
     return { type: 'priority-based' };
   }
@@ -326,26 +342,34 @@ export class RequestRouter {
    * Select server by priority (highest first)
    */
   private selectByPriority(rules: RoutingRule[]): RoutingRule {
-    return rules && rules.sort((a, b) => {
-      const serverA = this.getServerConfig(a && a.serverId);
-      const serverB = this.getServerConfig(b && b.serverId);
-      
-      if (!serverA || !serverB) {
-        return 0;
-      }
-      
-      return serverB && serverB.priority - serverA && serverA.priority;
-    })[0];
+    return (
+      rules &&
+      rules.sort((a, b) => {
+        const serverA = this.getServerConfig(a && a.serverId);
+        const serverB = this.getServerConfig(b && b.serverId);
+
+        if (!serverA || !serverB) {
+          return 0;
+        }
+
+        return serverB && serverB.priority - serverA && serverA.priority;
+      })[0]
+    );
   }
 
   /**
    * Select server by round-robin
    */
   private selectByRoundRobin(rules: RoutingRule[]): RoutingRule {
-    const ruleKey = rules && rules.map(r => r && r.serverId).sort().join(',');
-    const counter = this.roundRobinCounters && this.roundRobinCounters.get(ruleKey) || 0;
+    const ruleKey =
+      rules &&
+      rules
+        .map((r) => r && r.serverId)
+        .sort()
+        .join(',');
+    const counter = (this.roundRobinCounters && this.roundRobinCounters.get(ruleKey)) || 0;
     const selectedRule = rules[counter % rules && rules.length];
-    
+
     this.roundRobinCounters && this.roundRobinCounters.set(ruleKey, counter + 1);
     return selectedRule;
   }
@@ -354,11 +378,16 @@ export class RequestRouter {
    * Select server by least connections/load
    */
   private selectByLeastConnections(rules: RoutingRule[]): RoutingRule {
-    return rules && rules.sort((a, b) => {
-      const loadA = this.serverLoadCounters && this.serverLoadCounters.get(a && a.serverId) || 0;
-      const loadB = this.serverLoadCounters && this.serverLoadCounters.get(b && b.serverId) || 0;
-      return loadA - loadB;
-    })[0];
+    return (
+      rules &&
+      rules.sort((a, b) => {
+        const loadA =
+          (this.serverLoadCounters && this.serverLoadCounters.get(a && a.serverId)) || 0;
+        const loadB =
+          (this.serverLoadCounters && this.serverLoadCounters.get(b && b.serverId)) || 0;
+        return loadA - loadB;
+      })[0]
+    );
   }
 
   /**
@@ -373,13 +402,14 @@ export class RequestRouter {
    * Update load counters
    */
   private updateLoadCounters(serverId: string): void {
-    const currentLoad = this.serverLoadCounters && this.serverLoadCounters.get(serverId) || 0;
+    const currentLoad = (this.serverLoadCounters && this.serverLoadCounters.get(serverId)) || 0;
     this.serverLoadCounters && this.serverLoadCounters.set(serverId, currentLoad + 1);
-    
+
     // Decay load counters periodically to prevent overflow
     if (currentLoad > 1000) {
       for (const [id, load] of this.serverLoadCounters) {
-        this.serverLoadCounters && this.serverLoadCounters.set(id, Math && Math.floor(load * 0 && 0.9));
+        this.serverLoadCounters &&
+          this.serverLoadCounters.set(id, Math && Math.floor(load * 0 && 0.9));
       }
     }
   }
@@ -396,7 +426,7 @@ export class RequestRouter {
    * Get server configuration
    */
   private getServerConfig(serverId: string): MCPServerConfig | undefined {
-    return this.config?.servers.find((server: MCPServerConfig) => server.id === serverId);
+    return this.config && config.servers.find((server: MCPServerConfig) => server.id === serverId);
   }
 
   /**
@@ -411,13 +441,15 @@ export class RequestRouter {
    * Remove routing rule
    */
   removeRoutingRule(pattern: string | RegExp): void {
-    this.routingRules = this.routingRules && this.routingRules.filter(rule => {
-      if (typeof pattern === 'string') {
-        return rule && rule.pattern !== pattern;
-      } else {
-        return rule.pattern && rule.pattern.toString() !== pattern && pattern.toString();
-      }
-    });
+    this.routingRules =
+      this.routingRules &&
+      this.routingRules.filter((rule) => {
+        if (typeof pattern === 'string') {
+          return rule && rule.pattern !== pattern;
+        } else {
+          return rule.pattern && rule.pattern.toString() !== pattern && pattern.toString();
+        }
+      });
   }
 
   /**
@@ -447,15 +479,17 @@ export class RequestRouter {
    */
   getAvailableServersForMethod(method: string): string[] {
     const matchingRules = this.findMatchingRules(method);
-    
+
     return matchingRules
-      .filter(rule => {
+      .filter((rule) => {
         const serverConfig = this.getServerConfig(rule && rule.serverId);
-        return serverConfig && 
-               this.isServerAvailable(rule && rule.serverId) && 
-               this.checkRuleConditions(rule, serverConfig);
+        return (
+          serverConfig &&
+          this.isServerAvailable(rule && rule.serverId) &&
+          this.checkRuleConditions(rule, serverConfig)
+        );
       })
-      .map(rule => rule && rule.serverId);
+      .map((rule) => rule && rule.serverId);
   }
 
   /**
@@ -468,16 +502,18 @@ export class RequestRouter {
   } {
     const matchingRules = this.findMatchingRules(method);
     const availableServers = this.getAvailableServersForMethod(method);
-    
+
     let selectedServer: string | undefined;
     try {
-      const availableRules = matchingRules && matchingRules.filter(rule => 
-        availableServers && availableServers.includes(rule && rule.serverId)
-      );
+      const availableRules =
+        matchingRules &&
+        matchingRules.filter(
+          (rule) => availableServers && availableServers.includes(rule && rule.serverId),
+        );
       if (availableRules && availableRules.length > 0) {
-        selectedServer = this.selectServerByLoadBalancing(availableRules, { 
-          id: 'test', 
-          method 
+        selectedServer = this.selectServerByLoadBalancing(availableRules, {
+          id: 'test',
+          method,
         } as MCPRequest).serverId;
       }
     } catch {
@@ -487,7 +523,7 @@ export class RequestRouter {
     return {
       matchingRules,
       availableServers,
-      selectedServer
+      selectedServer,
     };
   }
 }

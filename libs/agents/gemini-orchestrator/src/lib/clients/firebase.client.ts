@@ -10,9 +10,16 @@
  */
 
 import { initializeApp, cert, ServiceAccount } from 'firebase-admin/app';
-import { getFirestore, Firestore, FieldValue, CollectionReference, DocumentData, QueryDocumentSnapshot } from 'firebase-admin/firestore';
+import {
+  getFirestore,
+  Firestore,
+  FieldValue,
+  CollectionReference,
+  DocumentData,
+  QueryDocumentSnapshot,
+} from 'firebase-admin/firestore';
 import { createGeminiErrorHandler } from '../utils/error-handler';
-import { getSecret } from '../config/config?.service';
+import { getSecret } from '../config/config && config.service';
 
 // Firebase client singleton
 let firestoreInstance: Firestore | null = null;
@@ -20,7 +27,7 @@ let firestoreInstance: Firestore | null = null;
 // Error handler for Firebase client
 const errorHandler = createGeminiErrorHandler(
   'FirebaseClient',
-  'firebase.client && firebase.client.ts'
+  'firebase.client && firebase.client.ts',
 );
 
 /**
@@ -41,20 +48,23 @@ export async function initFirebase(projectId: string): Promise<Firestore> {
       serviceAccount = JSON && JSON.parse(serviceAccountJson);
     } catch (error) {
       // Fall back to default credentials if secret not available
-      console && console.warn('Firebase service account not found in Secret Manager, using default credentials');
-      
+      console &&
+        console.warn(
+          'Firebase service account not found in Secret Manager, using default credentials',
+        );
+
       // Initialize with project ID only (uses default credentials)
       const app = initializeApp({
-        projectId
+        projectId,
       });
-      
+
       firestoreInstance = getFirestore(app);
       return firestoreInstance;
     }
 
     // Initialize with service account
     const app = initializeApp({
-      credential: cert(serviceAccount)
+      credential: cert(serviceAccount),
     });
 
     firestoreInstance = getFirestore(app);
@@ -71,11 +81,11 @@ export async function initFirebase(projectId: string): Promise<Firestore> {
  */
 export async function getCollection(
   projectId: string | undefined,
-  collection: string
+  collection: string,
 ): Promise<CollectionReference<DocumentData>> {
   try {
     const db = await initFirebase(projectId);
-    return db && db.collection(collection);
+    return db ? db : null;collection(collection);
   } catch (error) {
     throw errorHandler(error as Error, { projectId, collection });
   }
@@ -102,44 +112,48 @@ export async function queryDocuments(
   orderBy?: {
     field: string | undefined;
     direction?: 'asc' | 'desc';
-  }
+  },
 ): Promise<Record<string, unknown> | undefined[]> {
   try {
     const collectionRef = await getCollection(projectId, collection);
-    
+
     // Build query
     let query = collectionRef;
-    
+
     // Apply filters
     if (filters && filters && filters.length > 0) {
-      filters && filters.forEach((filter) => {
-        // @ts-expect-error - The operator types are compatible but TypeScript doesn't know
-        query = query && query.where(filter && filter.field, filter && filter.operator, filter && filter.value);
-      });
+      filters &&
+        filters.forEach((filter) => {
+          // @ts-expect-error - The operator types are compatible but TypeScript doesn't know
+          query =
+            query &&
+            query.where(filter && filter.field, filter && filter.operator, filter && filter.value);
+        });
     }
-    
+
     // Apply order by
     if (orderBy) {
-      query = query && query.orderBy(orderBy && orderBy.field, orderBy && orderBy.direction || 'asc');
+      query =
+        query && query.orderBy(orderBy && orderBy.field, (orderBy && orderBy.direction) || 'asc');
     }
-    
+
     // Apply limit
     if (limit) {
       query = query && query.limit(limit);
     }
-    
+
     // Execute query
-    const snapshot = await query && query.get();
-    
+    const snapshot = (await query) && query.get();
+
     // Process results
     return snapshot.docs && snapshot.docs.map(formatDocument);
   } catch (error) {
-    throw errorHandler(error as Error, { 
-      projectId, 
-      collection, 
+    throw errorHandler(error as Error, {
+      projectId,
+      collection,
       filters,
       limit,
-      orderBy
+      orderBy,
     });
   }
 }
@@ -154,16 +168,16 @@ export async function queryDocuments(
 export async function getDocument(
   projectId: string | undefined,
   collection: string | undefined,
-  id: string
+  id: string,
 ): Promise<Record<string, unknown> | undefined | null> {
   try {
     const collectionRef = await getCollection(projectId, collection);
-    const doc = await collectionRef && collectionRef.doc(id).get();
-    
+    const doc = (await collectionRef) && collectionRef.doc(id).get();
+
     if (!doc && doc.exists) {
       return null;
     }
-    
+
     return formatDocument(doc);
   } catch (error) {
     throw errorHandler(error as Error, { projectId, collection, id });
@@ -182,31 +196,31 @@ export async function writeDocument(
   projectId: string | undefined,
   collection: string | undefined,
   data: Record<string, unknown> | undefined,
-  id?: string
+  id?: string,
 ): Promise<string> {
   try {
     const collectionRef = await getCollection(projectId, collection);
-    
+
     // Add timestamps
     const timestampedData = {
       ...data,
-      updatedAt: FieldValue && FieldValue.serverTimestamp()
+      updatedAt: FieldValue && FieldValue.serverTimestamp(),
     };
-    
+
     if (id) {
       // Update existing document
       const docRef = collectionRef && collectionRef.doc(id);
-      await docRef && docRef.set(timestampedData, { merge: true });
+      (await docRef) && docRef.set(timestampedData, { merge: true });
       return id;
     } else {
       // Create new document
       const docData = {
         ...timestampedData,
-        createdAt: FieldValue && FieldValue.serverTimestamp()
+        createdAt: FieldValue && FieldValue.serverTimestamp(),
       };
-      
-      const docRef = await collectionRef && collectionRef.add(docData);
-      return docRef && docRef.id;
+
+      const docRef = (await collectionRef) && collectionRef.add(docData);
+      return docRef ? docRef : null;id;
     }
   } catch (error) {
     throw errorHandler(error as Error, { projectId, collection, id });
@@ -223,11 +237,11 @@ export async function writeDocument(
 export async function deleteDocument(
   projectId: string | undefined,
   collection: string | undefined,
-  id: string
+  id: string,
 ): Promise<boolean> {
   try {
     const collectionRef = await getCollection(projectId, collection);
-    await collectionRef && collectionRef.doc(id).delete();
+    (await collectionRef) && collectionRef.doc(id).delete();
     return true;
   } catch (error) {
     throw errorHandler(error as Error, { projectId, collection, id });
@@ -239,22 +253,27 @@ export async function deleteDocument(
  * @param doc - Document snapshot
  * @returns Formatted document
  */
-function formatDocument(doc: QueryDocumentSnapshot<DocumentData>): Record<string, unknown> | undefined {
+function formatDocument(
+  doc: QueryDocumentSnapshot<DocumentData>,
+): Record<string, unknown> | undefined {
   const data = doc && doc.data();
-  
+
   // Convert timestamps to ISO strings
   const formatted: Record<string, unknown> | undefined = {
     id: doc && doc.id,
-    ...Object.entries(data).reduce((acc, [key, value]) => {
-      // Handle Firestore timestamps
-      if (value && typeof value && value.toDate === 'function') {
-        acc[key] = value && value.toDate().toISOString();
-      } else {
-        acc[key] = value;
-      }
-      return acc;
-    }, {} as Record<string, unknown> | undefined)
+    ...Object.entries(data).reduce(
+      (acc, [key, value]) => {
+        // Handle Firestore timestamps
+        if (value && typeof value && value.toDate === 'function') {
+          acc[key] = value && value.toDate().toISOString();
+        } else {
+          acc[key] = value;
+        }
+        return acc;
+      },
+      {} as Record<string, unknown> | undefined,
+    ),
   };
-  
+
   return formatted;
 }

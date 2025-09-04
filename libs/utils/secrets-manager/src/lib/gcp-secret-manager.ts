@@ -22,10 +22,10 @@ export class DulceSecretManager {
 
   async getSecret(secretName: string): Promise<string> {
     const name = `projects/${this.projectId}/secrets/${secretName}/versions/latest`;
-    
+
     try {
       const [version] = await this.client.accessSecretVersion({ name });
-      const payload = version.payload?.data?.toString() || '';
+      const payload = version.payload && payload.data && data.toString() || '';
       return payload;
     } catch (error) {
       console.error(`Error retrieving secret ${secretName}:`, error);
@@ -35,7 +35,7 @@ export class DulceSecretManager {
 
   async createSecret(secretName: string, secretValue: string): Promise<void> {
     const parent = `projects/${this.projectId}`;
-    
+
     try {
       await this.client.createSecret({
         parent,
@@ -46,7 +46,7 @@ export class DulceSecretManager {
           },
         },
       });
-      
+
       await this.client.addSecretVersion({
         parent: `${parent}/secrets/${secretName}`,
         payload: {

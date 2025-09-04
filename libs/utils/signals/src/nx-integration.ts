@@ -23,12 +23,12 @@ import { createSignal } from '../index.js';
 export function createReduxSignal<S, T>(
   store: { getState: () => S; subscribe: (listener: () => void) => () => void },
   selector: (state: S) => T,
-  initialValue: T
+  initialValue: T,
 ): Signal<T> {
   // Create a signal with the current state
   const initialState = selector(store.getState());
   const signalInstance = createSignal<T>(initialState !== undefined ? initialState : initialValue);
-  
+
   // Subscribe to store changes
   store.subscribe(() => {
     const newValue = selector(store.getState());
@@ -36,7 +36,7 @@ export function createReduxSignal<S, T>(
       signalInstance.set(newValue);
     }
   });
-  
+
   return signalInstance;
 }
 
@@ -52,22 +52,21 @@ export function createMappedReduxSignal<S, R, T>(
   store: { getState: () => S; subscribe: (listener: () => void) => () => void },
   selector: (state: S) => R,
   mapper: (selected: R) => T,
-  initialValue: T
+  initialValue: T,
 ): Signal<T> {
   // Get initial value
   const initialSelected = selector(store.getState());
-  const initialMapped = initialSelected !== undefined && mapper 
-    ? mapper(initialSelected) 
-    : initialValue;
-  
+  const initialMapped =
+    initialSelected !== undefined && mapper ? mapper(initialSelected) : initialValue;
+
   const signalInstance = createSignal<T>(initialMapped);
-  
+
   store.subscribe(() => {
     const newSelected = selector(store.getState());
-    const newValue = mapper ? mapper(newSelected) : newSelected as unknown as T;
+    const newValue = mapper ? mapper(newSelected) : (newSelected as unknown as T);
     signalInstance.set(newValue);
   });
-  
+
   return signalInstance;
 }
 
@@ -77,7 +76,10 @@ export function createMappedReduxSignal<S, R, T>(
  * @returns Connected component with signals
  */
 export function connectWithSignals<S, P extends object>(
-  mapStateToSignals: (store: { getState: () => S; subscribe: (listener: () => void) => () => void }) => Record<string, Signal<unknown>>
+  mapStateToSignals: (store: {
+    getState: () => S;
+    subscribe: (listener: () => void) => () => void;
+  }) => Record<string, Signal<unknown>>,
 ) {
   return function connectComponent(Component: React.ComponentType<P>) {
     return function ConnectedComponent(props: P) {

@@ -42,13 +42,13 @@ export async function processDocument(cloudEvent: CloudEvent<StorageObjectData>)
   try {
     // Get the storage event data from the CloudEvent
     const data = cloudEvent.data as StorageObjectData;
-    
+
     if (!data) {
       throw new Error('No event data found');
     }
 
     const { bucket, name: fileName, contentType } = data;
-    
+
     console.log(`Processing file: ${fileName} from bucket: ${bucket}`);
     console.log(`Content type: ${contentType}`);
 
@@ -59,7 +59,7 @@ export async function processDocument(cloudEvent: CloudEvent<StorageObjectData>)
       documentsBucket: process.env.DOCUMENTS_BUCKET!,
       chunksBucket: process.env.CHUNKS_BUCKET!,
       searchEngineId: process.env.SEARCH_ENGINE_ID!,
-      datastoreId: process.env.DATASTORE_ID!
+      datastoreId: process.env.DATASTORE_ID!,
     };
 
     // Validate configuration
@@ -79,7 +79,7 @@ export async function processDocument(cloudEvent: CloudEvent<StorageObjectData>)
     // Download the file from Cloud Storage
     const file = storage.bucket(bucket).file(fileName);
     const [fileBuffer] = await file.download();
-    
+
     console.log(`Downloaded file: ${fileName}, size: ${fileBuffer.length} bytes`);
 
     // Extract text content from the file (simplified version)
@@ -93,14 +93,14 @@ export async function processDocument(cloudEvent: CloudEvent<StorageObjectData>)
       contentType,
       uploadTime: new Date().toISOString(),
       bucket,
-      fileSize: fileBuffer.length
+      fileSize: fileBuffer.length,
     };
 
     // Process the document for RAG (simplified version)
     const chunkSize = 1000;
     const overlap = 200;
     const chunks = [];
-    
+
     for (let i = 0; i < textContent.length; i += chunkSize - overlap) {
       const chunkContent = textContent.slice(i, i + chunkSize);
       if (chunkContent.trim()) {
@@ -111,9 +111,9 @@ export async function processDocument(cloudEvent: CloudEvent<StorageObjectData>)
             ...metadata,
             chunkIndex: chunks.length,
             startPosition: i,
-            endPosition: i + chunkContent.length
+            endPosition: i + chunkContent.length,
           },
-          embedding: [] // Placeholder for embedding
+          embedding: [], // Placeholder for embedding
         });
       }
     }
@@ -127,18 +127,18 @@ export async function processDocument(cloudEvent: CloudEvent<StorageObjectData>)
         id: chunk.id,
         content: chunk.content,
         metadata: chunk.metadata,
-        embedding: chunk.embedding
+        embedding: chunk.embedding,
       })),
-      processedAt: new Date().toISOString()
+      processedAt: new Date().toISOString(),
     };
 
     const chunksFileName = `${metadata?.documentId}_chunks.json`;
     const chunksFile = storage.bucket(config?.chunksBucket).file(chunksFileName);
-    
+
     await chunksFile.save(JSON.stringify(chunksData, null, 2), {
       metadata: {
-        contentType: 'application/json'
-      }
+        contentType: 'application/json',
+      },
     });
 
     console.log(`Saved chunks to: ${chunksFileName}`);
@@ -149,7 +149,6 @@ export async function processDocument(cloudEvent: CloudEvent<StorageObjectData>)
     console.log(`- Text length: ${textContent.length} characters`);
     console.log(`- Chunks created: ${chunks.length}`);
     console.log(`- Chunks saved to: ${chunksFileName}`);
-
   } catch (error) {
     console.error('Error processing document:', error);
     throw error;
@@ -162,6 +161,6 @@ export async function processDocument(cloudEvent: CloudEvent<StorageObjectData>)
 export async function healthCheck(): Promise<{ status: string | undefined; timestamp: string }> {
   return {
     status: 'healthy',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 }

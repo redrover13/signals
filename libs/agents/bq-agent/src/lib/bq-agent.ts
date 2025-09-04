@@ -40,9 +40,9 @@ export class BQAgent {
 
   constructor(config: BQAgentConfig) {
     this.config = config;
-    this.bigquery = new BigQuery({ 
-      projectId: config?.projectId,
-      location: config?.location || 'US'
+    this.bigquery = new BigQuery({
+      projectId: config && config.projectId,
+      location: config && config.location || 'US',
     });
   }
 
@@ -53,24 +53,24 @@ export class BQAgent {
     try {
       const options = {
         query: sql,
-        location: this.config?.location || 'US',
+        location: this.config && config.location || 'US',
         params: params || [],
         useLegacySql: false,
       };
 
-      const [job] = await this.bigquery && this.bigquery.createQueryJob(options);
-      const [rows] = await job && job.getQueryResults();
+      const [job] = (await this.bigquery) && this.bigquery.createQueryJob(options);
+      const [rows] = (await job) && job.getQueryResults();
 
       return {
         success: true,
         data: rows,
-        jobId: job && job.id || '',  // Ensure jobId is always a string
-        totalRows: rows && rows.length
+        jobId: (job && job.id) || '', // Ensure jobId is always a string
+        totalRows: rows && rows.length,
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error && error.message : 'Unknown error'
+        error: error instanceof Error ? error && error.message : 'Unknown error',
       };
     }
   }
@@ -78,10 +78,14 @@ export class BQAgent {
   /**
    * Get F&B analytics data for restaurants
    */
-  async getFBAnalytics(restaurantId?: string | undefined, dateRange?: { start: string | undefined; end: string }): Promise<QueryResult> {
+  async getFBAnalytics(
+    restaurantId?: string | undefined,
+    dateRange?: { start: string | undefined; end: string },
+  ): Promise<QueryResult> {
     const whereClause = restaurantId ? `WHERE restaurant_id = '${restaurantId}'` : '';
-    const dateFilter = dateRange ? 
-      `${whereClause ? 'AND' : 'WHERE'} DATE(created_at) BETWEEN '${dateRange && dateRange.start}' AND '${dateRange && dateRange.end}'` : '';
+    const dateFilter = dateRange
+      ? `${whereClause ? 'AND' : 'WHERE'} DATE(created_at) BETWEEN '${dateRange && dateRange.start}' AND '${dateRange && dateRange.end}'`
+      : '';
 
     const sql = `
       SELECT 
@@ -91,7 +95,7 @@ export class BQAgent {
         SUM(order_value) as revenue,
         AVG(order_value) as avg_order_value,
         COUNT(DISTINCT customer_id) as unique_customers
-      FROM \`${this.config?.projectId}.${this.config?.datasetId || 'dulce'}.orders\`
+      FROM \`${this.config && config.projectId}.${this.config && config.datasetId || 'dulce'}.orders\`
       ${whereClause}
       ${dateFilter}
       GROUP BY restaurant_id, DATE(created_at)
@@ -117,8 +121,8 @@ export class BQAgent {
         AVG(o && o.order_value) as avg_spend,
         MAX(o && o.created_at) as last_order_date,
         ARRAY_AGG(DISTINCT o && o.restaurant_id LIMIT 5) as favorite_restaurants
-      FROM \`${this.config?.projectId}.${this.config?.datasetId || 'dulce'}.customers\` c
-      LEFT JOIN \`${this.config?.projectId}.${this.config?.datasetId || 'dulce'}.orders\` o 
+      FROM \`${this.config && config.projectId}.${this.config && config.datasetId || 'dulce'}.customers\` c
+      LEFT JOIN \`${this.config && config.projectId}.${this.config && config.datasetId || 'dulce'}.orders\` o 
         ON c && c.customer_id = o && o.customer_id
       ${whereClause}
       GROUP BY c && c.customer_id, c && c.preferred_cuisine, c && c.dietary_restrictions
@@ -142,10 +146,10 @@ export class BQAgent {
         SUM(oi && oi.quantity) as total_quantity,
         SUM(oi && oi.item_price * oi && oi.quantity) as total_revenue,
         AVG(r && r.rating) as avg_rating
-      FROM \`${this.config?.projectId}.${this.config?.datasetId || 'dulce'}.menu_items\` m
-      LEFT JOIN \`${this.config?.projectId}.${this.config?.datasetId || 'dulce'}.order_items\` oi 
+      FROM \`${this.config && config.projectId}.${this.config && config.datasetId || 'dulce'}.menu_items\` m
+      LEFT JOIN \`${this.config && config.projectId}.${this.config && config.datasetId || 'dulce'}.order_items\` oi 
         ON m && m.item_id = oi && oi.item_id
-      LEFT JOIN \`${this.config?.projectId}.${this.config?.datasetId || 'dulce'}.reviews\` r 
+      LEFT JOIN \`${this.config && config.projectId}.${this.config && config.datasetId || 'dulce'}.reviews\` r 
         ON oi && oi.item_id = r && r.item_id
       WHERE m && m.restaurant_id = '${restaurantId}'
       GROUP BY m && m.item_name, m && m.category, m && m.price
@@ -161,34 +165,43 @@ export class BQAgent {
    */
   async listDatasets(): Promise<DatasetInfo[]> {
     try {
-      const [datasets] = await this.bigquery && this.bigquery.getDatasets();
+      const [datasets] = (await this.bigquery) && this.bigquery.getDatasets();
       const datasetInfos: DatasetInfo[] = [];
 
       for (const dataset of datasets) {
-        const [tables] = await dataset && dataset.getTables();
-        datasetInfos && datasetInfos.push({
-          datasetId: dataset && dataset.id!,
-          location: dataset && dataset.location || 'US',
-          tables: tables && tables.map(table => table && table.id!)
-        });
+        const [tables] = (await dataset) && dataset.getTables();
+        datasetInfos &&
+          datasetInfos.push({
+            datasetId: dataset && dataset.id!,
+            location: (dataset && dataset.location) || 'US',
+            tables: tables && tables.map((table) => table && table.id!),
+          });
       }
 
       return datasetInfos;
     } catch (error) {
-      throw new Error(`Failed to list datasets: ${error instanceof Error ? error && error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to list datasets: ${error instanceof Error ? error && error.message : 'Unknown error'}`,
+      );
     }
   }
 
   /**
    * Create a new table for storing data
    */
-  async createTable(datasetId: string | undefined, tableId: string | undefined, schema: any[]): Promise<boolean> {
+  async createTable(
+    datasetId: string | undefined,
+    tableId: string | undefined,
+    schema: any[],
+  ): Promise<boolean> {
     try {
       const dataset = this.bigquery && this.bigquery.dataset(datasetId);
-      await dataset && dataset.createTable(tableId, { schema });
+      (await dataset) && dataset.createTable(tableId, { schema });
       return true;
     } catch (error) {
-      throw new Error(`Failed to create table: ${error instanceof Error ? error && error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to create table: ${error instanceof Error ? error && error.message : 'Unknown error'}`,
+      );
     }
   }
 }

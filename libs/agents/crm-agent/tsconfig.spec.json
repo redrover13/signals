@@ -4,10 +4,7 @@
     "outDir": "../../../dist/out-tsc",
     "module": "ESNext",
     "moduleResolution": "nodenext",
-    "types": [
-      "jest",
-      "node"
-    ]
+    "types": ["jest", "node"]
   },
   "include": [
     "jest.config.ts",
@@ -21,9 +18,5 @@
     "**/*.spec.ts",
     "**/*.test.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "tmp",
-    "dist"
-  ]
+  "exclude": ["node_modules", "tmp", "dist"]
 }

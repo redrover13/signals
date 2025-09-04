@@ -2,20 +2,20 @@ name: Performance Benchmark
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   benchmark:
     name: Performance Benchmarks
     runs-on: ubuntu-latest
     env:
-      STORE_PATH: ""
+      STORE_PATH: ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.1.0
         with:
@@ -34,25 +34,25 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: pnpm
-          
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        
+
       - name: Build project
         run: pnpm nx run-many --target=build --all --parallel=3
-        
+
       - name: Run benchmarks
         run: |
           echo "Running performance benchmarks..."
           # Here you would typically run your benchmark tests
           # For example: pnpm benchmark
-          
+
           # For demonstration purposes, let's simulate a benchmark
           START=$(date +%s%N)
           pnpm nx run-many --target=test --projects=api,mcp --parallel=false
@@ -63,7 +63,7 @@ jobs:
           # Create benchmark report
           mkdir -p benchmark-results
           echo "{\"timestamp\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\", \"duration\": ${DURATION}, \"commit\": \"${{ github.sha }}\"}" > benchmark-results/report.json
-          
+
       - name: Upload benchmark results
         uses: actions/upload-artifact@v3.1.3
         with:

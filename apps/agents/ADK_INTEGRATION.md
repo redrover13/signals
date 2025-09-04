@@ -21,45 +21,40 @@ pnpm install
 The main entry point for agent applications should initialize the ADK and use its components:
 
 ```typescript
-import { 
-  initializeADK, 
-  VertexAIClient, 
-  WebAnalyticsTracker, 
-  FirestoreService 
-} from 'adk';
+import { initializeADK, VertexAIClient, WebAnalyticsTracker, FirestoreService } from 'adk';
 
 async function main() {
   // Initialize the ADK
   const { logger, config } = initializeADK({
     projectId: 'my-project',
     serviceName: 'MyAgent',
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
   });
 
   // Create a Vertex AI client
   const vertexClient = new VertexAIClient({
     project: config.get('gcp.projectId'),
     location: config.get('gcp.location'),
-    endpointId: config.get('vertexai.endpointId')
+    endpointId: config.get('vertexai.endpointId'),
   });
 
   // Set up analytics tracking
   const tracker = new WebAnalyticsTracker({
     projectId: config.get('gcp.projectId'),
     datasetId: 'analytics',
-    tableId: 'events'
+    tableId: 'events',
   });
 
   // Initialize Firestore
   const firestore = new FirestoreService({
-    projectId: config.get('gcp.projectId')
+    projectId: config.get('gcp.projectId'),
   });
 
   // Your agent logic here
   logger.info('Agent started');
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error('Agent failed:', error);
   process.exit(1);
 });
@@ -84,12 +79,12 @@ import { VertexAIClient } from 'adk';
 const vertexClient = new VertexAIClient({
   project: 'my-project',
   location: 'us-central1',
-  endpointId: 'my-endpoint'
+  endpointId: 'my-endpoint',
 });
 
 // Make predictions
 const predictions = await vertexClient.predict({
-  instances: [{ content: 'Your content here' }]
+  instances: [{ content: 'Your content here' }],
 });
 ```
 
@@ -102,7 +97,7 @@ import { WebAnalyticsTracker, EventCategory } from 'adk';
 const tracker = new WebAnalyticsTracker({
   projectId: 'my-project',
   datasetId: 'analytics',
-  tableId: 'events'
+  tableId: 'events',
 });
 
 // Track events
@@ -110,7 +105,7 @@ tracker.trackEvent({
   category: EventCategory.USER,
   action: 'query',
   label: 'agent_interaction',
-  value: 1
+  value: 1,
 });
 ```
 
@@ -121,7 +116,7 @@ import { FirestoreService } from 'adk';
 
 // Create service
 const firestore = new FirestoreService({
-  projectId: 'my-project'
+  projectId: 'my-project',
 });
 
 // CRUD operations
@@ -138,13 +133,13 @@ import { MobileAgentService } from 'adk';
 // Create mobile service
 const mobileService = new MobileAgentService({
   platform: 'ios', // or 'android'
-  projectId: 'my-project'
+  projectId: 'my-project',
 });
 
 // Use mobile-specific features
 mobileService.sendNotification({
   userId: 'user123',
-  message: 'New recommendation available'
+  message: 'New recommendation available',
 });
 ```
 
@@ -157,8 +152,8 @@ For testing agents that use the ADK, mock the ADK components in your tests:
 jest.mock('adk', () => ({
   VertexAIClient: jest.fn().mockImplementation(() => ({
     predict: jest.fn().mockResolvedValue({
-      predictions: ['Mock prediction']
-    })
+      predictions: ['Mock prediction'],
+    }),
   })),
   // Mock other components as needed
 }));

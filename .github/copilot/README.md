@@ -9,6 +9,7 @@ This directory contains configuration files for GitHub Copilot coding agent. For
 This file configures the setup steps that run before the firewall is enabled in the GitHub Copilot coding agent. These steps allow the agent to access specific external services that would otherwise be blocked by the firewall.
 
 Currently configured hosts:
+
 - `cloud.nx.app` - Required for Nx Cloud integration for distributed task execution and caching
 - `nx.app` - Required for Nx Cloud services
 - `*.nx.app` - Required for various Nx Cloud subdomains

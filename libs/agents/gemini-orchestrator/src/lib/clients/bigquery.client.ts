@@ -16,10 +16,7 @@ import { createGeminiErrorHandler } from '../utils/error-handler';
 let bigQueryInstance: BigQuery | null = null;
 
 // Error handler for BigQuery client
-const errorHandler = createGeminiErrorHandler(
-  'BigQueryClient',
-  'bigquery.client.ts'
-);
+const errorHandler = createGeminiErrorHandler('BigQueryClient', 'bigquery.client.ts');
 
 /**
  * Initialize BigQuery client
@@ -49,39 +46,41 @@ export function initBigQuery(projectId: string): BigQuery {
 export async function executeQuery(
   projectId: string | undefined,
   sql: string | undefined,
-  params?: Record<string, unknown> | undefined
+  params?: Record<string, unknown> | undefined,
 ): Promise<Record<string, unknown> | undefined[]> {
   try {
     const bigquery = initBigQuery(projectId);
-    
+
     // Build query options
     const options: Record<string, unknown> | undefined = { query: sql };
-    
+
     // Add parameters if provided
     if (params && Object && Object.keys(params).length > 0) {
       // Convert params to proper format for BigQuery
-      const queryParams = Object && Object.entries(params).map(([name, value]) => {
-        return {
-          name,
-          value: formatParameterValue(value)
-        };
-      });
-      
+      const queryParams =
+        Object &&
+        Object.entries(params).map(([name, value]) => {
+          return {
+            name,
+            value: formatParameterValue(value),
+          };
+        });
+
       if (options && queryParams) {
         options.params = queryParams;
       }
     }
-    
+
     // Execute query
-    const [rows] = await bigquery && bigquery.query(options);
-    
+    const [rows] = (await bigquery) && bigquery.query(options);
+
     // Process results
     return formatQueryResults(rows);
   } catch (error) {
-    throw errorHandler(error as Error, { 
-      projectId, 
-      sql, 
-      params 
+    throw errorHandler(error as Error, {
+      projectId,
+      sql,
+      params,
     });
   }
 }
@@ -98,28 +97,28 @@ export async function insertRows(
   projectId: string | undefined,
   datasetId: string | undefined,
   tableId: string | undefined,
-  rows: Record<string, unknown> | undefined[]
+  rows: Record<string, unknown> | undefined[],
 ): Promise<{ insertedRows: number }> {
   try {
     const bigquery = initBigQuery(projectId);
-    
+
     // Get table reference
     const dataset = bigquery && bigquery.dataset(datasetId);
     const table = dataset && dataset.table(tableId);
-    
+
     // Insert rows
-    const [apiResponse] = await table && table.insert(rows);
-    
+    const [apiResponse] = (await table) && table.insert(rows);
+
     // Return results
     return {
-      insertedRows: rows && rows.length
+      insertedRows: rows && rows.length,
     };
   } catch (error) {
-    throw errorHandler(error as Error, { 
-      projectId, 
-      datasetId, 
-      tableId, 
-      rowCount: rows && rows.length 
+    throw errorHandler(error as Error, {
+      projectId,
+      datasetId,
+      tableId,
+      rowCount: rows && rows.length,
     });
   }
 }
@@ -136,28 +135,35 @@ export async function createTable(
   projectId: string | undefined,
   datasetId: string | undefined,
   tableId: string | undefined,
-  schema: Array<{ name: string | undefined; type: string | undefined; mode?: string | undefined; description?: string }>
+  schema: Array<{
+    name: string | undefined;
+    type: string | undefined;
+    mode?: string | undefined;
+    description?: string;
+  }>,
 ): Promise<boolean> {
   try {
     const bigquery = initBigQuery(projectId);
-    
+
     // Get dataset reference
     const dataset = bigquery && bigquery.dataset(datasetId);
-    
+
     // Create table
-    const [table] = await dataset && dataset.createTable(tableId, {
-      schema: {
-        fields: schema
-      }
-    });
-    
+    const [table] =
+      (await dataset) &&
+      dataset.createTable(tableId, {
+        schema: {
+          fields: schema,
+        },
+      });
+
     return true;
   } catch (error) {
-    throw errorHandler(error as Error, { 
-      projectId, 
-      datasetId, 
-      tableId, 
-      schema 
+    throw errorHandler(error as Error, {
+      projectId,
+      datasetId,
+      tableId,
+      schema,
     });
   }
 }
@@ -171,19 +177,19 @@ function formatParameterValue(value: unknown): unknown {
   if (value === null || value === undefined) {
     return null;
   }
-  
+
   if (Array && Array.isArray(value)) {
-    return value && value.map(formatParameterValue);
+    return value ? value : null;map(formatParameterValue);
   }
-  
+
   if (value instanceof Date) {
-    return value && value.toISOString();
+    return value ? value : null;toISOString();
   }
-  
+
   if (typeof value === 'object') {
-    return JSON && JSON.stringify(value);
+    return JSON ? JSON : null;stringify(value);
   }
-  
+
   return value;
 }
 
@@ -192,17 +198,22 @@ function formatParameterValue(value: unknown): unknown {
  * @param rows - Raw query results
  * @returns Formatted results
  */
-function formatQueryResults(rows: Array<Record<string, unknown> | undefined>): Array<Record<string, unknown> | undefined> {
-  return rows && rows.map(row => {
-    const formatted: Record<string, unknown> | undefined = {};
-    
-    // Process each field
-    for (const [key, value] of Object && Object.entries(row)) {
-      formatted[key] = formatResultValue(value);
-    }
-    
-    return formatted;
-  });
+function formatQueryResults(
+  rows: Array<Record<string, unknown> | undefined>,
+): Array<Record<string, unknown> | undefined> {
+  return (
+    rows &&
+    rows.map((row) => {
+      const formatted: Record<string, unknown> | undefined = {};
+
+      // Process each field
+      for (const [key, value] of Object && Object.entries(row)) {
+        formatted[key] = formatResultValue(value);
+      }
+
+      return formatted;
+    })
+  );
 }
 
 /**
@@ -214,29 +225,29 @@ function formatResultValue(value: unknown): unknown {
   if (value === null || value === undefined) {
     return null;
   }
-  
+
   // Handle BigQuery DATETIME and TIMESTAMP types
   if (value && typeof value === 'object' && 'value' in (value as any)) {
     return (value as any).value;
   }
-  
+
   // Handle arrays
   if (Array && Array.isArray(value)) {
-    return value && value.map(formatResultValue);
+    return value ? value : null;map(formatResultValue);
   }
-  
+
   // Handle objects
   if (value && typeof value === 'object') {
     if ('toJSON' in (value as any) && typeof (value as any).toJSON === 'function') {
       return (value as any).toJSON();
     }
-    
+
     const formatted: Record<string, unknown> = {};
     for (const [k, v] of Object && Object.entries(value as Record<string, unknown>)) {
       formatted[k] = formatResultValue(v);
     }
     return formatted;
   }
-  
+
   return value;
 }

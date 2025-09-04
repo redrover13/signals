@@ -1,21 +1,21 @@
 #!/usr/bin/env ts-node
 /**
  * @fileoverview OpenTelemetry Demo Script
- * 
+ *
  * This script demonstrates the OpenTelemetry instrumentation capabilities
  * for the Dulce de Saigon F&B Data Platform.
- * 
+ *
  * @author Dulce de Saigon Engineering
  * @copyright Copyright (c) 2025 Dulce de Saigon
  * @license MIT
  */
 
-import { 
-  initializeOpenTelemetry, 
-  withSpan, 
-  logEvent, 
+import {
+  initializeOpenTelemetry,
+  withSpan,
+  logEvent,
   instrument,
-  shutdownOpenTelemetry 
+  shutdownOpenTelemetry,
 } from '../libs/utils/monitoring/src/lib/otel-config.js';
 import { BigQueryLogger } from '../libs/utils/monitoring/src/lib/bigquery-logger.js';
 import { generateDashboardTemplate } from '../apps/looker-dashboards/src/lib/dashboard-templates.js';
@@ -26,7 +26,7 @@ import { generateMonitoringQuery } from '../apps/looker-dashboards/src/lib/monit
  */
 async function demoBasicInstrumentation() {
   console.log('🔧 Demo: Basic OpenTelemetry Instrumentation');
-  
+
   // Initialize OpenTelemetry
   await initializeOpenTelemetry({
     serviceName: 'demo-agent',
@@ -34,7 +34,7 @@ async function demoBasicInstrumentation() {
     gcpProjectId: process.env['GCP_PROJECT_ID'] || 'demo-project',
     enableAutoInstrumentation: true,
     enableCustomExporter: false, // Disable for demo
-    enableBigQueryLogs: false,   // Disable for demo
+    enableBigQueryLogs: false, // Disable for demo
   });
 
   // Demo: Manual span creation
@@ -45,8 +45,8 @@ async function demoBasicInstrumentation() {
     });
 
     // Simulate some work
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     return 'Operation completed successfully';
   });
 
@@ -54,12 +54,12 @@ async function demoBasicInstrumentation() {
 
   // Demo: Function instrumentation
   const originalFunction = async (input: string) => {
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 50));
     return `Processed: ${input}`;
   };
 
   const instrumentedFunction = instrument('demo-function', originalFunction, {
-    attributes: { 'function.type': 'demo' }
+    attributes: { 'function.type': 'demo' },
   });
 
   const result2 = await instrumentedFunction('test-data');
@@ -85,7 +85,7 @@ async function demoFnBUseCases() {
   // Demo: Restaurant order processing
   await withSpan('process-order', async (span) => {
     const orderId = 'order-' + Date.now();
-    
+
     span.setAttributes({
       'order.id': orderId,
       'restaurant.id': 'restaurant-123',
@@ -95,15 +95,15 @@ async function demoFnBUseCases() {
 
     // Simulate order processing steps
     await withSpan('validate-order', async () => {
-      await new Promise(resolve => setTimeout(resolve, 20));
+      await new Promise((resolve) => setTimeout(resolve, 20));
     });
 
     await withSpan('inventory-check', async () => {
-      await new Promise(resolve => setTimeout(resolve, 30));
+      await new Promise((resolve) => setTimeout(resolve, 30));
     });
 
     await withSpan('payment-processing', async () => {
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     });
 
     await logEvent('order_processed', {
@@ -112,9 +112,9 @@ async function demoFnBUseCases() {
       totalAmount: 45.99,
       items: [
         { id: 'item-1', name: 'Pho Bo', price: 15.99 },
-        { id: 'item-2', name: 'Banh Mi', price: 12.00 },
-        { id: 'item-3', name: 'Vietnamese Coffee', price: 8.00 }
-      ]
+        { id: 'item-2', name: 'Banh Mi', price: 12.0 },
+        { id: 'item-3', name: 'Vietnamese Coffee', price: 8.0 },
+      ],
     });
 
     console.log('✅ Order processed:', orderId);
@@ -131,14 +131,14 @@ async function demoFnBUseCases() {
     const recommendations = [
       { id: 'item-5', name: 'Bun Cha', score: 0.95 },
       { id: 'item-8', name: 'Goi Cuon', score: 0.87 },
-      { id: 'item-12', name: 'Cao Lau', score: 0.82 }
+      { id: 'item-12', name: 'Cao Lau', score: 0.82 },
     ];
 
     await logEvent('recommendations_generated', {
       userId: 'user-789',
       restaurantId: 'restaurant-123',
       recommendations,
-      algorithmVersion: '2.1.0'
+      algorithmVersion: '2.1.0',
     });
 
     console.log('✅ Recommendations generated:', recommendations.length);
@@ -175,8 +175,8 @@ async function demoBigQueryLogging() {
       data: {
         action: 'view_menu',
         restaurantId: 'restaurant-123',
-        userId: 'user-456'
-      }
+        userId: 'user-456',
+      },
     },
     {
       timestamp: new Date(),
@@ -186,9 +186,9 @@ async function demoBigQueryLogging() {
       data: {
         operation: 'menu_recommendation',
         duration_ms: 150,
-        success: true
-      }
-    }
+        success: true,
+      },
+    },
   ];
 
   console.log('📝 Demo log entries prepared:', demoEntries.length);
@@ -205,20 +205,23 @@ async function demoDashboardTemplates() {
     projectId: 'demo-project',
     datasetId: 'demo_logs',
     tableId: 'demo_trace_logs',
-    dashboardName: 'Demo Agent Monitoring'
+    dashboardName: 'Demo Agent Monitoring',
   });
 
   console.log('✅ Dashboard template generated');
   console.log('📊 Dashboard name:', template.name);
   console.log('📊 Number of pages:', template.pages.length);
-  console.log('📊 Total charts:', template.pages.reduce((sum: number | undefined, page: any) => sum + page.charts.length, 0));
+  console.log(
+    '📊 Total charts:',
+    template.pages.reduce((sum: number | undefined, page: any) => sum + page.charts.length, 0),
+  );
 
   // Generate monitoring queries
   const healthQuery = generateMonitoringQuery('healthScore', {
     projectId: 'demo-project',
     datasetId: 'demo_logs',
     tableId: 'demo_trace_logs',
-    timeRange: '24h'
+    timeRange: '24h',
   });
 
   console.log('✅ Health score query generated (length:', healthQuery.length, 'chars)');
@@ -246,7 +249,7 @@ async function demoErrorHandlingAndCompliance() {
       throw new Error('Demo error for testing');
     });
   } catch (error) {
-    console.log('✅ Error properly caught and logged:', ((error as any)?.message || "Unknown error"));
+    console.log('✅ Error properly caught and logged:', (error as any)?.message || 'Unknown error');
   }
 
   // Demo: Compliance logging
@@ -255,7 +258,7 @@ async function demoErrorHandlingAndCompliance() {
     complianceMarker: 'GDPR-VIETNAM-COMPLIANT',
     userConsent: true,
     dataRetentionDays: 90,
-    processingPurpose: 'service_improvement'
+    processingPurpose: 'service_improvement',
   });
 
   console.log('✅ Compliance event logged');
@@ -266,7 +269,7 @@ async function demoErrorHandlingAndCompliance() {
     language: 'vi-VN',
     localTime: new Date().toLocaleString('vi-VN'),
     currency: 'VND',
-    dataSubject: 'vietnamese_citizen'
+    dataSubject: 'vietnamese_citizen',
   });
 
   console.log('✅ Vietnamese-specific data processing logged');
@@ -277,7 +280,7 @@ async function demoErrorHandlingAndCompliance() {
  */
 async function runDemo() {
   console.log('🎯 OpenTelemetry Demo for Dulce de Saigon F&B Platform');
-  console.log('=' .repeat(60));
+  console.log('='.repeat(60));
 
   try {
     await demoBasicInstrumentation();
@@ -287,8 +290,7 @@ async function runDemo() {
     await demoErrorHandlingAndCompliance();
 
     console.log('\n🎉 Demo completed successfully!');
-    console.log('=' .repeat(60));
-    
+    console.log('='.repeat(60));
   } catch (error) {
     console.error('❌ Demo failed:', error);
   } finally {

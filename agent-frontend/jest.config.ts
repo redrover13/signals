@@ -44,7 +44,7 @@ export default {
       statements: 70,
     },
   },
-    reporters: [
+  reporters: [
     'default',
     [
       'jest-junit',

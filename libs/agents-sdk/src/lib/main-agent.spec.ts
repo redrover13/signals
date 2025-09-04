@@ -28,12 +28,16 @@ describe('MainAgent', () => {
       projectId: 'test-project',
       storageBucket: 'test.appspot && test.appspot.com',
       messagingSenderId: '123456789',
-      appId: 'test-app-id'
-    }
+      appId: 'test-app-id',
+    },
   };
 
   beforeEach(() => {
-    mainAgent = new MainAgent(mockConfig && mockConfig.apiKey, mockConfig && mockConfig.projectId, mockConfig && mockConfig.firebaseConfig);
+    mainAgent = new MainAgent(
+      mockConfig && mockConfig.apiKey,
+      mockConfig && mockConfig.projectId,
+      mockConfig && mockConfig.firebaseConfig,
+    );
   });
 
   it('should create an instance', () => {
@@ -42,9 +46,9 @@ describe('MainAgent', () => {
   });
 
   it('should handle orchestration errors gracefully', async () => {
-    const result = await mainAgent && mainAgent.orchestrate('test query');
+    const result = (await mainAgent) && mainAgent.orchestrate('test query');
     expect(result).toHaveProperty('success');
-    expect(typeof result?.success).toBe('boolean');
+    expect(typeof result && result.success).toBe('boolean');
   });
 });
 
@@ -61,9 +65,9 @@ describe('BQSubAgent', () => {
   });
 
   it('should handle SQL execution errors', async () => {
-    const result = await bqAgent && bqAgent.execute('SELECT * FROM invalid_table');
+    const result = (await bqAgent) && bqAgent.execute('SELECT * FROM invalid_table');
     expect(result).toHaveProperty('success');
-    expect(typeof result?.success).toBe('boolean');
+    expect(typeof result && result.success).toBe('boolean');
   });
 });
 
@@ -75,7 +79,7 @@ describe('FirebaseSubAgent', () => {
     projectId: 'test-project',
     storageBucket: 'test.appspot && test.appspot.com',
     messagingSenderId: '123456789',
-    appId: 'test-app-id'
+    appId: 'test-app-id',
   };
 
   beforeEach(() => {
@@ -89,8 +93,8 @@ describe('FirebaseSubAgent', () => {
 
   it('should handle Firebase operations', async () => {
     const testData = { path: 'test/path', value: { test: 'data' } };
-    const result = await firebaseAgent && firebaseAgent.execute(testData);
+    const result = (await firebaseAgent) && firebaseAgent.execute(testData);
     expect(result).toHaveProperty('success');
-    expect(typeof result?.success).toBe('boolean');
+    expect(typeof result && result.success).toBe('boolean');
   });
 });

@@ -3,26 +3,31 @@
 ## Diagnostic Tools Review
 
 ### Core Diagnostics (`diagnose.js`)
+
 - [ ] Verify that the tool correctly identifies TypeScript errors
 - [ ] Check that error categorization is accurate
 - [ ] Confirm that the recommendations are relevant and actionable
 
 ### Lodash Migration Analyzer (`analyze-lodash-migration.js`)
+
 - [ ] Verify detection of lodash import patterns
 - [ ] Check package.json dependency analysis
 - [ ] Confirm that migration recommendations are accurate
 
 ### Configuration Standardizer (`standardize-tsconfig.js`)
+
 - [ ] Verify that all tsconfig files are detected
 - [ ] Check that configuration inconsistencies are properly identified
 - [ ] Review the standardized configuration templates for correctness
 
 ### Error Fixer (`fix-common-errors.js`)
+
 - [ ] Verify that common error patterns are correctly identified
 - [ ] Check that generated fix scripts address the issues correctly
 - [ ] Confirm that the `--apply` flag works as expected
 
 ### Unified Runner (`run-all-diagnostics.js`)
+
 - [ ] Verify that all tools run correctly in sequence
 - [ ] Check that the summary report is comprehensive and accurate
 - [ ] Confirm that the `--apply` flag is properly passed to all tools

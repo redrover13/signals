@@ -10,19 +10,19 @@
  */
 
 import Fastify, { FastifyInstance, FastifyRequest } from 'fastify';
-import { runAgent } from "@dulce-de-saigon/agents-lib";
-import { registerSecurity, loadAppConfig } from "@dulce-de-saigon/security";
-import { VertexAIClient, VertexAIClientConfig } from "@dulce/adk";
-import { WebAnalyticsTracker } from "@dulce/adk";
-import { EventCategory } from "@dulce/adk";
-import { createConfigFromEnv } from "@dulce/adk";
+import { runAgent } from '@dulce-de-saigon/agents-lib';
+import { registerSecurity, loadAppConfig } from '@dulce-de-saigon/security';
+import { VertexAIClient, VertexAIClientConfig } from '@dulce/adk';
+import { WebAnalyticsTracker } from '@dulce/adk';
+import { EventCategory } from '@dulce/adk';
+import { createConfigFromEnv } from '@dulce/adk';
 // (The import of `mcpService` from '@dulce/mcp' has been removed)
-import { 
-  initializeOpenTelemetry, 
-  withSpan, 
-  logEvent, 
+import {
+  initializeOpenTelemetry,
+  withSpan,
+  logEvent,
   instrument,
-  getTracer 
+  getTracer,
 } from '@dulce/utils/monitoring';
 import { SpanKind } from '@opentelemetry/api';
 
@@ -39,12 +39,12 @@ initializeOpenTelemetry({
 // Initialize configuration from environment
 const config = createConfigFromEnv({
   gcp: {
-    projectId: process.env.GCP_PROJECT_ID || "324928471234",
-    location: process.env.GCP_LOCATION || "us-central1"
+    projectId: process.env.GCP_PROJECT_ID || '324928471234',
+    location: process.env.GCP_LOCATION || 'us-central1',
   },
   agent: {
-    model: 'gemini-1.5-pro'
-  }
+    model: 'gemini-1.5-pro',
+  },
 });
 
 // Initialize the analytics tracker
@@ -65,7 +65,7 @@ const fastify = Fastify({
 const vertexAIConfig: VertexAIClientConfig = {
   project: config?.get('gcp.projectId'),
   location: config?.get('gcp.location'),
-  endpointId: process.env.VERTEX_AI_ENDPOINT_ID || "839281723491823912",
+  endpointId: process.env.VERTEX_AI_ENDPOINT_ID || '839281723491823912',
 };
 
 // Initialize Vertex AI client
@@ -77,17 +77,21 @@ registerSecurity(fastify);
 // Local route implementations for agents project
 async function healthRoutes(fastify: FastifyInstance) {
   fastify.get('/health', async (request: FastifyRequest, reply) => {
-    return withSpan('health-check', async (span) => {
-      span.setAttributes({
-        'http.method': 'GET',
-        'http.route': '/health',
-        'service.component': 'agents',
-      });
+    return withSpan(
+      'health-check',
+      async (span) => {
+        span.setAttributes({
+          'http.method': 'GET',
+          'http.route': '/health',
+          'service.component': 'agents',
+        });
 
-      await logEvent('health_check', { status: 'ok' });
-      
-      return { status: 'ok', timestamp: new Date().toISOString() };
-    }, { kind: SpanKind.SERVER });
+        await logEvent('health_check', { status: 'ok' });
+
+        return { status: 'ok', timestamp: new Date().toISOString() };
+      },
+      { kind: SpanKind.SERVER },
+    );
   });
 }
 
@@ -102,29 +106,29 @@ async function agentsRoutes(fastify: FastifyInstance) {
       value: 1,
       metadata: {
         timestamp: new Date().toISOString(),
-        userId: request.headers['x-user-id'] || 'anonymous'
-      }
+        userId: request.headers['x-user-id'] || 'anonymous',
+      },
     });
-    
+
     try {
       const agentResult = await runAgent({
-        prompt: request.body['prompt'] || "Tell me about Vietnamese food",
+        prompt: request.body['prompt'] || 'Tell me about Vietnamese food',
         tools: [],
       });
-      
+
       return { success: true, result: agentResult };
     } catch (error) {
       fastify.log.error(error);
       reply.status(500).send({
         success: false,
-        error: "Failed to run agent"
+        error: 'Failed to run agent',
       });
     }
   });
 
   // Example route demonstrating an inference call
   // Ví dụ về một route thực hiện lệnh gọi suy luận
-  fastify.post("/api/v1/agent-predict", async (request, reply) => {
+  fastify.post('/api/v1/agent-predict', async (request, reply) => {
     try {
       const instancePayload = request.body; // Assume body contains the instance
       const predictions = await vertexClient.predict(instancePayload);
@@ -132,7 +136,7 @@ async function agentsRoutes(fastify: FastifyInstance) {
       // Log for compliance and analytics, respecting data privacy.
       // Ghi nhật ký để tuân thủ và phân tích, tôn trọng quyền riêng tư dữ liệu.
       fastify.log.info({
-        message: "Prediction successful",
+        message: 'Prediction successful',
         endpointId: vertexAIConfig.endpointId,
       });
 
@@ -141,7 +145,7 @@ async function agentsRoutes(fastify: FastifyInstance) {
       fastify.log.error(error); // The ADK client already logged details
       reply.status(500).send({
         success: false,
-        error: "Failed to process prediction"
+        error: 'Failed to process prediction',
       });
     }
   });
@@ -156,14 +160,14 @@ const start = async () => {
   try {
     // Load application configuration
     const config = await loadAppConfig();
-    
+
     // Apply configuration
     fastify.log.info(`Starting server with environment: ${config?.environment}`);
-    
+
     // Start listening
-    await fastify.listen({ port: 3000, host: "0.0.0.0" });
-    console.log("Agent server is listening on port 3000");
-    
+    await fastify.listen({ port: 3000, host: '0.0.0.0' });
+    console.log('Agent server is listening on port 3000');
+
     // Track server start
     analyticsTracker.trackEvent({
       category: EventCategory.SYSTEM,
@@ -172,8 +176,8 @@ const start = async () => {
       value: 1,
       metadata: {
         timestamp: new Date().toISOString(),
-        environment: config?.environment
-      }
+        environment: config?.environment,
+      },
     });
   } catch (err) {
     fastify.log.error(err);

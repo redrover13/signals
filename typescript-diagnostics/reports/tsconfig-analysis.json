@@ -15,12 +15,7 @@
           "vite/client"
         ]
       },
-      "include": [
-        "src/**/*.js",
-        "src/**/*.jsx",
-        "src/**/*.ts",
-        "src/**/*.tsx"
-      ],
+      "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
       "exclude": [
         "src/**/*.spec.ts",
         "src/**/*.test.ts",
@@ -48,16 +43,10 @@
         "allowSyntheticDefaultImports": true,
         "strict": true,
         "allowImportingTsExtensions": true,
-        "types": [
-          "vite/client"
-        ]
+        "types": ["vite/client"]
       },
       "include": [],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.app.json"
@@ -100,11 +89,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "agent-frontend/tsconfig.storybook.json",
@@ -141,18 +126,10 @@
       "compilerOptions": {
         "outDir": "../../dist/out-tsc",
         "module": "commonjs",
-        "types": [
-          "node"
-        ]
+        "types": ["node"]
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "apps/agents/tsconfig.json",
@@ -163,12 +140,8 @@
         "module": "ESNext",
         "moduleResolution": "Bundler"
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "node_modules"
-      ]
+      "include": ["src/**/*.ts"],
+      "exclude": ["node_modules"]
     },
     {
       "path": "apps/agents/tsconfig.spec.json",
@@ -178,17 +151,9 @@
         "outDir": "../../dist/out-tsc",
         "module": "commonjs",
         "moduleResolution": "node10",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
-      "include": [
-        "jest.config.ts",
-        "src/**/*.test.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.d.ts"
-      ]
+      "include": ["jest.config.ts", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.d.ts"]
     },
     {
       "path": "apps/api/tsconfig.app.json",
@@ -197,18 +162,10 @@
       "compilerOptions": {
         "outDir": "../../dist/out-tsc",
         "module": "commonjs",
-        "types": [
-          "node"
-        ]
+        "types": ["node"]
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "apps/api/tsconfig.json",
@@ -221,17 +178,10 @@
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "resolveJsonModule": true,
-        "types": [
-          "node"
-        ]
+        "types": ["node"]
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "node_modules",
-        "dist"
-      ]
+      "include": ["src/**/*.ts"],
+      "exclude": ["node_modules", "dist"]
     },
     {
       "path": "apps/cloud-functions/cms-api/tsconfig.app.json",
@@ -241,18 +191,10 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "node"
-        ]
+        "types": ["node"]
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "include": ["src/**/*.ts"],
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "apps/cloud-functions/cms-api/tsconfig.json",
@@ -261,15 +203,8 @@
       "compilerOptions": {
         "esModuleInterop": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.app.json"
@@ -284,17 +219,9 @@
         "outDir": "../../../dist/out-tsc",
         "module": "commonjs",
         "moduleResolution": "node10",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
-      "include": [
-        "jest.config.ts",
-        "src/**/*.test.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.d.ts"
-      ]
+      "include": ["jest.config.ts", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.d.ts"]
     },
     {
       "path": "apps/cloud-functions/crm-api/tsconfig.app.json",
@@ -304,18 +231,10 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "node"
-        ]
+        "types": ["node"]
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "include": ["src/**/*.ts"],
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "apps/cloud-functions/crm-api/tsconfig.json",
@@ -324,15 +243,8 @@
       "compilerOptions": {
         "esModuleInterop": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.app.json"
@@ -347,17 +259,9 @@
         "outDir": "../../../dist/out-tsc",
         "module": "commonjs",
         "moduleResolution": "node10",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
-      "include": [
-        "jest.config.ts",
-        "src/**/*.test.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.d.ts"
-      ]
+      "include": ["jest.config.ts", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.d.ts"]
     },
     {
       "path": "apps/cloud-functions/rag-processor/tsconfig.json",
@@ -367,13 +271,8 @@
         "outDir": "./dist",
         "rootDir": "./src"
       },
-      "include": [
-        "src/**/*"
-      ],
-      "exclude": [
-        "node_modules",
-        "dist"
-      ]
+      "include": ["src/**/*"],
+      "exclude": ["node_modules", "dist"]
     },
     {
       "path": "apps/cloud-functions/reviews-api/tsconfig.app.json",
@@ -383,18 +282,10 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "node"
-        ]
+        "types": ["node"]
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "include": ["src/**/*.ts"],
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "apps/cloud-functions/reviews-api/tsconfig.json",
@@ -403,15 +294,8 @@
       "compilerOptions": {
         "esModuleInterop": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.app.json"
@@ -426,17 +310,9 @@
         "outDir": "../../../dist/out-tsc",
         "module": "commonjs",
         "moduleResolution": "node10",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
-      "include": [
-        "jest.config.ts",
-        "src/**/*.test.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.d.ts"
-      ]
+      "include": ["jest.config.ts", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.d.ts"]
     },
     {
       "path": "apps/cloud-functions/social-api/tsconfig.app.json",
@@ -446,18 +322,10 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "node"
-        ]
+        "types": ["node"]
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "include": ["src/**/*.ts"],
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "apps/cloud-functions/social-api/tsconfig.json",
@@ -466,15 +334,8 @@
       "compilerOptions": {
         "esModuleInterop": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.app.json"
@@ -489,17 +350,9 @@
         "outDir": "../../../dist/out-tsc",
         "module": "commonjs",
         "moduleResolution": "node10",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
-      "include": [
-        "jest.config.ts",
-        "src/**/*.test.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.d.ts"
-      ]
+      "include": ["jest.config.ts", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.d.ts"]
     },
     {
       "path": "apps/frontend-agents/tsconfig.json",
@@ -516,11 +369,7 @@
         "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "isolatedModules": true,
-        "lib": [
-          "dom",
-          "dom.iterable",
-          "esnext"
-        ],
+        "lib": ["dom", "dom.iterable", "esnext"],
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
         "forceConsistentCasingInFileNames": true,
@@ -541,12 +390,7 @@
         "next-env.d.ts",
         ".next/types/**/*.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "jest.config.ts",
-        "**/*.spec.ts",
-        "**/*.test.ts"
-      ],
+      "exclude": ["node_modules", "jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
       "references": [
         {
           "path": "../../libs/gcp"
@@ -561,17 +405,9 @@
         "outDir": "../../dist/out-tsc",
         "module": "commonjs",
         "moduleResolution": "node10",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
-      "include": [
-        "jest.config.ts",
-        "src/**/*.test.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.d.ts"
-      ]
+      "include": ["jest.config.ts", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.d.ts"]
     },
     {
       "path": "apps/looker-dashboards/tsconfig.json",
@@ -588,15 +424,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -613,21 +442,12 @@
       "compilerOptions": {
         "outDir": "../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "apps/looker-dashboards/tsconfig.spec.json",
@@ -637,10 +457,7 @@
         "outDir": "../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -651,11 +468,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "infra/workflows/cloud-workflows/tsconfig.json",
@@ -673,11 +486,7 @@
         "noPropertyAccessFromIndexSignature": true
       },
       "include": [],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -694,21 +503,12 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "infra/workflows/cloud-workflows/tsconfig.spec.json",
@@ -718,10 +518,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -731,11 +528,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "infra/workflows/pubsub-workflows/tsconfig.json",
@@ -753,11 +546,7 @@
         "noPropertyAccessFromIndexSignature": true
       },
       "include": [],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -774,21 +563,12 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "infra/workflows/pubsub-workflows/tsconfig.spec.json",
@@ -798,10 +578,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -811,11 +588,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "libs/adk/tsconfig.json",
@@ -825,15 +598,8 @@
         "module": "ESNext",
         "moduleResolution": "Node"
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -850,20 +616,12 @@
       "compilerOptions": {
         "outDir": "../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ],
+      "include": ["src/**/*.ts"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
       "references": [
         {
           "path": "../gcp"
@@ -878,10 +636,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -916,15 +671,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -940,21 +688,12 @@
       "hasExtendsRoot": true,
       "compilerOptions": {
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/agents/bq-agent/tsconfig.spec.json",
@@ -964,10 +703,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -978,11 +714,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "libs/agents/content-agent/tsconfig.json",
@@ -999,15 +731,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -1023,9 +748,7 @@
       "hasExtendsRoot": true,
       "compilerOptions": {
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
@@ -1036,11 +759,7 @@
         "../../../libs/gcp/src/**/*.ts",
         "../../../libs/gcp-core/src/**/*.ts"
       ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/agents/content-agent/tsconfig.spec.json",
@@ -1050,10 +769,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -1067,11 +783,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "libs/agents/crm-agent/tsconfig.json",
@@ -1088,15 +800,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -1112,9 +817,7 @@
       "hasExtendsRoot": true,
       "compilerOptions": {
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
@@ -1125,11 +828,7 @@
         "../../../libs/gcp/src/**/*.ts",
         "../../../libs/gcp-core/src/**/*.ts"
       ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/agents/crm-agent/tsconfig.spec.json",
@@ -1139,10 +838,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -1156,11 +852,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "libs/agents/gemini-orchestrator/tsconfig.json",
@@ -1177,15 +869,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -1201,21 +886,12 @@
       "hasExtendsRoot": true,
       "compilerOptions": {
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ],
+      "include": ["src/**/*.ts", "src/**/*.tsx"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
       "references": [
         {
           "path": "../../gcp/tsconfig.lib.json"
@@ -1230,10 +906,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -1244,11 +917,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "libs/agents/looker-agent/tsconfig.json",
@@ -1265,15 +934,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -1289,21 +951,12 @@
       "hasExtendsRoot": true,
       "compilerOptions": {
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/agents/looker-agent/tsconfig.spec.json",
@@ -1313,10 +966,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -1327,11 +977,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "libs/agents/reviews-agent/tsconfig.json",
@@ -1348,15 +994,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -1372,21 +1011,12 @@
       "hasExtendsRoot": true,
       "compilerOptions": {
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/agents/reviews-agent/tsconfig.spec.json",
@@ -1396,10 +1026,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -1410,11 +1037,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "libs/agents/tsconfig.json",
@@ -1422,22 +1045,12 @@
       "hasExtendsRoot": false,
       "compilerOptions": {
         "declaration": true,
-        "types": [
-          "node",
-          "jest"
-        ],
+        "types": ["node", "jest"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/agents/tsconfig.lib.json",
@@ -1445,21 +1058,12 @@
       "hasExtendsRoot": true,
       "compilerOptions": {
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/agents/tsconfig.spec.json",
@@ -1469,17 +1073,9 @@
         "outDir": "../../dist/out-tsc",
         "module": "commonjs",
         "moduleResolution": "node10",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
-      "include": [
-        "jest.config.ts",
-        "src/**/*.test.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.d.ts"
-      ]
+      "include": ["jest.config.ts", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.d.ts"]
     },
     {
       "path": "libs/agents-sdk/tsconfig.json",
@@ -1496,15 +1092,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -1521,21 +1110,12 @@
       "compilerOptions": {
         "outDir": "../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/agents-sdk/tsconfig.spec.json",
@@ -1545,10 +1125,7 @@
         "outDir": "../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -1559,11 +1136,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "libs/build-tools/tsconfig.json",
@@ -1580,15 +1153,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -1605,22 +1171,12 @@
       "compilerOptions": {
         "outDir": "../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node",
-          "vite/client"
-        ],
+        "types": ["node", "vite/client"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/build-tools/tsconfig.spec.json",
@@ -1630,10 +1186,7 @@
         "outDir": "../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -1644,11 +1197,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "libs/data-models/dbt-models/tsconfig.json",
@@ -1665,15 +1214,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -1690,21 +1232,12 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/data-models/dbt-models/tsconfig.spec.json",
@@ -1714,10 +1247,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -1728,11 +1258,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "libs/data-models/schemas/tsconfig.json",
@@ -1749,15 +1275,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -1774,21 +1293,12 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/data-models/schemas/tsconfig.spec.json",
@@ -1798,10 +1308,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -1812,11 +1319,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "libs/env/tsconfig.json",
@@ -1850,22 +1353,14 @@
       "compilerOptions": {
         "outDir": "../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "module": "ES2022",
         "moduleResolution": "node",
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/env/tsconfig.spec.json",
@@ -1875,10 +1370,7 @@
         "outDir": "../../dist/out-tsc",
         "module": "ES2022",
         "moduleResolution": "node",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -1897,16 +1389,8 @@
         "module": "NodeNext",
         "moduleResolution": "NodeNext"
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx",
-        "../gcp-core/src/**/*.ts"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx", "../gcp-core/src/**/*.ts"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -1929,20 +1413,12 @@
       "compilerOptions": {
         "outDir": "../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ],
+      "include": ["src/**/*.ts"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
       "references": [
         {
           "path": "../gcp-core"
@@ -1957,10 +1433,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -1985,9 +1458,7 @@
         "module": "NodeNext",
         "moduleResolution": "NodeNext"
       },
-      "include": [
-        "**/*.ts"
-      ],
+      "include": ["**/*.ts"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -2001,20 +1472,12 @@
       "compilerOptions": {
         "outDir": "../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/gcp-core/tsconfig.spec.json",
@@ -2024,17 +1487,9 @@
         "outDir": "../../dist/out-tsc",
         "module": "commonjs",
         "moduleResolution": "node10",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
-      "include": [
-        "jest.config.ts",
-        "src/**/*.test.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.d.ts"
-      ]
+      "include": ["jest.config.ts", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.d.ts"]
     },
     {
       "path": "libs/mcp/tsconfig.json",
@@ -2050,15 +1505,8 @@
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -2075,10 +1523,7 @@
       "compilerOptions": {
         "outDir": "../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node",
-          "jest"
-        ],
+        "types": ["node", "jest"],
         "target": "es2022",
         "module": "ESNext",
         "moduleResolution": "nodenext",
@@ -2093,10 +1538,7 @@
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "**/*.ts",
-        "src/**/*"
-      ],
+      "include": ["**/*.ts", "src/**/*"],
       "exclude": [
         "jest.config.ts",
         "**/*.spec.ts",
@@ -2113,10 +1555,7 @@
         "outDir": "../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ],
+        "types": ["jest", "node"],
         "esModuleInterop": true
       },
       "include": [
@@ -2135,11 +1574,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "libs/security/tsconfig.json",
@@ -2155,10 +1590,7 @@
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -2172,20 +1604,12 @@
       "compilerOptions": {
         "outDir": "../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/security/tsconfig.spec.json",
@@ -2195,10 +1619,7 @@
         "outDir": "../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -2225,10 +1646,7 @@
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -2245,21 +1663,12 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*.tsx"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/ui/components/tsconfig.spec.json",
@@ -2269,10 +1678,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -2304,15 +1710,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -2329,21 +1728,12 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/utils/api-clients/tsconfig.spec.json",
@@ -2353,10 +1743,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -2367,11 +1754,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "libs/utils/common-types/tsconfig.json",
@@ -2382,9 +1765,7 @@
         "moduleResolution": "NodeNext",
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "strictNullChecks": true,
         "strictFunctionTypes": true,
         "strictPropertyInitialization": true,
@@ -2410,18 +1791,10 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ]
+        "types": ["node"]
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/utils/common-types/tsconfig.spec.json",
@@ -2430,10 +1803,7 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "module": "commonjs",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -2465,15 +1835,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["src/**/*.ts", "src/**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -2496,20 +1859,12 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ],
+      "include": ["src/**/*.ts"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
       "references": [
         {
           "path": "../../gcp-core"
@@ -2524,10 +1879,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -2538,11 +1890,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "libs/utils/gcp-auth-bigquery/tsconfig.json",
@@ -2561,15 +1909,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["src/**/*.ts", "src/**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -2589,20 +1930,12 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ],
+      "include": ["src/**/*.ts"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
       "references": [
         {
           "path": "../../gcp-core"
@@ -2626,15 +1959,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["src/**/*.ts", "src/**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -2654,20 +1980,12 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ],
+      "include": ["src/**/*.ts"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
       "references": [
         {
           "path": "../../gcp-core"
@@ -2691,15 +2009,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["src/**/*.ts", "src/**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -2719,20 +2030,12 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ],
+      "include": ["src/**/*.ts"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
       "references": [
         {
           "path": "../../gcp-core"
@@ -2756,15 +2059,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["src/**/*.ts", "src/**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -2784,20 +2080,12 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ],
+      "include": ["src/**/*.ts"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
       "references": [
         {
           "path": "../../gcp-core"
@@ -2821,15 +2109,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["src/**/*.ts", "src/**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -2849,20 +2130,12 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ],
+      "include": ["src/**/*.ts"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
       "references": [
         {
           "path": "../../gcp-core"
@@ -2886,15 +2159,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["src/**/*.ts", "src/**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -2914,20 +2180,12 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ],
+      "include": ["src/**/*.ts"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
       "references": [
         {
           "path": "../../gcp-core"
@@ -2949,15 +2207,8 @@
         "noFallthroughCasesInSwitch": true,
         "noPropertyAccessFromIndexSignature": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -2977,21 +2228,12 @@
       "compilerOptions": {
         "outDir": "../../../dist/out-tsc",
         "declaration": true,
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*.tsx"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
     },
     {
       "path": "libs/utils/monitoring/tsconfig.spec.json",
@@ -3001,10 +2243,7 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
       "include": [
         "jest.config.ts",
@@ -3015,11 +2254,7 @@
         "**/*.spec.ts",
         "**/*.test.ts"
       ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "libs/utils/secrets-manager/tsconfig.lib.json",
@@ -3028,21 +2263,12 @@
       "compilerOptions": {
         "declaration": true,
         "outDir": "../../../dist/out-tsc",
-        "types": [
-          "node"
-        ],
+        "types": ["node"],
         "composite": true,
         "declarationMap": true
       },
-      "include": [
-        "src/**/*"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts",
-        "src/**/*.stories.ts"
-      ]
+      "include": ["src/**/*"],
+      "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts", "src/**/*.stories.ts"]
     },
     {
       "path": "libs/utils/signals/tsconfig.json",
@@ -3060,15 +2286,8 @@
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "include": ["**/*.ts", "**/*.tsx"],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./tsconfig.lib.json"
@@ -3087,20 +2306,10 @@
         "declaration": true,
         "declarationMap": true,
         "composite": true,
-        "types": [
-          "node"
-        ]
+        "types": ["node"]
       },
-      "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx",
-        "index.ts"
-      ],
-      "exclude": [
-        "jest.config.ts",
-        "**/*.spec.ts",
-        "**/*.test.ts"
-      ]
+      "include": ["src/**/*.ts", "src/**/*.tsx", "index.ts"],
+      "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"]
     },
     {
       "path": "libs/utils/signals/tsconfig.spec.json",
@@ -3110,23 +2319,10 @@
         "outDir": "../../../dist/out-tsc",
         "module": "ESNext",
         "moduleResolution": "nodenext",
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
-      "include": [
-        "jest.config.ts",
-        "**/*.test.ts",
-        "**/*.spec.ts",
-        "**/*.d.ts",
-        "index.ts"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ]
+      "include": ["jest.config.ts", "**/*.test.ts", "**/*.spec.ts", "**/*.d.ts", "index.ts"],
+      "exclude": ["node_modules", "tmp", "dist"]
     },
     {
       "path": "tsconfig.base.json",
@@ -3138,108 +2334,42 @@
         "declarationMap": true,
         "sourceMap": true,
         "paths": {
-          "@dulce/gcp": [
-            "libs/gcp/src/index.ts"
-          ],
-          "@dulce-de-saigon/security": [
-            "libs/security/src/index.ts"
-          ],
-          "@dulce/*": [
-            "libs/*"
-          ],
-          "@dulce/adk": [
-            "libs/adk/src/index.ts"
-          ],
-          "@dulce/agents": [
-            "libs/agents/src/index.ts"
-          ],
-          "@dulce/agents/gemini-orchestrator": [
-            "libs/agents/gemini-orchestrator/src/index.ts"
-          ],
-          "@dulce/agents/bq-agent": [
-            "libs/agents/bq-agent/src/index.ts"
-          ],
-          "@dulce/agents/content-agent": [
-            "libs/agents/content-agent/src/index.ts"
-          ],
-          "@dulce/agents/crm-agent": [
-            "libs/agents/crm-agent/src/index.ts"
-          ],
-          "@dulce/agents/looker-agent": [
-            "libs/agents/looker-agent/src/index.ts"
-          ],
-          "@dulce/agents/reviews-agent": [
-            "libs/agents/reviews-agent/src/index.ts"
-          ],
-          "@dulce/agents-sdk": [
-            "libs/agents-sdk/src/index.ts"
-          ],
-          "@dulce/build-tools": [
-            "libs/build-tools/src/index.ts"
-          ],
-          "@dulce/gcp/*": [
-            "libs/gcp/src/*"
-          ],
-          "@dulce/mcp": [
-            "libs/mcp/src/index.ts"
-          ],
-          "@dulce/utils/api-clients": [
-            "libs/utils/api-clients/src/index.ts"
-          ],
-          "@dulce/utils/gcp-auth": [
-            "libs/utils/gcp-auth/src/index.ts"
-          ],
-          "@dulce/utils/monitoring": [
-            "libs/utils/monitoring/src/index.ts"
-          ],
-          "@dulce/utils/signals": [
-            "libs/utils/signals/src/index.ts"
-          ],
-          "@dulce/data-models": [
-            "libs/data-models/schemas/src/index.ts"
-          ],
-          "@dulce/data-models/dbt-models": [
-            "libs/data-models/dbt-models/src/index.ts"
-          ],
-          "@dulce/data-models/schemas": [
-            "libs/data-models/schemas/src/index.ts"
-          ],
-          "@dulce/env": [
-            "libs/env/src/index.ts"
-          ],
-          "@dulce/security": [
-            "libs/security/src/index.ts"
-          ],
-          "@dulce/ui/components": [
-            "libs/ui/components/src/index.ts"
-          ],
-          "@dulce/utils/secrets-manager": [
-            "libs/utils/secrets-manager/src/index.ts"
-          ],
-          "@dulce/utils/common-types": [
-            "libs/utils/common-types/src/index.ts"
-          ],
-          "@dulce/gcp-core": [
-            "libs/gcp-core/src/index.ts"
-          ],
-          "@dulce/utils/gcp-auth-bigquery": [
-            "libs/utils/gcp-auth-bigquery/src/index.ts"
-          ],
-          "@dulce/utils/gcp-auth-firestore": [
-            "libs/utils/gcp-auth-firestore/src/index.ts"
-          ],
-          "@dulce/utils/gcp-auth-pubsub": [
-            "libs/utils/gcp-auth-pubsub/src/index.ts"
-          ],
+          "@dulce/gcp": ["libs/gcp/src/index.ts"],
+          "@dulce-de-saigon/security": ["libs/security/src/index.ts"],
+          "@dulce/*": ["libs/*"],
+          "@dulce/adk": ["libs/adk/src/index.ts"],
+          "@dulce/agents": ["libs/agents/src/index.ts"],
+          "@dulce/agents/gemini-orchestrator": ["libs/agents/gemini-orchestrator/src/index.ts"],
+          "@dulce/agents/bq-agent": ["libs/agents/bq-agent/src/index.ts"],
+          "@dulce/agents/content-agent": ["libs/agents/content-agent/src/index.ts"],
+          "@dulce/agents/crm-agent": ["libs/agents/crm-agent/src/index.ts"],
+          "@dulce/agents/looker-agent": ["libs/agents/looker-agent/src/index.ts"],
+          "@dulce/agents/reviews-agent": ["libs/agents/reviews-agent/src/index.ts"],
+          "@dulce/agents-sdk": ["libs/agents-sdk/src/index.ts"],
+          "@dulce/build-tools": ["libs/build-tools/src/index.ts"],
+          "@dulce/gcp/*": ["libs/gcp/src/*"],
+          "@dulce/mcp": ["libs/mcp/src/index.ts"],
+          "@dulce/utils/api-clients": ["libs/utils/api-clients/src/index.ts"],
+          "@dulce/utils/gcp-auth": ["libs/utils/gcp-auth/src/index.ts"],
+          "@dulce/utils/monitoring": ["libs/utils/monitoring/src/index.ts"],
+          "@dulce/utils/signals": ["libs/utils/signals/src/index.ts"],
+          "@dulce/data-models": ["libs/data-models/schemas/src/index.ts"],
+          "@dulce/data-models/dbt-models": ["libs/data-models/dbt-models/src/index.ts"],
+          "@dulce/data-models/schemas": ["libs/data-models/schemas/src/index.ts"],
+          "@dulce/env": ["libs/env/src/index.ts"],
+          "@dulce/security": ["libs/security/src/index.ts"],
+          "@dulce/ui/components": ["libs/ui/components/src/index.ts"],
+          "@dulce/utils/secrets-manager": ["libs/utils/secrets-manager/src/index.ts"],
+          "@dulce/utils/common-types": ["libs/utils/common-types/src/index.ts"],
+          "@dulce/gcp-core": ["libs/gcp-core/src/index.ts"],
+          "@dulce/utils/gcp-auth-bigquery": ["libs/utils/gcp-auth-bigquery/src/index.ts"],
+          "@dulce/utils/gcp-auth-firestore": ["libs/utils/gcp-auth-firestore/src/index.ts"],
+          "@dulce/utils/gcp-auth-pubsub": ["libs/utils/gcp-auth-pubsub/src/index.ts"],
           "@dulce/utils/gcp-auth-secret-manager": [
             "libs/utils/gcp-auth-secret-manager/src/index.ts"
           ],
-          "@dulce/utils/gcp-auth-storage": [
-            "libs/utils/gcp-auth-storage/src/index.ts"
-          ],
-          "@dulce/utils/gcp-auth-vertex-ai": [
-            "libs/utils/gcp-auth-vertex-ai/src/index.ts"
-          ]
+          "@dulce/utils/gcp-auth-storage": ["libs/utils/gcp-auth-storage/src/index.ts"],
+          "@dulce/utils/gcp-auth-vertex-ai": ["libs/utils/gcp-auth-vertex-ai/src/index.ts"]
         },
         "outDir": "./dist/out-tsc",
         "moduleResolution": "NodeNext",
@@ -3247,10 +2377,7 @@
         "experimentalDecorators": true,
         "target": "ES2022",
         "module": "NodeNext",
-        "lib": [
-          "ES2022",
-          "dom"
-        ],
+        "lib": ["ES2022", "dom"],
         "skipLibCheck": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
@@ -3275,16 +2402,8 @@
         "allowUnreachableCode": false,
         "allowUnusedLabels": false
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx",
-        "**/*.d.ts",
-        "**/*.js"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp"
-      ],
+      "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", "**/*.js"],
+      "exclude": ["node_modules", "tmp"],
       "references": [
         {
           "path": "./tsconfig.references.json"
@@ -3299,23 +2418,10 @@
       "extends": "./tsconfig.base.json",
       "hasExtendsRoot": true,
       "compilerOptions": {
-        "types": [
-          "node",
-          "jest"
-        ]
+        "types": ["node", "jest"]
       },
-      "include": [
-        "**/*.ts",
-        "**/*.tsx",
-        "**/*.js",
-        "**/*.jsx"
-      ],
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist",
-        ".nx"
-      ]
+      "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+      "exclude": ["node_modules", "tmp", "dist", ".nx"]
     },
     {
       "path": "tsconfig.json",
@@ -3324,12 +2430,7 @@
       "compilerOptions": {
         "noEmit": true
       },
-      "include": [
-        "libs/**/*.ts",
-        "tools/**/*.ts",
-        "scripts/**/*.ts",
-        "**/*.d.ts"
-      ],
+      "include": ["libs/**/*.ts", "tools/**/*.ts", "scripts/**/*.ts", "**/*.d.ts"],
       "exclude": [
         "node_modules",
         "dist",
@@ -3348,11 +2449,7 @@
       "extends": "./tsconfig.base.json",
       "hasExtendsRoot": true,
       "compilerOptions": {},
-      "exclude": [
-        "node_modules",
-        "tmp",
-        "dist"
-      ],
+      "exclude": ["node_modules", "tmp", "dist"],
       "references": [
         {
           "path": "./libs/mcp"
@@ -3446,19 +2543,10 @@
       "hasExtendsRoot": true,
       "compilerOptions": {
         "outDir": "./dist",
-        "types": [
-          "node"
-        ]
+        "types": ["node"]
       },
-      "include": [
-        "src/**/*"
-      ],
-      "exclude": [
-        "node_modules",
-        "dist",
-        "test",
-        "**/*.spec.ts"
-      ]
+      "include": ["src/**/*"],
+      "exclude": ["node_modules", "dist", "test", "**/*.spec.ts"]
     },
     {
       "path": "typescript-diagnostics/configs/tsconfig.base.template.json",
@@ -3475,108 +2563,42 @@
         "noImplicitReturns": true,
         "forceConsistentCasingInFileNames": true,
         "paths": {
-          "@dulce/gcp": [
-            "libs/gcp/src/index.ts"
-          ],
-          "@dulce-de-saigon/security": [
-            "libs/security/src/index.ts"
-          ],
-          "@dulce/*": [
-            "libs/*"
-          ],
-          "@dulce/adk": [
-            "libs/adk/src/index.ts"
-          ],
-          "@dulce/agents": [
-            "libs/agents/src/index.ts"
-          ],
-          "@dulce/agents/gemini-orchestrator": [
-            "libs/agents/gemini-orchestrator/src/index.ts"
-          ],
-          "@dulce/agents/bq-agent": [
-            "libs/agents/bq-agent/src/index.ts"
-          ],
-          "@dulce/agents/content-agent": [
-            "libs/agents/content-agent/src/index.ts"
-          ],
-          "@dulce/agents/crm-agent": [
-            "libs/agents/crm-agent/src/index.ts"
-          ],
-          "@dulce/agents/looker-agent": [
-            "libs/agents/looker-agent/src/index.ts"
-          ],
-          "@dulce/agents/reviews-agent": [
-            "libs/agents/reviews-agent/src/index.ts"
-          ],
-          "@dulce/agents-sdk": [
-            "libs/agents-sdk/src/index.ts"
-          ],
-          "@dulce/build-tools": [
-            "libs/build-tools/src/index.ts"
-          ],
-          "@dulce/gcp/*": [
-            "libs/gcp/src/*"
-          ],
-          "@dulce/mcp": [
-            "libs/mcp/src/index.ts"
-          ],
-          "@dulce/utils/api-clients": [
-            "libs/utils/api-clients/src/index.ts"
-          ],
-          "@dulce/utils/gcp-auth": [
-            "libs/utils/gcp-auth/src/index.ts"
-          ],
-          "@dulce/utils/monitoring": [
-            "libs/utils/monitoring/src/index.ts"
-          ],
-          "@dulce/utils/signals": [
-            "libs/utils/signals/src/index.ts"
-          ],
-          "@dulce/data-models": [
-            "libs/data-models/schemas/src/index.ts"
-          ],
-          "@dulce/data-models/dbt-models": [
-            "libs/data-models/dbt-models/src/index.ts"
-          ],
-          "@dulce/data-models/schemas": [
-            "libs/data-models/schemas/src/index.ts"
-          ],
-          "@dulce/env": [
-            "libs/env/src/index.ts"
-          ],
-          "@dulce/security": [
-            "libs/security/src/index.ts"
-          ],
-          "@dulce/ui/components": [
-            "libs/ui/components/src/index.ts"
-          ],
-          "@dulce/utils/secrets-manager": [
-            "libs/utils/secrets-manager/src/index.ts"
-          ],
-          "@dulce/utils/common-types": [
-            "libs/utils/common-types/src/index.ts"
-          ],
-          "@dulce/gcp-core": [
-            "libs/gcp-core/src/index.ts"
-          ],
-          "@dulce/utils/gcp-auth-bigquery": [
-            "libs/utils/gcp-auth-bigquery/src/index.ts"
-          ],
-          "@dulce/utils/gcp-auth-firestore": [
-            "libs/utils/gcp-auth-firestore/src/index.ts"
-          ],
-          "@dulce/utils/gcp-auth-pubsub": [
-            "libs/utils/gcp-auth-pubsub/src/index.ts"
-          ],
+          "@dulce/gcp": ["libs/gcp/src/index.ts"],
+          "@dulce-de-saigon/security": ["libs/security/src/index.ts"],
+          "@dulce/*": ["libs/*"],
+          "@dulce/adk": ["libs/adk/src/index.ts"],
+          "@dulce/agents": ["libs/agents/src/index.ts"],
+          "@dulce/agents/gemini-orchestrator": ["libs/agents/gemini-orchestrator/src/index.ts"],
+          "@dulce/agents/bq-agent": ["libs/agents/bq-agent/src/index.ts"],
+          "@dulce/agents/content-agent": ["libs/agents/content-agent/src/index.ts"],
+          "@dulce/agents/crm-agent": ["libs/agents/crm-agent/src/index.ts"],
+          "@dulce/agents/looker-agent": ["libs/agents/looker-agent/src/index.ts"],
+          "@dulce/agents/reviews-agent": ["libs/agents/reviews-agent/src/index.ts"],
+          "@dulce/agents-sdk": ["libs/agents-sdk/src/index.ts"],
+          "@dulce/build-tools": ["libs/build-tools/src/index.ts"],
+          "@dulce/gcp/*": ["libs/gcp/src/*"],
+          "@dulce/mcp": ["libs/mcp/src/index.ts"],
+          "@dulce/utils/api-clients": ["libs/utils/api-clients/src/index.ts"],
+          "@dulce/utils/gcp-auth": ["libs/utils/gcp-auth/src/index.ts"],
+          "@dulce/utils/monitoring": ["libs/utils/monitoring/src/index.ts"],
+          "@dulce/utils/signals": ["libs/utils/signals/src/index.ts"],
+          "@dulce/data-models": ["libs/data-models/schemas/src/index.ts"],
+          "@dulce/data-models/dbt-models": ["libs/data-models/dbt-models/src/index.ts"],
+          "@dulce/data-models/schemas": ["libs/data-models/schemas/src/index.ts"],
+          "@dulce/env": ["libs/env/src/index.ts"],
+          "@dulce/security": ["libs/security/src/index.ts"],
+          "@dulce/ui/components": ["libs/ui/components/src/index.ts"],
+          "@dulce/utils/secrets-manager": ["libs/utils/secrets-manager/src/index.ts"],
+          "@dulce/utils/common-types": ["libs/utils/common-types/src/index.ts"],
+          "@dulce/gcp-core": ["libs/gcp-core/src/index.ts"],
+          "@dulce/utils/gcp-auth-bigquery": ["libs/utils/gcp-auth-bigquery/src/index.ts"],
+          "@dulce/utils/gcp-auth-firestore": ["libs/utils/gcp-auth-firestore/src/index.ts"],
+          "@dulce/utils/gcp-auth-pubsub": ["libs/utils/gcp-auth-pubsub/src/index.ts"],
           "@dulce/utils/gcp-auth-secret-manager": [
             "libs/utils/gcp-auth-secret-manager/src/index.ts"
           ],
-          "@dulce/utils/gcp-auth-storage": [
-            "libs/utils/gcp-auth-storage/src/index.ts"
-          ],
-          "@dulce/utils/gcp-auth-vertex-ai": [
-            "libs/utils/gcp-auth-vertex-ai/src/index.ts"
-          ]
+          "@dulce/utils/gcp-auth-storage": ["libs/utils/gcp-auth-storage/src/index.ts"],
+          "@dulce/utils/gcp-auth-vertex-ai": ["libs/utils/gcp-auth-vertex-ai/src/index.ts"]
         },
         "allowSyntheticDefaultImports": true
       }
@@ -3589,34 +2611,18 @@
         "outDir": "./dist",
         "declaration": true
       },
-      "include": [
-        "src/**/*"
-      ],
-      "exclude": [
-        "node_modules",
-        "dist",
-        "test",
-        "**/*.spec.ts"
-      ]
+      "include": ["src/**/*"],
+      "exclude": ["node_modules", "dist", "test", "**/*.spec.ts"]
     },
     {
       "path": "typescript-diagnostics/configs/tsconfig.test.template.json",
       "extends": "./tsconfig.base.json",
       "hasExtendsRoot": true,
       "compilerOptions": {
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
-      "include": [
-        "test/**/*",
-        "**/*.spec.ts"
-      ],
-      "exclude": [
-        "node_modules",
-        "dist"
-      ]
+      "include": ["test/**/*", "**/*.spec.ts"],
+      "exclude": ["node_modules", "dist"]
     },
     {
       "path": "typescript-diagnostics/reports/tsconfig-analysis.json",
@@ -3641,108 +2647,40 @@
     },
     "paths": {
       "value": {
-        "@dulce/gcp": [
-          "libs/gcp/src/index.ts"
-        ],
-        "@dulce-de-saigon/security": [
-          "libs/security/src/index.ts"
-        ],
-        "@dulce/*": [
-          "libs/*"
-        ],
-        "@dulce/adk": [
-          "libs/adk/src/index.ts"
-        ],
-        "@dulce/agents": [
-          "libs/agents/src/index.ts"
-        ],
-        "@dulce/agents/gemini-orchestrator": [
-          "libs/agents/gemini-orchestrator/src/index.ts"
-        ],
-        "@dulce/agents/bq-agent": [
-          "libs/agents/bq-agent/src/index.ts"
-        ],
-        "@dulce/agents/content-agent": [
-          "libs/agents/content-agent/src/index.ts"
-        ],
-        "@dulce/agents/crm-agent": [
-          "libs/agents/crm-agent/src/index.ts"
-        ],
-        "@dulce/agents/looker-agent": [
-          "libs/agents/looker-agent/src/index.ts"
-        ],
-        "@dulce/agents/reviews-agent": [
-          "libs/agents/reviews-agent/src/index.ts"
-        ],
-        "@dulce/agents-sdk": [
-          "libs/agents-sdk/src/index.ts"
-        ],
-        "@dulce/build-tools": [
-          "libs/build-tools/src/index.ts"
-        ],
-        "@dulce/gcp/*": [
-          "libs/gcp/src/*"
-        ],
-        "@dulce/mcp": [
-          "libs/mcp/src/index.ts"
-        ],
-        "@dulce/utils/api-clients": [
-          "libs/utils/api-clients/src/index.ts"
-        ],
-        "@dulce/utils/gcp-auth": [
-          "libs/utils/gcp-auth/src/index.ts"
-        ],
-        "@dulce/utils/monitoring": [
-          "libs/utils/monitoring/src/index.ts"
-        ],
-        "@dulce/utils/signals": [
-          "libs/utils/signals/src/index.ts"
-        ],
-        "@dulce/data-models": [
-          "libs/data-models/schemas/src/index.ts"
-        ],
-        "@dulce/data-models/dbt-models": [
-          "libs/data-models/dbt-models/src/index.ts"
-        ],
-        "@dulce/data-models/schemas": [
-          "libs/data-models/schemas/src/index.ts"
-        ],
-        "@dulce/env": [
-          "libs/env/src/index.ts"
-        ],
-        "@dulce/security": [
-          "libs/security/src/index.ts"
-        ],
-        "@dulce/ui/components": [
-          "libs/ui/components/src/index.ts"
-        ],
-        "@dulce/utils/secrets-manager": [
-          "libs/utils/secrets-manager/src/index.ts"
-        ],
-        "@dulce/utils/common-types": [
-          "libs/utils/common-types/src/index.ts"
-        ],
-        "@dulce/gcp-core": [
-          "libs/gcp-core/src/index.ts"
-        ],
-        "@dulce/utils/gcp-auth-bigquery": [
-          "libs/utils/gcp-auth-bigquery/src/index.ts"
-        ],
-        "@dulce/utils/gcp-auth-firestore": [
-          "libs/utils/gcp-auth-firestore/src/index.ts"
-        ],
-        "@dulce/utils/gcp-auth-pubsub": [
-          "libs/utils/gcp-auth-pubsub/src/index.ts"
-        ],
-        "@dulce/utils/gcp-auth-secret-manager": [
-          "libs/utils/gcp-auth-secret-manager/src/index.ts"
-        ],
-        "@dulce/utils/gcp-auth-storage": [
-          "libs/utils/gcp-auth-storage/src/index.ts"
-        ],
-        "@dulce/utils/gcp-auth-vertex-ai": [
-          "libs/utils/gcp-auth-vertex-ai/src/index.ts"
-        ]
+        "@dulce/gcp": ["libs/gcp/src/index.ts"],
+        "@dulce-de-saigon/security": ["libs/security/src/index.ts"],
+        "@dulce/*": ["libs/*"],
+        "@dulce/adk": ["libs/adk/src/index.ts"],
+        "@dulce/agents": ["libs/agents/src/index.ts"],
+        "@dulce/agents/gemini-orchestrator": ["libs/agents/gemini-orchestrator/src/index.ts"],
+        "@dulce/agents/bq-agent": ["libs/agents/bq-agent/src/index.ts"],
+        "@dulce/agents/content-agent": ["libs/agents/content-agent/src/index.ts"],
+        "@dulce/agents/crm-agent": ["libs/agents/crm-agent/src/index.ts"],
+        "@dulce/agents/looker-agent": ["libs/agents/looker-agent/src/index.ts"],
+        "@dulce/agents/reviews-agent": ["libs/agents/reviews-agent/src/index.ts"],
+        "@dulce/agents-sdk": ["libs/agents-sdk/src/index.ts"],
+        "@dulce/build-tools": ["libs/build-tools/src/index.ts"],
+        "@dulce/gcp/*": ["libs/gcp/src/*"],
+        "@dulce/mcp": ["libs/mcp/src/index.ts"],
+        "@dulce/utils/api-clients": ["libs/utils/api-clients/src/index.ts"],
+        "@dulce/utils/gcp-auth": ["libs/utils/gcp-auth/src/index.ts"],
+        "@dulce/utils/monitoring": ["libs/utils/monitoring/src/index.ts"],
+        "@dulce/utils/signals": ["libs/utils/signals/src/index.ts"],
+        "@dulce/data-models": ["libs/data-models/schemas/src/index.ts"],
+        "@dulce/data-models/dbt-models": ["libs/data-models/dbt-models/src/index.ts"],
+        "@dulce/data-models/schemas": ["libs/data-models/schemas/src/index.ts"],
+        "@dulce/env": ["libs/env/src/index.ts"],
+        "@dulce/security": ["libs/security/src/index.ts"],
+        "@dulce/ui/components": ["libs/ui/components/src/index.ts"],
+        "@dulce/utils/secrets-manager": ["libs/utils/secrets-manager/src/index.ts"],
+        "@dulce/utils/common-types": ["libs/utils/common-types/src/index.ts"],
+        "@dulce/gcp-core": ["libs/gcp-core/src/index.ts"],
+        "@dulce/utils/gcp-auth-bigquery": ["libs/utils/gcp-auth-bigquery/src/index.ts"],
+        "@dulce/utils/gcp-auth-firestore": ["libs/utils/gcp-auth-firestore/src/index.ts"],
+        "@dulce/utils/gcp-auth-pubsub": ["libs/utils/gcp-auth-pubsub/src/index.ts"],
+        "@dulce/utils/gcp-auth-secret-manager": ["libs/utils/gcp-auth-secret-manager/src/index.ts"],
+        "@dulce/utils/gcp-auth-storage": ["libs/utils/gcp-auth-storage/src/index.ts"],
+        "@dulce/utils/gcp-auth-vertex-ai": ["libs/utils/gcp-auth-vertex-ai/src/index.ts"]
       },
       "count": 2,
       "consistent": true
@@ -3789,16 +2727,12 @@
         {
           "value": "ES2022",
           "count": 1,
-          "configs": [
-            "tsconfig.base.json"
-          ]
+          "configs": ["tsconfig.base.json"]
         },
         {
           "value": "ESNext",
           "count": 1,
-          "configs": [
-            "typescript-diagnostics/configs/tsconfig.base.template.json"
-          ]
+          "configs": ["typescript-diagnostics/configs/tsconfig.base.template.json"]
         }
       ],
       "consistent": false
@@ -3808,16 +2742,12 @@
         {
           "value": "NodeNext",
           "count": 1,
-          "configs": [
-            "tsconfig.base.json"
-          ]
+          "configs": ["tsconfig.base.json"]
         },
         {
           "value": "ESNext",
           "count": 1,
-          "configs": [
-            "typescript-diagnostics/configs/tsconfig.base.template.json"
-          ]
+          "configs": ["typescript-diagnostics/configs/tsconfig.base.template.json"]
         }
       ],
       "consistent": false
@@ -3838,108 +2768,42 @@
         "noImplicitReturns": true,
         "forceConsistentCasingInFileNames": true,
         "paths": {
-          "@dulce/gcp": [
-            "libs/gcp/src/index.ts"
-          ],
-          "@dulce-de-saigon/security": [
-            "libs/security/src/index.ts"
-          ],
-          "@dulce/*": [
-            "libs/*"
-          ],
-          "@dulce/adk": [
-            "libs/adk/src/index.ts"
-          ],
-          "@dulce/agents": [
-            "libs/agents/src/index.ts"
-          ],
-          "@dulce/agents/gemini-orchestrator": [
-            "libs/agents/gemini-orchestrator/src/index.ts"
-          ],
-          "@dulce/agents/bq-agent": [
-            "libs/agents/bq-agent/src/index.ts"
-          ],
-          "@dulce/agents/content-agent": [
-            "libs/agents/content-agent/src/index.ts"
-          ],
-          "@dulce/agents/crm-agent": [
-            "libs/agents/crm-agent/src/index.ts"
-          ],
-          "@dulce/agents/looker-agent": [
-            "libs/agents/looker-agent/src/index.ts"
-          ],
-          "@dulce/agents/reviews-agent": [
-            "libs/agents/reviews-agent/src/index.ts"
-          ],
-          "@dulce/agents-sdk": [
-            "libs/agents-sdk/src/index.ts"
-          ],
-          "@dulce/build-tools": [
-            "libs/build-tools/src/index.ts"
-          ],
-          "@dulce/gcp/*": [
-            "libs/gcp/src/*"
-          ],
-          "@dulce/mcp": [
-            "libs/mcp/src/index.ts"
-          ],
-          "@dulce/utils/api-clients": [
-            "libs/utils/api-clients/src/index.ts"
-          ],
-          "@dulce/utils/gcp-auth": [
-            "libs/utils/gcp-auth/src/index.ts"
-          ],
-          "@dulce/utils/monitoring": [
-            "libs/utils/monitoring/src/index.ts"
-          ],
-          "@dulce/utils/signals": [
-            "libs/utils/signals/src/index.ts"
-          ],
-          "@dulce/data-models": [
-            "libs/data-models/schemas/src/index.ts"
-          ],
-          "@dulce/data-models/dbt-models": [
-            "libs/data-models/dbt-models/src/index.ts"
-          ],
-          "@dulce/data-models/schemas": [
-            "libs/data-models/schemas/src/index.ts"
-          ],
-          "@dulce/env": [
-            "libs/env/src/index.ts"
-          ],
-          "@dulce/security": [
-            "libs/security/src/index.ts"
-          ],
-          "@dulce/ui/components": [
-            "libs/ui/components/src/index.ts"
-          ],
-          "@dulce/utils/secrets-manager": [
-            "libs/utils/secrets-manager/src/index.ts"
-          ],
-          "@dulce/utils/common-types": [
-            "libs/utils/common-types/src/index.ts"
-          ],
-          "@dulce/gcp-core": [
-            "libs/gcp-core/src/index.ts"
-          ],
-          "@dulce/utils/gcp-auth-bigquery": [
-            "libs/utils/gcp-auth-bigquery/src/index.ts"
-          ],
-          "@dulce/utils/gcp-auth-firestore": [
-            "libs/utils/gcp-auth-firestore/src/index.ts"
-          ],
-          "@dulce/utils/gcp-auth-pubsub": [
-            "libs/utils/gcp-auth-pubsub/src/index.ts"
-          ],
+          "@dulce/gcp": ["libs/gcp/src/index.ts"],
+          "@dulce-de-saigon/security": ["libs/security/src/index.ts"],
+          "@dulce/*": ["libs/*"],
+          "@dulce/adk": ["libs/adk/src/index.ts"],
+          "@dulce/agents": ["libs/agents/src/index.ts"],
+          "@dulce/agents/gemini-orchestrator": ["libs/agents/gemini-orchestrator/src/index.ts"],
+          "@dulce/agents/bq-agent": ["libs/agents/bq-agent/src/index.ts"],
+          "@dulce/agents/content-agent": ["libs/agents/content-agent/src/index.ts"],
+          "@dulce/agents/crm-agent": ["libs/agents/crm-agent/src/index.ts"],
+          "@dulce/agents/looker-agent": ["libs/agents/looker-agent/src/index.ts"],
+          "@dulce/agents/reviews-agent": ["libs/agents/reviews-agent/src/index.ts"],
+          "@dulce/agents-sdk": ["libs/agents-sdk/src/index.ts"],
+          "@dulce/build-tools": ["libs/build-tools/src/index.ts"],
+          "@dulce/gcp/*": ["libs/gcp/src/*"],
+          "@dulce/mcp": ["libs/mcp/src/index.ts"],
+          "@dulce/utils/api-clients": ["libs/utils/api-clients/src/index.ts"],
+          "@dulce/utils/gcp-auth": ["libs/utils/gcp-auth/src/index.ts"],
+          "@dulce/utils/monitoring": ["libs/utils/monitoring/src/index.ts"],
+          "@dulce/utils/signals": ["libs/utils/signals/src/index.ts"],
+          "@dulce/data-models": ["libs/data-models/schemas/src/index.ts"],
+          "@dulce/data-models/dbt-models": ["libs/data-models/dbt-models/src/index.ts"],
+          "@dulce/data-models/schemas": ["libs/data-models/schemas/src/index.ts"],
+          "@dulce/env": ["libs/env/src/index.ts"],
+          "@dulce/security": ["libs/security/src/index.ts"],
+          "@dulce/ui/components": ["libs/ui/components/src/index.ts"],
+          "@dulce/utils/secrets-manager": ["libs/utils/secrets-manager/src/index.ts"],
+          "@dulce/utils/common-types": ["libs/utils/common-types/src/index.ts"],
+          "@dulce/gcp-core": ["libs/gcp-core/src/index.ts"],
+          "@dulce/utils/gcp-auth-bigquery": ["libs/utils/gcp-auth-bigquery/src/index.ts"],
+          "@dulce/utils/gcp-auth-firestore": ["libs/utils/gcp-auth-firestore/src/index.ts"],
+          "@dulce/utils/gcp-auth-pubsub": ["libs/utils/gcp-auth-pubsub/src/index.ts"],
           "@dulce/utils/gcp-auth-secret-manager": [
             "libs/utils/gcp-auth-secret-manager/src/index.ts"
           ],
-          "@dulce/utils/gcp-auth-storage": [
-            "libs/utils/gcp-auth-storage/src/index.ts"
-          ],
-          "@dulce/utils/gcp-auth-vertex-ai": [
-            "libs/utils/gcp-auth-vertex-ai/src/index.ts"
-          ]
+          "@dulce/utils/gcp-auth-storage": ["libs/utils/gcp-auth-storage/src/index.ts"],
+          "@dulce/utils/gcp-auth-vertex-ai": ["libs/utils/gcp-auth-vertex-ai/src/index.ts"]
         },
         "allowSyntheticDefaultImports": true
       }
@@ -3948,19 +2812,10 @@
       "extends": "./tsconfig.base.json",
       "compilerOptions": {
         "outDir": "./dist",
-        "types": [
-          "node"
-        ]
+        "types": ["node"]
       },
-      "include": [
-        "src/**/*"
-      ],
-      "exclude": [
-        "node_modules",
-        "dist",
-        "test",
-        "**/*.spec.ts"
-      ]
+      "include": ["src/**/*"],
+      "exclude": ["node_modules", "dist", "test", "**/*.spec.ts"]
     },
     "libConfig": {
       "extends": "./tsconfig.base.json",
@@ -3968,32 +2823,16 @@
         "outDir": "./dist",
         "declaration": true
       },
-      "include": [
-        "src/**/*"
-      ],
-      "exclude": [
-        "node_modules",
-        "dist",
-        "test",
-        "**/*.spec.ts"
-      ]
+      "include": ["src/**/*"],
+      "exclude": ["node_modules", "dist", "test", "**/*.spec.ts"]
     },
     "testConfig": {
       "extends": "./tsconfig.base.json",
       "compilerOptions": {
-        "types": [
-          "jest",
-          "node"
-        ]
+        "types": ["jest", "node"]
       },
-      "include": [
-        "test/**/*",
-        "**/*.spec.ts"
-      ],
-      "exclude": [
-        "node_modules",
-        "dist"
-      ]
+      "include": ["test/**/*", "**/*.spec.ts"],
+      "exclude": ["node_modules", "dist"]
     }
   },
   "appliedChanges": []

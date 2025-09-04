@@ -134,10 +134,10 @@ describe('Reactivity System - Advanced Patterns', () => {
       const counter = createSignal(0);
       const [, setCounter] = useSignal(counter);
 
-      setCounter(prev => prev + 1);
+      setCounter((prev) => prev + 1);
       expect(counter()).toBe(1);
 
-      setCounter(prev => prev * 2);
+      setCounter((prev) => prev * 2);
       expect(counter()).toBe(2);
     });
   });
@@ -237,7 +237,7 @@ describe('Reactivity System - Advanced Patterns', () => {
       const user = createSignal<User>({
         name: 'John',
         age: 25,
-        preferences: { theme: 'light', notifications: true }
+        preferences: { theme: 'light', notifications: true },
       });
 
       const displayName = createDerivedSignal(() => `${user().name} (${user().age})`);
@@ -249,7 +249,7 @@ describe('Reactivity System - Advanced Patterns', () => {
       user.set({
         ...user(),
         name: 'Jane',
-        preferences: { ...user().preferences, theme: 'dark' }
+        preferences: { ...user().preferences, theme: 'dark' },
       });
 
       expect(displayName()).toBe('Jane (25)');
@@ -276,7 +276,7 @@ describe('Reactivity System - Advanced Patterns', () => {
       const id = createSignal(1);
       const userData = createDerivedSignal(async () => {
         // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await new Promise((resolve) => setTimeout(resolve, 10));
         return { id: id(), name: `User ${id()}` };
       });
 
@@ -285,7 +285,7 @@ describe('Reactivity System - Advanced Patterns', () => {
 
       id.set(2);
       // Should trigger new async computation
-      await new Promise(resolve => setTimeout(resolve, 20));
+      await new Promise((resolve) => setTimeout(resolve, 20));
       expect(userData().id).toBe(2);
     });
   });

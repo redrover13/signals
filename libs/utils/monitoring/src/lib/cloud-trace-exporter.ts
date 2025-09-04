@@ -41,10 +41,14 @@ export class CloudTraceExporter implements SpanExporter {
       service: 'unknown-service',
       version: 'unknown-version',
     };
-    
-    this.storage = new Storage(this.projectId ? {
-      projectId: this.projectId
-    } : {});
+
+    this.storage = new Storage(
+      this.projectId
+        ? {
+            projectId: this.projectId,
+          }
+        : {},
+    );
   }
 
   /**
@@ -60,7 +64,7 @@ export class CloudTraceExporter implements SpanExporter {
 
     try {
       const traceData = this.convertSpansToTraceData(spans);
-      
+
       if (this.bucketName) {
         this.exportToCloudStorage(traceData)
           .then(() => resultCallback({ code: ExportResultCode.SUCCESS }))
@@ -85,28 +89,28 @@ export class CloudTraceExporter implements SpanExporter {
    * @returns Trace data in Cloud Trace format
    */
   private convertSpansToTraceData(spans: ReadableSpan[]): any[] {
-    return spans.map(span => {
+    return spans.map((span) => {
       const attributes: Record<string, any> = {};
-      
+
       // Convert attributes
       span.attributes.forEach((value, key) => {
         attributes[key] = value;
       });
-      
+
       // Convert events
-      const events = span.events.map(event => ({
+      const events = span.events.map((event) => ({
         name: event.name,
         timestamp: event.time[0] * 1000000 + event.time[1] / 1000000,
         attributes: event.attributes || {},
       }));
-      
+
       // Convert links
-      const links = span.links.map(link => ({
+      const links = span.links.map((link) => ({
         spanId: (link as any).spanId,
         traceId: (link as any).traceId,
         attributes: link.attributes || {},
       }));
-      
+
       return {
         name: span.name,
         spanId: span.spanContext().spanId,
@@ -136,19 +140,19 @@ export class CloudTraceExporter implements SpanExporter {
       console.warn('No bucket name specified for Cloud Trace export');
       return;
     }
-    
+
     const timestamp = new Date().toISOString();
     const filename = `traces/${timestamp}-${Math.random().toString(36).substring(2, 10)}.json`;
-    
+
     const bucket = this.storage.bucket(this.bucketName);
     const file = bucket.file(filename);
-    
+
     const stream = file.createWriteStream({
       metadata: {
         contentType: 'application/json',
       },
     });
-    
+
     return new Promise((resolve, reject) => {
       stream.on('error', reject);
       stream.on('finish', resolve);

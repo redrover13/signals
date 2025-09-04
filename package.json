@@ -52,7 +52,11 @@
     "ts:diagnostics:nx": "node typescript-diagnostics/scripts/nx-typescript-diagnostics.js",
     "ts:diagnostics:nx:fix": "node typescript-diagnostics/scripts/nx-typescript-diagnostics.js --fix",
     "ts:diagnostics:codacy": "node typescript-diagnostics/scripts/verify-codacy-compliance.js",
-    "secretlint": "secretlint \"**/*\""
+    "secretlint": "secretlint \"**/*\"",
+    "analyze:paths": "node tools/typescript/analyze-path-mappings.js",
+    "analyze:nx": "node tools/nx/analyze-nx-config.js",
+    "analyze:env": "node tools/nx/analyze-nx-config.js > nx-analysis.md && node tools/typescript/analyze-path-mappings.js > path-analysis.md",
+    "ts:template:apply": "node typescript-diagnostics/scripts/apply-tsconfig-template.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",

@@ -159,7 +159,7 @@
           "optimizeYourTerminal": true
         },
         "distributedCacheEnabled": true,
-        "distributedExecutionEnabled": true
+        "distributedExecutionEnabled": true,
         "rebuildOptimizations": true
       }
     }

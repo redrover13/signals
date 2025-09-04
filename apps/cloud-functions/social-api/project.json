@@ -117,13 +117,14 @@
       "configurations": {
         "ci": {
           "ci": true,
-          "codeCoverage": true
+          "codeCoverage": true,
+          "maxWorkers": "50%"
         }
       },
       "inputs": [
         "default",
         "^default",
-        "{workspaceRoot}/jest.preset.js"
+        "{workspaceRoot}/jest.preset.mjs"
       ],
       "cache": true
     }

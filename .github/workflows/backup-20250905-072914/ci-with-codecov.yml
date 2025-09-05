@@ -13,18 +13,18 @@ jobs:
     
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
         with:
           fetch-depth: 0
       
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
         with:
           node-version: '18'
           cache: 'pnpm'
       
       - name: Install pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@4fe8674f344d65cf7384fc21ba97c2b05fd8df75 # v4.1.0
         with:
           version: 8
           run_install: false
@@ -36,7 +36,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
       
       - name: Setup pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v4
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -47,10 +47,10 @@ jobs:
         run: pnpm install --frozen-lockfile
       
       - name: Lint
-        run: pnpm lint:ci
+        run: pnpm nx affected --target=lint --parallel=3 --max-warnings=0
       
       - name: Build
-        run: pnpm build
+        run: pnpm nx affected --target=build --parallel=3
       
       - name: Test with Coverage
         run: pnpm nx run-many --target=test --all --coverage

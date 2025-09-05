@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
 
       - name: Dependency Review
         uses: actions/dependency-review-action@v3.1.4

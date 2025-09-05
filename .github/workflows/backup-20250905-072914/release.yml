@@ -56,13 +56,13 @@ jobs:
       next-version: ${{ steps.version.outputs.next }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@4fe8674f344d65cf7384fc21ba97c2b05fd8df75 # v4.1.0
         with:
           version: 10.0.0
           run_install: false
@@ -73,7 +73,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
       - name: Setup pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v4
         with:
           path: |
             ${{ env.STORE_PATH }}
@@ -82,7 +82,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -194,12 +194,12 @@ jobs:
     if: needs.prepare-release.outputs.should-release == 'true'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
         with:
           fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@4fe8674f344d65cf7384fc21ba97c2b05fd8df75 # v4.1.0
         with:
           version: 10.0.0
           run_install: false
@@ -210,7 +210,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
       - name: Setup pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v4
         with:
           path: |
             ${{ env.STORE_PATH }}
@@ -219,7 +219,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -307,21 +307,21 @@ jobs:
       release-url: ${{ steps.release.outputs.html_url }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js & pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@4fe8674f344d65cf7384fc21ba97c2b05fd8df75 # v4.1.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v4
         with:
           path: |
             ${{ env.STORE_PATH }}
@@ -470,7 +470,7 @@ jobs:
     if: needs.prepare-release.outputs.should-release == 'true'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
         with:
           ref: v${{ needs.prepare-release.outputs.next-version }}
 

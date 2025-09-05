@@ -275,6 +275,102 @@ else
     echo "ℹ️  GitHub CLI not available, skipping workflow validation"
 fi
 
+# Add PR-Agent workflow if not exists
+echo "🤖 Setting up PR-Agent..."
+if [[ ! -f ".github/workflows/pr_agent.yml" ]]; then
+    echo "Creating PR-Agent workflow..."
+    cat > ".github/workflows/pr_agent.yml" << 'EOF'
+name: PR Agent
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write  # Required for adding labels to PRs
+
+jobs:
+  pr_agent_job:
+    runs-on: ubuntu-latest
+    name: Run PR Agent on PR
+    steps:
+      - name: PR Agent action
+        uses: Codium-ai/pr-agent@v0.11
+        env:
+          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+EOF
+    echo "✅ PR-Agent workflow created"
+else
+    echo "✅ PR-Agent workflow already exists"
+fi
+
+# Create PR-Agent config if not exists
+if [[ ! -f ".pr_agent.toml" ]]; then
+    echo "Creating PR-Agent configuration..."
+    cat > ".pr_agent.toml" << 'EOF'
+# PR-Agent Configuration for Dulce de Saigon F&B Data Platform
+
+[general]
+verbosity_level = "debug"
+
+[pr_description]
+# Create custom descriptions based on PR content
+publish_description_as_comment = true
+publish_labels = true
+add_original_user_description = true
+user_description_heading = "## Original Description"
+
+[pr_reviewer]
+require_tests_for_new_code = true
+require_changelog_for_user_facing_changes = true
+review_bat_changes_as_text = true
+review_file_extension_to_language = { vue = "javascript", cjs = "javascript", mjs = "javascript" }
+enable_review_labels_security = true
+enable_review_labels_effort = true
+extra_instructions = """
+Follow the Dulce de Saigon project guidelines:
+- Check for TypeScript strict mode compliance
+- Ensure proper error handling for GCP API calls
+- Verify compliance with Vietnamese data privacy regulations
+- Check for unit tests for new code
+- Validate Nx workspace structure is maintained
+"""
+
+[pr_code_suggestions]
+auto_approve_suggestions = false
+extra_instructions = """
+Focus on:
+- TypeScript strict mode compliance
+- Performance optimizations for GCP
+- Nx monorepo best practices
+- Following Vietnamese compliance requirements
+"""
+
+[pr_compliance]
+enable_compliance_labels_security = true
+enable_user_defined_compliance_labels = true
+compliance_requirements = [
+  "All new code must have corresponding unit tests",
+  "TypeScript strict mode must be enabled for new files",
+  "Vietnamese language support must be maintained in user-facing components",
+  "Personal data must be properly encrypted and anonymized",
+  "GCP service accounts should follow least privilege principle",
+  "Dependencies should be checked for security vulnerabilities"
+]
+
+[inline_code_suggestions]
+num_code_suggestions = 5
+EOF
+    echo "✅ PR-Agent configuration created"
+else
+    echo "✅ PR-Agent configuration already exists"
+fi
+
 echo ""
 echo "🎉 GitHub Workflows Repair Complete!"
 echo ""
@@ -284,11 +380,12 @@ echo "   - Standardized pnpm version to $PNPM_VERSION"
 echo "   - Standardized pnpm action to $PNPM_ACTION_VERSION"
 echo "   - Added proper pnpm store path configuration"
 echo "   - Fixed cache configuration issues"
+echo "   - Added PR-Agent workflow and configuration"
 echo ""
 echo "📁 Backups saved in: $BACKUP_DIR"
 echo ""
 echo "🚀 Next steps:"
 echo "   1. Review the changes: git diff .github/workflows/"
 echo "   2. Test a workflow: gh workflow run ci-with-codecov.yml"
-echo "   3. Commit the fixes: git add .github/workflows/ && git commit -m 'fix: repair broken GitHub workflows'"
+echo "   3. Commit the fixes: git add .github/workflows/ .pr_agent.toml && git commit -m 'fix: repair GitHub workflows and add PR-Agent'"
 echo ""

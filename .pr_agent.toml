@@ -1,0 +1,52 @@
+# PR-Agent Configuration for Dulce de Saigon F&B Data Platform
+
+[general]
+verbosity_level = "debug"
+
+[pr_description]
+# Create custom descriptions based on PR content
+publish_description_as_comment = true
+publish_labels = true
+add_original_user_description = true
+user_description_heading = "## Original Description"
+
+[pr_reviewer]
+require_tests_for_new_code = true
+require_changelog_for_user_facing_changes = true
+review_bat_changes_as_text = true
+review_file_extension_to_language = { vue = "javascript", cjs = "javascript", mjs = "javascript" }
+enable_review_labels_security = true
+enable_review_labels_effort = true
+extra_instructions = """
+Follow the Dulce de Saigon project guidelines:
+- Check for TypeScript strict mode compliance
+- Ensure proper error handling for GCP API calls
+- Verify compliance with Vietnamese data privacy regulations
+- Check for unit tests for new code
+- Validate Nx workspace structure is maintained
+"""
+
+[pr_code_suggestions]
+auto_approve_suggestions = false
+extra_instructions = """
+Focus on:
+- TypeScript strict mode compliance
+- Performance optimizations for GCP
+- Nx monorepo best practices
+- Following Vietnamese compliance requirements
+"""
+
+[pr_compliance]
+enable_compliance_labels_security = true
+enable_user_defined_compliance_labels = true
+compliance_requirements = [
+  "All new code must have corresponding unit tests",
+  "TypeScript strict mode must be enabled for new files",
+  "Vietnamese language support must be maintained in user-facing components",
+  "Personal data must be properly encrypted and anonymized",
+  "GCP service accounts should follow least privilege principle",
+  "Dependencies should be checked for security vulnerabilities"
+]
+
+[inline_code_suggestions]
+num_code_suggestions = 5

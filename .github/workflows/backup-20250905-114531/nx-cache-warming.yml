@@ -1,12 +1,14 @@
-name: Lint Commit Messages
+name: NX Cloud Cache Warming
 
 on:
-  pull_request:
-    branches: [main, develop]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * 0' # Run at midnight every Sunday
 
 jobs:
-  commitlint:
-    name: Check Commit Messages
+  nx-cache-warming:
+    name: Warm NX Cloud Cache
     runs-on: ubuntu-latest
     env:
       STORE_PATH: ''
@@ -16,15 +18,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
-        with:
-          node-version: '20'
-
       - name: Setup pnpm
         uses: pnpm/action-setup@4fe8674f344d65cf7384fc21ba97c2b05fd8df75 # v4.1.0
         with:
-          version: 8.6.0
+          version: 10.0.0
           run_install: false
 
       - name: Get pnpm store directory
@@ -41,8 +38,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Setup Node.js
+        uses: actions/setup-node@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          node-version: '20'
+          cache: pnpm
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint commit messages
-        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+      - name: NX Cloud Warm Cache - Build
+        run: pnpm nx run-many --target=build --all --parallel=5
+
+      - name: NX Cloud Warm Cache - Lint
+        run: pnpm nx run-many --target=lint --all --parallel=5
+
+      - name: NX Cloud Warm Cache - Test
+        run: pnpm nx run-many --target=test --all --parallel=5

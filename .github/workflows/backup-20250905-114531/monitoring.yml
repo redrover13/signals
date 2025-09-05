@@ -1,0 +1,223 @@
+name: Infrastructure Monitoring & Alerting
+permissions:
+  contents: read
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+    - cron: '0 18 * * *' # Daily at 6 PM UTC
+  workflow_dispatch:
+    inputs:
+      check_type:
+        description: 'Type of check to run'
+        required: true
+        default: 'basic'
+        type: choice
+        options:
+          - basic
+          - performance
+          - security
+          - comprehensive
+
+jobs:
+  # ============================================================================
+  # Basic System Checks
+  # ============================================================================
+  basic-health-check:
+    name: Basic Health Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@4fe8674f344d65cf7384fc21ba97c2b05fd8df75 # v4.1.0
+        with:
+          version: '10.0.0'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+        run: pnpm install --frozen-lockfile
+
+      - name: Check API endpoints
+        run: |
+          echo "🔍 Checking API health endpoints..."
+          curl -s -o /dev/null -w "%{http_code}" https://api.example.com/health || echo "API check failed"
+
+      - name: Check database connectivity
+        run: |
+          echo "🔍 Checking database connectivity..."
+          pnpm exec nx run db:check || echo "Database check failed"
+
+      - name: Send notification if failed
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.MONITORING_SLACK_WEBHOOK }}
+          SLACK_TITLE: "❌ System Health Check Failed"
+          SLACK_MESSAGE: "Basic health check failed. Please check the logs."
+          SLACK_COLOR: danger
+
+  # ============================================================================
+  # Performance Monitoring
+  # ============================================================================
+  performance-check:
+    name: Performance Check
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 6 * * *' || inputs.check_type == 'performance' || inputs.check_type == 'comprehensive'
+    strategy:
+      matrix:
+        environment: [production, staging]
+        include:
+          - environment: production
+            project: saigon-signals
+          - environment: staging
+            project: saigon-signals-staging
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install -g lighthouse
+
+      - name: Run performance tests
+        run: |
+          echo "🚀 Running performance tests for ${{ matrix.environment }}..."
+          lighthouse https://${{ matrix.environment }}.example.com --output=json --output-path=./lighthouse-${{ matrix.environment }}.json
+
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-results-${{ matrix.environment }}
+          path: ./lighthouse-${{ matrix.environment }}.json
+
+      - name: Analyze results
+        run: |
+          echo "📊 Analyzing performance results..."
+          SCORE=$(cat ./lighthouse-${{ matrix.environment }}.json | jq '.categories.performance.score')
+          if (( $(echo "$SCORE < 0.7" | bc -l) )); then
+            echo "::warning::Performance score is below threshold: $SCORE"
+          else
+            echo "✅ Performance score is good: $SCORE"
+          fi
+
+  # ============================================================================
+  # Security Scanning
+  # ============================================================================
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 18 * * *' || inputs.check_type == 'security' || inputs.check_type == 'comprehensive'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@4fe8674f344d65cf7384fc21ba97c2b05fd8df75 # v4.1.0
+        with:
+          version: '10.0.0'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+        run: pnpm install --frozen-lockfile
+
+      - name: Run dependency scan
+        run: |
+          echo "🔒 Scanning dependencies for vulnerabilities..."
+          pnpm audit --audit-level=moderate || echo "::warning::Vulnerabilities found in dependencies"
+
+      - name: Run OWASP ZAP scan
+        uses: zaproxy/action-baseline@v0.11.0
+        with:
+          target: 'https://api.example.com'
+          allow_issue_writing: false
+
+  # ============================================================================
+  # Resource Usage Monitoring
+  # ============================================================================
+  resource-monitoring:
+    name: Resource Usage Monitoring
+    runs-on: ubuntu-latest
+    if: inputs.check_type == 'comprehensive'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Check GCP resource usage
+        run: |
+          echo "📊 Checking GCP resource usage..."
+          gcloud compute instances list --format="table(name,zone,status,networkInterfaces[0].networkIP,machineType)" || echo "Failed to list compute instances"
+          
+          echo "📊 Checking Cloud Functions usage..."
+          gcloud functions list --format="table(name,status,entryPoint,runtime)" || echo "Failed to list Cloud Functions"
+          
+          echo "📊 Checking BigQuery usage..."
+          bq ls --format=pretty || echo "Failed to list BigQuery datasets"
+
+      - name: Generate resource usage report
+        run: |
+          echo "📄 Generating resource usage report..."
+          mkdir -p reports
+          date > reports/resource-usage-$(date +%Y-%m-%d).txt
+          echo "=== Compute Instances ===" >> reports/resource-usage-$(date +%Y-%m-%d).txt
+          gcloud compute instances list --format="table(name,zone,status,machineType)" >> reports/resource-usage-$(date +%Y-%m-%d).txt || true
+          echo "=== Cloud Functions ===" >> reports/resource-usage-$(date +%Y-%m-%d).txt
+          gcloud functions list --format="table(name,status,runtime)" >> reports/resource-usage-$(date +%Y-%m-%d).txt || true
+          echo "=== Cloud Storage ===" >> reports/resource-usage-$(date +%Y-%m-%d).txt
+          gsutil ls -L gs://saigon-signals/* | grep "Storage class" >> reports/resource-usage-$(date +%Y-%m-%d).txt || true
+
+      - name: Upload resource usage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: resource-usage-report
+          path: reports/resource-usage-*.txt

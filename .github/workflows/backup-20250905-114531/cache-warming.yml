@@ -1,0 +1,104 @@
+name: Cache Warming
+
+on:
+  schedule:
+    - cron: '0 4 * * 1' # Every Monday at 4 AM UTC
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10.0.0'
+
+jobs:
+  warm-caches:
+    name: Warm Dependency Caches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@4fe8674f344d65cf7384fc21ba97c2b05fd8df75 # v4.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Warm Nx cache
+        run: |
+          pnpm exec nx reset
+          pnpm exec nx run-many --target=lint --all
+          pnpm exec nx run-many --target=build --all
+          pnpm exec nx run-many --target=test --all
+        env:
+          NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
+  warm-docker-caches:
+    name: Warm Docker Image Caches
+    runs-on: ubuntu-latest
+    needs: warm-caches
+    strategy:
+      matrix:
+        app:
+          - social-api
+          - frontend-agents
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.2.0
+
+      - name: Cache Docker layers
+        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ matrix.app }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-${{ matrix.app }}-
+            ${{ runner.os }}-buildx-
+
+      - name: Build image for cache
+        uses: docker/build-push-action@v5.1.0
+        with:
+          context: .
+          file: ${{ contains(fromJson('["Dockerfile", ""]'), env.DOCKERFILE_PATH) && env.DOCKERFILE_PATH || format('apps/{0}/Dockerfile', matrix.app) }}
+          push: false
+          tags: warm-cache-${{ matrix.app }}:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+          outputs: type=docker
+          load: true
+        env:
+          DOCKERFILE_PATH: ${{ (fileExists(format('apps/cloud-functions/{0}/Dockerfile', matrix.app)) && format('apps/cloud-functions/{0}/Dockerfile', matrix.app)) || (fileExists(format('apps/{0}/Dockerfile', matrix.app)) && format('apps/{0}/Dockerfile', matrix.app)) || '' }}
+        continue-on-error: true
+
+      # Temp fix for cache
+      - name: Move cache
+        if: always()
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true

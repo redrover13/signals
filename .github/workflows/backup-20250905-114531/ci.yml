@@ -5,6 +5,7 @@ on:
     branches: [main, dev]
   pull_request:
     branches: [main, dev]
+  workflow_dispatch:
 
 jobs:
   build-and-test:
@@ -18,9 +19,9 @@ jobs:
           fetch-depth: 0
       
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.2
+        uses: pnpm/action-setup@v4.1.0
         with:
-          version: 8.6.0
+          version: 10.0.0
           run_install: false
       
       - name: Setup Node.js
@@ -47,24 +48,19 @@ jobs:
         run: pnpm install --frozen-lockfile
       
       - name: Lint
-        run: pnpm lint:ci
+        run: pnpm nx affected --target=lint --parallel=3 --max-warnings=0
       
       - name: Build
-        run: pnpm build
+        run: pnpm nx affected --target=build --parallel=3
       
       - name: Test with Coverage
         run: pnpm nx run-many --target=test --all --coverage
-      
-      - name: Create combined coverage report
-        run: |
-          mkdir -p ./coverage/combined
-          npx nyc merge ./coverage ./coverage/combined/coverage.json
-          npx nyc report --reporter=lcov --report-dir=./coverage/combined --temp-dir=./coverage/combined
       
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ./coverage/combined
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
           fail_ci_if_error: false
-          verbose: true

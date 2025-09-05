@@ -12,9 +12,9 @@ set -e
 echo "🔧 Starting GitHub Workflows Repair..."
 
 # Define consistent versions
-PNPM_VERSION="10.0.0"
+PNPM_VERSION="8.6.0"  # Downgraded to ensure compatibility
 NODE_VERSION="20"
-PNPM_ACTION_VERSION="v4.1.0"
+PNPM_ACTION_VERSION="v2.2.2"  # Changed to v2 to ensure availability
 
 # Backup directory
 BACKUP_DIR=".github/workflows/backup-$(date +%Y%m%d-%H%M%S)"
@@ -201,9 +201,9 @@ jobs:
           fetch-depth: 0
       
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@v2.2.2
         with:
-          version: 10.0.0
+          version: 8.6.0
           run_install: false
       
       - name: Setup Node.js

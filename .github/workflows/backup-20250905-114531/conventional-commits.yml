@@ -1,0 +1,18 @@
+name: Conventional Commits Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check-commits:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          fetch-depth: 0
+
+      - name: Check Commit Messages
+        uses: wagoid/commitlint-github-action@v6.0.1

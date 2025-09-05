@@ -1,16 +1,22 @@
-name: Database Migration Verification
+name: Localization Validation
 
 on:
+  push:
+    branches: [main, develop]
+    paths:
+      - '**/locales/**'
+      - '**/translations/**'
+      - '**/i18n/**'
   pull_request:
     branches: [main, develop]
     paths:
-      - '**/migrations/**'
-      - '**/schemas/**'
-      - 'infra/terraform/bigquery/**'
+      - '**/locales/**'
+      - '**/translations/**'
+      - '**/i18n/**'
 
 jobs:
-  verify-migrations:
-    name: Verify Database Migrations
+  validate-translations:
+    name: Validate Translation Files
     runs-on: ubuntu-latest
     env:
       STORE_PATH: ''
@@ -21,7 +27,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@4fe8674f344d65cf7384fc21ba97c2b05fd8df75 # v4.1.0
         with:
-          version: 8.6.0
+          version: 10.0.0
           run_install: false
 
       - name: Get pnpm store directory
@@ -47,17 +53,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v2.1.2
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-
-      - name: Setup gcloud CLI
-        uses: google-github-actions/setup-gcloud@v2.1.0
-
-      - name: Verify migrations
+      - name: Run translation validation
         run: |
-          echo "Verifying database migrations..."
-          # Example: Run a script that verifies migrations against a test DB
-          # pnpm run migrations:verify
+          # Run your custom script for validating Vietnamese encoding
+          pnpm exec node scripts/validate-encoding.js
+
+          # Run your Vietnamese test script
+          pnpm exec node scripts/test-vietnamese.js
+
+      - name: Check for missing translations
+        run: |
+          # Add your custom script to check for missing translations across locales
+          echo "Checking for missing translations..."
+          # Example command (replace with your actual check)
+          # pnpm run i18n:check-missing

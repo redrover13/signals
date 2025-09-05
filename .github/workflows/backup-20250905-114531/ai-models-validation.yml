@@ -50,8 +50,6 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-
       - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@v2.1.0
 

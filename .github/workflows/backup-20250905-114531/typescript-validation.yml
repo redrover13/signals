@@ -67,6 +67,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: TypeScript Compilation Check

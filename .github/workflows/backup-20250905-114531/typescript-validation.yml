@@ -171,15 +171,11 @@ jobs:
 
         run: pnpm install --frozen-lockfile
 
-      - name: Install type-coverage
-        run: pnpm add -D -w type-coverage
-
       - name: Check type coverage
         run: |
           echo "🔍 Checking TypeScript type coverage..."
-          npx type-coverage --detail --at-least 85 --ignore-files "**/*.spec.ts,**/*.test.ts,**/*.d.ts" --ignore-catch
+          pnpm dlx type-coverage --detail --at-least 85 --ignore-files "**/*.spec.ts,**/*.test.ts,**/*.d.ts" --ignore-catch
           echo "✅ Type coverage check completed"
-
   # ============================================================================
   # Dead Code Detection
   # ============================================================================

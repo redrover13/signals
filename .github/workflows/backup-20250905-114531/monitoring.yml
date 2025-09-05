@@ -55,8 +55,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
       - name: Check API endpoints
         run: |
           echo "🔍 Checking API health endpoints..."

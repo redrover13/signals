@@ -32,7 +32,6 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
-      - name: Install dependencies
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
@@ -47,6 +46,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Get affected projects

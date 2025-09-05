@@ -125,10 +125,16 @@ jobs:
       - name: Check API Type Consistency
         run: |
           echo "🔍 Checking API type consistency..."
-          find libs -type f -name "*.ts" -not -path "*/node_modules/*" -not -path "*/dist/*" | xargs grep -l "interface" | 
-            xargs -I{} sh -c 'echo "Checking {}..."; pnpm tsc {} --noEmit --skipLibCheck || echo "Type error in {}"'
+          find libs -type f -name "*.ts" \
+            -not -path "*/node_modules/*" \
+            -not -path "*/dist/*" \
+            -print0 \
+            | xargs -0 grep -l "interface" \
+            | while IFS= read -r file; do
+                echo "Checking $file..."
+                pnpm tsc "$file" --noEmit --skipLibCheck || echo "Type error in $file"
+              done
           echo "✅ API type consistency check completed"
-
   # ============================================================================
   # Type Coverage Check
   # ============================================================================

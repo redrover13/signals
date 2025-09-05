@@ -41,7 +41,6 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
-      - name: Install dependencies
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash

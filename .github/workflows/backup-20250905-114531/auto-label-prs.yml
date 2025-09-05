@@ -17,11 +17,10 @@ jobs:
         run: git fetch origin main
 
       - name: Setup pnpm
-        - name: Setup pnpm
-          uses: pnpm/action-setup@v2.2.2
-          with:
-            version: 8.6.0
-            run_install: false
+        uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 8.6.0
+          run_install: false
       - name: Setup Node.js
         uses: actions/setup-node@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
         with:

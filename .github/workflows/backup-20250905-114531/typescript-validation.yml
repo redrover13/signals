@@ -222,11 +222,8 @@ jobs:
 
         run: pnpm install --frozen-lockfile
 
-      - name: Install ts-prune
-        run: pnpm add -D -w ts-prune
-
       - name: Detect unused exports
         run: |
           echo "🔍 Detecting unused exports..."
-          npx ts-prune --error || echo "📝 Some unused exports detected (review recommended)"
+          pnpm dlx ts-prune --error || echo "📝 Some unused exports detected (review recommended)"
           echo "✅ Dead code detection completed"

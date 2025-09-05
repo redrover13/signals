@@ -13,23 +13,42 @@
     "lastUpdated": "2025-08-29T13:49:06.621Z"
   },
   "servers": {
+    "pr-agent": {
+      "command": "node",
+      "args": [
+        "/home/g_nelson/signals-1/.mcp/servers/pr-agent-mcp-server.mjs"
+      ],
+      "env": {
+        "OPENAI_KEY": "openai-key",
+        "GITHUB_TOKEN": "github-token"
+      }
+    },
     "github": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "github-token"
       }
     },
     "codacy": {
       "command": "npx",
-      "args": ["-y", "@codacy/codacy-mcp@latest"],
+      "args": [
+        "-y",
+        "@codacy/codacy-mcp@latest"
+      ],
       "env": {
         "CODACY_API_TOKEN": "codacy-token"
       }
     },
     "playwright": {
       "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ]
     },
     "terraform": {
       "command": "docker",
@@ -57,26 +76,39 @@
     },
     "sequentialthinking": {
       "command": "npx",
-      "args": ["-y", "mcp-sequentialthinking@latest"]
+      "args": [
+        "-y",
+        "mcp-sequentialthinking@latest"
+      ]
     },
     "nx": {
       "command": "npx",
-      "args": ["-y", "@nx/mcp-server@latest"],
+      "args": [
+        "-y",
+        "@nx/mcp-server@latest"
+      ],
       "env": {
         "NX_CLOUD_ACCESS_TOKEN": "nx-cloud-token"
       }
     },
     "typescript": {
       "command": "node",
-      "args": ["/home/g_nelson/signals-1/.mcp/servers/typescript-mcp-server.mjs"]
+      "args": [
+        "/home/g_nelson/signals-1/.mcp/servers/typescript-mcp-server.mjs"
+      ]
     },
     "python": {
       "command": "python3",
-      "args": ["/home/g_nelson/signals-1/.mcp/servers/python-mcp-server.py"]
+      "args": [
+        "/home/g_nelson/signals-1/.mcp/servers/python-mcp-server.py"
+      ]
     },
     "sentry": {
       "command": "npx",
-      "args": ["-y", "@sentry/mcp-server@latest"],
+      "args": [
+        "-y",
+        "@sentry/mcp-server@latest"
+      ],
       "env": {
         "SENTRY_AUTH_TOKEN": "sentry-token",
         "SENTRY_ORG": "signals-org"
@@ -84,14 +116,20 @@
     },
     "tavily": {
       "command": "npx",
-      "args": ["-y", "tavily-mcp@latest"],
+      "args": [
+        "-y",
+        "tavily-mcp@latest"
+      ],
       "env": {
         "TAVILY_API_KEY": "tavily-api-key"
       }
     },
     "qdrant": {
       "command": "npx",
-      "args": ["-y", "@qdrant/mcp-server@latest"],
+      "args": [
+        "-y",
+        "@qdrant/mcp-server@latest"
+      ],
       "env": {
         "QDRANT_URL": "qdrant-url",
         "QDRANT_API_KEY": "qdrant-api-key"
@@ -99,14 +137,20 @@
     },
     "codecov": {
       "command": "npx",
-      "args": ["-y", "@codecov/mcp-server@latest"],
+      "args": [
+        "-y",
+        "@codecov/mcp-server@latest"
+      ],
       "env": {
         "CODECOV_TOKEN": "codecov-token"
       }
     },
     "google-search": {
       "command": "npx",
-      "args": ["-y", "@google/search-mcp@latest"],
+      "args": [
+        "-y",
+        "@google/search-mcp@latest"
+      ],
       "env": {
         "GOOGLE_API_KEY": "${GOOGLE_API_KEY}",
         "GOOGLE_CSE_ID": "${GOOGLE_CSE_ID}"
@@ -114,14 +158,20 @@
     },
     "google-drive": {
       "command": "npx",
-      "args": ["-y", "@google/drive-mcp@latest"],
+      "args": [
+        "-y",
+        "@google/drive-mcp@latest"
+      ],
       "env": {
         "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json"
       }
     },
     "google-cloud": {
       "command": "npx",
-      "args": ["-y", "@google-cloud/mcp-server@latest"],
+      "args": [
+        "-y",
+        "@google-cloud/mcp-server@latest"
+      ],
       "env": {
         "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json",
         "GCP_PROJECT_ID": "saigon-signals"
@@ -129,7 +179,10 @@
     },
     "bigquery": {
       "command": "npx",
-      "args": ["-y", "@google-cloud/bigquery-mcp@latest"],
+      "args": [
+        "-y",
+        "@google-cloud/bigquery-mcp@latest"
+      ],
       "env": {
         "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json",
         "GCP_PROJECT_ID": "saigon-signals"
@@ -137,7 +190,10 @@
     },
     "grafana": {
       "command": "npx",
-      "args": ["-y", "grafana-mcp-analyzer@latest"],
+      "args": [
+        "-y",
+        "grafana-mcp-analyzer@latest"
+      ],
       "env": {
         "CONFIG_PATH": "/home/g_nelson/signals-1/grafana-mcp-config.js",
         "GRAFANA_URL": "https://grafana-service-871192566066.us-central1.run.app",
@@ -148,43 +204,71 @@
     },
     "postgres": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres"
+      ],
       "env": {
         "POSTGRES_CONNECTION_STRING": "postgres-connection"
       }
     },
     "filesystem": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem"],
-      "args2": ["/home/g_nelson/signals-1"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem"
+      ],
+      "args2": [
+        "/home/g_nelson/signals-1"
+      ]
     },
     "memory": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-memory"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ]
     },
     "brave-search": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-brave-search"
+      ],
       "env": {
         "BRAVE_API_KEY": "brave-api-key"
       }
     },
     "fetch": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-fetch"
+      ]
     },
     "git": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-git"],
-      "args2": ["/home/g_nelson/signals-1"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-git"
+      ],
+      "args2": [
+        "/home/g_nelson/signals-1"
+      ]
     },
     "everything": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-everything"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-everything"
+      ]
     },
     "mcp-gemini-google-search": {
       "command": "npx",
-      "args": ["-y", "mcp-gemini-google-search@latest"],
+      "args": [
+        "-y",
+        "mcp-gemini-google-search@latest"
+      ],
       "env": {
         "GOOGLE_API_KEY": "${GOOGLE_API_KEY}",
         "GOOGLE_CSE_ID": "${GOOGLE_CSE_ID}"

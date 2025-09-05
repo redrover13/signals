@@ -1,3 +1,8 @@
+# Create PR-Agent GitHub workflow if it doesn't exist
+if [[ ! -f ".github/workflows/pr_agent.yml" ]]; then
+    mkdir -p ".github/workflows"
+    echo "Creating PR-Agent workflow..."
+    cat > ".github/workflows/pr_agent.yml" << 'EOF'
 name: PR-Agent
 
 on:
@@ -5,11 +10,6 @@ on:
     types: [opened, reopened, synchronize, ready_for_review]
   issue_comment:
     types: [created, edited]
-
-permissions:
-  contents: read
-  pull-requests: write
-  issues: write  # Required for adding labels to PRs
 
 jobs:
   pr_agent_job:
@@ -49,21 +49,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install
           
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-
-      - name: Get secrets from Google Cloud Secret Manager
-        run: |
-          echo "OPENAI_KEY=$(gcloud secrets versions access latest --secret=OPENAI_KEY)" >> $GITHUB_ENV
-          echo "GITHUB_TOKEN=$(gcloud secrets versions access latest --secret=github-token)" >> $GITHUB_ENV
-          
       - name: PR Agent Action
         uses: Codium-ai/pr-agent@v0.11
         env:
-          OPENAI_KEY: ${{ env.OPENAI_KEY }}
-          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+EOF
+    echo "✅ PR-Agent workflow created"
+else
+    echo "✅ PR-Agent workflow already exists"
+fi
+
+echo "✅ PR-Agent MCP integration setup complete"

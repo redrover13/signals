@@ -14,6 +14,17 @@
     ]
   },
   "servers": {
+    "pr-agent": {
+      "command": "node",
+      "args": [
+        "/home/g_nelson/signals-1/.mcp/servers/pr-agent-mcp-server.mjs"
+      ],
+      "type": "stdio",
+      "env": {
+        "OPENAI_KEY": "openai-key",
+        "GITHUB_TOKEN": "github-token"
+      }
+    },
     "github": {
       "url": "https://api.githubcopilot.com/mcp/",
       "type": "http",
@@ -21,7 +32,10 @@
     },
     "codacy": {
       "command": "npx",
-      "args": ["-y", "@codacy/codacy-mcp@latest"],
+      "args": [
+        "-y",
+        "@codacy/codacy-mcp@latest"
+      ],
       "type": "stdio",
       "env": {
         "CODACY_ACCOUNT_TOKEN": "codacy-token"
@@ -29,7 +43,9 @@
     },
     "playwright": {
       "command": "npx",
-      "args": ["@playwright/mcp@latest"],
+      "args": [
+        "@playwright/mcp@latest"
+      ],
       "type": "stdio"
     },
     "terraform": {
@@ -61,12 +77,18 @@
     },
     "sequentialthinking": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
       "type": "stdio"
     },
     "google-search": {
       "command": "npx",
-      "args": ["-y", "@google/search-mcp@latest"],
+      "args": [
+        "-y",
+        "@google/search-mcp@latest"
+      ],
       "type": "stdio",
       "env": {
         "GOOGLE_API_KEY": "${GOOGLE_API_KEY}",
@@ -75,7 +97,10 @@
     },
     "google-drive": {
       "command": "npx",
-      "args": ["-y", "@google/drive-mcp@latest"],
+      "args": [
+        "-y",
+        "@google/drive-mcp@latest"
+      ],
       "type": "stdio",
       "env": {
         "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json"
@@ -83,7 +108,10 @@
     },
     "google-cloud": {
       "command": "npx",
-      "args": ["-y", "@google-cloud/mcp-server@latest"],
+      "args": [
+        "-y",
+        "@google-cloud/mcp-server@latest"
+      ],
       "type": "stdio",
       "env": {
         "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json",
@@ -92,7 +120,10 @@
     },
     "bigquery": {
       "command": "npx",
-      "args": ["-y", "@google-cloud/bigquery-mcp@latest"],
+      "args": [
+        "-y",
+        "@google-cloud/bigquery-mcp@latest"
+      ],
       "type": "stdio",
       "env": {
         "GOOGLE_APPLICATION_CREDENTIALS": "/home/g_nelson/.config/gcloud/application_default_credentials.json",

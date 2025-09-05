@@ -42,7 +42,7 @@ jobs:
         uses: google-github-actions/auth@v2.1.2
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
-
+          service_account:           ${{ secrets.GCP_SERVICE_ACCOUNT }}
       - name: Setup pnpm cache
         uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v4
         with:

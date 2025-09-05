@@ -1,0 +1,20 @@
+{
+  "name": "rag-document-processor",
+  "version": "1.0.0",
+  "description": "Cloud Function for processing documents in the RAG pipeline",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.3.0",
+    "@google-cloud/storage": "^7.16.0",
+    "@google-cloud/aiplatform": "^5.5.0",
+    "@google-cloud/pubsub": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

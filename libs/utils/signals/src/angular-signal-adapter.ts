@@ -9,7 +9,7 @@
  * @license MIT
  */
 
-import type { Signal } from '../index.js';
+
 
 /**
  * Enhanced signal interface that includes methods for our implementation

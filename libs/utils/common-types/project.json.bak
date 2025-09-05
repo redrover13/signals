@@ -1,0 +1,29 @@
+{
+  "name": "common-types",
+  "sourceRoot": "libs/utils/common-types/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/utils/common-types",
+        "main": "libs/utils/common-types/src/index.ts",
+        "tsConfig": "libs/utils/common-types/tsconfig.lib.json",
+        "assets": ["libs/utils/common-types/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/utils/common-types/jest.config.ts"
+      }
+    }
+  },
+  "tags": ["scope:utils", "type:lib"]
+}

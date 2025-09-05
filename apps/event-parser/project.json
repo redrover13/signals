@@ -23,8 +23,13 @@
       },
       "defaultConfiguration": "production",
       "cache": true,
-      "dependsOn": ["^build"],
-      "inputs": ["production", "^production"]
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ]
     },
     "deploy": {
       "executor": "nx:run-commands",
@@ -43,21 +48,44 @@
           "codeCoverage": true
         }
       },
-      "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"],
+      "inputs": [
+        "default",
+        "^default",
+        "{workspaceRoot}/jest.preset.js"
+      ],
       "cache": true
     },
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["apps/event-parser/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": [
+          "apps/event-parser/**/*.{ts,tsx,js,jsx}"
+        ]
       },
-      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json"
+      ],
       "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "tsc --noEmit -p ./tsconfig.json"
+        ]
+      }
     }
   },
-  "tags": ["domain:event-parser", "type:application"],
+  "tags": [
+    "domain:event-parser",
+    "type:application"
+  ],
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
     "production": [
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",

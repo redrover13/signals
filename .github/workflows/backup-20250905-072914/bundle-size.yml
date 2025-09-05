@@ -1,0 +1,86 @@
+name: Bundle Size Monitoring
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'apps/frontend-agents/**'
+      - 'libs/**/*.ts'
+      - 'libs/**/*.tsx'
+
+jobs:
+  analyze:
+    name: Analyze Bundle Size
+    runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ''
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: 10.0.0
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Next.js application
+        run: pnpm exec nx build frontend-agents
+
+      - name: Analyze bundle
+        uses: actions/github-script@v7.0.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+
+            try {
+              // Read the Next.js build output stats
+              const stats = JSON.parse(fs.readFileSync('./apps/frontend-agents/.next/build-manifest.json', 'utf8'));
+              
+              let comment = '## Bundle Size Analysis\n\n';
+              comment += 'The following changes to bundle sizes were detected:\n\n';
+              
+              // This is simplified - you'd want to compare with the previous build
+              // and only report significant changes
+              comment += '| Page | Size |\n';
+              comment += '| ---- | ---- |\n';
+              
+              Object.keys(stats.pages).forEach(page => {
+                // This is a placeholder - you'd want to calculate actual sizes
+                comment += `| ${page} | Analyze required |\n`;
+              });
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+              
+            } catch (error) {
+              console.error('Error analyzing bundle size:', error);
+            }

@@ -1,4 +1,4 @@
-import { bqAgent, BQAgent } from './bq-agent';
+import { bqAgent, BQAgent } from "./bq-agent.js"';
 
 describe('bqAgent', () => {
   it('should work', () => {

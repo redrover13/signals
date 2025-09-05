@@ -1,0 +1,39 @@
+{
+  "name": "gcp-auth-bigquery",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/utils/gcp-auth-bigquery/src",
+  "projectType": "library",
+  "tags": ["domain:gcp-auth", "type:library"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/utils/gcp-auth-bigquery",
+        "main": "libs/utils/gcp-auth-bigquery/src/index.ts",
+        "tsConfig": "libs/utils/gcp-auth-bigquery/tsconfig.lib.json",
+        "assets": ["libs/utils/gcp-auth-bigquery/*.md"]
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "generatePackageJson": true,
+          "sourceMap": false
+        },
+        "development": {
+          "optimization": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/utils/gcp-auth-bigquery/jest.config.ts"
+      }
+    }
+  }
+}

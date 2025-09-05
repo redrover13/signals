@@ -1,4 +1,4 @@
-import { lookerAgent } from './looker-agent';
+import { lookerAgent } from "./looker-agent.js"';
 
 describe('lookerAgent', () => {
   it('should work', () => {

@@ -1,0 +1,450 @@
+#!/usr/bin/env node
+
+/**
+ * Module Syntax Fixer
+ * 
+ * This script identifies files with mixed module syntax (CommonJS + ES Modules)
+ * and provides options to convert them to consistent ES Module syntax or rename
+ * pure CommonJS files to use the .cjs extension.
+ */
+
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// ES Modules specific: Get __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Get root directory
+const rootDir = path.resolve(__dirname, '..');
+
+// ANSI color codes for formatting
+const colors = {
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  red: '\x1b[31m',
+  cyan: '\x1b[36m',
+  magenta: '\x1b[35m'
+};
+
+// File categorization
+let mixedModuleFiles = [];
+let commonJsFiles = [];
+let esModuleFiles = [];
+
+// Process command line arguments
+const args = process.argv.slice(2);
+const dryRun = args.includes('--dry-run');
+const fixMixed = args.includes('--fix-mixed');
+const renameCjs = args.includes('--rename-cjs');
+const convertAll = args.includes('--convert-all');
+const verbose = args.includes('--verbose');
+const targetFile = args.find(arg => !arg.startsWith('--'));
+
+/**
+ * Print a section header
+ */
+function printHeader(text) {
+  console.log(`\n${colors.bright}${colors.cyan}=== ${text} ===${colors.reset}\n`);
+}
+
+/**
+ * Print an info line
+ */
+function printInfo(label, value, color = colors.green) {
+  console.log(`${colors.bright}${label}:${colors.reset} ${color}${value}${colors.reset}`);
+}
+
+/**
+ * Print a warning
+ */
+function printWarning(text) {
+  console.log(`${colors.yellow}⚠ WARNING: ${text}${colors.reset}`);
+}
+
+/**
+ * Print an error
+ */
+function printError(text) {
+  console.log(`${colors.red}❌ ERROR: ${text}${colors.reset}`);
+}
+
+/**
+ * Print a success message
+ */
+function printSuccess(text) {
+  console.log(`${colors.green}✓ ${text}${colors.reset}`);
+}
+
+/**
+ * Check if a file has CommonJS syntax
+ */
+function hasCommonJSSyntax(content) {
+  // Look for common patterns that indicate CommonJS usage
+  return (
+    content.includes('require(') || 
+    content.includes('module.exports') || 
+    content.includes('exports.')
+  );
+}
+
+/**
+ * Check if a file has ES Module syntax
+ */
+function hasESModuleSyntax(content) {
+  // Look for common patterns that indicate ESM usage
+  return (
+    content.includes('import ') || 
+    content.includes('export ') || 
+    content.includes('import(')
+  );
+}
+
+/**
+ * Find files with specific syntax patterns
+ */
+function findFilesWithModuleSyntax() {
+  printHeader('Scanning Files');
+  
+  // Use grep to find files with CommonJS syntax
+  try {
+    const commonJsGrepCmd = `find ${rootDir} -type f -name "*.js" -o -name "*.ts" -not -path "*/node_modules/*" -not -path "*/dist/*" | xargs grep -l "require\\\\(\\\\|module\\\\.exports\\\\|exports\\\\." 2>/dev/null || true`;
+    const commonJsFilePaths = execSync(commonJsGrepCmd).toString().trim().split('\n').filter(Boolean);
+    
+    // Use grep to find files with ES Module syntax
+    const esModuleGrepCmd = `find ${rootDir} -type f -name "*.js" -o -name "*.ts" -not -path "*/node_modules/*" -not -path "*/dist/*" | xargs grep -l "import \\\\|export \\\\|import(" 2>/dev/null || true`;
+    const esModuleFilePaths = execSync(esModuleGrepCmd).toString().trim().split('\n').filter(Boolean);
+    
+    // Further analyze each file for its actual content
+    const allFilePaths = new Set([...commonJsFilePaths, ...esModuleFilePaths]);
+    
+    for (const filePath of allFilePaths) {
+      try {
+        const content = fs.readFileSync(filePath, 'utf8');
+        const hasCJS = hasCommonJSSyntax(content);
+        const hasESM = hasESModuleSyntax(content);
+        
+        if (hasCJS && hasESM) {
+          mixedModuleFiles.push(filePath);
+        } else if (hasCJS) {
+          commonJsFiles.push(filePath);
+        } else if (hasESM) {
+          esModuleFiles.push(filePath);
+        }
+      } catch (error) {
+        printWarning(`Could not analyze ${filePath}: ${error.message}`);
+      }
+    }
+    
+    printInfo('Mixed Module Files', mixedModuleFiles.length, mixedModuleFiles.length > 0 ? colors.yellow : colors.green);
+    printInfo('CommonJS Files', commonJsFiles.length, colors.cyan);
+    printInfo('ES Module Files', esModuleFiles.length, colors.green);
+    
+    if (verbose) {
+      if (mixedModuleFiles.length > 0) {
+        console.log(`\n${colors.yellow}Mixed Module Files:${colors.reset}`);
+        mixedModuleFiles.forEach(file => console.log(`  - ${file}`));
+      }
+      
+      if (commonJsFiles.length > 0) {
+        console.log(`\n${colors.cyan}CommonJS Files:${colors.reset}`);
+        commonJsFiles.forEach(file => console.log(`  - ${file}`));
+      }
+    }
+  } catch (error) {
+    printError(`Failed to find files: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+/**
+ * Convert a CommonJS require to ES Module import
+ */
+function convertRequireToImport(requireStatement) {
+  // Extract module name and variable assignment
+  const requireRegex = /(?:const|let|var)?\s*(?:\{([^}]*)\}|([a-zA-Z0-9_$]+))\s*=\s*require\(['"]([^'"]+)['"]\);?/;
+  const match = requireStatement.match(requireRegex);
+  
+  if (!match) {
+    return requireStatement; // Return original if no match
+  }
+  
+  const destructured = match[1];
+  const variableName = match[2];
+  const moduleName = match[3];
+  
+  if (destructured) {
+    // Convert destructured require
+    return `import { ${destructured} } from '${moduleName}';`;
+  } else if (variableName) {
+    // Convert default require
+    return `import ${variableName} from '${moduleName}';`;
+  }
+  
+  return requireStatement;
+}
+
+/**
+ * Convert module.exports to ES Module exports
+ */
+function convertModuleExports(exportStatement) {
+  // Convert module.exports = X to export default X
+  if (exportStatement.includes('module.exports =')) {
+    return exportStatement.replace('module.exports =', 'export default');
+  }
+  
+  // Convert exports.X = Y to export const X = Y
+  const exportsRegex = /exports\.([a-zA-Z0-9_$]+)\s*=\s*(.*);?/;
+  const match = exportStatement.match(exportsRegex);
+  
+  if (match) {
+    const exportName = match[1];
+    const exportValue = match[2];
+    
+    // Handle function exports
+    if (exportValue.trim().startsWith('function')) {
+      return `export function ${exportName}${exportValue.substring(8)};`;
+    }
+    
+    return `export const ${exportName} = ${exportValue};`;
+  }
+  
+  return exportStatement;
+}
+
+/**
+ * Convert a file from CommonJS to ES Module syntax
+ */
+function convertFileToESM(filePath) {
+  try {
+    if (dryRun) {
+      printInfo(`Would convert`, filePath, colors.cyan);
+      return true;
+    }
+    
+    let content = fs.readFileSync(filePath, 'utf8');
+    let lines = content.split('\n');
+    let modified = false;
+    
+    // Process each line
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      if (line.includes('require(')) {
+        const newLine = convertRequireToImport(line);
+        if (newLine !== line) {
+          lines[i] = newLine;
+          modified = true;
+        }
+      } else if (line.includes('module.exports') || line.includes('exports.')) {
+        const newLine = convertModuleExports(line);
+        if (newLine !== line) {
+          lines[i] = newLine;
+          modified = true;
+        }
+      }
+    }
+    
+    if (modified) {
+      fs.writeFileSync(filePath, lines.join('\n'), 'utf8');
+      printSuccess(`Converted ${filePath} to ES Module syntax`);
+      return true;
+    } else {
+      printInfo(`No changes needed for`, filePath, colors.cyan);
+      return false;
+    }
+  } catch (error) {
+    printError(`Failed to convert ${filePath}: ${error.message}`);
+    return false;
+  }
+}
+
+/**
+ * Rename a file to use .cjs extension
+ */
+function renameFileToCjs(filePath) {
+  try {
+    const dirName = path.dirname(filePath);
+    const baseName = path.basename(filePath);
+    const extension = path.extname(filePath);
+    const nameWithoutExt = baseName.substring(0, baseName.length - extension.length);
+    const newPath = path.join(dirName, `${nameWithoutExt}.cjs`);
+    
+    if (dryRun) {
+      printInfo(`Would rename`, `${filePath} → ${newPath}`, colors.cyan);
+      return true;
+    }
+    
+    fs.renameSync(filePath, newPath);
+    printSuccess(`Renamed ${filePath} to ${newPath}`);
+    return true;
+  } catch (error) {
+    printError(`Failed to rename ${filePath}: ${error.message}`);
+    return false;
+  }
+}
+
+/**
+ * Process a single file (target-specific mode)
+ */
+function processTargetFile(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const hasCJS = hasCommonJSSyntax(content);
+    const hasESM = hasESModuleSyntax(content);
+    
+    printHeader(`Analyzing ${filePath}`);
+    
+    if (hasCJS && hasESM) {
+      printInfo('Module Type', 'Mixed (CommonJS + ES Module)', colors.yellow);
+      if (fixMixed || convertAll) {
+        return convertFileToESM(filePath);
+      }
+    } else if (hasCJS) {
+      printInfo('Module Type', 'CommonJS', colors.cyan);
+      if (renameCjs) {
+        return renameFileToCjs(filePath);
+      } else if (convertAll) {
+        return convertFileToESM(filePath);
+      }
+    } else if (hasESM) {
+      printInfo('Module Type', 'ES Module', colors.green);
+      printSuccess('File already uses ES Module syntax');
+      return true;
+    } else {
+      printInfo('Module Type', 'No module syntax detected', colors.magenta);
+      return true;
+    }
+    
+    printInfo('No Action', 'Use --fix-mixed, --rename-cjs, or --convert-all to apply changes', colors.yellow);
+    return true;
+  } catch (error) {
+    printError(`Failed to process ${filePath}: ${error.message}`);
+    return false;
+  }
+}
+
+/**
+ * Fix all identified files based on command line arguments
+ */
+function fixAllFiles() {
+  let fixedCount = 0;
+  let errorCount = 0;
+  
+  printHeader('Fixing Files');
+  
+  // Fix mixed module files
+  if (fixMixed || convertAll) {
+    printInfo('Processing', `${mixedModuleFiles.length} mixed module files`, colors.cyan);
+    for (const filePath of mixedModuleFiles) {
+      const success = convertFileToESM(filePath);
+      if (success) fixedCount++;
+      else errorCount++;
+    }
+  }
+  
+  // Fix CommonJS files
+  if (commonJsFiles.length > 0) {
+    if (renameCjs) {
+      printInfo('Processing', `${commonJsFiles.length} CommonJS files for renaming`, colors.cyan);
+      for (const filePath of commonJsFiles) {
+        const success = renameFileToCjs(filePath);
+        if (success) fixedCount++;
+        else errorCount++;
+      }
+    } else if (convertAll) {
+      printInfo('Processing', `${commonJsFiles.length} CommonJS files for conversion`, colors.cyan);
+      for (const filePath of commonJsFiles) {
+        const success = convertFileToESM(filePath);
+        if (success) fixedCount++;
+        else errorCount++;
+      }
+    } else {
+      printWarning(`${commonJsFiles.length} CommonJS files not processed. Use --rename-cjs or --convert-all to process them.`);
+    }
+  }
+  
+  printHeader('Summary');
+  printInfo('Fixed Files', fixedCount, colors.green);
+  if (errorCount > 0) {
+    printInfo('Errors', errorCount, colors.red);
+  }
+  
+  if (dryRun) {
+    printInfo('Dry Run', 'No changes were actually made', colors.yellow);
+  }
+}
+
+/**
+ * Print usage information
+ */
+function printUsage() {
+  console.log(`
+${colors.bright}Module Syntax Fixer${colors.reset}
+
+This script identifies and fixes files with mixed module syntax (CommonJS + ES Modules).
+
+Usage:
+  node ${path.basename(__filename)} [options] [filepath]
+
+Options:
+  --dry-run      Show what would be changed without making changes
+  --fix-mixed    Convert mixed module files to ES Module syntax
+  --rename-cjs   Rename pure CommonJS files to use .cjs extension
+  --convert-all  Convert all CommonJS files to ES Module syntax
+  --verbose      Show detailed information about identified files
+
+Examples:
+  node ${path.basename(__filename)} --verbose            # Scan and report only
+  node ${path.basename(__filename)} --fix-mixed          # Fix mixed module files
+  node ${path.basename(__filename)} --rename-cjs         # Rename CommonJS files to .cjs
+  node ${path.basename(__filename)} --convert-all        # Convert all to ES Modules
+  node ${path.basename(__filename)} path/to/file.js      # Process a single file
+  `);
+}
+
+/**
+ * Main function
+ */
+function main() {
+  // Show usage if help is requested
+  if (args.includes('--help') || args.includes('-h')) {
+    printUsage();
+    return;
+  }
+  
+  console.log(`${colors.bright}${colors.magenta}Module Syntax Fixer${colors.reset}`);
+  
+  if (dryRun) {
+    console.log(`${colors.yellow}DRY RUN MODE: No files will be modified${colors.reset}`);
+  }
+  
+  // Process a single target file if specified
+  if (targetFile) {
+    if (!fs.existsSync(targetFile)) {
+      printError(`File not found: ${targetFile}`);
+      process.exit(1);
+    }
+    
+    processTargetFile(targetFile);
+    return;
+  }
+  
+  // Find files with module syntax
+  findFilesWithModuleSyntax();
+  
+  // Fix files if requested
+  if (fixMixed || renameCjs || convertAll) {
+    fixAllFiles();
+  } else {
+    console.log(`\n${colors.yellow}No action taken. Use --fix-mixed, --rename-cjs, or --convert-all to apply changes.${colors.reset}`);
+    console.log(`${colors.yellow}Use --help for more information.${colors.reset}`);
+  }
+}
+
+// Run the main function
+main();

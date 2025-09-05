@@ -35,7 +35,7 @@
     "ts:build": "nx run-many --target=build --all",
     "ts:build:watch": "nx run-many --target=build --all --watch",
     "ts:build:clean": "tsc -b tsconfig.references.json --clean",
-    "ts:check": "nx run-many --target=typecheck --all",
+    "ts:check": "nx run-many --target=typecheck --all --skip-nx-cache",
     "ts:check:strict": "tsc --noEmit --strict",
     "ts:refs:enable": "node scripts/enable-ts-project-references.js",
     "ts:analyze": "node ./tools/scripts/typescript-strict-analyzer.js",
@@ -56,7 +56,8 @@
     "analyze:paths": "node tools/typescript/analyze-path-mappings.js",
     "analyze:nx": "node tools/nx/analyze-nx-config.js",
     "analyze:env": "node tools/nx/analyze-nx-config.js > nx-analysis.md && node tools/typescript/analyze-path-mappings.js > path-analysis.md",
-    "ts:template:apply": "node typescript-diagnostics/scripts/apply-tsconfig-template.js"
+    "ts:template:apply": "node typescript-diagnostics/scripts/apply-tsconfig-template.js",
+    "esm:check": "./build-check.sh"
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",

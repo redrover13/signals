@@ -2,7 +2,11 @@
   "name": "agents",
   "sourceRoot": "apps/agents/src",
   "projectType": "application",
-  "implicitDependencies": ["gemini-orchestrator", "monitoring", "gcp"],
+  "implicitDependencies": [
+    "gemini-orchestrator",
+    "monitoring",
+    "gcp"
+  ],
   "targets": {
     "dev": {
       "executor": "nx:run-commands",
@@ -12,12 +16,16 @@
     },
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/apps/agents",
         "main": "apps/agents/src/main.ts",
         "tsConfig": "apps/agents/tsconfig.app.json",
-        "assets": ["apps/agents/src/assets"]
+        "assets": [
+          "apps/agents/src/assets"
+        ]
       },
       "configurations": {
         "production": {
@@ -32,14 +40,21 @@
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["apps/agents/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": [
+          "apps/agents/**/*.{ts,tsx,js,jsx}"
+        ]
       },
-      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json"
+      ],
       "cache": true
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
       "options": {
         "jestConfig": "{projectRoot}/jest.config.ts",
         "passWithNoTests": true
@@ -50,13 +65,32 @@
           "codeCoverage": true
         }
       },
-      "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"],
+      "inputs": [
+        "default",
+        "^default",
+        "{workspaceRoot}/jest.preset.js"
+      ],
       "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "tsc --noEmit -p ./tsconfig.json"
+        ]
+      }
     }
   },
-  "tags": ["domain:agents", "type:application", "scope:server"],
+  "tags": [
+    "domain:agents",
+    "type:application",
+    "scope:server"
+  ],
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
     "production": [
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",

@@ -1,0 +1,156 @@
+name: Nx Cloud CI
+
+on:
+  push:
+    branches: [main, develop, staging]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10.0.0'
+  NX_CLOUD_AUTH_TOKEN: ${{ secrets.NX_CLOUD_AUTH_TOKEN }}
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+  NX_BRANCH: ${{ github.event.number || github.ref_name }}
+  NX_CLOUD_DISTRIBUTED_EXECUTION: 'true'
+  NX_CLOUD_POWERPACK: "true"
+  NX_CLOUD_SMART_REBUILDS: "true"
+
+jobs:
+  main:
+    name: Nx Cloud Main Job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create .env.local for CI
+        run: |
+          cat > .env.local << EOL
+          # API Environment Variables
+          API_PORT=3333
+          API_HOST=localhost
+          API_PREFIX=/api
+          API_CORS_ORIGIN=*
+
+          # Agents Environment Variables
+          AGENTS_PORT=3334
+          AGENTS_HOST=localhost
+          AGENTS_PREFIX=/agents
+          AGENTS_CORS_ORIGIN=*
+
+          # Web Environment Variables
+          NEXT_PUBLIC_API_BASE=http://localhost:3333/api
+
+          # Agent Frontend Environment Variables
+          VITE_GEMINI_API_KEY=dummy-key
+          VITE_GCP_PROJECT_ID=dummy-project
+          VITE_FIREBASE_API_KEY=dummy-firebase-key
+          VITE_FIREBASE_AUTH_DOMAIN=dummy-auth-domain
+          VITE_FIREBASE_PROJECT_ID=dummy-project
+          VITE_FIREBASE_STORAGE_BUCKET=dummy-storage
+          VITE_FIREBASE_MESSAGING_SENDER_ID=dummy-sender
+          VITE_FIREBASE_APP_ID=dummy-app-id
+          EOL
+
+      - name: Initialize Nx Cloud run
+        run: pnpm exec nx-cloud start-ci-run --distribute-on=5:linux:16:8
+
+      - name: Run lint tasks
+        run: pnpm exec nx-cloud record -- pnpm exec nx run-many --target=lint --all --parallel=3
+
+      - name: Run build tasks
+        run: pnpm exec nx-cloud record -- pnpm exec nx run-many --target=build --all --parallel=3
+
+      - name: Report affected projects
+        id: affected
+        run: |
+          AFFECTED_APPS=$(pnpm exec nx show projects --affected --type=app)
+          AFFECTED_LIBS=$(pnpm exec nx show projects --affected --type=lib)
+
+          echo "Affected apps: $AFFECTED_APPS"
+          echo "Affected libs: $AFFECTED_LIBS"
+
+          echo "affected-apps=$(echo $AFFECTED_APPS | tr ' ' ',')" >> $GITHUB_OUTPUT
+          echo "affected-libs=$(echo $AFFECTED_LIBS | tr ' ' ',')" >> $GITHUB_OUTPUT
+
+      - name: Stop Nx Cloud run
+        if: always()
+        run: pnpm exec nx-cloud stop-all-agents
+
+  agents:
+    name: Nx Cloud Agent ${{ matrix.agent }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        agent: [1, 2, 3, 4]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create .env.local for CI
+        run: |
+          cat > .env.local << EOL
+          # API Environment Variables
+          API_PORT=3333
+          API_HOST=localhost
+          API_PREFIX=/api
+          API_CORS_ORIGIN=*
+
+          # Agents Environment Variables
+          AGENTS_PORT=3334
+          AGENTS_HOST=localhost
+          AGENTS_PREFIX=/agents
+          AGENTS_CORS_ORIGIN=*
+
+          # Web Environment Variables
+          NEXT_PUBLIC_API_BASE=http://localhost:3333/api
+
+          # Agent Frontend Environment Variables
+          VITE_GEMINI_API_KEY=dummy-key
+          VITE_GCP_PROJECT_ID=dummy-project
+          VITE_FIREBASE_API_KEY=dummy-firebase-key
+          VITE_FIREBASE_AUTH_DOMAIN=dummy-auth-domain
+          VITE_FIREBASE_PROJECT_ID=dummy-project
+          VITE_FIREBASE_STORAGE_BUCKET=dummy-storage
+          VITE_FIREBASE_MESSAGING_SENDER_ID=dummy-sender
+          VITE_FIREBASE_APP_ID=dummy-app-id
+          EOL
+
+      - name: Start Nx Agent ${{ matrix.agent }}
+        run: pnpm exec nx-cloud start-agent
+        env:
+          NX_AGENT_NAME: ${{ matrix.agent }}

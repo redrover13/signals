@@ -1,16 +1,14 @@
+import { readFileSync } from 'fs';
+
+// Reading the base Jest preset using dynamic import
+const { default: jestPreset } = await import('../../jest.preset.mjs');
+
 export default {
-  displayName: 'agents-lib',
-  preset: '../../jest.preset.mjs',
-  coverageDirectory: '../../coverage/libs/agents',
-  testEnvironment: 'node',
+  ...jestPreset,
+  displayName: 'agents',
   transform: {
-    '^.+\\.(ts|js|html)$': 'ts-jest',
+    '^.+\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
-  moduleFileExtensions: ['ts', 'html', 'js', 'json', 'mjs'],
-  collectCoverageFrom: [
-    'src/**/*.{ts,js}',
-    '!src/**/*.d.ts',
-    '!src/**/*.config.ts',
-    '!src/**/index.ts',
-  ],
+  moduleFileExtensions: ['ts', 'js', 'mjs', 'html'],
+  coverageDirectory: '../../coverage/agents'
 };

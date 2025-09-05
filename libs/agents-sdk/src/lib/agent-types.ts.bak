@@ -1,0 +1,46 @@
+/**
+ * @fileoverview Type definitions for the agents SDK
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains TypeScript type definitions for agent operations.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+export interface AgentConfig {
+  apiKey: string | undefined;
+  projectId: string | undefined;
+  firebaseConfig: {
+    apiKey: string | undefined;
+    authDomain: string | undefined;
+    projectId: string | undefined;
+    storageBucket: string | undefined;
+    messagingSenderId: string | undefined;
+    appId: string | undefined;
+  };
+}
+
+export interface AgentResponse {
+  success: boolean | undefined;
+  data?: any | undefined;
+  error?: string | undefined;
+  message?: string | undefined;
+}
+
+export interface SubAgentInterface {
+  execute(input: any): Promise<AgentResponse> | undefined;
+}
+
+export interface QueryRequest {
+  query: string | undefined;
+  context?: Record<string, any> | undefined;
+  userId?: string | undefined;
+  timestamp?: Date | undefined;
+}
+
+export interface OrchestrationResult extends AgentResponse {
+  agentUsed?: 'bigquery' | 'firebase' | 'none';
+  executionTime?: number | undefined;
+}

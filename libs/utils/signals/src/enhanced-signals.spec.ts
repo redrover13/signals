@@ -2,7 +2,7 @@
  * @fileoverview Enhanced signals test spec
  */
 
-import { createSignal, SignalValue, UnwrapSignal } from '../enhanced-index';
+import { createSignal, SignalValue, UnwrapSignal } from "../enhanced-index.js"';
 
 describe('Enhanced Signals Library', () => {
   describe('createSignal', () => {

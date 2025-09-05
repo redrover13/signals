@@ -1,4 +1,4 @@
-import { reviewsAgent } from './reviews-agent';
+import { reviewsAgent } from "./reviews-agent.js"';
 
 describe('reviewsAgent', () => {
   it('should work', () => {

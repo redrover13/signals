@@ -1,5 +1,6 @@
 {
   "name": "@dulce-de-saigon/event-parser",
+  "type": "module",
   "version": "1.0.0",
   "description": "Cloud Function to parse raw agent events, stage them, and load into BigQuery.",
   "main": "index.js",

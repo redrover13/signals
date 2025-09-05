@@ -1,0 +1,15 @@
+{
+  "name": "@dulce-de-saigon/event-parser",
+  "version": "1.0.0",
+  "description": "Cloud Function to parse raw agent events, stage them, and load into BigQuery.",
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+    "@google-cloud/bigquery": "8.1.1",
+    "@google-cloud/storage": "7.16.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@google-cloud/functions-framework": "^3.3.0"
+  }
+}

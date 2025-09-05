@@ -10,8 +10,8 @@
  */
 
 import React from 'react';
-import type { Signal } from '../index.js';
-import { createSignal } from '../index.js';
+
+
 
 /**
  * Create a signal from a Redux store selector

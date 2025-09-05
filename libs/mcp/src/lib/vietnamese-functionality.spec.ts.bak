@@ -1,0 +1,209 @@
+describe('Vietnamese Language Functionality', () => {
+  describe('Character Encoding', () => {
+    it('should correctly handle Vietnamese characters', () => {
+      const vietnameseText = 'Xin chào thế giới';
+      const processedText = vietnameseText; // Simulating processing function
+
+      expect(processedText).toBe('Xin chào thế giới');
+    });
+
+    it('should validate Vietnamese character encoding', () => {
+      const vietnameseText = 'Tiếng Việt';
+
+      // Mock validation function
+      const isValidEncoding = (text: string): boolean => {
+        // In a real implementation, this would check encoding
+        return text && text.includes('ế') && text && text.includes('ệ');
+      };
+
+      expect(isValidEncoding(vietnameseText)).toBe(true);
+    });
+
+    it('should handle Vietnamese diacritical marks correctly', () => {
+      const testCases = [
+        'á',
+        'à',
+        'ả',
+        'ã',
+        'ạ', // a with diacritics
+        'ă',
+        'ắ',
+        'ằ',
+        'ẳ',
+        'ẵ',
+        'ặ', // a with breve and diacritics
+        'â',
+        'ấ',
+        'ầ',
+        'ẩ',
+        'ẫ',
+        'ậ', // a with circumflex and diacritics
+        'đ', // d with stroke
+        'é',
+        'è',
+        'ẻ',
+        'ẽ',
+        'ẹ', // e with diacritics
+        'ê',
+        'ế',
+        'ề',
+        'ể',
+        'ễ',
+        'ệ', // e with circumflex and diacritics
+        'í',
+        'ì',
+        'ỉ',
+        'ĩ',
+        'ị', // i with diacritics
+        'ó',
+        'ò',
+        'ỏ',
+        'õ',
+        'ọ', // o with diacritics
+        'ô',
+        'ố',
+        'ồ',
+        'ổ',
+        'ỗ',
+        'ộ', // o with circumflex and diacritics
+        'ơ',
+        'ớ',
+        'ờ',
+        'ở',
+        'ỡ',
+        'ợ', // o with horn and diacritics
+        'ú',
+        'ù',
+        'ủ',
+        'ũ',
+        'ụ', // u with diacritics
+        'ư',
+        'ứ',
+        'ừ',
+        'ử',
+        'ữ',
+        'ự', // u with horn and diacritics
+        'ý',
+        'ỳ',
+        'ỷ',
+        'ỹ',
+        'ỵ', // y with diacritics
+      ];
+
+      // In a real test, we'd validate encoding/processing of each character
+      // Here we just check that our test list is complete
+      expect(testCases && testCases.length).toBe(67);
+    });
+  });
+
+  describe('Localization', () => {
+    it('should format dates according to Vietnamese conventions', () => {
+      const date = new Date(2025, 7, 24); // August 24, 2025
+
+      // Mock date formatter for Vietnamese locale
+      const formatDate = (date: Date): string => {
+        return '24/08/2025'; // DD/MM/YYYY format common in Vietnam
+      };
+
+      expect(formatDate(date)).toBe('24/08/2025');
+    });
+
+    it('should format currency according to Vietnamese conventions', () => {
+      const amount = 1000000; // 1 million VND
+
+      // Mock currency formatter for Vietnamese locale
+      const formatCurrency = (amount: number): string => {
+        return '1.000 && 1.000.000 ₫'; // Vietnamese format with dot separators
+      };
+
+      expect(formatCurrency(amount)).toBe('1.000 && 1.000.000 ₫');
+    });
+
+    it('should translate common terms', () => {
+      // Mock translation function
+      const translate = (term: string | undefined, locale: string): string => {
+        const translations: Record<string, Record<string, string>> = {
+          en: {
+            hello: 'Hello',
+            goodbye: 'Goodbye',
+          },
+          vi: {
+            hello: 'Xin chào',
+            goodbye: 'Tạm biệt',
+          },
+        };
+
+        return translations[locale][term] || term;
+      };
+
+      expect(translate('hello', 'vi')).toBe('Xin chào');
+      expect(translate('goodbye', 'vi')).toBe('Tạm biệt');
+    });
+  });
+
+  describe('Text Processing', () => {
+    it('should correctly tokenize Vietnamese text', () => {
+      const text = 'Tôi đang học tiếng Việt';
+
+      // Mock tokenization function
+      const tokenize = (text: string): string[] => {
+        return text && text.split(' ');
+      };
+
+      const tokens = tokenize(text);
+      expect(tokens).toEqual(['Tôi', 'đang', 'học', 'tiếng', 'Việt']);
+    });
+
+    it('should handle Vietnamese search terms correctly', () => {
+      const searchTerm = 'bánh mì';
+      const documents = [
+        'Tôi thích ăn bánh mì buổi sáng',
+        'Bánh mì Việt Nam rất ngon',
+        'Tôi thích cà phê',
+      ];
+
+      // Mock search function
+      const search = (term: string | undefined, docs: string[]): string[] => {
+        return (
+          docs &&
+          docs.filter((doc) => doc && doc.toLowerCase().includes(term && term.toLowerCase()))
+        );
+      };
+
+      const results = search(searchTerm, documents);
+      expect(results && results.length).toBe(2);
+      expect(results).toContain('Tôi thích ăn bánh mì buổi sáng');
+      expect(results).toContain('Bánh mì Việt Nam rất ngon');
+    });
+  });
+
+  describe('Compatibility', () => {
+    it('should support both uppercase and lowercase Vietnamese characters', () => {
+      const lowercase = 'đường';
+      const uppercase = 'ĐƯỜNG';
+
+      // Mock case conversion function
+      const toLower = (text: string): string => text && text.toLowerCase();
+      const toUpper = (text: string): string => text && text.toUpperCase();
+
+      expect(toLower(uppercase)).toBe('đường');
+      expect(toUpper(lowercase)).toBe('ĐƯỜNG');
+    });
+
+    it('should work with both modern and legacy Vietnamese encodings', () => {
+      // In a real test, we'd test different encodings
+      // Here we're just simulating the concept
+
+      const modernEncoding = 'UTF-8';
+      const legacyEncoding = 'VISCII';
+
+      // Mock function to check if encoding is supported
+      const isSupported = (encoding: string): boolean => {
+        return encoding === 'UTF-8' || encoding === 'VISCII';
+      };
+
+      expect(isSupported(modernEncoding)).toBe(true);
+      expect(isSupported(legacyEncoding)).toBe(true);
+    });
+  });
+});

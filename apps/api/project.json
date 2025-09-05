@@ -8,17 +8,27 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "node dist/apps/api/main.js",
-        "dependsOn": ["build"]
+        "dependsOn": [
+          "build"
+        ]
       }
     },
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/apps/api",
         "main": "apps/api/src/main.ts",
         "tsConfig": "apps/api/tsconfig.app.json",
-        "assets": [{ "glob": "**/*", "input": "apps/api/src/routes", "output": "routes" }]
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/api/src/routes",
+            "output": "routes"
+          }
+        ]
       },
       "configurations": {
         "production": {
@@ -33,9 +43,14 @@
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "args": ["**/*.{ts,tsx,js,jsx}"]
+        "args": [
+          "**/*.{ts,tsx,js,jsx}"
+        ]
       },
-      "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json"
+      ],
       "cache": true
     },
     "test": {
@@ -49,7 +64,11 @@
           "codeCoverage": true
         }
       },
-      "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"],
+      "inputs": [
+        "default",
+        "^default",
+        "{workspaceRoot}/jest.preset.js"
+      ],
       "cache": true
     },
     "build-all": {
@@ -58,12 +77,29 @@
       "options": {
         "command": "echo 'Building all dependencies' && nx build mcp && nx build gcp"
       }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "tsc --noEmit -p ./tsconfig.json"
+        ]
+      }
     }
   },
-  "tags": ["domain:api", "type:application", "scope:server"],
-  "implicitDependencies": ["gcp-auth"],
+  "tags": [
+    "domain:api",
+    "type:application",
+    "scope:server"
+  ],
+  "implicitDependencies": [
+    "gcp-auth"
+  ],
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
     "production": [
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",

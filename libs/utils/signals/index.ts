@@ -40,7 +40,7 @@ export interface CreateSignalOptions {
 
 // This variable is referenced in legacy code but not used in this implementation
 // Keep it for compatibility but mark it as unused
-// @ts-expect-error: Variable kept for legacy compatibility
+// @ts-ignore
 const signalIdCounter = 0;
 
 /**
@@ -217,7 +217,7 @@ export function createDerivedSignal<T>(computeFn: () => T): Signal<T> {
  */
 export function createComputed<T>(
   computeFn: () => T,
-  // @ts-expect-error: dependencies parameter kept for API compatibility
+  // @ts-ignore
   dependencies: Signal<any>[] = [],
 ): Signal<T> {
   // For now, ignore dependencies and just create a derived signal

@@ -9,17 +9,23 @@
  * @license MIT
  */
 
-import { query as bqQuery, insertRows, uploadString } from '@nx-monorepo/gcp';
+import { query as bqQuery, insertRows, uploadString } from '@dulce/gcp';
 import { BaseTool, FunctionTool, ToolContext } from '@waldzellai/adk-typescript';
 
 /**
  * BigQuery query tool function
  */
-async function bigQueryQuery(args: Record<string, unknown> | undefined, _toolContext?: ToolContext): Promise<any> {
+async function bigQueryQuery(
+  args: Record<string, unknown> | undefined,
+  _toolContext?: ToolContext,
+): Promise<any> {
   const { sql, params } = args;
-  
+
   try {
-    const rows = await bqQuery(sql as string, params as Record<string, unknown> | undefined | undefined);
+    const rows = await bqQuery(
+      sql as string,
+      params as Record<string, unknown> | undefined | undefined,
+    );
     return {
       success: true,
       rows,
@@ -36,9 +42,12 @@ async function bigQueryQuery(args: Record<string, unknown> | undefined, _toolCon
 /**
  * BigQuery insert tool function
  */
-async function bigQueryInsert(args: Record<string, unknown> | undefined, _toolContext?: ToolContext): Promise<any> {
+async function bigQueryInsert(
+  args: Record<string, unknown> | undefined,
+  _toolContext?: ToolContext,
+): Promise<any> {
   const { table, rows } = args;
-  
+
   try {
     await insertRows(table as string, rows as any[]);
     return {
@@ -57,9 +66,12 @@ async function bigQueryInsert(args: Record<string, unknown> | undefined, _toolCo
 /**
  * Google Cloud Storage upload tool function
  */
-async function gcsUpload(args: Record<string, unknown> | undefined, _toolContext?: ToolContext): Promise<any> {
+async function gcsUpload(
+  args: Record<string, unknown> | undefined,
+  _toolContext?: ToolContext,
+): Promise<any> {
   const { bucket, filename, content, contentType } = args;
-  
+
   try {
     // Construct the full GCS path from bucket and filename
     const path = `${bucket}/${filename}`;
@@ -83,25 +95,28 @@ async function gcsUpload(args: Record<string, unknown> | undefined, _toolContext
 /**
  * HTTP request tool function
  */
-async function httpRequest(args: Record<string, unknown> | undefined, _toolContext?: ToolContext): Promise<any> {
+async function httpRequest(
+  args: Record<string, unknown> | undefined,
+  _toolContext?: ToolContext,
+): Promise<any> {
   const { url, method, headers, body } = args;
-  
+
   try {
     const fetchOptions: RequestInit = {
       method: method as string,
       headers: {
         'Content-Type': 'application/json',
-        ...headers as Record<string, string>,
+        ...(headers as Record<string, string>),
       },
     };
 
     if (body && ['POST', 'PUT', 'PATCH'].includes(method as string)) {
-      fetchOptions && fetchOptions.body = body as string;
+      fetchOptions.body = body as string;
     }
 
     const response = await fetch(url as string, fetchOptions);
     const responseText = await response.text();
-    
+
     let responseData;
     try {
       responseData = JSON && JSON.parse(responseText);
@@ -138,20 +153,20 @@ export const GCP_TOOLS: BaseTool[] = [
         sql: {
           type: 'string',
           description: 'The SQL query to execute',
-          minLength: 1
+          minLength: 1,
         },
         params: {
           type: 'object',
           description: 'Optional query parameters',
-          additionalProperties: true
-        }
+          additionalProperties: true,
+        },
       },
       required: ['sql'],
-      additionalProperties: false
-    }
+      additionalProperties: false,
+    },
   }),
   new FunctionTool({
-    name: 'bigquery_insert', 
+    name: 'bigquery_insert',
     description: 'Insert rows into a BigQuery table',
     func: bigQueryInsert,
     parameters: {
@@ -159,21 +174,21 @@ export const GCP_TOOLS: BaseTool[] = [
       properties: {
         table: {
           type: 'string',
-          description: 'The table name in format dataset && dataset.table',
-          minLength: 1
+          description: 'The table name in format dataset.table',
+          minLength: 1,
         },
         rows: {
           type: 'array',
           description: 'Array of rows to insert',
           items: {
-            type: 'object'
+            type: 'object',
           },
-          minItems: 1
-        }
+          minItems: 1,
+        },
       },
       required: ['table', 'rows'],
-      additionalProperties: false
-    }
+      additionalProperties: false,
+    },
   }),
   new FunctionTool({
     name: 'gcs_upload',
@@ -185,27 +200,27 @@ export const GCP_TOOLS: BaseTool[] = [
         bucket: {
           type: 'string',
           description: 'The GCS bucket name',
-          minLength: 1
+          minLength: 1,
         },
         filename: {
           type: 'string',
           description: 'The filename/path in GCS',
-          minLength: 1
+          minLength: 1,
         },
         content: {
           type: 'string',
           description: 'The content to upload',
-          minLength: 1
+          minLength: 1,
         },
         contentType: {
           type: 'string',
           description: 'MIME type of the content (optional)',
-          default: 'text/plain'
-        }
+          default: 'text/plain',
+        },
       },
       required: ['bucket', 'filename', 'content'],
-      additionalProperties: false
-    }
+      additionalProperties: false,
+    },
   }),
   new FunctionTool({
     name: 'http_request',
@@ -218,44 +233,44 @@ export const GCP_TOOLS: BaseTool[] = [
           type: 'string',
           description: 'The URL to make the request to',
           format: 'uri',
-          minLength: 1
+          minLength: 1,
         },
         method: {
           type: 'string',
           description: 'HTTP method',
           enum: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-          default: 'GET'
+          default: 'GET',
         },
         headers: {
           type: 'object',
           description: 'HTTP headers',
           additionalProperties: {
-            type: 'string'
-          }
+            type: 'string',
+          },
         },
         body: {
           type: 'string',
-          description: 'Request body for POST/PUT/PATCH'
-        }
+          description: 'Request body for POST/PUT/PATCH',
+        },
       },
       required: ['url'],
-      additionalProperties: false
-    }
-  })
+      additionalProperties: false,
+    },
+  }),
 ];
 
 /**
  * Get tools by name
  */
 export function getToolByName(name: string): BaseTool | undefined {
-  return GCP_TOOLS && GCP_TOOLS.find(tool => (tool as any).name === name);
+  return GCP_TOOLS && GCP_TOOLS.find((tool) => (tool as any).name === name);
 }
 
 /**
  * Get all tool names
  */
 export function getToolNames(): string[] {
-  return GCP_TOOLS && GCP_TOOLS.map(tool => (tool as any).name);
+  return GCP_TOOLS && GCP_TOOLS.map((tool) => (tool as any).name);
 }
 
 /**
@@ -273,17 +288,17 @@ export class BigQueryQueryTool extends FunctionTool {
           sql: {
             type: 'string',
             description: 'The SQL query to execute',
-            minLength: 1
+            minLength: 1,
           },
           params: {
             type: 'object',
             description: 'Optional query parameters',
-            additionalProperties: true
-          }
+            additionalProperties: true,
+          },
         },
         required: ['sql'],
-        additionalProperties: false
-      }
+        additionalProperties: false,
+      },
     });
   }
 }
@@ -291,7 +306,7 @@ export class BigQueryQueryTool extends FunctionTool {
 export class BigQueryInsertTool extends FunctionTool {
   constructor() {
     super({
-      name: 'bigquery_insert', 
+      name: 'bigquery_insert',
       description: 'Insert rows into a BigQuery table',
       func: bigQueryInsert,
       parameters: {
@@ -300,20 +315,20 @@ export class BigQueryInsertTool extends FunctionTool {
           table: {
             type: 'string',
             description: 'The table name in format dataset && dataset.table',
-            minLength: 1
+            minLength: 1,
           },
           rows: {
             type: 'array',
             description: 'Array of rows to insert',
             items: {
-              type: 'object'
+              type: 'object',
             },
-            minItems: 1
-          }
+            minItems: 1,
+          },
         },
         required: ['table', 'rows'],
-        additionalProperties: false
-      }
+        additionalProperties: false,
+      },
     });
   }
 }
@@ -330,27 +345,27 @@ export class GCSUploadTool extends FunctionTool {
           bucket: {
             type: 'string',
             description: 'The GCS bucket name',
-            minLength: 1
+            minLength: 1,
           },
           filename: {
             type: 'string',
             description: 'The filename/path in GCS',
-            minLength: 1
+            minLength: 1,
           },
           content: {
             type: 'string',
             description: 'The content to upload',
-            minLength: 1
+            minLength: 1,
           },
           contentType: {
             type: 'string',
             description: 'MIME type of the content (optional)',
-            default: 'text/plain'
-          }
+            default: 'text/plain',
+          },
         },
         required: ['bucket', 'filename', 'content'],
-        additionalProperties: false
-      }
+        additionalProperties: false,
+      },
     });
   }
 }
@@ -368,29 +383,29 @@ export class HttpRequestTool extends FunctionTool {
             type: 'string',
             description: 'The URL to make the request to',
             format: 'uri',
-            minLength: 1
+            minLength: 1,
           },
           method: {
             type: 'string',
             description: 'HTTP method',
             enum: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-            default: 'GET'
+            default: 'GET',
           },
           headers: {
             type: 'object',
             description: 'HTTP headers',
             additionalProperties: {
-              type: 'string'
-            }
+              type: 'string',
+            },
           },
           body: {
             type: 'string',
-            description: 'Request body for POST/PUT/PATCH'
-          }
+            description: 'Request body for POST/PUT/PATCH',
+          },
         },
         required: ['url'],
-        additionalProperties: false
-      }
+        additionalProperties: false,
+      },
     });
   }
 }

@@ -1,4 +1,4 @@
-import { buildTools } from './build-tools';
+import { buildTools } from "./build-tools.js"';
 
 describe('buildTools', () => {
   it('should work', () => {

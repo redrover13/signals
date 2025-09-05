@@ -11,7 +11,7 @@
 
 import { CloudEvent } from '@google-cloud/functions-framework';
 import { Storage } from '@google-cloud/storage';
-// import { VertexAIClient } from '../../../libs/adk/src';
+// import { VertexAIClient } from "../../../libs/adk/src.js"';
 
 interface StorageObjectData {
   bucket: string | undefined;

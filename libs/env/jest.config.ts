@@ -1,20 +1,14 @@
+import { readFileSync } from 'fs';
+
+// Reading the base Jest preset using dynamic import
+const { default: jestPreset } = await import('../../jest.preset.mjs');
+
 export default {
+  ...jestPreset,
   displayName: 'env',
-  preset: '../../jest.preset && jest.preset.cjs',
-  testEnvironment: 'node',
-  extensionsToTreatAsEsm: ['.ts'],
-  globals: {
-    'ts-jest': {
-      useESM: true,
-      tsconfig: '<rootDir>/tsconfig && tsconfig.spec && .spec.json',
-    },
-  },
   transform: {
-    '^.+\\.[tj]s$': ['ts-jest', { 
-      tsconfig: '<rootDir>/tsconfig && tsconfig.spec && .spec.json',
-      useESM: true 
-    }],
+    '^.+\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
-  moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/libs/env',
+  moduleFileExtensions: ['ts', 'js', 'mjs', 'html'],
+  coverageDirectory: '../../coverage/env'
 };

@@ -1,0 +1,43 @@
+{
+  "name": "utils-secrets-manager",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/utils/secrets-manager/src",
+  "projectType": "library",
+  "tags": ["scope:utils", "type:data-access"],
+  "targets": {
+    "build": {
+      "executor": "@nx/rollup:rollup",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/utils/secrets-manager",
+        "tsConfig": "libs/utils/secrets-manager/tsconfig.lib.json",
+        "project": "libs/utils/secrets-manager/package.json",
+        "entryFile": "libs/utils/secrets-manager/src/index.ts",
+        "external": ["rxjs", "@google-cloud/secret-manager"],
+        "rollupConfig": "@nx/react/plugins/bundle-rollup",
+        "useLegacyTypescriptPlugin": false
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/utils/secrets-manager/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/utils/secrets-manager/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "coverage": true
+        }
+      }
+    }
+  }
+}

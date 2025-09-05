@@ -1,14 +1,13 @@
 {
   "extends": "../../../tsconfig.base.json",
-  "files": [],
-  "include": ["**/*.ts", "**/*.tsx"],
-  "references": [
-    {
-      "path": "./tsconfig.app.json"
-    }
-  ],
   "compilerOptions": {
-    "esModuleInterop": true
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "../../../dist/out-tsc",
+    "declaration": true,
+    "types": ["node", "jest"]
   },
-  "exclude": ["node_modules", "tmp", "dist"]
+  "files": [],
+  "include": ["**/*.ts"],
+  "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts", "**/*.d.ts"]
 }

@@ -1,11 +1,13 @@
 {
   "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "../../../dist/out-tsc",
+    "declaration": true,
+    "types": ["node", "jest"]
+  },
   "files": [],
-  "include": ["**/*.ts", "**/*.tsx"],
-  "references": [
-    {
-      "path": "./tsconfig.lib.json"
-    }
-  ],
-  "exclude": ["node_modules", "tmp", "dist"]
+  "include": ["**/*.ts"],
+  "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts", "**/*.d.ts"]
 }

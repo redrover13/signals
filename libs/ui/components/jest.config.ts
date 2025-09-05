@@ -1,11 +1,14 @@
-/* eslint-disable */
+import { readFileSync } from 'fs';
+
+// Reading the base Jest preset using dynamic import
+const { default: jestPreset } = await import('../../../jest.preset.mjs');
+
 export default {
-  displayName: 'ui-components',
-  preset: '../../../jest.preset.cjs',
+  ...jestPreset,
+  displayName: 'components',
   transform: {
-    '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
-    '^.+\\.[tj]sx?$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
+    '^.+\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/ui/components',
+  moduleFileExtensions: ['ts', 'js', 'mjs', 'html'],
+  coverageDirectory: '../../../coverage/components'
 };

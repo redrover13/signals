@@ -1,4 +1,4 @@
-import { dbtModels } from './dbt-models';
+import { dbtModels } from "./dbt-models.js"';
 
 describe('dbtModels', () => {
   it('should work', () => {

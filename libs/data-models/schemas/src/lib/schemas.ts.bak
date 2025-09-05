@@ -1,0 +1,38 @@
+/**
+ * @fileoverview schemas module for the lib component
+ *
+ * This file is part of the Dulce de Saigon F&B Data Platform.
+ * Contains implementation for TypeScript functionality.
+ *
+ * @author Dulce de Saigon Engineering
+ * @copyright Copyright (c) 2025 Dulce de Saigon
+ * @license MIT
+ */
+
+/**
+ * Customer data interface
+ */
+export interface CustomerData {
+  customerId: string | undefined;
+  name: string | undefined;
+  email?: string | undefined;
+  phone?: string | undefined;
+  preferences?: Record<string, any> | undefined;
+  orderHistory?: any[];
+  location?: string | undefined;
+}
+
+/**
+ * Requirements interface for content generation
+ */
+export interface Requirements {
+  [key: string]: unknown | undefined;
+}
+
+/**
+ * Response interface for content generation
+ */
+export interface ContentResponse {
+  content: string | undefined;
+  metadata?: Record<string, unknown> | undefined | undefined;
+}

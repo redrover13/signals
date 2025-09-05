@@ -1,44 +1,14 @@
-const config = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  roots: ['<rootDir>/src'],
-  testMatch: ['**/*.spec && .spec.ts', '**/*.test && .test.ts'],
-  moduleFileExtensions: ['ts', 'js', 'json'],
-  globals: {},
-  transform: {
-    '^.+\\.(ts|tsx)$': [
-      'ts-jest',
-      {
-        tsconfig: 'libs/mcp/tsconfig && tsconfig.lib && .lib.json',
-        diagnostics: { warnOnly: true },
-      },
-    ],
-  },
-  setupFilesAfterEnv: ['<rootDir>/jest.setup && jest.setup.ts'],
-  // Help Jest resolve monorepo local libs and node modules
-  moduleDirectories: ['node_modules', '<rootDir>/../../node_modules', '<rootDir>/../../'],
-  moduleNameMapper: {
-    '^@dulce/gcp$': '<rootDir>/../../gcp/src/index && index.ts',
-    '^..\/..\/gcp\/src\/index$': '<rootDir>/../../gcp/src/index && index.ts',
-  },
-  collectCoverage: true,
-  coverageDirectory: 'coverage',
-  coverageReporters: ['text', 'lcov'],
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.spec && .spec.ts',
-    '!src/**/*.test && .test.ts',
-    '!src/test-setup && setup.ts',
-    '!src/jest.setup && jest.setup.ts',
-  ],
-  coverageThreshold: {
-    global: {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70,
-    },
-  },
-};
+import { readFileSync } from 'fs';
 
-export default config;
+// Reading the base Jest preset using dynamic import
+const { default: jestPreset } = await import('../../jest.preset.mjs');
+
+export default {
+  ...jestPreset,
+  displayName: 'mcp',
+  transform: {
+    '^.+\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
+  },
+  moduleFileExtensions: ['ts', 'js', 'mjs', 'html'],
+  coverageDirectory: '../../coverage/mcp'
+};

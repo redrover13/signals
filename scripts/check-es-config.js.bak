@@ -1,0 +1,544 @@
+#!/usr/bin/env node
+
+/**
+ * ES Module Configuration Checker
+ * 
+ * This script checks and validates the ECMAScript configuration in the project.
+ * It reports on:
+ * - Node.js version
+ * - ECMAScript module type (CommonJS vs ES Modules)
+ * - Package.json configuration
+ * - TypeScript configuration
+ * - Module resolution strategy
+ */
+
+// Import system modules
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// ES Modules specific: Get __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Get root directory
+const rootDir = path.resolve(__dirname, '..');
+
+// ANSI color codes for formatting
+const colors = {
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  red: '\x1b[31m',
+  cyan: '\x1b[36m',
+  magenta: '\x1b[35m'
+};
+
+/**
+ * Print a section header
+ */
+function printHeader(text) {
+  console.log(`\n${colors.bright}${colors.cyan}=== ${text} ===${colors.reset}\n`);
+}
+
+/**
+ * Print an info line
+ */
+function printInfo(label, value, color = colors.green) {
+  console.log(`${colors.bright}${label}:${colors.reset} ${color}${value}${colors.reset}`);
+}
+
+/**
+ * Print a warning
+ */
+function printWarning(text) {
+  console.log(`${colors.yellow}⚠ WARNING: ${text}${colors.reset}`);
+}
+
+/**
+ * Print an error
+ */
+function printError(text) {
+  console.log(`${colors.red}❌ ERROR: ${text}${colors.reset}`);
+}
+
+/**
+ * Print a success message
+ */
+function printSuccess(text) {
+  console.log(`${colors.green}✓ ${text}${colors.reset}`);
+}
+
+/**
+ * Get Node.js and npm/pnpm versions
+ */
+function getNodeInfo() {
+  printHeader('Node.js Environment');
+  
+  try {
+    const nodeVersion = execSync('node --version').toString().trim();
+    printInfo('Node.js Version', nodeVersion);
+    
+    // Detect the package manager
+    let packageManager = 'npm';
+    let packageManagerVersion = '';
+    
+    if (fs.existsSync(path.join(rootDir, 'pnpm-lock.yaml'))) {
+      packageManager = 'pnpm';
+      try {
+        packageManagerVersion = execSync('pnpm --version').toString().trim();
+      } catch (e) {
+        packageManagerVersion = 'installed (version detection failed)';
+      }
+    } else if (fs.existsSync(path.join(rootDir, 'yarn.lock'))) {
+      packageManager = 'yarn';
+      try {
+        packageManagerVersion = execSync('yarn --version').toString().trim();
+      } catch (e) {
+        packageManagerVersion = 'installed (version detection failed)';
+      }
+    } else {
+      try {
+        packageManagerVersion = execSync('npm --version').toString().trim();
+      } catch (e) {
+        packageManagerVersion = 'installed (version detection failed)';
+      }
+    }
+    
+    printInfo('Package Manager', `${packageManager} v${packageManagerVersion}`);
+    
+    // Check for ESM support
+    const nodeVersionNum = parseFloat(nodeVersion.replace('v', ''));
+    if (nodeVersionNum < 14) {
+      printWarning('Node.js version is below 14.0.0. Full ES Modules support requires Node.js 14.0.0 or higher.');
+    } else if (nodeVersionNum < 16) {
+      printWarning('Node.js version is below 16.0.0. Some ES Modules features might not be fully supported.');
+    } else {
+      printSuccess('Node.js version supports ES Modules');
+    }
+  } catch (error) {
+    printError(`Failed to detect Node.js information: ${error.message}`);
+  }
+}
+
+/**
+ * Check package.json configuration
+ */
+function checkPackageJson() {
+  printHeader('Package.json Configuration');
+  
+  try {
+    const packageJsonPath = path.join(rootDir, 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    
+    // Check type field
+    const type = packageJson.type || 'commonjs';
+    let typeColor = colors.green;
+    if (type !== 'module') {
+      typeColor = colors.yellow;
+    }
+    
+    printInfo('Module Type', type, typeColor);
+    
+    if (type === 'commonjs') {
+      printWarning('Package.json "type" is set to "commonjs" or not specified. This means .js files are treated as CommonJS by default.');
+      printInfo('Recommendation', 'Add "type": "module" to package.json to use ES Modules by default', colors.cyan);
+    } else {
+      printSuccess('Package.json "type" is set to "module", enabling ES Modules by default');
+    }
+    
+    // Check for exports field
+    if (packageJson.exports) {
+      printSuccess('Package.json contains "exports" field, which helps with dual package support');
+      // TODO: Add more detailed exports field validation
+    } else if (packageJson.main || packageJson.module) {
+      printInfo('Entry Points', `main: ${packageJson.main || 'not set'}, module: ${packageJson.module || 'not set'}`);
+      printWarning('Consider using the "exports" field for better module resolution in modern Node.js');
+    }
+    
+    // Check engines field
+    if (packageJson.engines && packageJson.engines.node) {
+      printInfo('Node.js Engine Constraint', packageJson.engines.node);
+    } else {
+      printWarning('No Node.js engine constraint specified in package.json');
+      printInfo('Recommendation', 'Add "engines": { "node": ">=16" } to ensure compatibility', colors.cyan);
+    }
+  } catch (error) {
+    printError(`Failed to analyze package.json: ${error.message}`);
+  }
+}
+
+/**
+ * Check TypeScript configuration
+ */
+function checkTsConfig() {
+  printHeader('TypeScript Configuration');
+  
+  try {
+    const tsConfigPath = path.join(rootDir, 'tsconfig.json');
+    const tsConfigBasePath = path.join(rootDir, 'tsconfig.base.json');
+    
+    if (!fs.existsSync(tsConfigPath)) {
+      printWarning('No tsconfig.json found in the project root');
+      return;
+    }
+    
+    const tsConfig = JSON.parse(fs.readFileSync(tsConfigPath, 'utf-8'));
+    const baseConfig = fs.existsSync(tsConfigBasePath) 
+      ? JSON.parse(fs.readFileSync(tsConfigBasePath, 'utf-8')) 
+      : null;
+    
+    // Get the effective configuration by merging base and extended configs
+    const effectiveConfig = baseConfig 
+      ? { ...baseConfig.compilerOptions, ...tsConfig.compilerOptions } 
+      : tsConfig.compilerOptions;
+    
+    // Check module setting
+    const moduleType = effectiveConfig.module || 'CommonJS';
+    let moduleColor = colors.green;
+    
+    if (!moduleType.toLowerCase().includes('node') && 
+        !['esnext', 'es2020', 'es2022'].includes(moduleType.toLowerCase())) {
+      moduleColor = colors.yellow;
+    }
+    
+    printInfo('TypeScript Module', moduleType, moduleColor);
+    
+    // Check module resolution
+    const moduleResolution = effectiveConfig.moduleResolution || 'Node';
+    let resolutionColor = colors.green;
+    
+    if (!moduleResolution.toLowerCase().includes('node')) {
+      resolutionColor = colors.yellow;
+    }
+    
+    printInfo('Module Resolution', moduleResolution, resolutionColor);
+    
+    // Check target
+    const target = effectiveConfig.target || 'ES3';
+    let targetColor = colors.green;
+    
+    if (!['es2020', 'es2021', 'es2022', 'esnext'].includes(target.toLowerCase())) {
+      targetColor = colors.yellow;
+    }
+    
+    printInfo('Target', target, targetColor);
+    
+    // Check ESM-specific settings
+    if (moduleType.toLowerCase().includes('node') || 
+        ['esnext', 'es2020', 'es2022'].includes(moduleType.toLowerCase())) {
+      
+      // For Node ES modules, these settings are recommended
+      if (effectiveConfig.allowSyntheticDefaultImports !== true) {
+        printWarning('allowSyntheticDefaultImports is not set to true');
+      }
+      
+      if (effectiveConfig.esModuleInterop !== true) {
+        printWarning('esModuleInterop is not set to true');
+      }
+      
+      if (effectiveConfig.resolveJsonModule !== true) {
+        printWarning('resolveJsonModule is not set to true');
+      }
+      
+      printSuccess('TypeScript is configured for ES Modules');
+    } else {
+      printWarning('TypeScript is not optimally configured for ES Modules');
+      printInfo('Recommendation', 'Set "module": "NodeNext" and "moduleResolution": "NodeNext" in tsconfig.json', colors.cyan);
+    }
+  } catch (error) {
+    printError(`Failed to analyze TypeScript configuration: ${error.message}`);
+  }
+}
+
+/**
+ * Check for ES Module compatibility issues in files
+ */
+function checkFilesForESMCompatibility() {
+  printHeader('File Analysis');
+  
+  try {
+    // Check for package.json type field
+    const packageJsonPath = path.join(rootDir, 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    const isESMByDefault = packageJson.type === 'module';
+    
+    printInfo('Default Module System', isESMByDefault ? 'ES Modules' : 'CommonJS');
+    
+    // Function to check if a file uses CommonJS syntax
+    function hasCommonJSSyntax(content) {
+      // Look for common patterns that indicate CommonJS usage
+      return (
+        content.includes('require(') || 
+        content.includes('module.exports') || 
+        content.includes('exports.')
+      );
+    }
+    
+    // Function to check if a file uses ES Module syntax
+    function hasESModuleSyntax(content) {
+      // Look for common patterns that indicate ESM usage
+      return (
+        content.includes('import ') || 
+        content.includes('export ') || 
+        content.includes('import(')
+      );
+    }
+    
+    // Check some critical files to see if they match the expected format
+    const scriptsDir = path.join(rootDir, 'scripts');
+    const toolsDir = path.join(rootDir, 'tools');
+    
+    let jsFiles = [];
+    
+    // Try to find some script files to analyze
+    if (fs.existsSync(scriptsDir)) {
+      fs.readdirSync(scriptsDir)
+        .filter(file => file.endsWith('.js'))
+        .slice(0, 5)  // Only look at a few files to avoid overwhelming output
+        .forEach(file => jsFiles.push(path.join(scriptsDir, file)));
+    }
+    
+    if (fs.existsSync(toolsDir)) {
+      fs.readdirSync(toolsDir)
+        .filter(file => file.endsWith('.js') || file.endsWith('.ts'))
+        .slice(0, 5)  // Only look at a few files to avoid overwhelming output
+        .forEach(file => jsFiles.push(path.join(toolsDir, file)));
+    }
+    
+    // Analyze each file
+    if (jsFiles.length > 0) {
+      printInfo('Analyzing', `${jsFiles.length} JavaScript/TypeScript files`);
+      
+      jsFiles.forEach(filePath => {
+        try {
+          const content = fs.readFileSync(filePath, 'utf-8');
+          const fileBasename = path.basename(filePath);
+          
+          const hasCJS = hasCommonJSSyntax(content);
+          const hasESM = hasESModuleSyntax(content);
+          
+          if (hasCJS && hasESM) {
+            printWarning(`${fileBasename}: Mixed CommonJS and ES Module syntax`);
+          } else if (hasCJS && isESMByDefault) {
+            printWarning(`${fileBasename}: Uses CommonJS syntax but project is set to ES Modules by default`);
+          } else if (hasESM && !isESMByDefault) {
+            printWarning(`${fileBasename}: Uses ES Module syntax but project is set to CommonJS by default`);
+          } else if (hasCJS) {
+            printInfo(`${fileBasename}`, 'CommonJS syntax', colors.cyan);
+          } else if (hasESM) {
+            printInfo(`${fileBasename}`, 'ES Module syntax', colors.green);
+          } else {
+            printInfo(`${fileBasename}`, 'No module imports/exports detected', colors.magenta);
+          }
+        } catch (error) {
+          printError(`Failed to analyze ${filePath}: ${error.message}`);
+        }
+      });
+    } else {
+      printWarning('No JavaScript/TypeScript files found for analysis');
+    }
+  } catch (error) {
+    printError(`Failed to analyze files: ${error.message}`);
+  }
+}
+
+/**
+ * Check Nx configuration for ECMAScript modules
+ */
+function checkNxConfiguration() {
+  printHeader('Nx Configuration');
+  
+  try {
+    const nxJsonPath = path.join(rootDir, 'nx.json');
+    
+    if (!fs.existsSync(nxJsonPath)) {
+      printWarning('No nx.json found in the project root');
+      return;
+    }
+    
+    const nxJson = JSON.parse(fs.readFileSync(nxJsonPath, 'utf-8'));
+    
+    // Check for executor defaults that might be related to ES modules
+    let executorDefaults = nxJson.executors || nxJson.tasksRunnerOptions?.default?.options?.cacheableOperations;
+    
+    if (executorDefaults) {
+      printInfo('Nx Cacheable Operations', JSON.stringify(executorDefaults));
+    }
+    
+    // Check for Jest configuration
+    const jestPlugin = nxJson.plugins?.find(p => p.plugin?.includes('jest'));
+    if (jestPlugin) {
+      printInfo('Jest Plugin', 'Configured in nx.json');
+      printInfo('Jest Target', jestPlugin.options?.targetName || 'test');
+      
+      // Check Jest preset
+      const jestPresetPath = path.join(rootDir, 'jest.preset.js');
+      const jestPresetMjsPath = path.join(rootDir, 'jest.preset.mjs');
+      const jestPresetCjsPath = path.join(rootDir, 'jest.preset.cjs');
+      
+      if (fs.existsSync(jestPresetMjsPath)) {
+        printSuccess('jest.preset.mjs found (ES Module format)');
+      } else if (fs.existsSync(jestPresetCjsPath)) {
+        printSuccess('jest.preset.cjs found (CommonJS format)');
+      } else if (fs.existsSync(jestPresetPath)) {
+        // Check the content to guess the format
+        const content = fs.readFileSync(jestPresetPath, 'utf-8');
+        if (content.includes('module.exports')) {
+          printInfo('jest.preset.js', 'Uses CommonJS format', colors.cyan);
+        } else if (content.includes('export default')) {
+          printInfo('jest.preset.js', 'Uses ES Module format', colors.green);
+        } else {
+          printWarning('jest.preset.js exists but format could not be determined');
+        }
+      } else {
+        printWarning('No jest.preset.* file found');
+      }
+    }
+    
+    // Check for ESLint configuration
+    const eslintPlugin = nxJson.plugins?.find(p => p.plugin?.includes('eslint'));
+    if (eslintPlugin) {
+      printInfo('ESLint Plugin', 'Configured in nx.json');
+      
+      // Check ESLint config format
+      const eslintConfigPath = path.join(rootDir, '.eslintrc.js');
+      const eslintConfigJsonPath = path.join(rootDir, '.eslintrc.json');
+      const eslintConfigCjsPath = path.join(rootDir, '.eslintrc.cjs');
+      const eslintConfigMjsPath = path.join(rootDir, '.eslintrc.mjs');
+      const eslintConfigFlatPath = path.join(rootDir, 'eslint.config.js');
+      const eslintConfigFlatMjsPath = path.join(rootDir, 'eslint.config.mjs');
+      
+      if (fs.existsSync(eslintConfigFlatMjsPath)) {
+        printSuccess('eslint.config.mjs found (ES Module flat config)');
+      } else if (fs.existsSync(eslintConfigFlatPath)) {
+        printInfo('eslint.config.js', 'Flat config format', colors.green);
+      } else if (fs.existsSync(eslintConfigMjsPath)) {
+        printSuccess('.eslintrc.mjs found (ES Module format)');
+      } else if (fs.existsSync(eslintConfigCjsPath)) {
+        printSuccess('.eslintrc.cjs found (CommonJS format)');
+      } else if (fs.existsSync(eslintConfigJsonPath)) {
+        printInfo('.eslintrc.json', 'JSON format (module-neutral)', colors.cyan);
+      } else if (fs.existsSync(eslintConfigPath)) {
+        // Check the content to guess the format
+        const content = fs.readFileSync(eslintConfigPath, 'utf-8');
+        if (content.includes('module.exports')) {
+          printInfo('.eslintrc.js', 'Uses CommonJS format', colors.cyan);
+          if (packageJson.type === 'module') {
+            printWarning('.eslintrc.js uses CommonJS but project is ES Module by default, consider renaming to .eslintrc.cjs');
+          }
+        } else if (content.includes('export default')) {
+          printInfo('.eslintrc.js', 'Uses ES Module format', colors.green);
+          if (packageJson.type !== 'module') {
+            printWarning('.eslintrc.js uses ES Modules but project is CommonJS by default, might cause issues');
+          }
+        } else {
+          printWarning('.eslintrc.js exists but format could not be determined');
+        }
+      } else {
+        printWarning('No .eslintrc.* file found');
+      }
+    }
+  } catch (error) {
+    printError(`Failed to analyze Nx configuration: ${error.message}`);
+  }
+}
+
+/**
+ * Provide recommendations based on the analysis
+ */
+function provideRecommendations() {
+  printHeader('Recommendations');
+  
+  try {
+    const packageJsonPath = path.join(rootDir, 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    const isESMByDefault = packageJson.type === 'module';
+    
+    const tsConfigPath = path.join(rootDir, 'tsconfig.json');
+    const tsConfigBasePath = path.join(rootDir, 'tsconfig.base.json');
+    
+    let tsConfig = null;
+    let baseConfig = null;
+    
+    if (fs.existsSync(tsConfigPath)) {
+      tsConfig = JSON.parse(fs.readFileSync(tsConfigPath, 'utf-8'));
+    }
+    
+    if (fs.existsSync(tsConfigBasePath)) {
+      baseConfig = JSON.parse(fs.readFileSync(tsConfigBasePath, 'utf-8'));
+    }
+    
+    // Get the effective configuration by merging base and extended configs
+    const effectiveConfig = baseConfig && tsConfig
+      ? { ...baseConfig.compilerOptions, ...tsConfig.compilerOptions } 
+      : (tsConfig ? tsConfig.compilerOptions : null);
+    
+    // Based on package.json type
+    if (!isESMByDefault) {
+      console.log(`1. ${colors.yellow}Consider adding ${colors.cyan}"type": "module"${colors.yellow} to package.json for ES Module support${colors.reset}`);
+    } else {
+      console.log(`1. ${colors.green}✓ package.json correctly has "type": "module" set${colors.reset}`);
+    }
+    
+    // Based on TypeScript configuration
+    if (effectiveConfig) {
+      const moduleType = effectiveConfig.module || 'CommonJS';
+      const moduleResolution = effectiveConfig.moduleResolution || 'Node';
+      
+      if (!moduleType.toLowerCase().includes('node') && 
+          !['esnext', 'es2020', 'es2022'].includes(moduleType.toLowerCase())) {
+        console.log(`2. ${colors.yellow}Update TypeScript configuration with ${colors.cyan}"module": "NodeNext"${colors.yellow} for better ES Module support${colors.reset}`);
+      } else {
+        console.log(`2. ${colors.green}✓ TypeScript "module" setting is optimized for ES Modules${colors.reset}`);
+      }
+      
+      if (!moduleResolution.toLowerCase().includes('node')) {
+        console.log(`3. ${colors.yellow}Update TypeScript configuration with ${colors.cyan}"moduleResolution": "NodeNext"${colors.yellow} for better ES Module support${colors.reset}`);
+      } else {
+        console.log(`3. ${colors.green}✓ TypeScript "moduleResolution" setting is optimized for ES Modules${colors.reset}`);
+      }
+    }
+    
+    // Extension recommendations
+    console.log(`4. ${colors.cyan}For ES Modules, use file extensions in imports:${colors.reset}`);
+    console.log(`   - ${colors.green}import { something } from './module.js';${colors.reset} ${colors.yellow}// Not './module'${colors.reset}`);
+    
+    // Jest and ESLint recommendations
+    console.log(`5. ${colors.cyan}For Jest and ESLint in ES Module projects:${colors.reset}`);
+    console.log(`   - ${colors.green}Use jest.config.mjs or specify "type": "commonjs" in jest.config.js${colors.reset}`);
+    console.log(`   - ${colors.green}Use eslint.config.mjs or .eslintrc.cjs for ESLint configuration${colors.reset}`);
+    
+    // Nx recommendations
+    console.log(`6. ${colors.cyan}For Nx in ES Module projects:${colors.reset}`);
+    console.log(`   - ${colors.green}Make sure executors support ES Modules${colors.reset}`);
+    console.log(`   - ${colors.green}Check that all plugins properly handle ES Module syntax${colors.reset}`);
+  } catch (error) {
+    printError(`Failed to generate recommendations: ${error.message}`);
+  }
+}
+
+/**
+ * Run the analysis
+ */
+async function runAnalysis() {
+  console.log(`${colors.bright}${colors.magenta}ES Module Configuration Checker${colors.reset}`);
+  console.log(`${colors.cyan}Analyzing project at: ${rootDir}${colors.reset}\n`);
+  
+  getNodeInfo();
+  checkPackageJson();
+  checkTsConfig();
+  checkNxConfiguration();
+  checkFilesForESMCompatibility();
+  provideRecommendations();
+  
+  console.log(`\n${colors.bright}${colors.magenta}Analysis Complete${colors.reset}`);
+}
+
+// Run the analysis
+runAnalysis().catch(error => {
+  console.error(`${colors.red}Error during analysis: ${error.message}${colors.reset}`);
+  process.exit(1);
+});

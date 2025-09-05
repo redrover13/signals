@@ -1,0 +1,296 @@
+#!/usr/bin/env node
+
+/**
+ * ES Module Compatibility Analysis
+ * 
+ * This script provides a comprehensive analysis of ES Module compatibility issues
+ * in the codebase, identifying mixed module syntax, missing file extensions,
+ * and CommonJS files that need to be converted or renamed.
+ */
+
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// ES Modules specific: Get __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Get root directory
+const rootDir = path.resolve(__dirname, '..');
+
+// ANSI color codes for formatting
+const colors = {
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  red: '\x1b[31m',
+  cyan: '\x1b[36m',
+  magenta: '\x1b[35m',
+  gray: '\x1b[90m'
+};
+
+// Tracked stats
+let esModuleFiles = 0;
+let commonjsFiles = 0;
+let mixedModuleFiles = 0;
+let importsWithoutExtension = 0;
+let processingErrors = 0;
+
+// Lists of files by category
+const mixedModuleFilesList = [];
+const missingExtensionFilesList = [];
+const commonJsFilesList = [];
+
+/**
+ * Print a section header
+ */
+function printHeader(text) {
+  console.log(`\n${colors.bright}${colors.cyan}=== ${text} ===${colors.reset}\n`);
+}
+
+/**
+ * Print an info line
+ */
+function printInfo(label, value, color = colors.green) {
+  console.log(`${colors.bright}${label}:${colors.reset} ${color}${value}${colors.reset}`);
+}
+
+/**
+ * Print a file entry
+ */
+function printFile(filePath, message = '', indent = 2) {
+  const indentStr = ' '.repeat(indent);
+  console.log(`${indentStr}${colors.gray}${filePath}${colors.reset}${message ? ' ' + message : ''}`);
+}
+
+/**
+ * Print an error
+ */
+function printError(text) {
+  console.log(`${colors.red}❌ ERROR: ${text}${colors.reset}`);
+}
+
+/**
+ * Find files by extension, excluding certain paths
+ */
+function findFiles(extensions) {
+  try {
+    const extensionPattern = extensions.map(ext => `-name "*.${ext}"`).join(' -o ');
+    const cmd = `find ${rootDir} -type f \\( ${extensionPattern} \\) -not -path "*/node_modules/*" -not -path "*/dist/*" -not -path "*/.git/*"`;
+    return execSync(cmd).toString().trim().split('\n').filter(Boolean);
+  } catch (error) {
+    printError(`Failed to find files: ${error.message}`);
+    return [];
+  }
+}
+
+/**
+ * Check if a file uses ES Module imports
+ */
+function hasESMImports(content) {
+  // Check for ES import statements
+  return /import\s+(?:(?:[\w*\s{},]*)\s+from\s+)?['"]([@\w./-]+)['"];?/.test(content);
+}
+
+/**
+ * Check if a file uses ES Module exports
+ */
+function hasESMExports(content) {
+  // Check for ES export statements
+  return /export\s+(?:default\s+)?(?:const|let|var|function|class|interface|type|enum|{|\*)/m.test(content);
+}
+
+/**
+ * Check if a file uses CommonJS require
+ */
+function hasCommonJSRequire(content) {
+  // Check for require statements
+  return /(?:const|let|var)\s+(?:[\w{}\s,]+)\s*=\s*require\(['"][@\w./-]+['"]\)/.test(content) || 
+         /require\(['"][@\w./-]+['"]\)/.test(content);
+}
+
+/**
+ * Check if a file uses CommonJS module.exports
+ */
+function hasCommonJSExports(content) {
+  // Check for module.exports statements
+  return /module\.exports\s*=/.test(content) || /exports\.[\w]+ =/.test(content);
+}
+
+/**
+ * Check if imports in a file are missing extensions
+ */
+function findMissingExtensions(content, filePath) {
+  const importRegex = /import\s+(?:(?:[\w*\s{},]*)\s+from\s+)?['"](\.\.?\/[^'"]+)['"]/g;
+  let match;
+  let missingCount = 0;
+  
+  while ((match = importRegex.exec(content)) !== null) {
+    const importPath = match[1];
+    if (isRelativeImport(importPath) && !hasFileExtension(importPath)) {
+      missingCount++;
+    }
+  }
+  
+  return missingCount;
+}
+
+/**
+ * Check if a module path is a relative import
+ */
+function isRelativeImport(importPath) {
+  return importPath.startsWith('./') || importPath.startsWith('../') || importPath === '.';
+}
+
+/**
+ * Check if an import already has a file extension
+ */
+function hasFileExtension(importPath) {
+  const extensions = ['.js', '.mjs', '.cjs', '.jsx', '.ts', '.mts', '.cts', '.tsx', '.json'];
+  return extensions.some(ext => importPath.endsWith(ext));
+}
+
+/**
+ * Analyze a single file for module compatibility
+ */
+function analyzeFile(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    
+    // Check module syntax
+    const hasESM = hasESMImports(content) || hasESMExports(content);
+    const hasCJS = hasCommonJSRequire(content) || hasCommonJSExports(content);
+    
+    if (hasESM && hasCJS) {
+      mixedModuleFiles++;
+      mixedModuleFilesList.push(filePath);
+    } else if (hasESM) {
+      esModuleFiles++;
+      
+      // Check for missing extensions in ES Module files
+      const missingExtCount = findMissingExtensions(content, filePath);
+      if (missingExtCount > 0) {
+        importsWithoutExtension += missingExtCount;
+        missingExtensionFilesList.push({ path: filePath, count: missingExtCount });
+      }
+    } else if (hasCJS) {
+      commonjsFiles++;
+      commonJsFilesList.push(filePath);
+    }
+    
+  } catch (error) {
+    printError(`Failed to analyze ${filePath}: ${error.message}`);
+    processingErrors++;
+  }
+}
+
+/**
+ * Print recommendations based on analysis
+ */
+function printRecommendations() {
+  printHeader('Recommendations');
+  
+  if (mixedModuleFiles > 0) {
+    console.log(`1. ${colors.yellow}Fix files with mixed module syntax${colors.reset}`);
+    console.log(`   Use the script: ${colors.cyan}node scripts/fix-module-syntax.js --fix-all${colors.reset}`);
+    console.log(`   This will convert CommonJS require to ES Module imports in mixed module files.\n`);
+  }
+  
+  if (importsWithoutExtension > 0) {
+    console.log(`2. ${colors.yellow}Add file extensions to imports${colors.reset}`);
+    console.log(`   Use the script: ${colors.cyan}node scripts/fix-import-extensions.js --fix-all${colors.reset}`);
+    console.log(`   This will add .js extensions to all local imports in ES Module files.\n`);
+  }
+  
+  if (commonjsFiles > 0) {
+    console.log(`3. ${colors.yellow}Handle pure CommonJS files${colors.reset}`);
+    console.log(`   Option 1: Convert to ES Modules`);
+    console.log(`     Use: ${colors.cyan}node scripts/fix-module-syntax.js --convert-to-esm${colors.reset}`);
+    console.log(`   Option 2: Rename to .cjs extension`);
+    console.log(`     Use: ${colors.cyan}node scripts/fix-module-syntax.js --rename-cjs${colors.reset}\n`);
+  }
+  
+  console.log(`4. ${colors.yellow}Update configurations${colors.reset}`);
+  console.log(`   - Ensure TypeScript config has "module": "NodeNext", "moduleResolution": "NodeNext"`);
+  console.log(`   - Update jest.config.ts to use ESM-compatible configuration`);
+  console.log(`   - Check Nx executor compatibility with ES Modules\n`);
+  
+  console.log(`5. ${colors.yellow}Create a comprehensive fix script${colors.reset}`);
+  console.log(`   Combine the steps into a single script:`);
+  console.log(`   ${colors.cyan}#!/bin/bash
+# Fix mixed module syntax
+node scripts/fix-module-syntax.js --fix-all
+
+# Add file extensions to imports
+node scripts/fix-import-extensions.js --fix-all
+
+# Handle remaining CommonJS files
+node scripts/fix-module-syntax.js --convert-to-esm
+
+# Run TypeScript to verify fixes
+npx tsc --noEmit
+${colors.reset}`);
+}
+
+/**
+ * Main function
+ */
+function main() {
+  console.log(`${colors.bright}${colors.magenta}ES Module Compatibility Analysis${colors.reset}`);
+  console.log(`Analyzing codebase at ${colors.cyan}${rootDir}${colors.reset}`);
+  
+  // Find all JS and TS files
+  const files = findFiles(['js', 'ts', 'jsx', 'tsx']);
+  
+  if (files.length === 0) {
+    printError('No JavaScript or TypeScript files found');
+    return;
+  }
+  
+  printInfo('Found', `${files.length} JavaScript/TypeScript files`, colors.cyan);
+  
+  // Analyze each file
+  for (const file of files) {
+    analyzeFile(file);
+  }
+  
+  // Print summary
+  printHeader('Summary');
+  printInfo('Total Files', files.length, colors.cyan);
+  printInfo('ES Module Files', esModuleFiles, colors.green);
+  printInfo('CommonJS Files', commonjsFiles, commonjsFiles > 0 ? colors.yellow : colors.green);
+  printInfo('Mixed Module Files', mixedModuleFiles, mixedModuleFiles > 0 ? colors.red : colors.green);
+  printInfo('Files With Missing Extensions', missingExtensionFilesList.length, missingExtensionFilesList.length > 0 ? colors.yellow : colors.green);
+  printInfo('Total Missing Extensions', importsWithoutExtension, importsWithoutExtension > 0 ? colors.yellow : colors.green);
+  
+  if (processingErrors > 0) {
+    printInfo('Processing Errors', processingErrors, colors.red);
+  }
+  
+  // Print detailed information
+  if (mixedModuleFiles > 0) {
+    printHeader('Files with Mixed Module Syntax');
+    mixedModuleFilesList.forEach(file => printFile(file));
+  }
+  
+  if (missingExtensionFilesList.length > 0) {
+    printHeader('Files with Missing Import Extensions');
+    missingExtensionFilesList
+      .sort((a, b) => b.count - a.count)
+      .forEach(file => printFile(file.path, `${colors.yellow}(${file.count} missing)${colors.reset}`));
+  }
+  
+  if (commonjsFiles > 0) {
+    printHeader('Pure CommonJS Files');
+    commonJsFilesList.forEach(file => printFile(file));
+  }
+  
+  // Print recommendations
+  printRecommendations();
+}
+
+// Run the main function
+main();

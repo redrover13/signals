@@ -1,0 +1,178 @@
+name: TypeScript Validation
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - '**/*.ts'
+      - '**/*.tsx'
+      - 'tsconfig*.json'
+      - '.github/workflows/typescript-validation.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - '**/*.ts'
+      - '**/*.tsx'
+      - 'tsconfig*.json'
+      - '.github/workflows/typescript-validation.yml'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10.0.0'
+
+jobs:
+  # ============================================================================
+  # TypeScript Compilation Check
+  # ============================================================================
+  typescript-check:
+    name: TypeScript Compilation Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: TypeScript Compilation Check
+        run: |
+          echo "🔍 Checking TypeScript compilation..."
+          pnpm tsc --noEmit
+          echo "✅ TypeScript compilation check completed"
+
+      - name: Project Reference Check
+        run: |
+          echo "🔍 Checking TypeScript project references..."
+          pnpm exec nx run-many --target=tsc --all --parallel=3 || echo "::warning::Some TypeScript project references may have issues"
+          echo "✅ Project reference check completed"
+
+  # ============================================================================
+  # API Type Consistency
+  # ============================================================================
+  api-type-consistency:
+    name: API Type Consistency
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check API Type Consistency
+        run: |
+          echo "🔍 Checking API type consistency..."
+          find libs -type f -name "*.ts" -not -path "*/node_modules/*" -not -path "*/dist/*" | xargs grep -l "interface" | 
+            xargs -I{} sh -c 'echo "Checking {}..."; pnpm tsc {} --noEmit --skipLibCheck || echo "Type error in {}"'
+          echo "✅ API type consistency check completed"
+
+  # ============================================================================
+  # Type Coverage Check
+  # ============================================================================
+  type-coverage:
+    name: TypeScript Type Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install type-coverage
+        run: pnpm add -D -w type-coverage
+
+      - name: Check type coverage
+        run: |
+          echo "🔍 Checking TypeScript type coverage..."
+          npx type-coverage --detail --at-least 85 --ignore-files "**/*.spec.ts,**/*.test.ts,**/*.d.ts" --ignore-catch
+          echo "✅ Type coverage check completed"
+
+  # ============================================================================
+  # Dead Code Detection
+  # ============================================================================
+  dead-code-detection:
+    name: Dead Code Detection
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install ts-prune
+        run: pnpm add -D -w ts-prune
+
+      - name: Detect unused exports
+        run: |
+          echo "🔍 Detecting unused exports..."
+          npx ts-prune --error || echo "📝 Some unused exports detected (review recommended)"
+          echo "✅ Dead code detection completed"

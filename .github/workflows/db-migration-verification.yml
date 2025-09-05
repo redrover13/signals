@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.2 # TODO: replace with the v2.2.2 commit SHA for pinning
+        uses: pnpm/action-setup@v4.1.0
         with:
           version: 8.6.0
           run_install: false

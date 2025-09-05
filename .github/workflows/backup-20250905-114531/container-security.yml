@@ -148,15 +148,15 @@ jobs:
 
       - name: Check for critical vulnerabilities
         run: |
-          CRITICAL_COUNT=$(jq '.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL") | length' trivy-results-${{ matrix.app }}.json | wc -l)
-          HIGH_COUNT=$(jq '.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH") | length' trivy-results-${{ matrix.app }}.json | wc -l)
+          CRITICAL_COUNT=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL")] | length' trivy-results-${{ matrix.app }}.json 2>/dev/null || echo 0)
+          HIGH_COUNT=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH")] | length' trivy-results-${{ matrix.app }}.json 2>/dev/null || echo 0)
 
           echo "Critical vulnerabilities: $CRITICAL_COUNT"
           echo "High vulnerabilities: $HIGH_COUNT"
 
           if [ "$CRITICAL_COUNT" -gt 0 ]; then
-            echo "��� Critical vulnerabilities found in ${{ matrix.app }}"
-            jq '.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL")' trivy-results-${{ matrix.app }}.json
+            echo "❌ Critical vulnerabilities found in ${{ matrix.app }}"
+            jq '.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL")' trivy-results-${{ matrix.app }}.json || true
             exit 1
           fi
 

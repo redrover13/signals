@@ -1,0 +1,147 @@
+name: Dependency Updates
+
+on:
+  schedule:
+    - cron: '0 7 * * 1' # Every Monday at 7 AM UTC
+  workflow_dispatch:
+    inputs:
+      update-level:
+        description: 'Level of dependencies to update'
+        required: true
+        default: 'minor'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10.0.0'
+  UPDATE_LEVEL: ${{ github.event.inputs.update-level || 'minor' }}
+
+jobs:
+  update-dependencies:
+    name: Update Dependencies
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@4fe8674f344d65cf7384fc21ba97c2b05fd8df75 # v4.1.0
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4 # v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+        run: pnpm install --frozen-lockfile
+
+      - name: Create branch for dependency updates
+        run: |
+          BRANCH_NAME="chore/dependency-updates-$(date +%Y-%m-%d)"
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git checkout -b $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Update dependencies
+        run: |
+          echo "Updating dependencies with level: $UPDATE_LEVEL"
+          case "$UPDATE_LEVEL" in
+            "patch")
+              pnpm update --interactive=false
+              ;;
+            "minor")
+              pnpm update --interactive=false -L
+              ;;
+            "major")
+              pnpm update --interactive=false -L --latest
+              ;;
+          esac
+
+      - name: Run tests to verify updates
+        run: |
+          set +e
+          pnpm nx test --skip-nx-cache
+          TEST_EXIT_CODE=$?
+          set -e
+
+          if [ $TEST_EXIT_CODE -ne 0 ]; then
+            echo "::warning::Some tests failed after dependency updates. Proceeding anyway for manual review."
+          fi
+
+      - name: Check for changes
+        id: check-changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "has-changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has-changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit changes
+        if: steps.check-changes.outputs.has-changes == 'true'
+        run: |
+          git add .
+          git commit -m "chore: update dependencies (auto)"
+          git push origin $BRANCH_NAME
+
+      - name: Create Pull Request
+        if: steps.check-changes.outputs.has-changes == 'true'
+        uses: peter-evans/create-pull-request@v6.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: 'chore: update dependencies (auto) - ${{ env.UPDATE_LEVEL }} level'
+          body: |
+            ## Automated Dependency Updates
+
+            This PR updates dependencies to their ${{ env.UPDATE_LEVEL }} level.
+
+            ### 🤖 Automated Process
+            - Updated dependencies to ${{ env.UPDATE_LEVEL }} level
+            - Ran tests to verify compatibility
+
+            ### ✅ Actions Required
+            - [ ] Review changes
+            - [ ] Check CI/CD pipeline runs
+            - [ ] Verify application functionality
+
+            ### 📝 Notes
+            - Generated on: $(date +"%Y-%m-%d")
+            - Update level: ${{ env.UPDATE_LEVEL }}
+          branch: ${{ env.BRANCH_NAME }}
+          base: develop
+          labels: dependencies,automerge-candidate
+
+      - name: Output result
+        if: steps.check-changes.outputs.has-changes == 'true'
+        run: echo "Created PR for dependency updates"
+
+      - name: No changes detected
+        if: steps.check-changes.outputs.has-changes == 'false'
+        run: echo "No dependency updates were needed at this time"

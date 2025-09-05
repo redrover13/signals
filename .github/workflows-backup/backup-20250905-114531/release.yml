@@ -1,0 +1,635 @@
+name: Release Management
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - '.github/workflows/monitoring.yml'
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Type of release'
+        required: true
+        default: 'auto'
+        type: choice
+        options:
+          - auto
+          - patch
+          - minor
+          - major
+          - prerelease
+      skip_tests:
+        description: 'Skip test execution'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  packages: write
+  id-token: write
+
+env:
+  NODE_VERSION: '20'
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # ============================================================================
+  # RELEASE PREPARATION
+  # ============================================================================
+  prepare-release:
+    name: Prepare Release
+    runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ''
+    outputs:
+      should-release: ${{ steps.check.outputs.should-release }}
+      release-type: ${{ steps.check.outputs.release-type }}
+      current-version: ${{ steps.version.outputs.current }}
+      next-version: ${{ steps.version.outputs.next }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@4fe8674f344d65cf7384fc21ba97c2b05fd8df75 # v4.1.0
+        with:
+          version: 10.0.0
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4 # v4
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Determine if we should create a release
+      - name: Check release conditions
+        id: check
+        run: |
+          # Check if this is a manual dispatch
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "should-release=true" >> $GITHUB_OUTPUT
+            echo "release-type=${{ inputs.release_type }}" >> $GITHUB_OUTPUT
+            echo "Manual release triggered"
+            exit 0
+          fi
+
+          # Check for conventional commits since last release
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$LAST_TAG" ]; then
+            echo "should-release=true" >> $GITHUB_OUTPUT
+            echo "release-type=minor" >> $GITHUB_OUTPUT
+            echo "No previous releases found, creating initial release"
+            exit 0
+          fi
+
+          # Analyze commits since last tag
+          COMMITS=$(git log $LAST_TAG..HEAD --oneline --grep="^feat\|^fix\|^perf\|BREAKING CHANGE" || echo "")
+
+          if [ -z "$COMMITS" ]; then
+            echo "should-release=false" >> $GITHUB_OUTPUT
+            echo "No release-worthy commits found"
+            exit 0
+          fi
+
+          # Determine release type based on commits
+          if echo "$COMMITS" | grep -q "BREAKING CHANGE"; then
+            RELEASE_TYPE="major"
+          elif echo "$COMMITS" | grep -q "^feat"; then
+            RELEASE_TYPE="minor"
+          else
+            RELEASE_TYPE="patch"
+          fi
+
+          echo "should-release=true" >> $GITHUB_OUTPUT
+          echo "release-type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+          echo "Release type determined: $RELEASE_TYPE"
+
+      # Get current version and calculate next version
+      - name: Calculate versions
+        id: version
+        if: steps.check.outputs.should-release == 'true'
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "0.0.0")
+          echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+          # Calculate next version based on release type
+          RELEASE_TYPE="${{ steps.check.outputs.release-type }}"
+
+          if [ "$RELEASE_TYPE" = "auto" ]; then
+            # Use semantic-release to determine version
+            NEXT_VERSION=$(npx semantic-release --dry-run --no-ci | grep "next release version" | sed 's/.*version is \([0-9.]*\).*/\1/' || echo "$CURRENT_VERSION")
+          else
+            # Calculate version manually
+            IFS='.' read -ra VERSION_PARTS <<< "$CURRENT_VERSION"
+            MAJOR=${VERSION_PARTS[0]}
+            MINOR=${VERSION_PARTS[1]}
+            PATCH=${VERSION_PARTS[2]}
+            
+            case $RELEASE_TYPE in
+              major)
+                MAJOR=$((MAJOR + 1))
+                MINOR=0
+                PATCH=0
+                ;;
+              minor)
+                MINOR=$((MINOR + 1))
+                PATCH=0
+                ;;
+              patch)
+                PATCH=$((PATCH + 1))
+                ;;
+              prerelease)
+                PATCH=$((PATCH + 1))
+                NEXT_VERSION="$MAJOR.$MINOR.$PATCH-rc.$(date +%Y%m%d%H%M%S)"
+                ;;
+            esac
+            
+            if [ "$RELEASE_TYPE" != "prerelease" ]; then
+              NEXT_VERSION="$MAJOR.$MINOR.$PATCH"
+            fi
+          fi
+
+          echo "next=$NEXT_VERSION" >> $GITHUB_OUTPUT
+          echo "Next version: $NEXT_VERSION"
+
+  # ============================================================================
+  # PRE-RELEASE VALIDATION
+  # ============================================================================
+  pre-release-validation:
+    name: Pre-release Validation
+    runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ''
+    needs: prepare-release
+    if: needs.prepare-release.outputs.should-release == 'true'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@4fe8674f344d65cf7384fc21ba97c2b05fd8df75 # v4.1.0
+        with:
+          version: 10.0.0
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4 # v4
+        with:
+          path: |
+            ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Run comprehensive tests
+      - name: Run test suite
+        if: inputs.skip_tests != true
+        run: |
+          pnpm nx run-many -t test --all --coverage --parallel=3
+
+      # Security scan
+      - name: Security scan
+        run: |
+          pnpm audit --audit-level=high
+          pnpm secretlint "**/*"
+
+      # Build all projects
+      - name: Build all projects
+        run: |
+          pnpm nx run-many -t build --all --parallel=3
+
+      # Validate package.json and dependencies
+      - name: Validate package configuration
+        run: |
+          # Check for missing or invalid fields
+          node -e "
+            const pkg = require('./package.json');
+            const required = ['name', 'version', 'description'];
+            const missing = required.filter(field => !pkg[field]);
+            if (missing.length > 0) {
+              console.error('Missing required fields:', missing);
+              process.exit(1);
+            }
+            console.log('Package configuration is valid');
+          "
+
+      # Check for breaking changes
+      - name: Breaking change analysis
+        run: |
+          echo "Analyzing potential breaking changes..."
+
+          # This would typically use tools like api-extractor or similar
+          # For now, we'll check commit messages
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -n "$LAST_TAG" ]; then
+            BREAKING_CHANGES=$(git log $LAST_TAG..HEAD --grep="BREAKING CHANGE" --oneline || echo "")
+            
+            if [ -n "$BREAKING_CHANGES" ]; then
+              echo "⚠�� Breaking changes detected:"
+              echo "$BREAKING_CHANGES"
+              
+              # Create a breaking changes summary
+              echo "$BREAKING_CHANGES" > breaking-changes.txt
+            else
+              echo "✅ No breaking changes detected"
+            fi
+          fi
+
+      # Upload breaking changes artifact
+      - name: Upload breaking changes
+        if: hashFiles('breaking-changes.txt') != ''
+        uses: actions/upload-artifact@v4.3.0
+        with:
+          name: breaking-changes
+          path: breaking-changes.txt
+          retention-days: 30
+
+  # ============================================================================
+  # CREATE RELEASE
+  # ============================================================================
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ''
+    needs: [prepare-release, pre-release-validation]
+    if: needs.prepare-release.outputs.should-release == 'true'
+    outputs:
+      release-id: ${{ steps.release.outputs.id }}
+      release-tag: ${{ steps.release.outputs.tag_name }}
+      release-url: ${{ steps.release.outputs.html_url }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js & pnpm
+        uses: pnpm/action-setup@4fe8674f344d65cf7384fc21ba97c2b05fd8df75 # v4.1.0
+        with:
+          version: 10.0.0
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Configure git
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Update version in package.json
+      - name: Update package version
+        run: |
+          NEW_VERSION="${{ needs.prepare-release.outputs.next-version }}"
+          npm version $NEW_VERSION --no-git-tag-version
+          git add package.json
+          git commit -m "chore: bump version to $NEW_VERSION"
+
+      # Generate changelog
+      - name: Generate changelog
+        id: changelog
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+          NEW_VERSION="${{ needs.prepare-release.outputs.next-version }}"
+
+          if [ -z "$LAST_TAG" ]; then
+            CHANGELOG="## Initial Release\n\nFirst release of the Dulce de Saigon platform."
+          else
+            # Generate changelog from commits
+            CHANGELOG="## Changes\n\n"
+            
+            # Features
+            FEATURES=$(git log $LAST_TAG..HEAD --grep="^feat" --oneline --pretty=format:"- %s" || echo "")
+            if [ -n "$FEATURES" ]; then
+              CHANGELOG="$CHANGELOG### ✨ Features\n$FEATURES\n\n"
+            fi
+            
+            # Bug fixes
+            FIXES=$(git log $LAST_TAG..HEAD --grep="^fix" --oneline --pretty=format:"- %s" || echo "")
+            if [ -n "$FIXES" ]; then
+              CHANGELOG="$CHANGELOG### 🐛 Bug Fixes\n$FIXES\n\n"
+            fi
+            
+            # Performance improvements
+            PERF=$(git log $LAST_TAG..HEAD --grep="^perf" --oneline --pretty=format:"- %s" || echo "")
+            if [ -n "$PERF" ]; then
+              CHANGELOG="$CHANGELOG### ⚡ Performance\n$PERF\n\n"
+            fi
+            
+            # Other changes
+            OTHER=$(git log $LAST_TAG..HEAD --grep="^build\|^ci\|^docs\|^style\|^refactor\|^test\|^chore" --oneline --pretty=format:"- %s" || echo "")
+            if [ -n "$OTHER" ]; then
+              CHANGELOG="$CHANGELOG### 🔧 Other Changes\n$OTHER\n\n"
+            fi
+          fi
+
+          # Add breaking changes if any
+          if [ -f breaking-changes.txt ]; then
+            CHANGELOG="$CHANGELOG### ⚠️ BREAKING CHANGES\n$(cat breaking-changes.txt)\n\n"
+          fi
+
+          # Save changelog
+          echo -e "$CHANGELOG" > RELEASE_CHANGELOG.md
+
+          # Set output for GitHub release
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      # Download breaking changes artifact
+      - name: Download breaking changes
+        uses: actions/download-artifact@v4.1.3
+        with:
+          name: breaking-changes
+          path: .
+        continue-on-error: true
+
+      # Create GitHub release
+      - name: Create GitHub Release
+        id: release
+        uses: actions/create-release@v1.1.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ needs.prepare-release.outputs.next-version }}
+          release_name: Release v${{ needs.prepare-release.outputs.next-version }}
+          body: |
+            # Release v${{ needs.prepare-release.outputs.next-version }}
+
+            **Release Type:** ${{ needs.prepare-release.outputs.release-type }}
+            **Previous Version:** v${{ needs.prepare-release.outputs.current-version }}
+            **Release Date:** ${{ github.event.head_commit.timestamp }}
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            ## Installation
+
+            ```bash
+            # Clone the repository
+            git clone https://github.com/${{ github.repository }}.git
+            cd ${{ github.event.repository.name }}
+
+            # Checkout this release
+            git checkout v${{ needs.prepare-release.outputs.next-version }}
+
+            # Install dependencies
+            pnpm install --frozen-lockfile
+            ```
+
+            ## Deployment
+
+            This release has been automatically deployed to production.
+
+            **API Endpoint:** https://dulce-api-dot-saigon-signals.asia-southeast1.run.app
+
+            ## Support
+
+            - 📖 [Documentation](https://github.com/${{ github.repository }}/wiki)
+            - 🐛 [Report Issues](https://github.com/${{ github.repository }}/issues)
+            - 💬 [Discussions](https://github.com/${{ github.repository }}/discussions)
+          draft: false
+          prerelease: ${{ contains(needs.prepare-release.outputs.next-version, 'rc') || contains(needs.prepare-release.outputs.next-version, 'beta') || contains(needs.prepare-release.outputs.next-version, 'alpha') }}
+
+      # Push version commit and tag
+      - name: Push changes
+        run: |
+          git push origin main
+          git push origin v${{ needs.prepare-release.outputs.next-version }}
+
+  # ============================================================================
+  # POST-RELEASE TASKS
+  # ============================================================================
+  post-release:
+    name: Post-release Tasks
+    runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ''
+    needs: [prepare-release, create-release]
+    if: needs.prepare-release.outputs.should-release == 'true'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          ref: v${{ needs.prepare-release.outputs.next-version }}
+
+      # Update documentation
+      - name: Update documentation
+        run: |
+          echo "Updating documentation for release v${{ needs.prepare-release.outputs.next-version }}"
+
+          # Update README with new version
+          if [ -f README.md ]; then
+            sed -i "s/Version: [0-9.]*/Version: ${{ needs.prepare-release.outputs.next-version }}/g" README.md || true
+          fi
+
+      # Create release announcement
+      - name: Create release announcement
+        uses: actions/github-script@v7.0.1
+        with:
+          script: |
+            const title = `🎉 Release v${{ needs.prepare-release.outputs.next-version }} is now available!`;
+            const body = `
+            ## 🚀 New Release Available
+
+            **Version:** v${{ needs.prepare-release.outputs.next-version }}
+            **Release Type:** ${{ needs.prepare-release.outputs.release-type }}
+            **Release URL:** ${{ needs.create-release.outputs.release-url }}
+
+            ### What's New
+            Check out the [full release notes](${{ needs.create-release.outputs.release-url }}) for detailed information about this release.
+
+            ### Deployment Status
+            This release has been automatically deployed to production and is now live.
+
+            ### Feedback
+            We'd love to hear your feedback! Please let us know if you encounter any issues or have suggestions for improvement.
+
+            ---
+            *This announcement was automatically generated by our release workflow.*
+            `;
+
+            // Create discussion for release announcement
+            try {
+              await github.rest.repos.createDiscussion({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                category: 'announcements'
+              });
+            } catch (error) {
+              console.log('Could not create discussion (may not be enabled):', error.message);
+            }
+
+      # Notify stakeholders
+      # Slack notifications removed - not owned by this repo
+
+      # Update project boards or issues
+      - name: Update project management
+        uses: actions/github-script@v7.0.1
+        with:
+          script: |
+            // Close issues that are fixed in this release
+            const releaseTag = 'v${{ needs.prepare-release.outputs.next-version }}';
+
+            // Find issues with "fixed in next release" label
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'fixed-in-next-release',
+              state: 'open'
+            });
+
+            for (const issue of issues.data) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `🎉 This issue has been resolved in release ${releaseTag}!\n\n**Release Notes:** ${{ needs.create-release.outputs.release-url }}`
+              });
+              
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed',
+                labels: issue.labels.map(l => l.name).filter(l => l !== 'fixed-in-next-release').concat(['released'])
+              });
+            }
+
+  # ============================================================================
+  # RELEASE VALIDATION
+  # ============================================================================
+  validate-release:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ''
+    needs: [prepare-release, create-release]
+    if: needs.prepare-release.outputs.should-release == 'true'
+    steps:
+      - name: Wait for deployment
+        run: sleep 120
+
+      # Validate production deployment
+      - name: Validate production deployment
+        run: |
+          API_URL="https://dulce-api-dot-saigon-signals.asia-southeast1.run.app"
+
+          echo "Validating production deployment..."
+
+          # Health check
+          for i in {1..5}; do
+            if curl -f -s "$API_URL/health" > /dev/null; then
+              echo "✅ Production health check passed"
+              break
+            else
+              echo "❌ Production health check failed (attempt $i/5)"
+              if [ $i -eq 5 ]; then
+                exit 1
+              fi
+              sleep 30
+            fi
+          done
+
+          # Version check (if endpoint exists)
+          VERSION_RESPONSE=$(curl -s "$API_URL/version" || echo "")
+          if [ -n "$VERSION_RESPONSE" ]; then
+            echo "Production version: $VERSION_RESPONSE"
+          fi
+
+      # Run smoke tests against production
+      - name: Production smoke tests
+        run: |
+          echo "Running smoke tests against production..."
+
+          API_URL="https://dulce-api-dot-saigon-signals.asia-southeast1.run.app"
+
+          # Basic endpoint tests
+          curl -f "$API_URL/health" || exit 1
+
+          echo "✅ Production smoke tests passed"
+
+      # Alert on validation failure
+      - name: Alert on validation failure
+        if: failure()
+        uses: actions/github-script@v7.0.1
+        with:
+          script: |
+            const title = `🚨 Release Validation Failed - v${{ needs.prepare-release.outputs.next-version }}`;
+            const body = `
+            ## Release Validation Failure
+
+            **Release:** v${{ needs.prepare-release.outputs.next-version }}
+            **Time:** ${new Date().toISOString()}
+            **Workflow:** ${context.workflow}
+
+            ### Issue
+            The production deployment validation failed after release creation.
+
+            ### Action Required
+            1. Check production deployment status
+            2. Verify all services are running correctly
+            3. Consider rollback if necessary
+            4. Investigate root cause
+
+            **Release URL:** ${{ needs.create-release.outputs.release-url }}
+            `;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['alert', 'release', 'production', 'critical-priority']
+            });

@@ -99,6 +99,10 @@ servers/
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
 
+# Backup workflow files
+.github/workflows/backup-*/
+.github/workflows/*.bak
+
 # Next.js
 .next
 out

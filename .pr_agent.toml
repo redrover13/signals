@@ -1,7 +1,7 @@
-# PR-Agent Configuration for Dulce de Saigon F&B Data Platform
+# PR-Agent Configuration
 
 [general]
-verbosity_level = "debug"
+verbosity_level = "info"
 
 [pr_description]
 # Create custom descriptions based on PR content

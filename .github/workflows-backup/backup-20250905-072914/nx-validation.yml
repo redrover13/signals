@@ -1,0 +1,68 @@
+name: NX Monorepo Validation
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Validate NX Monorepo
+    runs-on: ubuntu-latest
+    env:
+      STORE_PATH: ''
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@4fe8674f344d65cf7384fc21ba97c2b05fd8df75 # v4.1.0
+        with:
+          version: 10.0.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4 # v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: |
+          pnpm install --frozen-lockfile
+          bash tools/scripts/install-tool-dependencies.sh
+
+      - name: Run TypeScript validation
+        run: npx ts-node tools/scripts/check-typescript-issues.ts
+
+      - name: Analyze dependencies
+        run: npx ts-node tools/scripts/analyze-dependencies.ts
+
+      - name: Run NX affected commands
+        run: |
+          npx nx affected --target=lint --parallel=3
+          npx nx affected --target=test --parallel=3
+          npx nx affected --target=build --parallel=3
+
+      - name: Upload validation reports
+        uses: actions/upload-artifact@v4.3.0
+        with:
+          name: validation-reports
+          path: |
+            typescript-issues.json
+            dependency-issues.json

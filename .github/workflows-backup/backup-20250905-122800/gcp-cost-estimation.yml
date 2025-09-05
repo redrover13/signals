@@ -1,0 +1,72 @@
+name: GCP Cost Estimation
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'infra/terraform/**'
+
+jobs:
+  cost-estimation:
+    name: Estimate GCP Cost Changes
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f42bc1c9890d4047f6d0ff69e889a4ca # v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2.1.2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3.0.0
+        with:
+          terraform_version: 1.x
+
+      - name: Install Infracost
+        run: |
+          curl -fsSL https://get.infracost.io | sh
+          infracost --version
+
+      - name: Infracost Init
+        run: infracost auth login --key ${{ secrets.INFRACOST_API_KEY }}
+
+      - name: Run Infracost for BigQuery
+        working-directory: infra/terraform/bigquery
+        run: |
+          terraform init -backend=false
+          infracost breakdown --path=. --format=json --out-file=/tmp/infracost-bigquery.json
+
+      - name: Run Infracost for Functions
+        working-directory: infra/terraform/functions
+        run: |
+          terraform init -backend=false
+          infracost breakdown --path=. --format=json --out-file=/tmp/infracost-functions.json
+
+      - name: Run Infracost for Vertex Agents
+        working-directory: infra/terraform/vertex-agents
+        run: |
+          terraform init -backend=false
+          infracost breakdown --path=. --format=json --out-file=/tmp/infracost-vertex-agents.json
+
+      - name: Run Infracost for Looker
+        working-directory: infra/terraform/looker
+        run: |
+          terraform init -backend=false
+          infracost breakdown --path=. --format=json --out-file=/tmp/infracost-looker.json
+
+      - name: Generate Infracost Report
+        run: |
+          infracost output --path="/tmp/infracost-*.json" --format=html --out-file=/tmp/infracost-report.html
+
+      - name: Post Infracost comment
+        run: |
+          infracost comment github --path="/tmp/infracost-*.json" \
+            --repo=$GITHUB_REPOSITORY \
+            --pull-request=${{ github.event.pull_request.number }} \
+            --github-token=${{ secrets.GITHUB_TOKEN }}

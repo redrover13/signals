@@ -9,8 +9,6 @@
       "runner": "@nx/tasks-runner",
       "options": {
         "cacheableOperations": [
-        "parallel": 3,
-        "cacheDirectory": ".nx/cache"
           "build",
           "lint",
           "test",

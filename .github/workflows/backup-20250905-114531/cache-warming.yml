@@ -1,10 +1,5 @@
-name: Cache Warming
-
 on:
-  schedule:
-    - cron: '0 4 * * 1' # Every Monday at 4 AM UTC
-  workflow_dispatch:
-
+  workflow_call: # backup; not auto-triggered
 env:
   NODE_VERSION: '20'
   PNPM_VERSION: '10.0.0'

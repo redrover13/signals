@@ -26,11 +26,10 @@ jobs:
           # cache: pnpm # Removed - pnpm not installed yet
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@4fe8674f344d65cf7384fc21ba97c2b05fd8df75 # v4.1.0
+        uses: pnpm/action-setup@v2.2.2
         with:
-          version: 10.0.0
+          version: 8.6.0
           run_install: false
-
       - name: Get pnpm store directory
         shell: bash
         run: |

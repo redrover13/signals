@@ -7,7 +7,7 @@
     "nx:report": "nx run-many --target=build --all --configuration=production --with-deps",
     "nx": "nx",
     "start": "nx serve",
-    "build": "nx build",
+    "build": "nx run-many --target=build --all",
     "test": "nx test",
     "test:coverage": "nx run-many --target=test --all --coverage",
     "test:coverage:combine": "./scripts/combine-coverage.sh",
